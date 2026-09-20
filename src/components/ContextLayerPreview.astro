@@ -1,0 +1,239 @@
+---
+// Context Layer, running on SYNTHETIC data. Three views, matching the three
+// things the system actually does: write a record (create-record), keep the
+// slate visible (index), and reason across records to plan the next cycle
+// (debate). The structure is the real repo's; every record here is invented —
+// a bike-parts marketplace, so nothing touches Meesho's work.
+const TABS = [
+  { id: 'record', label: 'create-record' },
+  { id: 'track', label: 'index.md' },
+  { id: 'debate', label: 'debate' },
+];
+---
+<div class="clp" data-clp aria-label="Context Layer running on invented records">
+  <div class="clp__tabs" role="tablist" aria-label="Context Layer views">
+    {TABS.map((t, i) => (
+      <button
+        class="clp__tab" role="tab" type="button"
+        id={`clp-tab-${t.id}`} aria-controls={`clp-panel-${t.id}`}
+        aria-selected={i === 0 ? 'true' : 'false'}
+        data-tab={t.id} tabindex={i === 0 ? 0 : -1}>{t.label}</button>
+    ))}
+  </div>
+
+  <!-- 1 · preparing the insight -->
+  <div class="clp__panel" id="clp-panel-record" role="tabpanel" aria-labelledby="clp-tab-record" data-panel="record">
+    <p class="clp__line clp__line--you" data-seq="1"><span class="clp__who">You</span><span class="clp__said">Ran the fitment badge test. Cards with the badge did better.</span></p>
+    <p class="clp__line clp__line--ask" data-seq="2"><span class="clp__who">↳</span><span class="clp__said">Better on what metric, and against which control?</span></p>
+    <p class="clp__line clp__line--you" data-seq="3"><span class="clp__who">You</span><span class="clp__said">Orders per view. Control was the plain card.</span></p>
+    <p class="clp__line clp__line--ask" data-seq="4"><span class="clp__who">↳</span><span class="clp__said">Superset link? And did it hold outside metros?</span></p>
+
+    <div class="clp__written" data-seq="5">
+      <span class="clp__file">records/fitment-badge.md</span>
+      <div class="clp__meta"><span class="clp__id">REC-004</span><span class="clp__status">winner</span></div>
+      <p class="clp__title">Fitment badge on listing cards</p>
+      <dl class="clp__front">
+        <div><dt>metric</dt><dd>orders per view</dd></div>
+        <div><dt>outcome</dt><dd>positive, small <span class="clp__flag">direction-only</span></dd></div>
+      </dl>
+      <ul class="clp__heads">
+        <li>Scope</li><li>What changed</li>
+        <li>User learnings</li><li>Data reads</li>
+        <li>Reflection</li><li>Open questions</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 2 · keeping the slate in track -->
+  <div class="clp__panel" id="clp-panel-track" role="tabpanel" aria-labelledby="clp-tab-track" data-panel="track" hidden>
+    <table class="clp__table">
+      <thead><tr><th>Record</th><th>Exp</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr data-seq="1"><td>Fitment badge</td><td>1</td><td><span class="s s--win">winner</span></td></tr>
+        <tr data-seq="2"><td>Two-column grid</td><td>3</td><td><span class="s s--open">inconclusive</span></td></tr>
+        <tr data-seq="3"><td>Fitment on PDP</td><td>0</td><td><span class="s s--idle">not started</span></td></tr>
+        <tr data-seq="4"><td>Bundle pricing</td><td>2</td><td><span class="s s--live">live</span></td></tr>
+      </tbody>
+    </table>
+    <p class="clp__learn" data-seq="5">
+      <span class="clp__L">L-002</span> A badge earns its line only when it
+      <em>discriminates</em> between cards.
+    </p>
+    <p class="clp__foot" data-seq="6">A record exists from the moment the work is named — so the index is a map of the slate, not a list of finished work.</p>
+  </div>
+
+  <!-- 3 · next-cycle ideation -->
+  <div class="clp__panel" id="clp-panel-debate" role="tabpanel" aria-labelledby="clp-tab-debate" data-panel="debate" hidden>
+    <p class="clp__line clp__line--you" data-seq="1"><span class="clp__who">You</span><span class="clp__said">What should we run next cycle?</span></p>
+    <p class="clp__line clp__line--ask" data-seq="2"><span class="clp__who">↳</span><span class="clp__said">Reading 4 records and 2 learnings…</span></p>
+    <ul class="clp__found">
+      <li data-seq="3"><b>REC-004</b> and <b>REC-006</b> both spend a card line. Neither was tested alone.</li>
+      <li data-seq="4"><b>L-002</b> forbids a badge that repeats down a homogeneous feed.</li>
+    </ul>
+    <div class="clp__next" data-seq="5">
+      <p class="clp__nextlabel">Proposed next</p>
+      <ol>
+        <li>Isolate the badge from the grid change — one manipulation.</li>
+        <li>Suppress the badge where every card would carry it.</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<style>
+  .clp {
+    display: flex; flex-direction: column;
+    font-family: var(--font-paper); text-align: left;
+    text-transform: none; letter-spacing: 0; color: var(--ink-900);
+    min-height: 296px;
+  }
+
+  .clp__tabs { display: flex; gap: 2px; padding: var(--space-2) var(--space-3) 0; border-bottom: 1px solid var(--line-1); }
+  .clp__tab {
+    padding: 4px 9px; border: 1px solid transparent; border-bottom: 0;
+    border-radius: 5px 5px 0 0; background: none; cursor: pointer;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 10.5px; color: var(--ink-400);
+    transition: color var(--dur-1) var(--ease-standard), background var(--dur-1) var(--ease-standard);
+  }
+  .clp__tab[aria-selected='true'] {
+    color: var(--ink-900); background: var(--paper-1);
+    border-color: var(--line-1); margin-bottom: -1px; padding-bottom: 5px;
+  }
+  .clp__tab:focus-visible { outline: 2px solid var(--amber-text); outline-offset: 1px; }
+
+  .clp__panel { padding: var(--space-4); display: grid; gap: var(--space-2); align-content: start; }
+  .clp__panel[hidden] { display: none; }
+
+  /* each element arrives in sequence once its panel is shown */
+  [data-seq] { opacity: 0; translate: 0 5px; transition: opacity var(--dur-2) var(--ease-enter), translate var(--dur-2) var(--ease-enter); }
+  .clp__panel[data-on] [data-seq] { opacity: 1; translate: 0 0; }
+  .clp__panel[data-on] [data-seq='1'] { transition-delay: 60ms; }
+  .clp__panel[data-on] [data-seq='2'] { transition-delay: 380ms; }
+  .clp__panel[data-on] [data-seq='3'] { transition-delay: 700ms; }
+  .clp__panel[data-on] [data-seq='4'] { transition-delay: 1020ms; }
+  .clp__panel[data-on] [data-seq='5'] { transition-delay: 1340ms; }
+  .clp__panel[data-on] [data-seq='6'] { transition-delay: 1660ms; }
+
+  /* --- conversation lines --- */
+  .clp__line { margin: 0; display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: var(--space-2); font-size: 11.5px; line-height: 1.45; text-wrap: pretty; }
+  .clp__who { font-size: 9px; font-weight: 600; letter-spacing: var(--track-label); text-transform: uppercase; color: var(--ink-400); padding-top: 2px; }
+  .clp__said { min-width: 0; }
+  .clp__line--you { color: var(--ink-900); }
+  .clp__line--ask { color: var(--ink-600); }
+  .clp__line--ask .clp__who { color: var(--amber-text); font-size: 11px; letter-spacing: 0; }
+
+  /* --- the record that gets written --- */
+  .clp__written {
+    margin-top: var(--space-2); padding: var(--space-3);
+    border: 1px solid var(--line-1); border-radius: var(--radius-inset);
+    background: var(--paper-1); display: grid; gap: 6px;
+  }
+  .clp__file { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 9.5px; color: var(--ink-400); }
+  .clp__meta { display: flex; align-items: center; gap: var(--space-2); }
+  .clp__id { font-size: 10.5px; font-weight: 600; letter-spacing: var(--track-label); color: var(--ink-600); font-variant-numeric: tabular-nums; }
+  .clp__status { font-size: 9px; font-weight: 600; letter-spacing: var(--track-label); text-transform: uppercase; padding: 2px 6px; border-radius: 999px; background: var(--amber-400); color: var(--ink-900); }
+  .clp__title { margin: 0; font-size: var(--text-small); font-weight: 600; line-height: var(--lh-heading); }
+  .clp__front { margin: 0; display: grid; gap: 3px; }
+  .clp__front > div { display: grid; grid-template-columns: 58px minmax(0, 1fr); gap: var(--space-2); align-items: baseline; }
+  .clp__front dt { font-size: 10px; color: var(--ink-400); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .clp__front dd { margin: 0; font-size: 11px; color: var(--ink-600); }
+  .clp__flag { margin-left: 3px; padding: 1px 4px; border-radius: 3px; background: rgba(22, 20, 14, 0.06); color: var(--ink-400); font-size: 9px; letter-spacing: var(--track-label); }
+  .clp__heads { margin: 0; padding: var(--space-2) 0 0; list-style: none; border-top: 1px dashed var(--line-1); display: grid; grid-template-columns: 1fr 1fr; gap: 3px var(--space-3); }
+  .clp__heads li { font-size: 10px; color: var(--ink-600); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .clp__heads li::before { content: '## '; color: var(--ink-400); }
+
+  /* --- the tracked slate --- */
+  .clp__table { width: 100%; border-collapse: collapse; font-size: 11px; }
+  .clp__table th { text-align: left; font-size: 9px; font-weight: 600; letter-spacing: var(--track-label); text-transform: uppercase; color: var(--ink-400); padding-bottom: 5px; border-bottom: 1px solid var(--line-1); }
+  .clp__table th:nth-child(2), .clp__table td:nth-child(2) { width: 32px; text-align: center; color: var(--ink-400); font-variant-numeric: tabular-nums; }
+  .clp__table th:last-child, .clp__table td:last-child { text-align: right; }
+  .clp__table td { padding: 5px 0; border-bottom: 1px dashed var(--line-0); color: var(--ink-900); }
+  .s { padding: 2px 6px; border-radius: 999px; font-size: 9px; font-weight: 600; letter-spacing: var(--track-label); text-transform: uppercase; white-space: nowrap; }
+  .s--win { background: var(--amber-400); color: var(--ink-900); }
+  .s--live { background: rgba(22, 20, 14, 0.08); color: var(--ink-900); }
+  .s--open { background: rgba(22, 20, 14, 0.05); color: var(--ink-600); }
+  .s--idle { background: none; color: var(--ink-400); box-shadow: inset 0 0 0 1px var(--line-1); }
+
+  .clp__learn { margin: var(--space-2) 0 0; font-size: 11px; line-height: 1.5; color: var(--ink-600); text-wrap: pretty; }
+  .clp__learn em { font-style: italic; color: var(--ink-900); }
+  .clp__L { font-weight: 600; color: var(--amber-text); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 10px; }
+  .clp__foot { margin: 0; font-size: 10.5px; line-height: 1.5; color: var(--ink-400); text-wrap: pretty; }
+
+  /* --- next cycle --- */
+  .clp__found { margin: 0; padding: 0; list-style: none; display: grid; gap: 5px; }
+  .clp__found li { padding-left: var(--space-4); position: relative; font-size: 11px; line-height: 1.45; color: var(--ink-600); text-wrap: pretty; }
+  .clp__found li::before { content: ''; position: absolute; left: 4px; top: 7px; width: 4px; height: 4px; border-radius: 50%; background: var(--amber-500); }
+  .clp__found b { color: var(--ink-900); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 10px; font-weight: 600; }
+  .clp__next { margin-top: var(--space-2); padding: var(--space-3); border: 1px solid var(--line-1); border-left: 2px solid var(--amber-500); border-radius: var(--radius-inset); background: var(--paper-1); }
+  .clp__nextlabel { margin: 0 0 5px; font-size: 9px; font-weight: 600; letter-spacing: var(--track-label); text-transform: uppercase; color: var(--amber-text); }
+  .clp__next ol { margin: 0; padding-left: var(--space-4); display: grid; gap: 4px; }
+  .clp__next li { font-size: 11px; line-height: 1.45; color: var(--ink-900); text-wrap: pretty; }
+
+  @media (max-width: 520px) {
+    .clp__heads { grid-template-columns: 1fr; }
+    .clp__tab { padding-inline: 7px; font-size: 10px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    [data-seq] { opacity: 1; translate: none; transition: none; }
+  }
+</style>
+
+<script>
+  const QUIET = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  document.querySelectorAll('[data-clp]').forEach((root) => {
+    const tabs = [...root.querySelectorAll('[data-tab]')];
+    const panels = [...root.querySelectorAll('[data-panel]')];
+    let cycle;
+    let touched = false; // once a person picks a tab, stop cycling for them
+
+    const show = (id) => {
+      tabs.forEach((t) => {
+        const on = t.dataset.tab === id;
+        t.setAttribute('aria-selected', String(on));
+        t.tabIndex = on ? 0 : -1;
+      });
+      panels.forEach((p) => {
+        const on = p.dataset.panel === id;
+        p.hidden = !on;
+        // restart the sequence each time a panel is shown
+        p.removeAttribute('data-on');
+        if (on) requestAnimationFrame(() => p.setAttribute('data-on', ''));
+      });
+    };
+
+    const stopCycle = () => { clearInterval(cycle); cycle = undefined; };
+    const startCycle = () => {
+      if (touched || QUIET.matches || cycle) return;
+      let i = 0;
+      cycle = setInterval(() => {
+        i = (i + 1) % tabs.length;
+        show(tabs[i].dataset.tab);
+      }, 4800);
+    };
+
+    tabs.forEach((tab, i) => {
+      tab.addEventListener('click', () => { touched = true; stopCycle(); show(tab.dataset.tab); });
+      tab.addEventListener('keydown', (e) => {
+        const d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+        if (!d) return;
+        e.preventDefault();
+        touched = true; stopCycle();
+        const next = tabs[(i + d + tabs.length) % tabs.length];
+        show(next.dataset.tab);
+        next.focus();
+      });
+    });
+
+    // Runs only while on screen — nothing cycles in a section nobody is reading.
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) { show(root.querySelector('[data-panel]').dataset.panel); startCycle(); }
+        else stopCycle();
+      },
+      { threshold: 0.3 }
+    );
+    io.observe(root);
+  });
+</script>

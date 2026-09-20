@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Case studies road</title>
+    <style>
+      :root { --paper: #fcfaf2; --ink: #66635f; --surface: #dedede; }
+      * { box-sizing: border-box; }
+      body {
+        min-height: 100vh;
+        margin: 0;
+        display: grid;
+        place-items: center;
+        background: transparent;
+        font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+      }
+      .panel { width: min(720px, 100vw); aspect-ratio: 7 / 8; overflow: hidden; background: var(--paper); }
+      svg { display: block; width: 100%; height: 100%; }
+      .ink { fill: none; stroke: var(--ink); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+      .road { fill: var(--surface); stroke: var(--ink); stroke-width: 2; }
+      .caption { fill: var(--ink); font-size: 13px; letter-spacing: .12em; text-transform: uppercase; }
+      .muted { fill: rgb(102 99 95 / 64%); }
+    </style>
+  </head>
+  <body>
+    <main class="panel" aria-label="Static Case Studies road artwork">
+      <svg viewBox="0 0 720 823" role="img" aria-labelledby="title description">
+        <title id="title">Case studies road</title>
+        <desc id="description">A quiet straight road with a dashed center line, representing a clear route through case studies.</desc>
+
+        <text class="caption" x="34" y="48">02 / case studies</text>
+        <text class="caption muted" x="686" y="48" text-anchor="end">open road</text>
+
+        <path class="road" d="M-28 452 H748 V552 H-28 Z" />
+        <path class="ink" stroke-dasharray="20 24" d="M-14 502 H734" />
+
+        <g class="ink" aria-hidden="true">
+          <path d="M45 582 H675" />
+          <path d="M96 604 H174 M211 604 H288 M432 604 H510 M548 604 H625" />
+          <path d="M143 592 V615 M360 592 V615 M573 592 V615" />
+        </g>
+
+        <text class="caption muted" x="34" y="778">selected routes</text>
+        <text class="caption muted" x="686" y="778" text-anchor="end">work in progress</text>
+      </svg>
+    </main>
+  </body>
+</html>

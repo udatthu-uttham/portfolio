@@ -1,0 +1,602 @@
+/* Two families: General Sans for interface text, Caveat for handwriting. */
+@font-face {
+  font-family: 'General Sans';
+  src: url('/fonts/general-sans-400.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'General Sans';
+  src: url('/fonts/general-sans-500.woff2') format('woff2');
+  font-weight: 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'General Sans';
+  src: url('/fonts/general-sans-600.woff2') format('woff2');
+  font-weight: 600;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Caveat';
+  src: url('/fonts/caveat-variable.woff2') format('woff2');
+  font-weight: 400 600;
+  font-display: swap;
+}
+
+/* ---------------------------------------------------------------
+   Tokens — docs/design-tokens.json + brief §6–§9
+   --------------------------------------------------------------- */
+:root {
+  /* paper — a cool-neutral board, not white stock. Two reasons it is toned at
+     all, and toned this way (Uttham, 2026-09-19):
+     1. Glass is read as a difference, not a colour. On a 98%-white board a
+        white translucent pane has ~1 L* of headroom and reads as nothing.
+     2. It is toned AWAY from amber, not toward it. Amber is the only accent
+        on this site; a warm board puts ground and accent in one family and the
+        accent stops ringing — which is what made the warm version look dull.
+     White sheets and glass both rise off this; amber stays the only warm note. */
+  --paper-0: #e9ebec; /* the board everything is pinned to */
+  --paper-1: #ffffff; /* white sheets on the board: tiles, Instax, principles */
+  --paper-2: #dbdee0; /* recessed wells inside a white sheet — always below the board */
+  --grain-opacity: 0.07; /* the paper's tooth and tonal unevenness (body::before); fibres are authored at their own ink */
+  --dust-alpha: 0.22; /* the ceiling for anything the pointer ride leaves in the air (raised from the hero's 0.16: it has to read at pointer scale) */
+
+  /* ink */
+  --ink-900: #16140e;
+  --ink-600: #5c594f;
+  --ink-400: #8c887c;
+
+  /* lines */
+  --line-1: rgba(22, 20, 14, 0.13);
+  --line-0: rgba(22, 20, 14, 0.07);
+  --mall-lavender: #efe9ff; /* the deck's cover panel behind the phone (slide 1, slide 5) */
+  --mall-purple: #6625ff; /* Meesho Mall brand purple, sampled from the v3 splash; used only on /work/meesho-mall from chapter 4 on */
+  --line-mark: rgba(22, 20, 14, 0.28); /* the ruler's ticks where a section boundary meets the measure */
+  --tick-size: 7px;
+
+  /* amber — CTAs, active states, sketch accents only. Never backgrounds. */
+  --amber-500: #f3b44a;
+  --amber-400: #f7c36d;
+  --amber-700: #c8871f;
+  /* amber as small text on light surfaces — same family, WCAG AA */
+  --amber-text: #9c640c;
+
+  --graphite: rgba(58, 55, 46, 0.85);
+
+  /* glass */
+  --glass-fill: rgba(253, 254, 255, 0.5); /* the pane: faintly cool, never warm */
+  --glass-edge: rgba(22, 20, 14, 0.1); /* the cut edge of the pane — a hairline, never piping */
+  --glass-blur: 8px; /* Uttham took the deeper 12px back: it milked the pane */
+  --glass-nav-bg: rgba(252, 253, 254, 0.74);
+  --glass-overlay-bg: rgba(252, 253, 255, 0.86);
+  --glass-nav-blur: 14px;
+  --glass-overlay-blur: 16px;
+
+  /* The warm light is a real lamp BEHIND the pane (.glass-lamp), not a glow
+     painted onto it. A glow on the pane *and* a pool on the paper is two light
+     sources for one lamp — it reads as decoration rather than as light, which
+     is the tell we were trying to avoid (Uttham, 2026-09-19). One source, seen
+     only through the glass: it is clipped to the pane's own footprint, so it
+     never spills onto bare board. */
+  --glass-lamp-tint: rgba(243, 180, 74, 0.3);
+
+  /* type */
+  /* User revision: one interface sans, one handwritten accent. */
+  --font-paper: 'General Sans', ui-sans-serif, system-ui, sans-serif; /* on paper */
+  --font-glass: var(--font-paper); /* same sans on every interface surface */
+  --font-hand: 'Caveat', cursive; /* the paper's handwriting: notes, annotation, captions */
+
+  /* tracking — three values only */
+  --track-display: -0.03em; /* hero-size display */
+  --track-heading: -0.015em; /* h2, h3, statements */
+  --track-label: 0.06em; /* the one uppercase label style */
+
+  /* Warm-neutral emboss for type resting on an acrylic sheet. */
+  --etch-ink: rgba(22, 20, 14, 0.86);
+  --etch-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+
+  /* type scale (desktop / mobile via clamp) */
+  --text-hero: clamp(42px, 4.6vw, 68px);
+  --text-h2: clamp(34px, 3.6vw, 52px);
+  --text-h3: clamp(26px, 2.2vw, 34px);
+  --text-h4: clamp(20px, 1.7vw, 24px);
+  --text-body-lg: clamp(17px, 1.35vw, 20px);
+  --text-body: clamp(16px, 1.1vw, 17px);
+  --text-eyebrow: 12px; /* the one label style */
+  --text-small: 14px; /* footer, fine print */
+  --text-annotation: clamp(32px, 3vw, 44px); /* handwritten navigator cue */
+  --text-wordmark: var(--text-h3);
+  --text-note: clamp(18px, 1.4vw, 22px);
+
+  /* spacing (base-8) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+  --space-10: 128px;
+  --space-11: 160px;
+  --space-12: 200px;
+
+  /* semantic rhythm — keeps page whitespace independent from control sizing */
+  --section-y: clamp(96px, 10vh, 144px);
+  --section-y-sm: clamp(48px, 5vw, 72px);
+  --content-gap: clamp(16px, 2vw, 24px);
+  --group-gap: clamp(24px, 3.5vw, 48px);
+  --control-gap: 12px;
+
+  /* radius */
+  --radius-pill: 999px;
+  --radius-media: 24px;
+  --radius-card: 16px;
+  --radius-sm: 8px;
+  --radius-inset: 2px; /* nested inset exception in the supplied radius role */
+  --radius-control: 0px; /* CTA material recipe */
+
+  /* elevation — four warm-ink shadows for paper objects; glass, CTA and bolt
+     keep their own material recipes (documented in design-tokens.md) */
+  --shadow-rest: 0 2px 5px -2px rgba(22, 20, 14, 0.1), 0 10px 20px -14px rgba(22, 20, 14, 0.16); /* paper at rest: tiles, Instax */
+  --shadow-stuck: 0 8px 14px -8px rgba(22, 20, 14, 0.28); /* stuck-on objects: sticky notes */
+  --shadow-lift: 0 16px 28px -14px rgba(22, 20, 14, 0.32); /* hover lift: tiles, notes */
+  --shadow-press: 0 4px 8px -6px rgba(22, 20, 14, 0.3); /* pressed flat */
+  --drop-stuck: drop-shadow(0 8px 12px rgba(22, 20, 14, 0.24)); /* the same weight for SVG stickers (filter) */
+  --lift-y: -2px; /* the one hover-lift distance */
+
+  /* line-height — four values */
+  --lh-display: 1.05; /* hero-size, h2, big handwriting */
+  --lh-heading: 1.15; /* h3, titles, notes, captions */
+  --lh-statement: 1.4; /* multi-line display paragraphs */
+  --lh-body: 1.55; /* body copy */
+
+  /* z-index — page-level layers only; components stack locally with 0–3 */
+  --z-surface-fx: 5; /* residue on the paper (pointer marks): above content, under the header */
+  --z-header: 10;
+  --z-float: 20;
+  --z-skip: 100;
+
+  /* motion — four durations, three easings, one stagger. The SignalLoop
+     scene keeps its own narrative timing; every
+     UI transition uses these. Reduced motion zeroes the durations at :root
+     (see the media block below) so all consumers degrade together. */
+  --dur-1: 150ms; /* micro: color/opacity feedback, pointer tracking */
+  --dur-2: 220ms; /* standard: hover lifts, shadows, small moves */
+  --dur-3: 400ms; /* moderate: staged sequences, one-time entrances */
+  --dur-4: 600ms; /* deliberate: scroll reveals, hero entrance */
+  --stagger-1: 70ms; /* between siblings in one reveal group */
+  --linger: 8000ms; /* how long rubber stays on the paper before its 3s fade; the marks layer is off under reduced motion */
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1); /* moving between states */
+  --ease-enter: cubic-bezier(0.22, 1, 0.36, 1); /* arriving: fast in, soft settle */
+  --ease-exit: cubic-bezier(0.3, 0, 1, 0.3); /* leaving: gathers speed */
+  /* legacy aliases — all consumers are migrated; kept so nothing external breaks */
+  --ease-reveal: var(--ease-enter);
+  --ease-micro: var(--ease-standard);
+
+  /* layout */
+  --container-max: 1200px;
+  --margin-side: clamp(20px, 5.6vw, 80px);
+  --header-height: 76px;
+  --grid-columns: 12;
+  --grid-gap: 24px;
+  --panel-padding: var(--group-gap);
+  --card-padding: var(--content-gap);
+  --bolt-inset: 18px; /* the glass material recipe */
+  --bolt-size: 16px;
+  --bolt-clearance: var(--space-4);
+  /* Reserve the hardware plus a clear buffer before content begins. */
+  --bolt-content-inset: calc(var(--bolt-inset) + var(--bolt-size) + var(--bolt-clearance));
+  /* Tilted objects and entrance motion need room beyond the resting buffer. */
+  --bolted-panel-padding: calc(var(--bolt-content-inset) + var(--space-2)); /* the bolt zone plus one small step: 58px */
+  --bolted-board-padding: max(var(--bolted-panel-padding), var(--space-8)); /* tape and tilted sheets need 64 */
+}
+
+@media (max-width: 900px) {
+  :root {
+    --margin-side: 40px;
+    --header-height: 96px;
+    --grid-columns: 8;
+    --grid-gap: 20px;
+  }
+}
+
+@media (max-width: 640px) {
+  :root {
+    --margin-side: 20px;
+    --header-height: 96px;
+    --grid-columns: 4;
+    --grid-gap: 16px;
+  }
+}
+
+@media (max-width: 360px) {
+  :root {
+    --header-height: 92px;
+  }
+}
+
+/* ---------------------------------------------------------------
+   Base
+   --------------------------------------------------------------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  /* the sheet: near-white stock with sparse fibres and flecks authored once;
+     the fine tooth and tonal unevenness sit on body::before below */
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='640'%3E%3Cpath d='M91.5 321.5Q84.5 327.4 75.5 329.0' stroke='%2316140e' stroke-opacity='0.039' stroke-width='0.84' stroke-linecap='round' fill='none'/%3E%3Cpath d='M353.9 490.0Q346.7 495.8 341.8 503.7' stroke='%2316140e' stroke-opacity='0.050' stroke-width='0.83' stroke-linecap='round' fill='none'/%3E%3Cpath d='M164.0 388.5Q159.6 391.7 154.8 394.4' stroke='%2316140e' stroke-opacity='0.051' stroke-width='0.87' stroke-linecap='round' fill='none'/%3E%3Cpath d='M427.6 146.1Q420.8 144.0 414.4 147.0' stroke='%2316140e' stroke-opacity='0.051' stroke-width='1.00' stroke-linecap='round' fill='none'/%3E%3Cpath d='M328.2 65.8Q328.1 73.3 325.5 80.3' stroke='%2316140e' stroke-opacity='0.044' stroke-width='0.95' stroke-linecap='round' fill='none'/%3E%3Cpath d='M442.4 366.5Q440.1 370.7 436.6 373.9' stroke='%2316140e' stroke-opacity='0.043' stroke-width='0.76' stroke-linecap='round' fill='none'/%3E%3Cpath d='M371.4 319.1Q369.8 324.5 371.2 330.1' stroke='%2316140e' stroke-opacity='0.047' stroke-width='0.80' stroke-linecap='round' fill='none'/%3E%3Cpath d='M570.1 175.2Q562.2 177.2 554.3 178.9' stroke='%2316140e' stroke-opacity='0.045' stroke-width='0.61' stroke-linecap='round' fill='none'/%3E%3Cpath d='M154.7 97.4Q149.9 99.9 148.8 105.3' stroke='%2316140e' stroke-opacity='0.037' stroke-width='0.85' stroke-linecap='round' fill='none'/%3E%3Cpath d='M302.0 309.3Q295.7 310.8 290.0 313.8' stroke='%2316140e' stroke-opacity='0.044' stroke-width='0.79' stroke-linecap='round' fill='none'/%3E%3Cpath d='M577.7 612.3Q575.0 621.1 574.3 630.3' stroke='%2316140e' stroke-opacity='0.041' stroke-width='0.92' stroke-linecap='round' fill='none'/%3E%3Cpath d='M321.1 307.3Q324.9 318.8 326.2 330.8' stroke='%2316140e' stroke-opacity='0.040' stroke-width='0.61' stroke-linecap='round' fill='none'/%3E%3Cpath d='M413.4 378.4Q412.8 386.7 412.2 395.1' stroke='%2316140e' stroke-opacity='0.053' stroke-width='0.70' stroke-linecap='round' fill='none'/%3E%3Cpath d='M311.3 326.8Q301.7 333.0 292.4 339.8' stroke='%2316140e' stroke-opacity='0.053' stroke-width='0.93' stroke-linecap='round' fill='none'/%3E%3Cpath d='M210.0 570.1Q205.6 573.5 204.0 578.9' stroke='%2316140e' stroke-opacity='0.045' stroke-width='0.78' stroke-linecap='round' fill='none'/%3E%3Cpath d='M599.2 600.4Q602.5 611.8 600.7 623.6' stroke='%2316140e' stroke-opacity='0.040' stroke-width='0.80' stroke-linecap='round' fill='none'/%3E%3Ccircle cx='65.1' cy='476.5' r='0.69' fill='%2316140e' fill-opacity='0.061'/%3E%3Ccircle cx='12.9' cy='4.1' r='0.76' fill='%2316140e' fill-opacity='0.073'/%3E%3Ccircle cx='56.5' cy='505.7' r='0.61' fill='%2316140e' fill-opacity='0.066'/%3E%3Ccircle cx='479.2' cy='608.4' r='0.80' fill='%2316140e' fill-opacity='0.066'/%3E%3Ccircle cx='101.8' cy='202.1' r='0.76' fill='%2316140e' fill-opacity='0.069'/%3E%3Ccircle cx='604.4' cy='314.9' r='0.82' fill='%2316140e' fill-opacity='0.053'/%3E%3Ccircle cx='144.9' cy='375.6' r='0.93' fill='%2316140e' fill-opacity='0.072'/%3E%3Ccircle cx='323.0' cy='57.4' r='0.80' fill='%2316140e' fill-opacity='0.073'/%3E%3Ccircle cx='499.1' cy='582.3' r='0.64' fill='%2316140e' fill-opacity='0.060'/%3E%3Ccircle cx='514.7' cy='332.7' r='0.59' fill='%2316140e' fill-opacity='0.050'/%3E%3Ccircle cx='71.1' cy='565.1' r='0.52' fill='%2316140e' fill-opacity='0.059'/%3E%3Ccircle cx='227.4' cy='490.3' r='0.51' fill='%2316140e' fill-opacity='0.063'/%3E%3Ccircle cx='211.1' cy='195.9' r='0.65' fill='%2316140e' fill-opacity='0.053'/%3E%3Ccircle cx='603.6' cy='365.3' r='0.86' fill='%2316140e' fill-opacity='0.054'/%3E%3Ccircle cx='332.4' cy='278.0' r='0.65' fill='%2316140e' fill-opacity='0.065'/%3E%3Ccircle cx='432.8' cy='47.9' r='0.68' fill='%2316140e' fill-opacity='0.055'/%3E%3Ccircle cx='586.4' cy='32.6' r='0.75' fill='%2316140e' fill-opacity='0.071'/%3E%3Ccircle cx='289.6' cy='481.0' r='0.58' fill='%2316140e' fill-opacity='0.068'/%3E%3Ccircle cx='558.8' cy='85.6' r='0.74' fill='%2316140e' fill-opacity='0.070'/%3E%3Ccircle cx='330.7' cy='608.6' r='0.57' fill='%2316140e' fill-opacity='0.071'/%3E%3Ccircle cx='250.5' cy='272.8' r='0.69' fill='%2316140e' fill-opacity='0.052'/%3E%3Ccircle cx='196.7' cy='221.4' r='0.62' fill='%2316140e' fill-opacity='0.062'/%3E%3C/svg%3E") 0 0 / 640px 640px repeat, var(--paper-0);
+  color: var(--ink-900);
+  font-family: var(--font-paper);
+  font-size: var(--text-body);
+  line-height: var(--lh-body);
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Paper grain — the tooth and the tone of the sheet, fixed so scrolling never
+   shimmers. The tooth's baseFrequency (0.75 per CSS px) is mirrored by
+   PAPER_TOOTH in src/scripts/pointer-ride.js, which bakes the dust from it.
+   Two noise tiles (180px tooth, 1100px tone) share no small common
+   multiple, so no repeat is perceptible. Both are pushed towards white and
+   multiplied at --grain-opacity: the paper keeps its colour and gains dark
+   specks and faint clouds, rather than a grey cast. Above the base colour and
+   the fibres, below all content. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: var(--grain-opacity);
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='t'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='2.5' intercept='-0.4'/%3E%3CfeFuncG type='linear' slope='2.5' intercept='-0.4'/%3E%3CfeFuncB type='linear' slope='2.5' intercept='-0.4'/%3E%3CfeFuncA type='table' tableValues='1 1'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23t)'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1100' height='1100'%3E%3Cfilter id='u'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.004' numOctaves='1' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='1.5' intercept='0.15'/%3E%3CfeFuncG type='linear' slope='1.5' intercept='0.15'/%3E%3CfeFuncB type='linear' slope='1.5' intercept='0.15'/%3E%3CfeFuncA type='table' tableValues='1 1'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23u)'/%3E%3C/svg%3E");
+  background-size: 180px 180px, 1100px 1100px;
+  mix-blend-mode: multiply;
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  body::before { display: none; }
+}
+
+/* High-contrast readers get the flat stock. */
+@media (prefers-contrast: more) {
+  body { background-image: none; }
+  body::before { display: none; }
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+}
+
+/* Highlighter — a marker stroke over handwriting on the paper. Amber only,
+   multiplied so the ink shows through, ends tapered like a felt tip, and it
+   follows the text across a line break. Use it on a few words, never a line. */
+.hl {
+  --hl-ink: color-mix(in oklab, var(--amber-400) 72%, transparent);
+  background: linear-gradient(
+    100deg,
+    transparent 0%,
+    var(--hl-ink) 5%,
+    var(--hl-ink) 95%,
+    transparent 100%
+  );
+  color: inherit;
+  padding: 0.05em 0.3em 0.12em 0.25em;
+  margin-inline: -0.2em;
+  border-radius: 0.6em 0.25em 0.55em 0.2em / 0.45em 0.7em 0.35em 0.65em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  mix-blend-mode: multiply;
+}
+
+/* Liquid glass — warm soft-light pass: minimalist, one warm glow (not a
+   multi-hue wash), soft/subtle shadows only (no harsh edges). Still the
+   same liquid-glass mechanism — whatever sits behind stays visible,
+   softly blurred, with a diagonal sheen — just warmer and calmer. */
+.glass {
+  position: relative;
+  background:
+    /* the sheen: light raking across a solid sheet, brightest at the lit corner */
+    linear-gradient(
+      118deg,
+      rgba(255, 255, 255, 0.55) 0%,
+      rgba(255, 255, 255, 0.3) 18%,
+      rgba(255, 255, 255, 0) 44%,
+      rgba(255, 255, 255, 0.14) 78%,
+      rgba(255, 255, 255, 0.3) 100%
+    ),
+    var(--glass-fill);
+  /* The pass brightens and lifts what is behind rather than saturating it: a
+     lens over a cool board returns the room's light. Blur stays at 8px — deeper
+     milks the pane and loses the tucked photo edge, which is the thing worth
+     seeing through it (Uttham, 2026-09-20). */
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.06) brightness(1.05) contrast(1.02);
+  backdrop-filter: blur(var(--glass-blur)) saturate(1.06) brightness(1.05) contrast(1.02);
+  /* Thickness is carried by the LIT rim, not by dark ones. The shaded rims and
+     the inner bevel band are held near the threshold of visible: at the weights
+     first tried (0.10/0.07/0.14 ink) they read as black piping around the pane
+     rather than as an edge, which is louder than the glass itself
+     (Uttham, 2026-09-20). */
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 1),
+    inset 1.5px 0 0 rgba(255, 255, 255, 0.7),
+    inset 0 -1px 0 rgba(22, 20, 14, 0.05),
+    inset -1px 0 0 rgba(22, 20, 14, 0.035),
+    /* the bevel: an inner ring, then the band where the edge bends what's behind */
+    inset 0 0 0 1px rgba(255, 255, 255, 0.28),
+    inset 0 0 18px -6px rgba(255, 255, 255, 0.75),
+    inset 0 0 22px -12px rgba(22, 20, 14, 0.07),
+    /* contact shadow: the slab is bolted above the board, not printed on it */
+    0 1px 3px -1px rgba(22, 20, 14, 0.05),
+    14px 18px 34px -22px rgba(22, 20, 14, 0.17);
+  border: 0.5px solid var(--glass-edge);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-glass);
+}
+
+/* The lamp behind a pane. A sibling painted before the glass, clipped to the
+   pane's own footprint, so the pane's backdrop-filter blurs and lifts it and
+   nothing reaches the bare board around it. The gradient lands well inside the
+   edge: a lamp seen through glass has no seam. */
+.glass-lamp {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: var(--radius-sm);
+  background: radial-gradient(
+    42% 58% at 18% 22%,
+    var(--glass-lamp-tint),
+    color-mix(in oklab, var(--glass-lamp-tint) 38%, transparent) 46%,
+    transparent 74%
+  );
+}
+
+/* nav is the same material — class kept only as a structural hook */
+.glass--nav {
+  background-position: center;
+  border-radius: 0; /* full-bleed viewport edge, not a freestanding panel */
+  /* A full-bleed bar has no corners to catch light and no board beside it to
+     cast onto, so the panel's contact shadow becomes a grey band the width of
+     the page. The nav gets the lit top rim and a hairline underneath, nothing
+     more (Uttham, 2026-09-20). */
+  border: 0;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 1px 0 rgba(22, 20, 14, 0.06),
+    0 6px 16px -14px rgba(22, 20, 14, 0.14);
+}
+
+/* Bolts — the four fixings pinning a glass slab to the paper beneath it.
+   Black, not brushed metal: bold and legible against the glass. */
+.bolt {
+  position: absolute;
+  width: var(--bolt-size);
+  height: var(--bolt-size);
+  border-radius: 50%;
+  background: radial-gradient(circle at 33% 27%, #4a4a4a 0%, #1c1c1c 40%, #000000 100%);
+  box-shadow:
+    0 3px 4px rgba(0, 0, 0, 0.55),
+    inset 0 1px 1px rgba(255, 255, 255, 0.25),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.6);
+  z-index: 3;
+}
+.bolt--tl { left: var(--bolt-inset); top: var(--bolt-inset); }
+.bolt--tr { right: var(--bolt-inset); top: var(--bolt-inset); }
+.bolt--bl { left: var(--bolt-inset); bottom: var(--bolt-inset); }
+.bolt--br { right: var(--bolt-inset); bottom: var(--bolt-inset); }
+
+.bolt::after {
+  /* screwdriver slot */
+  content: '';
+  position: absolute;
+  left: 18%;
+  right: 18%;
+  top: calc(50% - 1px);
+  height: 2px;
+  border-radius: 1px;
+  background: rgba(255, 255, 255, 0.55);
+  transform: rotate(-24deg);
+}
+
+/* Accessibility utilities */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: fixed;
+  top: var(--space-2);
+  left: var(--space-2);
+  z-index: var(--z-skip);
+  padding: var(--space-3) var(--space-5);
+  background: var(--ink-900);
+  color: var(--paper-1);
+  font-family: var(--font-paper);
+  font-size: var(--text-body);
+  text-decoration: none;
+  border-radius: var(--radius-control);
+  transform: translateY(-200%);
+}
+
+.skip-link:focus-visible {
+  transform: none;
+  outline: 2px solid var(--amber-text);
+  outline-offset: 2px;
+}
+
+/* Embossed type resting on an acrylic sheet: softened ink, faint light edge */
+.on-glass {
+  color: var(--etch-ink);
+  font-optical-sizing: auto;
+  text-shadow: var(--etch-shadow);
+}
+
+/* Controls — ONE button family, three weights, the same on glass and on
+   paper (locked 2026-09-07). Every button is a die-cut sticker: sharp corners,
+   the sticker label voice, a slight lean, a stuck-on shadow; it straightens
+   and lifts on hover and presses flat. Weight is carried by the STOCK alone:
+   amber = primary (one per view), kiss-cut amber outline = secondary, and the
+   tertiary is not a sticker at all but a paper text link with an amber rule. */
+.cta {
+  --cta-tilt: -2deg;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: var(--space-7);
+  padding: var(--space-3) var(--space-5);
+  border-radius: var(--radius-control, 0);
+  border: 0;
+  font-family: var(--font-paper);
+  font-weight: 600;
+  font-size: var(--text-small);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-900);
+  text-decoration: none;
+  cursor: pointer;
+  rotate: var(--cta-tilt);
+  box-shadow: var(--shadow-stuck), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transition:
+    /* release snaps in 100ms; the deliberate press below takes --dur-1 */
+    rotate 100ms var(--ease-standard),
+    translate 100ms var(--ease-standard),
+    box-shadow 100ms var(--ease-standard),
+    background-color 100ms var(--ease-standard);
+}
+.cta:active {
+  transition-duration: var(--dur-1);
+  rotate: var(--cta-tilt);
+  translate: 0 0;
+  box-shadow: var(--shadow-press), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+.cta:focus-visible {
+  outline: 2px solid var(--amber-text);
+  outline-offset: 2px;
+}
+/* a second sticker beside the first leans the other way, the way a hand
+   would place them */
+.cta + .cta { --cta-tilt: 1.5deg; }
+
+.cta--primary { background: var(--amber-500); }
+.cta--primary:active { background: var(--amber-400); }
+
+.cta--secondary {
+  background: rgba(255, 255, 255, 0.35);
+  border: 1.5px solid var(--amber-700);
+  color: var(--amber-text);
+}
+.cta--secondary:active { background: rgba(255, 255, 255, 0.6); }
+
+/* Tertiary: a paper text link with an amber rule under it. "Read the case",
+   "All projects". Not a sticker, so the ladder stops at three. */
+.text-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: max-content; /* the rule below spans the link, not the column it sits in */
+  max-width: 100%;
+  font-family: var(--font-paper);
+  font-weight: 500;
+  font-size: var(--text-body);
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink-900);
+  text-decoration: none;
+}
+/* One rule under the whole link, arrow included — text-decoration would break at the gap. */
+.text-link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -5px;
+  height: 2px;
+  background: var(--amber-700);
+  transition:
+    background-color var(--dur-2) var(--ease-standard),
+    translate var(--dur-1) var(--ease-standard);
+}
+.text-link:active::after { translate: 0 -2px; }
+
+/* hover only where hover exists (see plans/003) */
+@media (hover: hover) and (pointer: fine) {
+  .cta:hover:not(:active) {
+    rotate: 0deg;
+    translate: 0 var(--lift-y);
+    box-shadow: var(--shadow-lift), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  }
+  .cta--secondary:hover:not(:active) { background: rgba(255, 255, 255, 0.6); }
+  .text-link:hover::after { background: var(--ink-900); }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+}
+
+/* Sticky-note layer physics */
+.sticky-piece {
+  position: absolute;
+  filter: var(--drop-stuck);
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-1: 0.01ms;
+    --dur-2: 0.01ms;
+    --dur-3: 0.01ms;
+    --dur-4: 0.01ms;
+    --stagger-1: 0ms;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .glass {
+    background: rgba(250, 248, 243, 0.97);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}

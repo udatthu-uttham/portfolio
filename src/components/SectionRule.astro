@@ -1,0 +1,72 @@
+---
+// The ruler — a section boundary drawn as a full-bleed dashed hairline with a
+// tick at every column of the measure and, optionally, the section's name as
+// a tracked label breaking the rule at the container's leading edge (plans/018).
+// Wayfinding, not a heading: the section's heading is its sentence just below.
+// It sits in the section's flow — the section gap above it separates it from
+// the previous content; one small step below it, its own content begins.
+interface Props {
+  label?: string;
+}
+const { label } = Astro.props;
+---
+
+<div class="rule" aria-hidden="true">
+  {Array.from({ length: 13 }).map((_, index) => <i style={`--col: ${index}`}></i>)}
+  {label && <span class="rule__label">{label}</span>}
+</div>
+
+<style>
+  .rule {
+    position: relative;
+    height: 0;
+    margin-bottom: var(--space-3);
+    pointer-events: none;
+  }
+
+  /* the hairline runs edge to edge of the viewport; the section is container-wide */
+  .rule::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: calc(50% - 50vw);
+    width: 100vw;
+    border-top: 1px dashed var(--line-0);
+  }
+
+  /* graduations: one tick per column of the measure */
+  .rule i {
+    position: absolute;
+    top: calc(var(--tick-size) / -2);
+    left: calc(100% * var(--col) / var(--grid-columns));
+    width: 1px;
+    height: var(--tick-size);
+    background: var(--line-mark);
+    translate: -50% 0;
+  }
+
+  .rule__label {
+    position: absolute;
+    top: 0;
+    left: calc(var(--space-2) * -1);
+    translate: 0 -50%;
+    padding: 0 var(--space-2);
+    background: var(--paper-0);
+    font-family: var(--font-paper);
+    font-size: var(--text-eyebrow);
+    font-weight: 500;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    line-height: 1;
+    color: var(--ink-900);
+    white-space: nowrap;
+  }
+
+  /* keep the tick count in step with the responsive column tokens */
+  @media (max-width: 900px) {
+    .rule i:nth-child(n + 10) { display: none; }
+  }
+  @media (max-width: 640px) {
+    .rule i:nth-child(n + 6) { display: none; }
+  }
+</style>

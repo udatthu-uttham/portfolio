@@ -1,0 +1,759 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Portfolio design tokens</title><style>/* Two families: General Sans for interface text, Caveat for handwriting. */
+@font-face {
+  font-family: 'General Sans';
+  src: url('../public/fonts/general-sans-400.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'General Sans';
+  src: url('../public/fonts/general-sans-500.woff2') format('woff2');
+  font-weight: 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'General Sans';
+  src: url('../public/fonts/general-sans-600.woff2') format('woff2');
+  font-weight: 600;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Caveat';
+  src: url('../public/fonts/caveat-variable.woff2') format('woff2');
+  font-weight: 400 600;
+  font-display: swap;
+}
+
+/* ---------------------------------------------------------------
+   Tokens — docs/design-tokens.json + brief §6–§9
+   --------------------------------------------------------------- */
+:root {
+  /* paper — toned close to white stock, warmth kept only as a whisper */
+  --paper-0: #faf9f4;
+  --paper-1: #ffffff;
+  --paper-2: #f0ece3;
+
+  /* ink */
+  --ink-900: #16140e;
+  --ink-600: #5c594f;
+  --ink-400: #8c887c;
+
+  /* lines */
+  --line-1: rgba(22, 20, 14, 0.13);
+  --line-0: rgba(22, 20, 14, 0.07);
+
+  /* amber — CTAs, active states, sketch accents only. Never backgrounds. */
+  --amber-500: #f3b44a;
+  --amber-400: #f7c36d;
+  --amber-700: #c8871f;
+  /* amber as small text on light surfaces — same family, WCAG AA */
+  --amber-text: #9c640c;
+
+  --graphite: rgba(58, 55, 46, 0.85);
+
+  /* glass */
+  --glass-nav-bg: rgba(247, 244, 236, 0.78);
+  --glass-overlay-bg: rgba(255, 253, 247, 0.85);
+  --glass-nav-blur: 14px;
+  --glass-overlay-blur: 16px;
+
+  /* warm soft-light glow — a single warm glow (like a lamp behind the
+     glass), not a multi-hue wash. Minimalist, low-alpha: a wash, never a
+     fill, so ink text stays at full contrast on top. */
+  --glass-warm-glow: rgba(247, 224, 186, 0.22);
+
+  /* type */
+  /* User revision: one interface sans, one handwritten accent. */
+  --font-paper: 'General Sans', ui-sans-serif, system-ui, sans-serif; /* on paper */
+  --font-glass: var(--font-paper); /* same sans on every interface surface */
+  --font-hand: 'Caveat', cursive; /* the paper's handwriting: notes, annotation, captions */
+
+  /* tracking — three values only */
+  --track-display: -0.03em; /* hero-size display */
+  --track-heading: -0.015em; /* h2, h3, statements */
+  --track-label: 0.06em; /* the one uppercase label style */
+
+  /* Warm-neutral emboss for type resting on an acrylic sheet. */
+  --etch-ink: rgba(22, 20, 14, 0.86);
+  --etch-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+
+  /* type scale (desktop / mobile via clamp) */
+  --text-hero: clamp(42px, 4.6vw, 68px);
+  --text-h2: clamp(34px, 3.6vw, 52px);
+  --text-h3: clamp(26px, 2.2vw, 34px);
+  --text-h4: clamp(20px, 1.7vw, 24px);
+  --text-body-lg: clamp(17px, 1.35vw, 20px);
+  --text-body: clamp(16px, 1.1vw, 17px);
+  --text-eyebrow: 12px; /* the one label style */
+  --text-small: 14px; /* footer, fine print */
+  --text-annotation: clamp(32px, 3vw, 44px); /* handwritten navigator cue */
+  --text-wordmark: var(--text-h3);
+  --text-note: clamp(18px, 1.4vw, 22px);
+
+  /* spacing (base-8) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+  --space-10: 128px;
+  --space-11: 160px;
+  --space-12: 200px;
+
+  /* semantic rhythm — keeps page whitespace independent from control sizing */
+  --section-y: clamp(96px, 10vh, 144px);
+  --section-y-sm: clamp(48px, 5vw, 72px);
+  --content-gap: clamp(16px, 2vw, 24px);
+  --group-gap: clamp(24px, 3.5vw, 48px);
+  --control-gap: 12px;
+
+  /* radius */
+  --radius-pill: 999px;
+  --radius-media: 24px;
+  --radius-card: 16px;
+  --radius-sm: 8px;
+  --radius-inset: 2px; /* nested inset exception in the supplied radius role */
+  --radius-control: 0px; /* CTA material recipe */
+
+  /* elevation — four warm-ink shadows for paper objects; glass, CTA and bolt
+     keep their own material recipes (documented in design-tokens.md) */
+  --shadow-rest: 0 2px 5px -2px rgba(22, 20, 14, 0.1), 0 10px 20px -14px rgba(22, 20, 14, 0.16); /* paper at rest: tiles, Instax */
+  --shadow-stuck: 0 8px 14px -8px rgba(22, 20, 14, 0.28); /* stuck-on objects: sticky notes */
+  --shadow-lift: 0 16px 28px -14px rgba(22, 20, 14, 0.32); /* hover lift: tiles, notes */
+  --shadow-press: 0 4px 8px -6px rgba(22, 20, 14, 0.3); /* pressed flat */
+  --drop-stuck: drop-shadow(0 8px 12px rgba(22, 20, 14, 0.24)); /* the same weight for SVG stickers (filter) */
+  --lift-y: -2px; /* the one hover-lift distance */
+
+  /* line-height — four values */
+  --lh-display: 1.05; /* hero-size, h2, big handwriting */
+  --lh-heading: 1.15; /* h3, titles, notes, captions */
+  --lh-statement: 1.4; /* multi-line display paragraphs */
+  --lh-body: 1.55; /* body copy */
+
+  /* z-index — page-level layers only; components stack locally with 0–3 */
+  --z-header: 10;
+  --z-float: 20;
+  --z-skip: 100;
+
+  /* motion — four durations, three easings, one stagger. The SignalLoop
+     scene keeps its own narrative timing; every
+     UI transition uses these. Reduced motion zeroes the durations at :root
+     (see the media block below) so all consumers degrade together. */
+  --dur-1: 150ms; /* micro: color/opacity feedback, pointer tracking */
+  --dur-2: 220ms; /* standard: hover lifts, shadows, small moves */
+  --dur-3: 400ms; /* moderate: staged sequences, one-time entrances */
+  --dur-4: 600ms; /* deliberate: scroll reveals, hero entrance */
+  --stagger-1: 70ms; /* between siblings in one reveal group */
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1); /* moving between states */
+  --ease-enter: cubic-bezier(0.22, 1, 0.36, 1); /* arriving: fast in, soft settle */
+  --ease-exit: cubic-bezier(0.3, 0, 1, 0.3); /* leaving: gathers speed */
+  /* legacy aliases — all consumers are migrated; kept so nothing external breaks */
+  --ease-reveal: var(--ease-enter);
+  --ease-micro: var(--ease-standard);
+
+  /* layout */
+  --container-max: 1200px;
+  --margin-side: clamp(20px, 5.6vw, 80px);
+  --header-height: 76px;
+  --grid-columns: 12;
+  --grid-gap: 24px;
+  --panel-padding: var(--group-gap);
+  --card-padding: var(--content-gap);
+  --bolt-inset: 18px; /* the glass material recipe */
+  --bolt-size: 16px;
+  --bolt-clearance: var(--space-4);
+  /* Reserve the hardware plus a clear buffer before content begins. */
+  --bolt-content-inset: calc(var(--bolt-inset) + var(--bolt-size) + var(--bolt-clearance));
+  /* Tilted objects and entrance motion need room beyond the resting buffer. */
+  --bolted-panel-padding: max(var(--section-y-sm), calc(var(--bolt-content-inset) + var(--space-6)));
+  --bolted-board-padding: max(var(--bolted-panel-padding), var(--space-9));
+}
+
+@media (max-width: 900px) {
+  :root {
+    --margin-side: 40px;
+    --header-height: 96px;
+    --grid-columns: 8;
+    --grid-gap: 20px;
+  }
+}
+
+@media (max-width: 640px) {
+  :root {
+    --margin-side: 20px;
+    --header-height: 96px;
+    --grid-columns: 4;
+    --grid-gap: 16px;
+  }
+}
+
+@media (max-width: 360px) {
+  :root {
+    --header-height: 92px;
+  }
+}
+
+/* ---------------------------------------------------------------
+   Base
+   --------------------------------------------------------------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--paper-0);
+  color: var(--ink-900);
+  font-family: var(--font-paper);
+  font-size: var(--text-body);
+  line-height: var(--lh-body);
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Paper grain — a faint fibre tooth over the whole page so the near-white
+   stock never reads as a flat digital fill. Fixed so it doesn't shift with
+   scroll; sits above the base colour, below all content. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+  mix-blend-mode: multiply;
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  body::before { display: none; }
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+}
+
+/* Liquid glass — warm soft-light pass: minimalist, one warm glow (not a
+   multi-hue wash), soft/subtle shadows only (no harsh edges). Still the
+   same liquid-glass mechanism — whatever sits behind stays visible,
+   softly blurred, with a diagonal sheen — just warmer and calmer. */
+.glass {
+  background:
+    linear-gradient(
+      120deg,
+      rgba(255, 255, 255, 0.3),
+      rgba(255, 255, 255, 0) 40%,
+      rgba(255, 255, 255, 0.14) 75%
+    ),
+    radial-gradient(120% 90% at 12% 0%, var(--glass-warm-glow), transparent 62%),
+    rgba(255, 255, 255, 0.44);
+  /* Blur is the dominant lever for letting the paper grid show through —
+     not fill opacity, which stays at its full, properly-glass richness.
+     8px is enough blur to soften what's behind without smearing a thin
+     1px pattern into nothing the way a deeper blur would. */
+  -webkit-backdrop-filter: blur(8px) saturate(1.5);
+  backdrop-filter: blur(8px) saturate(1.5);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    inset 1px 0 0 rgba(255, 255, 255, 0.35),
+    -8px -8px 20px -20px rgba(255, 255, 255, 0.55),
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    14px 18px 36px -22px rgba(22, 20, 14, 0.16);
+  border: 0.5px solid var(--line-1);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-glass);
+}
+
+/* nav is the same material — class kept only as a structural hook */
+.glass--nav {
+  background-position: center;
+  border-radius: 0; /* full-bleed viewport edge, not a freestanding panel */
+}
+
+/* Bolts — the four fixings pinning a glass slab to the paper beneath it.
+   Black, not brushed metal: bold and legible against the glass. */
+.bolt {
+  position: absolute;
+  width: var(--bolt-size);
+  height: var(--bolt-size);
+  border-radius: 50%;
+  background: radial-gradient(circle at 33% 27%, #4a4a4a 0%, #1c1c1c 40%, #000000 100%);
+  box-shadow:
+    0 3px 4px rgba(0, 0, 0, 0.55),
+    inset 0 1px 1px rgba(255, 255, 255, 0.25),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.6);
+  z-index: 3;
+}
+.bolt--tl { left: var(--bolt-inset); top: var(--bolt-inset); }
+.bolt--tr { right: var(--bolt-inset); top: var(--bolt-inset); }
+.bolt--bl { left: var(--bolt-inset); bottom: var(--bolt-inset); }
+.bolt--br { right: var(--bolt-inset); bottom: var(--bolt-inset); }
+
+.bolt::after {
+  /* screwdriver slot */
+  content: '';
+  position: absolute;
+  left: 18%;
+  right: 18%;
+  top: calc(50% - 1px);
+  height: 2px;
+  border-radius: 1px;
+  background: rgba(255, 255, 255, 0.55);
+  transform: rotate(-24deg);
+}
+
+/* Accessibility utilities */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: fixed;
+  top: var(--space-2);
+  left: var(--space-2);
+  z-index: var(--z-skip);
+  padding: var(--space-3) var(--space-5);
+  background: var(--ink-900);
+  color: var(--paper-1);
+  font-family: var(--font-paper);
+  font-size: var(--text-body);
+  text-decoration: none;
+  border-radius: var(--radius-control);
+  transform: translateY(-200%);
+}
+
+.skip-link:focus-visible {
+  transform: none;
+  outline: 2px solid var(--amber-text);
+  outline-offset: 2px;
+}
+
+/* Embossed type resting on an acrylic sheet: softened ink, faint light edge */
+.on-glass {
+  color: var(--etch-ink);
+  font-optical-sizing: auto;
+  text-shadow: var(--etch-shadow);
+}
+
+/* CTAs — extruded from the glass at rest, pressed into it on hover/click.
+   radius/pill + body/base + spacing tokens throughout. */
+.cta {
+  font-family: var(--font-glass);
+  font-weight: 500;
+  font-size: var(--text-body); /* body/base token */
+  letter-spacing: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--space-7);
+  padding: var(--space-3) var(--space-5);
+  /* sharp corners, per pleurat.com's alternate CTA direction — supersedes
+     the pill-radius convention for buttons specifically (radius-pill
+     stays the default for other pill-shaped chips, e.g. tile tags) */
+  border-radius: var(--radius-control);
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    /* release snaps in 100ms; the deliberate press below takes --dur-1 */
+    transform 100ms var(--ease-standard),
+    box-shadow 100ms var(--ease-standard);
+  /* raised: top bevel catches light, bottom bevel shades, block casts onto glass */
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    inset 0 -1px 0 rgba(22, 20, 14, 0.18),
+    0 4px 10px -2px rgba(22, 20, 14, 0.3),
+    0 1px 2px rgba(22, 20, 14, 0.2);
+}
+.cta:active {
+  /* pressed harder — seated at the bottom of the well */
+  transition-duration: var(--dur-1);
+  transform: translateY(2px);
+  box-shadow:
+    inset 0 3px 6px rgba(22, 20, 14, 0.36),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.3),
+    0 0 0 rgba(255, 255, 255, 0);
+}
+.cta:focus-visible {
+  outline: 2px solid var(--amber-text);
+  outline-offset: 2px;
+}
+.cta--primary {
+  /* convex amber block: lit from above */
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 55%),
+    var(--amber-500);
+  color: var(--ink-900);
+  border: none;
+}
+.cta--primary:active {
+  background:
+    linear-gradient(180deg, rgba(22, 20, 14, 0.16), rgba(22, 20, 14, 0) 45%),
+    var(--amber-500);
+}
+.cta--ghost {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0) 55%),
+    var(--paper-0);
+  color: var(--ink-900);
+  border: 1px solid var(--ink-600);
+}
+.cta--ghost:active {
+  background:
+    linear-gradient(180deg, rgba(22, 20, 14, 0.09), rgba(22, 20, 14, 0) 45%),
+    var(--paper-0);
+}
+
+/* Glass CTA — for buttons sitting ON a glass slab: the same white liquid
+   material as the slab, not an opaque paper block. Still extrudes/presses. */
+.cta--glass {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.12) 60%),
+    radial-gradient(140% 100% at 15% 0%, var(--glass-warm-glow), transparent 65%),
+    rgba(255, 255, 255, 0.35);
+  -webkit-backdrop-filter: blur(8px) saturate(1.4);
+  backdrop-filter: blur(8px) saturate(1.4);
+  color: var(--ink-900);
+  /* no separate border: the shared .cta bevel (inset box-shadow, above)
+     already defines this button's edge — a literal border here read as a
+     stray line against the very transparent glass fill */
+  border: none;
+}
+.cta--glass:active {
+  background:
+    linear-gradient(180deg, rgba(22, 20, 14, 0.12), transparent 55%),
+    rgba(255, 255, 255, 0.48);
+}
+
+/* hover only where hover exists (see plans/003) */
+@media (hover: hover) and (pointer: fine) {
+  .cta:hover:not(:active) {
+    /* sinks into the glass: upper lip shades, lower lip catches light */
+    transform: translateY(1px);
+    box-shadow:
+      inset 0 2px 4px rgba(22, 20, 14, 0.26),
+      inset 0 -1px 1px rgba(255, 255, 255, 0.35),
+      0 1px 0 rgba(255, 255, 255, 0.5);
+  }
+  .cta--primary:hover:not(:active) {
+    /* gradient flips: the top of the well is now in shadow */
+    background:
+      linear-gradient(180deg, rgba(22, 20, 14, 0.12), rgba(22, 20, 14, 0) 45%),
+      var(--amber-400);
+  }
+  .cta--ghost:hover:not(:active) {
+    background:
+      linear-gradient(180deg, rgba(22, 20, 14, 0.09), rgba(22, 20, 14, 0) 45%),
+      var(--paper-0);
+  }
+  .cta--glass:hover:not(:active) {
+    background:
+      linear-gradient(180deg, rgba(22, 20, 14, 0.08), transparent 55%),
+      rgba(255, 255, 255, 0.42);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .cta--glass {
+    background: rgba(250, 248, 243, 0.98);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+/* Sticky-note layer physics */
+.sticky-piece {
+  position: absolute;
+  filter: var(--drop-stuck);
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-1: 0.01ms;
+    --dur-2: 0.01ms;
+    --dur-3: 0.01ms;
+    --dur-4: 0.01ms;
+    --stagger-1: 0ms;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .glass {
+    background: rgba(250, 248, 243, 0.97);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+ body{padding:var(--section-y-sm) var(--margin-side)}main{max-width:1000px;margin:auto}h1{font-size:var(--text-h2);line-height:var(--lh-heading)}h2{font-size:var(--text-h3);margin-top:var(--group-gap)}h3{font-size:var(--text-h4)}p,ul,table{margin-block:var(--content-gap)}code,pre{font-family:inherit;overflow-wrap:anywhere}table{display:block;overflow:auto;border-collapse:collapse}td,th{padding:var(--space-3);text-align:left;border-bottom:1px solid var(--line-1)}th{font-weight:600}a{color:var(--amber-text)}</style><main><h1 id="design-tokens--uttham-udatthu-portfolio">Design tokens — Uttham Udatthu portfolio</h1>
+<p>Updated 2026-09-07. Based on the second supplied token JSON, with the user’s latest requirement: <strong>exactly two font families</strong>. The shared tracking and line-height tokens resolve conflicting values in the older composite typography records. The glass CTA uses the explicit 8px/no-border material note.</p>
+<p>Canonical export: <code>docs/design-tokens.json</code>. Implementation: <code>src/styles/global.css</code>. Keep these and this guide synchronized; do not reintroduce older typography recipes.</p>
+<p><strong>Controls — one button family, three weights (locked 2026-09-07).</strong> Every button is a die-cut <em>sticker</em>: sharp corners (<code>--radius-control</code>, 0), the sticker label voice (<code>--font-paper</code> 600 · <code>--text-small</code> · uppercase · <code>--track-label</code>), padding <code>--space-3 --space-5</code>, min-height <code>--space-7</code>, a −2° lean (<code>--cta-tilt</code>; a second sticker beside the first leans +1.5°), <code>--shadow-stuck</code> at rest. Hover (fine pointers only): straightens, lifts <code>--lift-y</code>, <code>--shadow-lift</code>. Press: flat, <code>--shadow-press</code>, <code>--dur-1</code>; release 100ms. Weight is the stock alone:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Class</th><th>Stock</th><th>Use</th></tr></thead><tbody><tr><td><code>.cta.cta--primary</code></td><td><code>--amber-500</code> fill (<code>--amber-400</code> pressed)</td><td>The one primary action per view, on glass or paper</td></tr><tr><td><code>.cta.cta--secondary</code></td><td>Kiss-cut outline: <code>1.5px solid --amber-700</code>, <code>--amber-text</code> label, 35% white fill</td><td>Secondary action beside a primary</td></tr><tr><td><code>.text-link</code></td><td>No sticker: <code>--font-paper</code> 500 · <code>--text-body</code>, 2px <code>--amber-700</code> underline, offset 5px (3px pressed; ink on hover)</td><td>Tertiary: “Read the case”, “All projects”</td></tr></tbody></table>
+<p>Retired: <code>.cta--glass</code> (frosted), <code>.cta--ghost</code> (outline), the solid amber block. The floating page-navigator uses the primary stock with <code>--cta-tilt: 0</code> and no uppercase.</p>
+<hr>
+<h2 id="typography">Typography</h2>
+<p><strong>General Sans</strong> is the interface family on paper and glass: navigation, headings, body, buttons, labels, footer and case pages. <strong>Caveat</strong> is the handwritten accent for annotations, notes, photo captions and navigator cues. <code>--font-glass</code> aliases <code>--font-paper</code>; it is not another font family. Both are self-hosted. Only weights 400, 500 and 600 are allowed; synthetic font styles are disabled.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Role</th><th>Size</th><th>Weight</th><th>Line height</th></tr></thead><tbody><tr><td>display-hero</td><td><code>clamp(42px, 4.6vw, 68px)</code></td><td>600</td><td>1.05</td></tr><tr><td>display-h2</td><td><code>clamp(34px, 3.6vw, 52px)</code></td><td>600</td><td>1.15</td></tr><tr><td>heading-h3</td><td><code>clamp(26px, 2.2vw, 34px)</code></td><td>600</td><td>1.15</td></tr><tr><td>heading-h4</td><td><code>clamp(20px, 1.7vw, 24px)</code></td><td>500</td><td>1.15</td></tr><tr><td>body-lg</td><td><code>clamp(17px, 1.35vw, 20px)</code></td><td>400</td><td>1.55</td></tr><tr><td>body-base</td><td><code>clamp(16px, 1.1vw, 17px)</code></td><td>400</td><td>1.55</td></tr><tr><td>label-eyebrow</td><td><code>12</code></td><td>500</td><td>1.55</td></tr><tr><td>note</td><td><code>clamp(18px, 1.4vw, 22px)</code></td><td>500</td><td>1.4</td></tr><tr><td>annotation-hand</td><td><code>clamp(32px, 3vw, 44px)</code></td><td>500</td><td>1.05</td></tr><tr><td>small</td><td><code>14</code></td><td>400</td><td>1.55</td></tr></tbody></table>
+<p>Tracking: display <code>-0.03em</code>, headings <code>-0.015em</code>, uppercase labels <code>0.06em</code>; body and handwriting use normal tracking. Multi-line hero statements use line height <code>1.4</code>. Wordmark sizing reuses h3 (h4 at 900px and below).</p>
+<h2 id="spacing-and-grouping">Spacing and grouping</h2>
+<p>The spacing steps <code>--space-1</code> through <code>--space-12</code> are <strong>4, 8, 12, 16, 24, 32, 48, 64, 96, 128, 160 and 200px</strong>.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Role</th><th>Value</th><th>Application</th></tr></thead><tbody><tr><td>Section</td><td><code>clamp(96px, 10vh, 144px)</code></td><td>Separation between major sections</td></tr><tr><td>Compact section</td><td><code>clamp(48px, 5vw, 72px)</code></td><td>Supporting case details and case-navigation separation</td></tr><tr><td>Content gap</td><td><code>clamp(16px, 2vw, 24px)</code></td><td>Related text, card internals and card padding</td></tr><tr><td>Group gap</td><td><code>clamp(24px, 3.5vw, 48px)</code></td><td>Column groups and panel side padding</td></tr><tr><td>Control gap</td><td><code>12px</code></td><td>Controls that belong together</td></tr></tbody></table>
+<p>Headings and their labels form one group; descriptions stay nearer to their heading than the next group. Principle receipts have additional separation from their explanation. A single container owns the side gutter: never add container padding on top of the same margin. Card and panel padding aliases reuse the content/group values above. Artboard artwork has no extra nested padding.</p>
+<p>Homepage section openings use a Caveat chapter label (the note token), an 8px gap to the heading, and one content gap before the section body. Projects has a short introduction describing its four-study collection; other sections do not need a compulsory introduction. Contact uses the same opening inside its bolted panel. AI preview placeholders are compact 96px frames until actual previews are available. The continuous road/progress marker is not part of this layout.</p>
+<p>On the homepage, each section owns its top separation; do not add a second section-sized bottom gap to the preceding section. The work heading sits one content gap above its board, which supplies its own hardware padding. Case details use compact-section spacing because they support the artwork immediately above.</p>
+<p>The hero statement fills the glass panel’s padded content width. Its portrait tucks 32px behind the glass and sits 64px from the panel’s left edge, clear of the corner bolts. Panel top and bottom padding follows the hardware rules below. The scene and its handwritten explanation form one figure: caption first, artwork 12px below it, with a shared left edge. Its width follows whole foundation columns, as described below. Contact notes share the same size, and the photo group reserves 32px above its frame for the attached badge.</p>
+<h2 id="responsive-layout">Responsive layout</h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Width</th><th>Page gutter</th><th>Header token</th><th>Foundation grid / gap</th></tr></thead><tbody><tr><td>Above 900px</td><td><code>clamp(20px, 5.6vw, 80px)</code></td><td>76px</td><td>12 / 24px</td></tr><tr><td>641–900px</td><td>40px</td><td>96px</td><td>8 / 20px</td></tr><tr><td>Up to 640px</td><td>20px</td><td>96px</td><td>4 / 16px</td></tr><tr><td>Up to 360px</td><td>20px</td><td>92px</td><td>4 / 16px</td></tr></tbody></table>
+<p>Container maximum: <strong>1200px</strong>. The four project cards form a 2×2 collection from 768px, and one column below 768px. Hero and contact groups stack below 1024px; principles stack at 900px and below; case details stack at 640px and below. Hero content remains in normal flow so short viewports can scroll without overlapping.</p>
+<p>The decorative dashed guides divide the centred, capped content container into equal intervals: 13 lines above 900px, 9 at 641–900px and 5 on phones, including both outer edges. They use the subtle line token (<code>--line-0</code>) and do not draw paired gutter boundaries. Project, principle and AI columns retain the foundation gutter; padding inside glass remains independent to protect the bolts. On desktop the hero slab spans columns 1–8 and the scene 9–12. When stacked, the scene spans the centred 8 of 12 columns at 901–1023px, 6 of 8 columns at 641–900px, and all 4 columns on phones. The caption and artwork share that span.</p>
+<h2 id="corners-and-materials">Corners and materials</h2>
+<ul>
+<li><strong>8px</strong>: all freestanding surfaces, including glass slabs, work cards, notes, Instax frames and preview frames.</li>
+<li><strong>2px</strong>: nested media/insets.</li>
+<li><strong>0px</strong>: CTA controls and the full-width navigation edge.</li>
+<li><strong>999px</strong>: tag chips only. Circular avatars, bolts and illustrative geometry remain circular.</li>
+<li>Legacy 16px/24px radius tokens are unused; never apply them to new surfaces.</li>
+</ul>
+<p>White liquid glass keeps its diagonal sheen, single warm glow, 8px blur, saturation 1.5 and 0.5px border. Content panels have 16px bolts inset 18px; the navigation has no bolts. Glass CTAs use blur 8px/saturation 1.4 with no separate border. Glass, bolt and CTA recipes remain in the JSON; paper elevations use the four shared rest/stuck/lift/press shadows.</p>
+<p>Every bolt requires <strong>16px of clear space</strong> around its footprint. The static content inset is <code>18 + 16 + 16 = 50px</code> from the frame’s top and bottom. Case artboards own this padding; SVGs and placeholders fill the remaining interior without adding another padding layer. Hero and contact panels add a 32px motion allowance (<code>--bolted-panel-padding</code>, minimum 82px). The workboard reserves 96px for tape and sheets, increasing bottom padding to 128px on layouts with magnetic hover. These dimensions keep the current tallest card clear even at its maximum 4°/2.5° tilt. Recheck the projected bounds if card copy or hover amplitude changes. Side padding retains the group token so narrow screens keep their reading width.</p>
+<h2 id="color">Color</h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Family</th><th>Values</th></tr></thead><tbody><tr><td>Paper 0 / 1 / 2</td><td><code>#FAF9F4</code> / <code>#FFFFFF</code> / <code>#F0ECE3</code></td></tr><tr><td>Ink 900 / 600 / 400</td><td><code>#16140E</code> / <code>#5C594F</code> / <code>#8C887C</code></td></tr><tr><td>Amber 500 / 400 / 700 / text</td><td><code>#F3B44A</code> / <code>#F7C36D</code> / <code>#C8871F</code> / <code>#9C640C</code></td></tr><tr><td>Line 1 / 0</td><td><code>rgba(22,20,14,.13)</code> / <code>rgba(22,20,14,.07)</code></td></tr></tbody></table>
+<p>Small text uses ink 900 or 600; ink 400 is reserved for text at least 18px. Small amber text and focus rings use amber-text. Native illustrations retain their signal colors and rider liveries.</p>
+<h2 id="motion">Motion</h2>
+<p>Pointer smoke is a decorative fine-mouse effect: normal puffs fade in 600–700ms; sustained fast movement produces a brief burst that clears within 2 seconds, with a 4.5-second cooldown. Keep at most 64 puffs on one click-through canvas, cap its backing bitmap at 4 million pixels, and stop its frame loop when empty. Paper uses dry graphite texture; glass uses lighter smooth wisps with a faint highlight. Blend the material at emission over roughly 100ms and let existing puffs retain their appearance. Disable emission for touch, dragging, hidden pages and reduced motion. Clear trails on scrolling, resize or leaving the window. The native pointer remains visible.</p>
+<p>The bot faces right in three-quarter profile on an electric bike with a small battery/lightning panel. Only the human bikes leave occasional low-opacity exhaust, which dissipates in 650ms. Their exhaust shares the scene’s existing visibility and reduced-motion gates.</p>
+<p>The signal scene represents two people and a small AI bot on matching motorcycles. At the start of each red-light cycle, choose a new flip combination: usually one rider, occasionally two, rarely all three, with no consecutive repeat. All riders have equal selection weight. Keep the choice fixed through the cycle and off-screen pauses; selected riders finish one eased backflip before landing. Reduced motion shows the group riding under green without animation. The caption refers to “people and AI agents” and stays above the scene. On desktop the caption-and-scene group is centred vertically against the glass slab, excluding the portrait above it.</p>
+<p>Durations: <strong>150 / 220 / 400 / 600ms</strong>. Sibling stagger: <strong>70ms</strong>. Standard/enter/exit easing: <code>cubic-bezier(.2,0,0,1)</code> / <code>cubic-bezier(.22,1,.36,1)</code> / <code>cubic-bezier(.3,0,1,.3)</code>.</p>
+<p>Tile entrances stagger by the current grid column. Case headings rise 12px and fade in. Hover movement is limited to a fine pointer with hover support; touch has active press feedback. CTA press is 150ms and release 100ms. Reduced motion removes spatial transitions and reduces durations to 0.01ms.</p>
+<p>Magnetic card perspective is four times the larger sheet dimension (minimum 400px), updated through ResizeObserver. This keeps the top-anchored tilt gentle as cards grow wider, protecting the next row’s tape and the board hardware. Resizing below 768px removes the observer/listeners and reverts the transforms.</p>
+<p>The SVG scene has its own narrative timing. A small ramp settles on red; all three riders jump and only the middle rider completes one backflip. It lifts away after the rear rider clears it. Distant scenery is cropped behind the far curb; the vehicle signal occupies the foreground to the left of the zebra crossing, overlapping the ramp’s left edge. Its placement is independent of the crossing and jump anchor so the pole stays clear of airborne riders. Rendering pauses off-screen and in hidden tabs, and reduced motion shows a still green crossing. Illustration coordinates, SVG letter placement and physical hardware geometry are drawing measurements, not extra interface spacing or type tokens.</p></main></html>

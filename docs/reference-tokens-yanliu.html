@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Reference Teardown — yanliuportfolio.vercel.app</title>
+<style>
+  :root { --paper-0:#faf9f4; --paper-1:#fff; --paper-2:#f0ece3; --ink-900:#16140e; --ink-600:#5c594f; --ink-400:#8c887c; --line-1:rgba(22,20,14,.13); --line-0:rgba(22,20,14,.07); --amber-700:#c8871f; --amber-text:#9c640c; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--paper-0); color:var(--ink-900); font-family:-apple-system,"Segoe UI",Helvetica,Arial,sans-serif; line-height:1.6; }
+  article { max-width: 820px; margin: 0 auto; padding: 64px 32px 96px; }
+  h1 { font-size: 30px; font-weight: 700; letter-spacing: -.02em; margin: 0 0 6px; }
+  .meta { color: var(--ink-600); font-size: 14px; margin: 0 0 40px; }
+  h2 { font-size: 21px; font-weight: 700; margin: 40px 0 6px; padding-top: 18px; border-top: 1px solid var(--line-1); }
+  h3 { font-size: 16px; font-weight: 700; margin: 22px 0 8px; }
+  p { margin: 10px 0; }
+  ul, ol { padding-left: 22px; }
+  li { margin: 5px 0; }
+  code { font-family: ui-monospace,"SF Mono",Menlo,monospace; font-size: 13px; background: var(--paper-2); padding: 1px 6px; border-radius: 4px; color: var(--amber-text); }
+  pre { background: var(--ink-900); color: #eae6da; padding: 16px 18px; border-radius: 10px; overflow-x: auto; font-size: 12.5px; line-height: 1.6; }
+  pre code { background: none; padding: 0; color: inherit; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; margin: 12px 0 20px; }
+  th { text-align: left; color: var(--ink-400); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; padding: 7px 10px; border-bottom: 1px solid var(--line-1); }
+  td { padding: 8px 10px; border-bottom: 1px solid var(--line-0); vertical-align: top; }
+  strong { font-weight: 700; }
+  .note-box { background: var(--paper-1); border: 1px solid var(--line-1); border-left: 3px solid var(--amber-700); padding: 12px 16px; border-radius: 6px; font-size: 13.5px; color: var(--ink-600); margin: 16px 0; }
+</style>
+</head>
+<body>
+<article>
+  <h1>Reference teardown — yanliuportfolio.vercel.app</h1>
+  <p class="meta">Live-extracted 2026-08-27 via computed styles + stylesheet rules. For tone-matching only, not literal copying (per the brief's reference set, §13). This is a separate site's system — nothing here is wired into our codebase.</p>
+
+  <h2>Base tokens</h2>
+  <table>
+    <tr><th>Token</th><th>Value</th></tr>
+    <tr><td>Page background</td><td>#FAF8F5 (rgb(250,248,245))</td></tr>
+    <tr><td>Body text</td><td>#1C1917 (rgb(28,25,23)) — a warm near-black, same family as our <code>ink-900</code></td></tr>
+    <tr><td>Secondary text</td><td>#44403C, #78716C, #A8A2A9 (a stone/warm-grey ramp)</td></tr>
+    <tr><td>Card surface</td><td>#FFFFFF</td></tr>
+    <tr><td>Segmented-control bg</td><td>#F5F5F4, border stone-300/40</td></tr>
+    <tr><td>Accent — mint/green</td><td>#059669 (used sparingly, link or status color)</td></tr>
+    <tr><td>Dark glass (mobile notice)</td><td>rgba(28,25,23,.92) + backdrop-filter: blur(12px)</td></tr>
+    <tr><td>Signal colors</td><td>red #FF5F57, amber #FEBC2E, green #28C840 — literally macOS traffic-light dots on a fake terminal window</td></tr>
+    <tr><td>Radii in use</td><td>50% (avatars/dots), 9999px (pills), 16px, 12px, 8px, 2px</td></tr>
+  </table>
+
+  <h2>Typography</h2>
+  <ul>
+    <li><strong>Body/UI font:</strong> Noto Sans (self-hosted via <code>next/font</code>, exposed as <code>--font-noto</code>)</li>
+    <li><strong>Mono accents:</strong> Source Code Pro (<code>--font-mono</code>) — same family we use for our own <code>--font-mono</code></li>
+    <li><strong>Secondary mono:</strong> Courier Prime (<code>--font-courier-prime</code>) — same family as our <code>--font-note</code></li>
+    <li>Heading example: 28px / weight 800 / letter-spacing +4.2px (tracked way out, on a dark badge) — a much heavier hand than our type scale (max weight 600, tracking only on eyebrows)</li>
+    <li>Buttons run small: 11px, weight 500, in a segmented tab control (Projects / Snapshot / Achievements), padding 8px, pill/rounded container 16px radius, no per-button radius (the container clips)</li>
+  </ul>
+
+  <h2>Signature interesting elements</h2>
+  <p>The whole page is a <strong>desk/scrapbook metaphor</strong> — same instinct as our Paper/Sticky/Glass system, executed as literal skeuomorphic desk objects rather than material layers:</p>
+  <ul>
+    <li><strong>ID lanyard badge</strong> — a name tag with a photo, tilted, hanging from a lanyard strap</li>
+    <li><strong>Vinyl record widget</strong> ("Vibe coding playlist") — a spinning record; see animation below</li>
+    <li><strong>Concert-ticket stub</strong> — perforated edge, "DESIGN X TECHNOLOGY" event styling</li>
+    <li><strong>Flip-clock/dot-matrix logo tile</strong> — an 8×8 LED-style "P" monogram</li>
+    <li><strong>macOS terminal window</strong> — real traffic-light dots (#FF5F57 #FEBC2E #28C840), monospace <code>whoami</code> / <code>ls interests/</code> commands typed out</li>
+    <li><strong>Punched sticky note</strong> — a yellow note with four grommet holes at the top edge (ring-binder style) instead of tape — a different "how is this note attached" answer than our washi-tape convention</li>
+    <li><strong>Manila folder icon</strong> — closes the desk-drawer metaphor</li>
+  </ul>
+
+  <h3>Keyframe animations (verbatim from the site's stylesheet)</h3>
+  <pre><code>@keyframes twinkle {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+/* applied to many small `rounded-full bg-text-muted/20` dots, each with a
+   randomized duration (2.1–4.7s) and delay (0–4.5s) — an ambient starfield
+   sparkle over the paper background, never in sync, never mechanical */
+
+@keyframes vinyl-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(1turn); }
+}
+/* .group/vinyl:hover .vinyl-spin, .vinyl-spin-active {
+     animation: 12s linear infinite vinyl-spin;
+   }
+   — the record only spins on hover (or a manually toggled "active" class),
+   12s per rotation reads as believably heavy/analog, not a cheap spinner */
+
+@keyframes vinyl-border-rotate {
+  0% { --vinyl-angle: 0deg; }
+  100% { --vinyl-angle: 360deg; }
+}
+/* animates a CSS custom property directly (@property-registered), driving a
+   conic-gradient border ring around the record — a rotating light/reflection
+   ring independent of the label's own spin */
+
+@keyframes vinyl-progress-grow {
+  0% { width: 0px; }
+  100% { width: 100%; }
+}
+/* a "now playing" progress bar filling — ties the widget to actual audio state */</code></pre>
+
+  <h3>Worth stealing (technique, not asset)</h3>
+  <ol>
+    <li><strong>Randomized-but-deterministic ambient motion</strong> (the twinkle field) — same principle as our brief's sticky-note idle bob (hand-set angles, "reads as placed by a person, not randomized"), applied to a background layer instead of foreground objects.</li>
+    <li><strong>Hover-gated looping animation</strong> (vinyl spin only runs on hover/active, not always) — cheaper, calmer, and more intentional than an always-spinning decoration.</li>
+    <li><strong>Animating a registered custom property</strong> (<code>--vinyl-angle</code>) to drive a conic-gradient — a clean way to rotate a gradient (not just a transform), useful if we ever want a rotating light-catch on the glass bolts/dots or a "recording" ring anywhere.</li>
+    <li><strong>A second valid answer to "how is a paper item attached"</strong> — grommets/binder holes, as an alternative to our washi tape, worth keeping in mind if a future note needs to read as "filed" rather than "stuck down."</li>
+  </ol>
+</article>
+</body>
+</html>

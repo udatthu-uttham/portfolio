@@ -1,0 +1,85 @@
+---
+// A white-label guide for one AI Space tool: what you get, what you need, the
+// prompt itself (copyable), and what to change for your team.
+import Base from '../../layouts/Base.astro';
+import Header from '../../components/Header.astro';
+import GridOverlay from '../../components/GridOverlay.astro';
+import { guides } from '../../data/guides';
+import { tools } from '../../data/tools';
+import { rich } from '../../lib/rich';
+
+export function getStaticPaths() {
+  return guides.map((guide) => ({ params: { slug: guide.slug }, props: { guide } }));
+}
+const { guide } = Astro.props;
+const tool = tools.find((t) => t.slug === guide.slug);
+---
+<Base title={`${guide.title} — Uttham Udatthu`} description={guide.intro.replace(/\*\*/g, '')}>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <Header active="ai" />
+  <main id="main" class="guide" tabindex="-1">
+    <GridOverlay />
+    <article class="guide__wrap">
+      <a class="text-link guide__back" href="/#ai">← AI Space</a>
+      <p class="eyebrow">{tool?.kicker} · White-label guide</p>
+      <h1>{guide.title}</h1>
+      <p class="guide__intro" set:html={rich(guide.intro)} />
+
+      <div class="guide__cols">
+        <section>
+          <h2 class="eyebrow">What you get</h2>
+          <ul>{guide.get.map((g) => <li set:html={rich(g)} />)}</ul>
+        </section>
+        <section>
+          <h2 class="eyebrow">What you need</h2>
+          <ul>{guide.need.map((g) => <li set:html={rich(g)} />)}</ul>
+        </section>
+      </div>
+
+      <section class="guide__prompt glass">
+        <span class="bolt bolt--tl" aria-hidden="true"></span>
+        <span class="bolt bolt--tr" aria-hidden="true"></span>
+        <span class="bolt bolt--bl" aria-hidden="true"></span>
+        <span class="bolt bolt--br" aria-hidden="true"></span>
+        <div class="guide__prompthead">
+          <h2 class="eyebrow">The prompt</h2>
+          <button class="guide__copy" type="button" data-copy-prompt data-copied="Copied">Copy the prompt</button>
+        </div>
+        <pre class="guide__pre" data-prompt-text>{guide.prompt}</pre>
+      </section>
+
+      <section>
+        <h2 class="eyebrow">What to change for your team</h2>
+        <ul>{guide.adapt.map((g) => <li set:html={rich(g)} />)}</ul>
+      </section>
+    </article>
+  </main>
+</Base>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('[data-copy-prompt]').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const text = document.querySelector<HTMLElement>('[data-prompt-text]')?.textContent ?? '';
+      try { await navigator.clipboard.writeText(text); } catch { /* clipboard blocked: the text is on the page to select */ }
+      const label = btn.textContent; btn.textContent = btn.dataset.copied ?? 'Copied';
+      window.setTimeout(() => { btn.textContent = label; }, 1600);
+    });
+  });
+</script>
+
+<style>
+  .guide { position: relative; min-height: 100svh; padding-top: calc(var(--header-height) + var(--section-y-sm)); padding-bottom: var(--section-y); }
+  .guide__wrap { position: relative; z-index: 1; width: min(calc(100% - var(--margin-side) * 2), 880px); margin: 0 auto; display: grid; gap: var(--group-gap); }
+  .guide__back { justify-self: start; }
+  .eyebrow { margin: 0; color: var(--ink-600); font-family: var(--font-paper); font-size: var(--text-eyebrow); font-weight: 500; letter-spacing: var(--track-label); text-transform: uppercase; }
+  h1 { margin: calc(-1 * var(--group-gap) + var(--space-3)) 0 0; font-size: var(--text-h1, var(--text-hero)); font-weight: 600; letter-spacing: var(--track-display); line-height: var(--lh-display); }
+  .guide__intro { margin: calc(-1 * var(--group-gap) + var(--space-4)) 0 0; max-width: 62ch; color: var(--ink-600); font-size: var(--text-body-lg); line-height: var(--lh-body); }
+  .guide__intro :global(.em), li :global(.em) { color: var(--ink-900); font-weight: 600; }
+  .guide__cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--group-gap); }
+  section > ul { margin: var(--space-3) 0 0; padding: 0 0 0 var(--space-4); list-style: '— '; display: grid; gap: var(--space-2); color: var(--ink-600); font-size: var(--text-body); line-height: var(--lh-body); }
+  .guide__prompt { position: relative; padding: var(--bolted-panel-padding); border-radius: var(--radius-sm); display: grid; gap: var(--space-4); }
+  .guide__prompthead { display: flex; justify-content: space-between; align-items: center; gap: var(--space-4); }
+  .guide__copy { padding: var(--space-2) var(--space-4); background: var(--ink-900); color: var(--paper-0); border: 0; border-radius: var(--radius-control); font: inherit; font-size: var(--text-small); font-weight: 500; cursor: pointer; }
+  .guide__pre { margin: 0; padding: var(--space-5); background: var(--paper-1); border: 1px solid var(--line-1); border-radius: var(--radius-sm); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; line-height: 1.6; color: var(--ink-900); white-space: pre-wrap; overflow-x: auto; }
+  @media (max-width: 640px) { .guide__cols { grid-template-columns: 1fr; } }
+</style>

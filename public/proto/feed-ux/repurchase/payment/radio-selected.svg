@@ -1,0 +1,50 @@
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="16" height="16" fill="#F5F5F5"/>
+<g id="Repurchase Flows">
+<path d="M-1299.5 -3013.5C-1299.5 -3014.6 -1298.6 -3015.5 -1297.5 -3015.5H2930.5C2931.6 -3015.5 2932.5 -3014.6 2932.5 -3013.5V1574.5C2932.5 1575.6 2931.6 1576.5 2930.5 1576.5H-1297.5C-1298.6 1576.5 -1299.5 1575.6 -1299.5 1574.5V-3013.5Z" fill="white"/>
+<path d="M-1297.5 -3015.5V-3014.5H2930.5V-3015.5V-3016.5H-1297.5V-3015.5ZM2932.5 -3013.5H2931.5V1574.5H2932.5H2933.5V-3013.5H2932.5ZM2930.5 1576.5V1575.5H-1297.5V1576.5V1577.5H2930.5V1576.5ZM-1299.5 1574.5H-1298.5V-3013.5H-1299.5H-1300.5V1574.5H-1299.5ZM-1297.5 1576.5V1575.5C-1298.05 1575.5 -1298.5 1575.05 -1298.5 1574.5H-1299.5H-1300.5C-1300.5 1576.16 -1299.16 1577.5 -1297.5 1577.5V1576.5ZM2932.5 1574.5H2931.5C2931.5 1575.05 2931.05 1575.5 2930.5 1575.5V1576.5V1577.5C2932.16 1577.5 2933.5 1576.16 2933.5 1574.5H2932.5ZM2930.5 -3015.5V-3014.5C2931.05 -3014.5 2931.5 -3014.05 2931.5 -3013.5H2932.5H2933.5C2933.5 -3015.16 2932.16 -3016.5 2930.5 -3016.5V-3015.5ZM-1297.5 -3015.5V-3016.5C-1299.16 -3016.5 -1300.5 -3015.16 -1300.5 -3013.5H-1299.5H-1298.5C-1298.5 -3014.05 -1298.05 -3014.5 -1297.5 -3014.5V-3015.5Z" fill="black" fill-opacity="0.1"/>
+<g id="Payment">
+<g clip-path="url(#clip0_4161_72978)">
+<rect x="-310.5" y="-341.5" width="360" height="720" fill="#EAEAF2"/>
+<g id="Frame 1973344801">
+<g id="Frame 1973344802">
+<g id="Frame 1973344664">
+<rect width="360" height="528" transform="translate(-310.5 -242.5)" fill="white"/>
+<g id="payment options">
+<g id="Frame 2147225816">
+<g id="Pay Online Card" filter="url(#filter0_d_4161_72978)">
+<rect x="-295" y="-31" width="329" height="301" rx="8.5" stroke="#9F2089"/>
+<g id="Pay Online Card_2">
+<rect x="-294.5" y="-30.5" width="328" height="112" rx="8" fill="white"/>
+<g id="Frame 1973347937">
+<g id="Line Icons">
+<rect width="16" height="16" rx="8" fill="#9F2089"/>
+<path id="Shape" d="M5.95945 10.4652L3.75036 8.25765C3.63142 8.13852 3.46994 8.07158 3.30154 8.07158C3.13314 8.07158 2.97166 8.13852 2.85272 8.25765C2.60443 8.50576 2.60443 8.90656 2.85272 9.15467L5.51381 11.8139C5.7621 12.062 6.16317 12.062 6.41146 11.8139L13.147 5.08309C13.3952 4.83498 13.3952 4.43419 13.147 4.18607C13.028 4.06695 12.8665 4 12.6981 4C12.5297 4 12.3683 4.06695 12.2493 4.18607L5.95945 10.4652Z" fill="white"/>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+<rect x="-310" y="-341" width="359" height="719" stroke="#73738C"/>
+</g>
+</g>
+<defs>
+<filter id="filter0_d_4161_72978" x="-299.5" y="-34.5" width="338" height="310" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="1"/>
+<feGaussianBlur stdDeviation="2"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.2 0 0 0 0 0.2 0 0 0 0 0.2 0 0 0 0.12 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_4161_72978"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_4161_72978" result="shape"/>
+</filter>
+<clipPath id="clip0_4161_72978">
+<rect x="-310.5" y="-341.5" width="360" height="720" fill="white"/>
+</clipPath>
+</defs>
+</svg>

@@ -1,0 +1,167 @@
+---
+// Full-bleed glass nav — one of the two structural bookends (brief §4).
+// Copy + structure from Figma frame 2003:156.
+interface Props {
+  active?: 'about' | 'projects' | 'contact' | 'ai';
+}
+
+const { active = 'about' } = Astro.props;
+---
+
+<header class="site-header glass glass--nav" data-hero-nav>
+  <div class="site-header__inner">
+    <a class="site-header__brand" href="/" aria-label="Uttham Udatthu — home">
+      <img
+        class="site-header__avatar"
+        data-header-avatar
+        src="/assets/avatar.png"
+        alt=""
+        width="64"
+        height="90"
+      />
+      <span class="site-header__wordmark on-glass">
+        UTTHAM <span class="site-header__wordmark-last">UDATTHU</span>
+      </span>
+    </a>
+    <nav class="site-header__nav" aria-label="Primary">
+      <a class:list={[{ 'is-active': active === 'about' }]} data-nav="about" href="/#about">About Me</a>
+      <a class:list={[{ 'is-active': active === 'projects' }]} data-nav="work" href="/#work">Projects</a>
+      <a class:list={[{ 'is-active': active === 'ai' }]} data-nav="ai" href="/#ai">AI Space</a>
+      <a class:list={[{ 'is-active': active === 'contact' }]} data-nav="contact" href="/#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: fixed;
+    inset: 0 0 auto 0;
+    z-index: var(--z-header);
+    border-left: none;
+    border-right: none;
+    border-top: none;
+  }
+
+  .site-header__inner {
+    width: min(calc(100% - var(--margin-side) * 2), var(--container-max));
+    margin-inline: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-5);
+    min-height: var(--header-height);
+    padding-block: var(--space-2);
+  }
+
+  .site-header__brand {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    text-decoration: none;
+  }
+
+  .site-header__avatar {
+    width: auto;
+    height: clamp(38px, 3.75vw, 52px);
+    transition: opacity var(--dur-2) var(--ease-standard);
+  }
+
+  /* on pages with the hero Instax photo, the avatar starts hidden — a
+     second small portrait right next to the big one reads as clutter —
+     and motion.js fades it back in once that photo scrolls out of view */
+  .site-header__avatar.is-hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .site-header__wordmark {
+    /* heading/h3 token — brand lockup, no Figma sizes */
+    font-family: var(--font-glass);
+    font-weight: 600;
+    font-size: var(--text-wordmark);
+    letter-spacing: var(--track-heading);
+    color: var(--ink-900);
+    white-space: nowrap;
+  }
+
+  .site-header__wordmark-last {
+    font-weight: 400;
+    color: var(--ink-600);
+    margin-inline-start: var(--space-1);
+  }
+
+  .site-header__nav {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: clamp(var(--space-4), 2vw, var(--space-6));
+  }
+
+  /* eyebrow-size type still needs a ≥44px tap target */
+  .site-header__nav a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 44px;
+    padding-block: var(--space-2);
+  }
+
+  .site-header__nav a {
+    /* Shared label: 12px, medium weight, 0.06em tracking. */
+    font-family: var(--font-glass);
+    font-weight: 500;
+    font-size: var(--text-eyebrow);
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--etch-ink);
+    transition: color var(--dur-1) var(--ease-standard);
+    text-shadow: var(--etch-shadow);
+    position: relative;
+  }
+
+  /* link hover — underline draws left→right (brief §9) */
+  .site-header__nav a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: var(--space-1);
+    height: 1.5px;
+    width: 100%;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform var(--dur-2) var(--ease-standard);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .site-header__nav a:hover::after {
+      transform: scaleX(1);
+    }
+  }
+
+  .site-header__nav a.is-active {
+    color: var(--amber-text);
+    text-shadow: var(--etch-shadow);
+  }
+
+  @media (max-width: 900px) {
+    .site-header__inner {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-1);
+      padding-block: var(--space-1);
+    }
+
+    .site-header__brand { gap: var(--space-2); }
+    .site-header__avatar { height: var(--space-6); }
+    .site-header__wordmark { font-size: var(--text-h4); }
+    .site-header__nav { justify-content: space-between; gap: var(--space-1); flex-wrap: nowrap; }
+    .site-header__nav a { min-block-size: 44px; padding-block: 0; font-size: var(--text-eyebrow); letter-spacing: var(--track-label); }
+  }
+
+  @media (max-width: 360px) {
+    .site-header__avatar { height: var(--space-6); }
+    .site-header__wordmark { font-size: var(--text-h4); }
+    .site-header__nav a { font-size: var(--text-eyebrow); }
+  }
+</style>

@@ -1,0 +1,579 @@
+{
+  "global": {
+    "paper": {
+      "0": {
+        "value": "#FAF9F4",
+        "type": "color",
+        "description": "Page background — near-white stock. Texture: fibres tile on the body background (scrolls), tooth + tone noise on body::before at --grain-opacity (fixed, multiply)"
+      },
+      "1": {
+        "value": "#FFFFFF",
+        "type": "color",
+        "description": "Raised cards, tiles, paper sheets"
+      },
+      "2": {
+        "value": "#F0ECE3",
+        "type": "color",
+        "description": "Inset wells, media placeholders"
+      },
+      "grain-opacity": {
+        "value": "0.07",
+        "type": "opacity",
+        "description": "The sheet's tooth and tonal unevenness (body::before, multiply). Fibres are authored at their own ink and do not scale with it."
+      },
+      "dust-alpha": {
+        "value": "0.3",
+        "type": "opacity",
+        "description": "The ceiling for anything the pointer ride leaves in the air (graphite dust); raised from the hero exhaust's 0.16 because it has to read at pointer scale. Rubber on the sheet is bounded by the coverage cap instead."
+      }
+    },
+    "ink": {
+      "400": {
+        "value": "#8C887C",
+        "type": "color",
+        "description": "Large metadata (>=18px) only — never small text (3.36:1 on paper)"
+      },
+      "600": {
+        "value": "#5C594F",
+        "type": "color",
+        "description": "Body secondary, captions"
+      },
+      "900": {
+        "value": "#16140E",
+        "type": "color",
+        "description": "Headings, primary text"
+      }
+    },
+    "line": {
+      "0": {
+        "value": "rgba(22, 20, 14, 0.07)",
+        "type": "color",
+        "description": "Subtle rules"
+      },
+      "1": {
+        "value": "rgba(22, 20, 14, 0.13)",
+        "type": "color",
+        "description": "Card borders, hairlines"
+      }
+    },
+    "amber": {
+      "400": {
+        "value": "#F7C36D",
+        "type": "color",
+        "description": "CTA hover"
+      },
+      "500": {
+        "value": "#F3B44A",
+        "type": "color",
+        "description": "Primary CTA fill, active state, annotations"
+      },
+      "700": {
+        "value": "#C8871F",
+        "type": "color",
+        "description": "Large amber accents only (2.87:1 on paper — not a focus ring)"
+      },
+      "text": {
+        "value": "#9C640C",
+        "type": "color",
+        "description": "Amber as small text on light surfaces (AA) and the focus ring (4.70:1)"
+      }
+    },
+    "graphite": {
+      "value": "rgba(58, 55, 46, 0.85)",
+      "type": "color",
+      "description": "Sketch/outline stroke color"
+    },
+    "glass": {
+      "nav-bg": {
+        "value": "rgba(247, 244, 236, 0.78)",
+        "type": "color",
+        "description": "Legacy hook, unused by .glass itself"
+      },
+      "overlay-bg": {
+        "value": "rgba(255, 253, 247, 0.85)",
+        "type": "color",
+        "description": "Legacy hook, unused by .glass itself"
+      },
+      "etch-ink": {
+        "value": "rgba(22, 20, 14, 0.86)",
+        "type": "color",
+        "description": "Warm-neutral ink for type resting on glass (--etch-ink)"
+      },
+      "etch-shadow": {
+        "value": "0 1px 0 rgba(255,255,255,0.6)",
+        "type": "boxShadow",
+        "description": "Embossed light edge under etched type (--etch-shadow)"
+      },
+      "warm-glow": {
+        "value": "rgba(247, 224, 186, 0.22)",
+        "type": "color",
+        "description": "The single warm glow inside .glass / .cta--glass (radial, top-left)"
+      }
+    },
+    "font": {
+      "paper": {
+        "value": "General Sans",
+        "type": "fontFamilies",
+        "description": "Everything on paper: headings, body, tiles, principles, labels, stickers, footer, case pages"
+      },
+      "glass": {
+        "value": "General Sans",
+        "type": "fontFamilies",
+        "description": "User revision: General Sans on glass as well as paper; only Caveat is used as the handwritten accent."
+      },
+      "hand": {
+        "value": "Caveat",
+        "type": "fontFamilies",
+        "description": "The paper's handwriting only: annotation, sticky notes, Instax captions, hi! bubble, cursor label"
+      }
+    },
+    "fontWeight": {
+      "regular": {
+        "value": "400",
+        "type": "fontWeights"
+      },
+      "medium": {
+        "value": "500",
+        "type": "fontWeights"
+      },
+      "semibold": {
+        "value": "600",
+        "type": "fontWeights"
+      }
+    },
+    "radius": {
+      "pill": {
+        "value": "999",
+        "type": "borderRadius",
+        "description": "Tag chips only; CTAs are sharp (0)"
+      },
+      "media": {
+        "value": "24",
+        "type": "borderRadius",
+        "description": "Legacy — no longer applied to any surface"
+      },
+      "card": {
+        "value": "16",
+        "type": "borderRadius",
+        "description": "Legacy — no longer applied to any surface"
+      },
+      "sm": {
+        "value": "8",
+        "type": "borderRadius",
+        "description": "Every surface since 2026-09-04: glass slabs, workboard, case artboard, work tiles, art window, AI mock shells. Nested insets: 2px."
+      },
+      "inset": {
+        "value": "2",
+        "type": "borderRadius",
+        "description": "Nested media inside an 8px surface."
+      },
+      "control": {
+        "value": "0",
+        "type": "borderRadius",
+        "description": "Sharp CTA corners."
+      }
+    },
+    "space": {
+      "1": {
+        "value": "4",
+        "type": "spacing"
+      },
+      "2": {
+        "value": "8",
+        "type": "spacing"
+      },
+      "3": {
+        "value": "12",
+        "type": "spacing"
+      },
+      "4": {
+        "value": "16",
+        "type": "spacing"
+      },
+      "5": {
+        "value": "24",
+        "type": "spacing"
+      },
+      "6": {
+        "value": "32",
+        "type": "spacing"
+      },
+      "7": {
+        "value": "48",
+        "type": "spacing"
+      },
+      "8": {
+        "value": "64",
+        "type": "spacing"
+      },
+      "9": {
+        "value": "96",
+        "type": "spacing"
+      },
+      "10": {
+        "value": "128",
+        "type": "spacing"
+      },
+      "11": {
+        "value": "160",
+        "type": "spacing"
+      },
+      "12": {
+        "value": "200",
+        "type": "spacing"
+      }
+    },
+    "rhythm": {
+      "section-y": {
+        "value": "clamp(96px, 10vh, 144px)",
+        "type": "spacing",
+        "description": "Single top separation between homepage sections; hardware padding is separate."
+      },
+      "section-y-sm": {
+        "value": "clamp(48px, 5vw, 72px)",
+        "type": "spacing"
+      },
+      "content-gap": {
+        "value": "clamp(16px, 2vw, 24px)",
+        "type": "spacing",
+        "description": "Related text, section-header-to-content gap and card padding."
+      },
+      "group-gap": {
+        "value": "clamp(24px, 3.5vw, 48px)",
+        "type": "spacing",
+        "description": "Column groups and panel side padding."
+      },
+      "control-gap": {
+        "value": "12",
+        "type": "spacing"
+      }
+    },
+    "layout": {
+      "container-max": {
+        "value": "1200",
+        "type": "sizing"
+      },
+      "margin-side": {
+        "value": "clamp(20px, 5.6vw, 80px)",
+        "type": "spacing",
+        "description": "40px ≤900, 20px ≤640"
+      },
+      "header-height": {
+        "value": "76",
+        "type": "sizing",
+        "description": "96 ≤900, 92 ≤360"
+      },
+      "grid-columns": {
+        "value": "12",
+        "type": "other",
+        "description": "8 ≤900, 4 ≤640. The centred 1200px maximum container has 13/9/5 equally spaced dashed guides including its outer edges, without paired gutter lines. Desktop hero spans 8 + 4 columns; stacked scene spans centred 8/12, 6/8 or all 4 phone columns."
+      },
+      "grid-gap": {
+        "value": "24",
+        "type": "spacing",
+        "description": "20 ≤900, 16 ≤640. Shared horizontal gutter for hero, project, principle and AI grids; decorative guides use equal intervals without gutter pairs."
+      },
+      "bolt-inset": {
+        "value": "18px",
+        "type": "spacing"
+      },
+      "bolt-size": {
+        "value": "16px",
+        "type": "sizing"
+      },
+      "bolt-clearance": {
+        "value": "var(--space-4)",
+        "type": "spacing",
+        "description": "Minimum 16px clear space beyond every bolt footprint."
+      },
+      "bolt-content-inset": {
+        "value": "calc(var(--bolt-inset) + var(--bolt-size) + var(--bolt-clearance))",
+        "type": "spacing",
+        "description": "50px static content rail from the top and bottom frame edges."
+      },
+      "bolted-panel-padding": {
+        "value": "max(var(--section-y-sm), calc(var(--bolt-content-inset) + var(--space-6)))",
+        "type": "spacing",
+        "description": "Hero/contact rails include 32px for tilt and entrance motion."
+      },
+      "bolted-board-padding": {
+        "value": "max(var(--bolted-panel-padding), var(--space-9))",
+        "type": "spacing",
+        "description": "Workboard rails: 96px; bottom increases to 128px where magnetic hover applies."
+      }
+    },
+    "shadow": {
+      "rest": {
+        "value": "0 2px 5px -2px rgba(22,20,14,.1), 0 10px 20px -14px rgba(22,20,14,.16)",
+        "type": "boxShadow",
+        "description": "Paper at rest: tiles, Instax"
+      },
+      "stuck": {
+        "value": "0 8px 14px -8px rgba(22,20,14,.28)",
+        "type": "boxShadow",
+        "description": "Stuck-on objects: sticky notes"
+      },
+      "lift": {
+        "value": "0 16px 28px -14px rgba(22,20,14,.32)",
+        "type": "boxShadow",
+        "description": "Hover lift, with translate 0 -2px"
+      },
+      "press": {
+        "value": "0 4px 8px -6px rgba(22,20,14,.3)",
+        "type": "boxShadow",
+        "description": "Pressed flat"
+      },
+      "drop-stuck": {
+        "value": "drop-shadow(0 8px 12px rgba(22,20,14,.24))",
+        "type": "filter",
+        "description": "SVG stickers"
+      }
+    },
+    "motion": {
+      "_note": "UI motion scale. Ambient loops and the SignalLoop scene are exempt. Under prefers-reduced-motion every duration → 0.01ms at :root.",
+      "linger": {
+        "value": "8000",
+        "type": "duration",
+        "description": "How long rubber stays on the paper before its 3s fade (pointer ride). The marks layer is off under reduced motion, so this is not zeroed."
+      },
+      "duration": {
+        "1": {
+          "value": "150",
+          "type": "duration",
+          "description": "Micro: feedback, pointer tracking, lamp fills"
+        },
+        "2": {
+          "value": "220",
+          "type": "duration",
+          "description": "Standard: hover lifts, shadows, small moves"
+        },
+        "3": {
+          "value": "400",
+          "type": "duration",
+          "description": "Moderate: staged sequences, one-time entrances"
+        },
+        "4": {
+          "value": "600",
+          "type": "duration",
+          "description": "Deliberate: scroll reveals, hero entrance"
+        }
+      },
+      "stagger": {
+        "1": {
+          "value": "70",
+          "type": "duration",
+          "description": "Between siblings in one reveal group"
+        }
+      },
+      "easing": {
+        "standard": {
+          "value": "cubic-bezier(0.2, 0, 0, 1)",
+          "type": "cubicBezier",
+          "description": "Moving between states"
+        },
+        "enter": {
+          "value": "cubic-bezier(0.22, 1, 0.36, 1)",
+          "type": "cubicBezier",
+          "description": "Arriving: fast in, soft settle"
+        },
+        "exit": {
+          "value": "cubic-bezier(0.3, 0, 1, 0.3)",
+          "type": "cubicBezier",
+          "description": "Leaving: gathers speed"
+        }
+      }
+    },
+    "tracking": {
+      "display": {
+        "value": "-0.03em",
+        "type": "letterSpacing",
+        "description": "Hero-size display"
+      },
+      "heading": {
+        "value": "-0.015em",
+        "type": "letterSpacing",
+        "description": "h2, h3, statements, glass titles"
+      },
+      "label": {
+        "value": "0.06em",
+        "type": "letterSpacing",
+        "description": "The one uppercase label style (12px / 500)"
+      }
+    },
+    "lineHeight": {
+      "display": {
+        "value": "1.05",
+        "type": "lineHeights"
+      },
+      "heading": {
+        "value": "1.15",
+        "type": "lineHeights"
+      },
+      "statement": {
+        "value": "1.4",
+        "type": "lineHeights"
+      },
+      "body": {
+        "value": "1.55",
+        "type": "lineHeights"
+      }
+    },
+    "zIndex": {
+      "surface-fx": {
+        "value": "5",
+        "type": "number",
+        "description": "Residue on the paper (pointer marks): above content, under the header"
+      },
+      "header": {
+        "value": "10",
+        "type": "number"
+      },
+      "float": {
+        "value": "20",
+        "type": "number"
+      },
+      "skip": {
+        "value": "100",
+        "type": "number"
+      }
+    }
+  },
+  "materials": {
+    "_note": "Composite recipes, not single CSS vars — copy the CSS verbatim rather than trying to flatten into one token; these are the site's signature surfaces.",
+    "glass": {
+      "description": "White liquid glass — the .glass class, on the fixed nav and every content slab (hero, workboard, contact panel, case artboard). Whatever sits behind stays visible through an 8px blur — the paper grid must read through; one warm glow, a diagonal white sheen. Content slabs carry four black machined bolts (.bolt, 16px, 18px from each corner); the nav does not.",
+      "css": "background: linear-gradient(120deg, rgba(255,255,255,.3), rgba(255,255,255,0) 40%, rgba(255,255,255,.14) 75%), radial-gradient(120% 90% at 12% 0%, var(--glass-warm-glow), transparent 62%), rgba(255,255,255,.44); backdrop-filter: blur(8px) saturate(1.5); box-shadow: inset 0 1px 0 rgba(255,255,255,.6), inset 1px 0 0 rgba(255,255,255,.35), -8px -8px 20px -20px rgba(255,255,255,.55), 0 1px 2px rgba(0,0,0,.04), 14px 18px 36px -22px rgba(22,20,14,.16); border: .5px solid var(--line-1);",
+      "reducedTransparencyFallback": "background: rgba(250,248,243,.97); backdrop-filter: none;"
+    },
+    "controls": {
+      "description": "One button family, three weights, on glass and paper alike (locked 2026-09-07). Every button is a die-cut sticker; weight is the stock alone.",
+      "sticker-base": "font: --font-paper 600 --text-small uppercase --track-label; padding: --space-3 --space-5; min-height: --space-7; border-radius: 0; rotate: -2deg (+1.5deg for a second sticker); box-shadow: --shadow-stuck; hover: rotate 0, translate 0 --lift-y, --shadow-lift; active: --shadow-press, flat",
+      "primary": {
+        "background": "var(--amber-500)",
+        "active": "var(--amber-400)",
+        "use": "the one primary action per view"
+      },
+      "secondary": {
+        "background": "rgba(255,255,255,.35)",
+        "border": "1.5px solid var(--amber-700)",
+        "color": "var(--amber-text)",
+        "use": "secondary action beside a primary"
+      },
+      "text-link": {
+        "font": "var(--font-paper) 500 var(--text-body)",
+        "underline": "2px var(--amber-700), offset 5px (3px pressed), ink on hover",
+        "use": "tertiary: Read the case, All projects"
+      }
+    }
+  },
+  "typography": {
+    "_note": "fontSize values are the implemented clamp() expressions (--text-* in global.css), not fixed px. Ceiling = desktop, floor = mobile.",
+    "display-hero": {
+      "value": {
+        "fontFamily": "General Sans",
+        "fontWeight": "600",
+        "fontSize": "clamp(42px, 4.6vw, 68px)",
+        "letterSpacing": "-0.03em",
+        "lineHeight": "1.05"
+      },
+      "type": "typography",
+      "description": "--text-hero"
+    },
+    "display-h2": {
+      "value": {
+        "fontFamily": "General Sans",
+        "fontWeight": "600",
+        "fontSize": "clamp(34px, 3.6vw, 52px)",
+        "letterSpacing": "-0.015em",
+        "lineHeight": "1.15"
+      },
+      "type": "typography",
+      "description": "--text-h2"
+    },
+    "heading-h3": {
+      "value": {
+        "fontFamily": "General Sans",
+        "fontWeight": "600",
+        "fontSize": "clamp(26px, 2.2vw, 34px)",
+        "letterSpacing": "-0.015em",
+        "lineHeight": "1.15"
+      },
+      "type": "typography",
+      "description": "--text-h3"
+    },
+    "heading-h4": {
+      "value": {
+        "fontFamily": "General Sans",
+        "fontWeight": "500",
+        "fontSize": "clamp(20px, 1.7vw, 24px)",
+        "letterSpacing": "-0.015em",
+        "lineHeight": "1.15"
+      },
+      "type": "typography",
+      "description": "--text-h4"
+    },
+    "body-lg": {
+      "value": {
+        "fontFamily": "General Sans",
+        "fontWeight": "400",
+        "fontSize": "clamp(17px, 1.35vw, 20px)",
+        "lineHeight": "1.55"
+      },
+      "type": "typography",
+      "description": "--text-body-lg"
+    },
+    "body-base": {
+      "value": {
+        "fontFamily": "General Sans",
+        "fontWeight": "400",
+        "fontSize": "clamp(16px, 1.1vw, 17px)",
+        "lineHeight": "1.55"
+      },
+      "type": "typography",
+      "description": "--text-body"
+    },
+    "label-eyebrow": {
+      "value": {
+        "fontFamily": "General Sans",
+        "fontWeight": "500",
+        "fontSize": "12",
+        "letterSpacing": "0.06em",
+        "textCase": "uppercase",
+        "lineHeight": "1.55"
+      },
+      "type": "typography",
+      "description": "--text-eyebrow: the one uppercase label style, on paper and glass."
+    },
+    "note": {
+      "value": {
+        "fontFamily": "Caveat",
+        "fontWeight": "500",
+        "fontSize": "clamp(18px, 1.4vw, 22px)",
+        "lineHeight": "1.4"
+      },
+      "type": "typography",
+      "description": "--text-note — annotation / note voice"
+    },
+    "annotation-hand": {
+      "value": {
+        "fontFamily": "Caveat",
+        "fontWeight": "500",
+        "fontSize": "clamp(32px, 3vw, 44px)",
+        "lineHeight": "1.05"
+      },
+      "type": "typography",
+      "description": "Handwritten page-navigator cue"
+    },
+    "small": {
+      "value": {
+        "fontFamily": "General Sans",
+        "fontWeight": "400",
+        "fontSize": "14",
+        "lineHeight": "1.55"
+      },
+      "type": "typography",
+      "description": "--text-small — footer, fine print"
+    }
+  },
+  "_revision": "2026-09-06: user explicitly limited the system to two families: General Sans and Caveat."
+}

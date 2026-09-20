@@ -1,0 +1,59 @@
+<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="20" height="20" fill="#F5F5F5"/>
+<g id="Repurchase Flows">
+<path d="M-1302 -2843C-1302 -2844.1 -1301.1 -2845 -1300 -2845H2928C2929.1 -2845 2930 -2844.1 2930 -2843V1745C2930 1746.1 2929.1 1747 2928 1747H-1300C-1301.1 1747 -1302 1746.1 -1302 1745V-2843Z" fill="white"/>
+<path d="M-1300 -2845V-2844H2928V-2845V-2846H-1300V-2845ZM2930 -2843H2929V1745H2930H2931V-2843H2930ZM2928 1747V1746H-1300V1747V1748H2928V1747ZM-1302 1745H-1301V-2843H-1302H-1303V1745H-1302ZM-1300 1747V1746C-1300.55 1746 -1301 1745.55 -1301 1745H-1302H-1303C-1303 1746.66 -1301.66 1748 -1300 1748V1747ZM2930 1745H2929C2929 1745.55 2928.55 1746 2928 1746V1747V1748C2929.66 1748 2931 1746.66 2931 1745H2930ZM2928 -2845V-2844C2928.55 -2844 2929 -2843.55 2929 -2843H2930H2931C2931 -2844.66 2929.66 -2846 2928 -2846V-2845ZM-1300 -2845V-2846C-1301.66 -2846 -1303 -2844.66 -1303 -2843H-1302H-1301C-1301 -2843.55 -1300.55 -2844 -1300 -2844V-2845Z" fill="black" fill-opacity="0.1"/>
+<g id="Payment">
+<g clip-path="url(#clip0_4161_72978)">
+<rect x="-313" y="-171" width="360" height="720" fill="#EAEAF2"/>
+<g id="Frame 1973344801">
+<g id="Frame 1973344802">
+<g id="Frame 1973344664">
+<rect width="360" height="528" transform="translate(-313 -72)" fill="white"/>
+<g id="payment options">
+<g id="Frame 2147225816">
+<g id="COD Nested" filter="url(#filter0_d_4161_72978)">
+<g clip-path="url(#clip1_4161_72978)">
+<g id="Pay Online Card">
+<mask id="path-7-inside-1_4161_72978" fill="white">
+<path d="M-297 -12C-297 -16.4183 -293.418 -20 -289 -20H24C28.4183 -20 32 -16.4183 32 -12V40H-297V-12Z"/>
+</mask>
+<path d="M-297 -12C-297 -16.4183 -293.418 -20 -289 -20H24C28.4183 -20 32 -16.4183 32 -12V40H-297V-12Z" fill="white"/>
+<path d="M-297 -20H32H-297M32 41H-297V39H32V41ZM32 39M-297 40V-20V40M-297 40M32 -20V40V-20" fill="#EAEAF2" mask="url(#path-7-inside-1_4161_72978)"/>
+<g id="smooth">
+<g id="Line Icons">
+<rect x="0.5" y="0.5" width="19" height="19" rx="9.5" fill="white"/>
+<rect x="0.5" y="0.5" width="19" height="19" rx="9.5" stroke="#CECEDE"/>
+</g>
+</g>
+</g>
+</g>
+<rect x="-297.5" y="-20.5" width="330" height="61" rx="8.5" stroke="#CECEDE"/>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+<rect x="-312.5" y="-170.5" width="359" height="719" stroke="#73738C"/>
+</g>
+</g>
+<defs>
+<filter id="filter0_d_4161_72978" x="-302" y="-24" width="339" height="70" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="1"/>
+<feGaussianBlur stdDeviation="2"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.2 0 0 0 0 0.2 0 0 0 0 0.2 0 0 0 0.12 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_4161_72978"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_4161_72978" result="shape"/>
+</filter>
+<clipPath id="clip0_4161_72978">
+<rect x="-313" y="-171" width="360" height="720" fill="white"/>
+</clipPath>
+<clipPath id="clip1_4161_72978">
+<rect x="-297" y="-20" width="329" height="60" rx="8" fill="white"/>
+</clipPath>
+</defs>
+</svg>

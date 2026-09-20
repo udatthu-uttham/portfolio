@@ -1,0 +1,1025 @@
+---
+import Base from '../layouts/Base.astro';
+import Header from '../components/Header.astro';
+import GridOverlay from '../components/GridOverlay.astro';
+import SectionRule from '../components/SectionRule.astro';
+import SignalLoop from '../components/SignalLoop.astro';
+import InstaxFrame from '../components/InstaxFrame.astro';
+import HiSticker from '../components/HiSticker.astro';
+import MotoSticker from '../components/MotoSticker.astro';
+import { studies, contact } from '../data/studies';
+import { rich } from '../lib/rich';
+import CaseIndex from '../components/CaseIndex.astro';
+import ToolBench from '../components/ToolBench.astro';
+const featuredStudies = studies.filter((s) => s.featured);
+const indexedStudies = studies.filter((s) => !s.featured);
+import { tools } from '../data/tools';
+import { Image } from 'astro:assets';
+import portrait from '../assets/uttham-portrait.webp';
+import rider from '../assets/rider.png';
+// Deck covers for the case tiles (slide 1 of each study's deck), keyed by file name.
+const coverFiles = import.meta.glob<ImageMetadata>('../assets/mall/*.{jpg,png}', { eager: true, import: 'default' });
+const covers: Record<string, ImageMetadata> = Object.fromEntries(
+  Object.entries(coverFiles).map(([path, img]) => [path.split('/').pop()!.replace(/\.(jpg|png)$/, ''), img])
+);
+
+// Authored copy; unfinished metrics stay out of the rendered page.
+const principles = [
+  {
+    title: 'Know the user two layers down.',
+    tag: 'What they do → why → what it costs them',
+    body: 'Every review carries the behaviour, the motive under it, and the trade-off it creates. I build the tooling that **makes that depth routine.**',
+  },
+  {
+    title: 'Evidence and craft, in the same room.',
+    tag: 'Open with the number. Close with the bar.',
+    body: 'Critique is where data meets design judgment. I run those rooms, and **mentor designers until they run their own.**',
+  },
+  {
+    title: 'Raise the org’s speed limit.',
+    tag: 'A sprint’s work in a day — for every team',
+    body: 'The biggest lever is what every team can do once the right tools exist. I build the systems that **make that the default.**',
+  },
+];
+---
+
+<Base title="Uttham Udatthu — Design Lead">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <Header />
+
+  <main id="main" tabindex="-1">
+    <h1 class="sr-only">Uttham Udatthu — design lead, systems thinker and builder</h1>
+
+    <!-- the dotted column grid runs under the entire page -->
+    <GridOverlay />
+
+    <!-- ============================ ABOUT / HERO ============================ -->
+    <section id="about" class="hero">
+
+      <div class="hero__stage">
+        <!-- The photo tucks behind the glass, inset clear of its corner bolts. -->
+        <div class="hero__hello" data-hero-hello>
+          <InstaxFrame label="Uttham Udatthu" rotate={-5}>
+            <Image
+              src={portrait}
+              alt="Uttham smiling on a boat, with green cliffs behind him"
+              width={480}
+              widths={[160, 320, 480]}
+              sizes="164px"
+              loading="eager"
+            />
+          </InstaxFrame>
+          <div class="hero__hello-sticker" aria-hidden="true">
+            <HiSticker />
+          </div>
+        </div>
+
+        <!-- The glass and its bolts sit in front of the tucked photo edge.
+             The bed holds the lamp behind the pane: same footprint, so the
+             light is only ever seen through the glass. -->
+        <div class="hero__bed">
+          <span class="glass-lamp" aria-hidden="true"></span>
+          <div class="hero__slab glass" data-hero-slab>
+            <span class="bolt bolt--tl" aria-hidden="true"></span>
+            <span class="bolt bolt--tr" aria-hidden="true"></span>
+            <span class="bolt bolt--bl" aria-hidden="true"></span>
+            <span class="bolt bolt--br" aria-hidden="true"></span>
+            <div class="hero__copy">
+              <div class="mask">
+                <p class="hero__lead" data-hero-line>
+                  I’m a <strong>design lead, systems thinker and builder.</strong>
+                  I run the signals at the <strong>busy intersections where user needs cross business goals.</strong>
+                </p>
+              </div>
+
+              <div class="hero__ctas" data-hero-ctas>
+                <a class="cta cta--primary" href="/uttham-udatthu-cv.pdf" download="Uttham-Udatthu-CV-2026.pdf">Download CV</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- The scene and its explanation are one compact, captioned figure. -->
+      <figure class="hero__aside" data-hero-art>
+        <figcaption class="mask">
+          <p class="hero__signals" data-hero-line>
+            <strong>These days I run the signals</strong><br />
+            — <strong>setting direction,</strong> deciding how to ship, and
+            <strong>clearing the road for <mark class="hl">people and AI agents</mark>.</strong>
+          </p>
+        </figcaption>
+        <div class="hero__art-window">
+          <SignalLoop />
+        </div>
+      </figure>
+    </section>
+
+    <!-- ============================ WORK / PROJECTS ======================== -->
+    <section id="work" class="section wrap" aria-label="Selected work">
+      <SectionRule label="Projects" />
+      <div class="sec-head rv">
+        <h2 class="sec-sub">The problems, the bets, what shipped.</h2>
+      </div>
+      <div class="workboard">
+        <!-- the pin-board behind the case-study pages, drifting slowly -->
+        <div class="workboard__board glass" aria-hidden="true">
+          <span class="bolt bolt--tl"></span>
+          <span class="bolt bolt--tr"></span>
+          <span class="bolt bolt--bl"></span>
+          <span class="bolt bolt--br"></span>
+        </div>
+        <div class="tiles">
+          {
+            featuredStudies.map((study, index) => (
+              <div class="tile-reveal rv" style={`--tile-layer: ${featuredStudies.length - index};`}>
+                <a
+                  class="tile"
+                  href={`/work/${study.slug}`}>
+                  <img class="tape" src="/assets/stickers/washi.svg" alt="" aria-hidden="true" />
+                  <div class="tile__top">
+                    <span class="pill">{study.kicker}</span>
+                    <span class="tile__year">{study.year}</span>
+                  </div>
+                  <h3>{study.title}</h3>
+                  <p class="tile__desc" set:html={rich(study.summary)} />
+                  <div class={`tile__media ${study.deck ? 'tile__media--deck' : ''}`}>
+                    {study.deck && covers[study.deck.screen] ? (
+                      <div class="tile__deck"><Image src={covers[study.deck.screen]} alt="" widths={[240, 480]} sizes="240px" /></div>
+                    ) : (
+                      study.placeholder && <span class="tile__ph">{study.placeholder}</span>
+                    )}
+                  </div>
+                  <span class="tile__go text-link">Read the case <span class="tile__arr" aria-hidden="true">→</span></span>
+                </a>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+      <CaseIndex items={indexedStudies} />
+    </section>
+
+    <!-- ============================ AI SPACE ============================== -->
+    <section id="ai" class="section wrap" aria-label="AI Space">
+      <SectionRule label="AI Space" />
+      <div class="sec-head rv">
+        <h2 class="sec-sub">Tools I build so the team moves faster.</h2>
+      </div>
+
+      <!-- Each tool renders inside its own chrome, the way it actually runs.
+           Every preview carries synthetic data — see src/data/tools.ts. -->
+      <ToolBench tools={tools} />
+    </section>
+
+    <!-- ============================ CONTACT =============================== -->
+    <section id="contact" class="section wrap" aria-label="Contact">
+      <SectionRule label="Contact" />
+      <!-- How I lead: one white paper sheet, the same stock as the case tiles,
+           so the three principles read as one object pinned above the glass -->
+      <div class="prin prin--sheet rv">
+        <h3 class="prin__title">How I lead</h3>
+        {
+          principles.map((p, index) => (
+            <div class:list={['prin__item', 'rv', { 'rv-d1': index === 1, 'rv-d2': index === 2 }]}>
+              <h3>{p.title}</h3>
+              <p class="prin__tag">{p.tag}</p>
+              <p set:html={rich(p.body)} />
+            </div>
+          ))
+        }
+      </div>
+      <div class="contact-panel glass rv contact-panel--after-prin">
+        <span class="bolt bolt--tl" aria-hidden="true"></span>
+        <span class="bolt bolt--tr" aria-hidden="true"></span>
+        <span class="bolt bolt--bl" aria-hidden="true"></span>
+        <span class="bolt bolt--br" aria-hidden="true"></span>
+        <div class="contact-panel__body">
+          <h2 class="contact-panel__title on-glass">Let’s catch up</h2>
+          <p class="contact-panel__sub">If our roads cross</p>
+
+          <!-- every way to reach me is a sticky note on the acrylic -->
+          <ul class="note-row">
+            <li>
+              <a class="note-link" style="--note-tilt: -3deg" href={`mailto:${contact.email}`}>
+                <span>email me</span>
+                <small>{contact.email}</small>
+                <span class="note-link__arrow" aria-hidden="true">→</span>
+              </a>
+            </li>
+            <li>
+              <a
+                class="note-link"
+                style="--note-tilt: 2deg"
+                href={contact.linkedin}
+                target="_blank"
+                rel="noopener">
+                <span>LinkedIn</span>
+                <small>{contact.linkedinHandle}</small>
+                <span class="note-link__arrow" aria-hidden="true">→</span>
+              </a>
+            </li>
+            <li>
+              <a
+                class="note-link"
+                style="--note-tilt: -1.5deg"
+                href={contact.whatsapp}
+                target="_blank"
+                rel="noopener">
+                <span>WhatsApp</span>
+                <small>{contact.phone}</small>
+                <span class="note-link__arrow" aria-hidden="true">→</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- me & the bike — every ride badge lives on this photo -->
+        <div class="contact-panel__photo rv rv-d1">
+          <InstaxFrame
+            label="Uttham on the bike"
+            caption="my peaceful zone = race tracks"
+            rotate={-3}
+            aspect="1500 / 1602"
+          >
+            <Image
+              src={rider}
+              alt="Uttham in riding gear on his motorcycle"
+              width={720}
+              widths={[360, 540, 720]}
+              sizes="(max-width: 639px) 340px, 360px"
+              loading="lazy"
+            />
+          </InstaxFrame>
+          <MotoSticker variant="forest" rotate={-10} />
+          <MotoSticker variant="speed" rotate={5} />
+        </div>
+      </div>
+    </section>
+
+    <footer class="wrap site-footer">
+      <SectionRule />
+      <span>© 2026 Uttham Udatthu</span>
+      <span class="site-footer__colophon">
+        General Sans · Caveat
+        <span class="footer-sticker" style="--note-tilt: 2deg">crafted with lots of Claude tokens 😛</span>
+      </span>
+    </footer>
+  </main>
+</Base>
+
+<style>
+  /* ============================ shared layout ========================= */
+  main {
+    position: relative; /* the page-wide grid overlay anchors to this */
+  }
+
+  .wrap {
+    width: min(calc(100% - var(--margin-side) * 2), var(--container-max));
+    margin-inline: auto;
+  }
+
+  .section,
+  .site-footer :global(.rule) { flex-basis: 100%; margin-bottom: 0; } /* its own row, so the copyright starts at the edge; the row gap is the 12px every ruler keeps */
+  .site-footer { position: relative; }
+
+  .section,
+  .site-footer {
+    /* lift content above the page-wide grid overlay */
+    position: relative;
+    z-index: 1;
+  }
+
+  .section {
+    /* One section gap, rather than adjacent top and bottom gaps added up. */
+    padding-block: var(--section-y) 0;
+    font-size: var(--text-body);
+    scroll-margin-top: var(--header-height);
+  }
+
+  section[id] {
+    scroll-margin-top: var(--header-height);
+  }
+
+  /* Contact hardware and badges are contained inside the panel. */
+  /* The sheet slides under the glass the way the hero photo does under the slab. */
+  /* The hero is content-height: its ruler sits one small step below the slab so the
+     ruler and its heading show inside the first fold. */
+  #work { padding-top: var(--section-y-sm); }
+  #contact {
+    scroll-margin-top: calc(var(--header-height) + var(--content-gap));
+  }
+
+  /* One quiet heading per section: the nav word, close to its content and far
+     from the section before it. No label above, no deck below (plans/016). */
+  .sec-head {
+    margin-bottom: var(--content-gap);
+  }
+  /* the section's heading is its sentence; the name lives on the ruler above */
+  .sec-sub {
+    margin: 0;
+    max-width: 52ch;
+    font-family: var(--font-paper);
+    font-size: var(--text-h3);
+    font-weight: 500;
+    letter-spacing: 0;
+    line-height: var(--lh-statement);
+    color: var(--ink-900);
+    text-wrap: balance;
+  }
+
+  h2 {
+    margin: 0;
+    text-wrap: balance;
+    font-family: var(--font-paper);
+    font-size: var(--text-h3);
+    font-weight: 600;
+    line-height: var(--lh-heading);
+    letter-spacing: var(--track-heading);
+  }
+
+  h3 {
+    margin: 0;
+    text-wrap: balance;
+    font-family: var(--font-paper);
+    font-size: var(--text-h3);
+    font-weight: 600;
+    line-height: var(--lh-heading);
+    letter-spacing: var(--track-heading);
+  }
+
+  /* reveal */
+  .rv {
+    opacity: 0;
+    transform: translateY(16px);
+    transition:
+      opacity var(--dur-4) var(--ease-enter),
+      transform var(--dur-4) var(--ease-enter);
+  }
+  .rv.is-in { opacity: 1; transform: none; }
+  .rv-d1 { transition-delay: var(--stagger-1); }
+  .rv-d2 { transition-delay: calc(var(--stagger-1) * 2); }
+  .rv-d3 { transition-delay: calc(var(--stagger-1) * 3); }
+
+  /* ============================ hero ================================= */
+  .hero {
+    position: relative;
+    z-index: 1; /* above the page-wide grid */
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    /* Keep the portrait safely below the fixed header. */
+    padding-top: calc(var(--header-height) + var(--group-gap));
+    padding-bottom: 0;
+  }
+
+  /* The bed carries the lamp behind the pane and takes the slab's place in
+     the stage grid. It is the positioning context for .glass-lamp, nothing more. */
+  .hero__bed {
+    position: relative;
+    z-index: 2;
+    min-width: 0;
+  }
+
+  .hero__slab {
+    position: relative;
+    z-index: 1; /* above the lamp in the bed; the bed carries the page-level z */
+    border-radius: var(--radius-sm);
+  }
+
+  .hero__copy {
+    /* Hardware rails include clearance for the CTA's entrance movement. */
+    padding: var(--bolted-panel-padding) var(--panel-padding);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    text-align: left;
+  }
+
+  .hero__art-window { border-radius: var(--radius-sm); }
+
+  .hero__lead {
+    font-family: var(--font-glass);
+    font-weight: 400;
+    margin: 0;
+    font-size: var(--text-h3); /* the locked 38-word bio needs one step down from the old 42px */
+    line-height: var(--lh-statement);
+    text-wrap: pretty;
+    letter-spacing: var(--track-heading);
+    color: var(--etch-ink);
+    max-width: none;
+    text-shadow: var(--etch-shadow);
+  }
+
+  /* the signals paragraph — a handwritten annotation on the scene */
+  .hero__signals {
+    font-family: var(--font-hand);
+    font-weight: 500;
+    margin: 0;
+    font-size: var(--text-note);
+    line-height: var(--lh-statement);
+    letter-spacing: 0;
+    color: var(--ink-600);
+    max-width: none;
+  }
+
+  /* Give the handwritten caption a small inset without separating it
+     from the scene that it explains. */
+  .hero__aside .mask {
+    padding-block: var(--space-1);
+  }
+
+  .hero__lead strong { font-weight: 600; }
+  .hero__signals strong { font-weight: 600; color: var(--ink-900); }
+
+  /* The instant photo is behind the glass, outside the bolt's footprint. */
+  .hero__hello {
+    position: relative;
+    z-index: 0;
+    width: clamp(120px, 13vw, 164px);
+    /* The tuck is deliberately deep: the photo's edge disappearing under the
+       pane is the most convincing glass on the page, so the pane gets a real
+       amount of it to bend rather than a sliver. The Instax chin is what goes
+       under — the subject stays clear (Uttham, 2026-09-19). */
+    margin: 0 0 calc(var(--space-7) * -1) var(--space-8);
+  }
+
+  .hero__hello :global(.instax) { width: 100%; }
+
+  .hero__hello-sticker {
+    /* The sticker bites the photo's top-right corner and spends the rest of
+       itself on the board. Offsets are expressed in the sticker's own width
+       so the bite stays the same fraction at every size: ~1/3 of it lands on
+       the photo (enough to read as holding the corner down), ~2/3 on open
+       paper, where it has room to move (revised 2026-09-19).
+       It still clears the fixed nav: the lift is under half its height, and
+       the photo starts a full group-gap below the header. */
+    --hi-size: clamp(52px, 5vw, 72px);
+    position: absolute;
+    width: var(--hi-size);
+    top: calc(var(--hi-size) * -0.22);
+    right: calc(var(--hi-size) * -0.8);
+    rotate: 12deg;
+    filter: var(--drop-stuck);
+  }
+
+  .hero__ctas {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: var(--control-gap);
+    margin-top: var(--group-gap);
+  }
+
+  .hero__stage {
+    position: relative;
+    z-index: 2;
+    isolation: isolate;
+    grid-column: 1 / -1;
+    min-width: 0;
+  }
+
+  .hero__aside {
+    position: relative;
+    z-index: 0;
+    grid-column: 1 / -1;
+    min-width: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-3);
+    text-align: left;
+  }
+
+  .hero__art-window {
+    width: 100%;
+    overflow: hidden;
+    aspect-ratio: 720 / 416;
+  }
+
+
+  .mask { overflow: hidden; }
+
+  /* ============================ work tiles =========================== */
+  /* The pin-board: sits behind the case-study pages. Plain shared glass —
+     same material as the hero slab and contact panel, no extra texture. */
+  .workboard + :global(.case-index) { margin-top: var(--group-gap); }
+  .workboard {
+    position: relative;
+    /* Tape extends above the sheets; magnetic tilt extends their lower edge. */
+    padding-block: var(--bolted-board-padding);
+  }
+
+  @media (min-width: 768px) and (hover: hover) and (pointer: fine) {
+    /* Retain the hardware allowance for the moving sheets. */
+    .workboard { padding-bottom: max(var(--bolted-board-padding), var(--space-9)); }
+  }
+
+  .workboard__board {
+    position: absolute;
+    /* The board starts below its heading. Only its side frame bleeds into
+       the gutter; top/bottom padding contains the tape and bolts. */
+    inset: 0 calc(min(var(--content-gap), var(--margin-side)) * -1);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+  }
+
+  .tiles {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    /* Two featured tiles share the row; a third fits beside them at desktop.
+       Below ~320px per tile the row wraps, and phones get one column. */
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+    /* Clear the rotated tape's ~18px visible overhang and the card shadow. */
+    gap: var(--space-7) var(--grid-gap);
+  }
+
+  /* Reveal the sheet wrapper so GSAP's magnetic transform and the touch
+     press never replace the entrance transform or its stagger. */
+  .tile-reveal {
+    position: relative;
+    display: grid;
+    min-width: 0;
+    isolation: isolate;
+    /* A card and its tape share one layer. Earlier cards stay above later
+       tape through reveals, tilt and press, regardless of column count. */
+    z-index: var(--tile-layer);
+  }
+  .tile-reveal:nth-child(3n + 1) { transition-delay: 0ms; }
+  .tile-reveal:nth-child(3n + 2) { transition-delay: var(--stagger-1); }
+  .tile-reveal:nth-child(3n) { transition-delay: calc(var(--stagger-1) * 2); }
+
+  .tile {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    padding: var(--card-padding);
+    font-family: var(--font-paper);
+    background: var(--paper-1);
+    border: 1px solid var(--line-1);
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    color: inherit;
+    /* A resting shadow is load-bearing, not decoration: these white sheets
+       sit on a near-white glass board, so without it they merge into one
+       continuous white slab — most visibly in the single-column layout,
+       where a card spans nearly the whole board and the row-gap stops
+       reading as a gap at all. */
+    box-shadow:
+      var(--shadow-rest);
+    /* transform is NOT transitioned here on purpose: GSAP owns it on fine
+       pointers (motion.js) and writes a new inline value every animation
+       frame — a CSS transition on the same property would re-ease each of
+       those already-eased frames, compounding into a mushy, laggy feel.
+       Touch/no-hover devices get their own transform transition below,
+       where nothing else is animating it. */
+    transition:
+      box-shadow var(--dur-2) var(--ease-standard),
+      border-color var(--dur-2) var(--ease-standard);
+  }
+
+  @media (hover: none), (pointer: coarse) {
+    .tile {
+      transition:
+        transform var(--dur-1) var(--ease-enter),
+        box-shadow var(--dur-2) var(--ease-standard),
+        border-color var(--dur-2) var(--ease-standard);
+    }
+    /* press feedback for touch — GSAP owns transform on fine pointers */
+    .tile:active { transform: scale(0.98); }
+  }
+
+  /* Hover motion is retired (Uttham, 2026-09-20). Nothing lifts, tilts or
+     straightens; the card states its affordance with its border and its arrow. */
+  @media (hover: hover) and (pointer: fine) {
+    .tile:hover { border-color: rgba(22, 20, 14, 0.3); }
+    .tile:hover .tile__arr { transform: translateX(4px); }
+  }
+
+  /* Uttham's washi tape holds each page to the board — one strip, dead
+     centre. The vertical tape asset is laid sideways across the top edge. */
+  .tape {
+    position: absolute;
+    top: calc(var(--space-7) * -1 + var(--space-1));
+    left: calc(50% - var(--space-4));
+    width: var(--space-6);
+    height: auto;
+    rotate: 92deg;
+    transform-origin: center;
+    mix-blend-mode: multiply;
+    opacity: 0.9;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  /* transform is owned by the magnetic-tile GSAP tween on fine pointers
+     (motion.js) — it always wins over a CSS transform here, so this rule
+     only actually drives translateY on touch/coarse-pointer devices where
+     that script bails out. Shadow/border apply everywhere either way. */
+  .tile:focus-visible {
+    outline: 2px solid var(--amber-text);
+    outline-offset: var(--space-1);
+  }
+
+  .tile__top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .pill {
+    font-family: var(--font-paper);
+    font-size: var(--text-eyebrow);
+    font-weight: 500;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--line-1);
+    border-radius: var(--radius-pill);
+    color: var(--ink-600);
+  }
+
+  .tile__year {
+    color: var(--ink-600);
+    font-family: var(--font-paper);
+    font-size: var(--text-eyebrow);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    letter-spacing: var(--track-label);
+  }
+
+  .tile__desc {
+    color: var(--ink-600);
+    margin: 0;
+    text-wrap: pretty;
+    /* Two lines are reserved whether or not the copy fills them, so every tile's
+       preview well starts on the same line and the row reads as one shelf. */
+    min-height: calc(2em * var(--lh-body));
+    text-wrap: balance;
+  }
+  .tile__desc :global(.em) { color: var(--ink-900); font-weight: 600; }
+
+  .tile__media {
+    /* Taller than the old 16/10: a phone standing in the well needs the height,
+       and at 16/10 it overflowed and was clipped mid-screen (Uttham, 2026-09-20). */
+    aspect-ratio: 4 / 3;
+    /* concentric: inner radius = outer (8px) − padding (32px) → effectively square */
+    border-radius: var(--radius-inset);
+    background: var(--paper-2);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink-600);
+    font-size: var(--text-eyebrow);
+    text-align: center;
+    padding: var(--space-4);
+    font-weight: 500;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    line-height: var(--lh-body);
+  }
+
+  .tile__media--deck { align-items: end; padding: var(--space-5) var(--space-5) 0; background: var(--mall-lavender); }
+  /* The phone is sized off the well's HEIGHT, not its width, so it always stands
+     flush on the bottom edge and is never cut off mid-screen. Width follows the
+     aspect ratio; the cap keeps it from dominating a wide tile. */
+  .tile__deck {
+    height: 100%;
+    width: auto;
+    max-width: 52%;
+    aspect-ratio: 9 / 15;
+    overflow: hidden;
+    border: 1px solid var(--line-1);
+    border-bottom: 0;
+    border-radius: 18px 18px 0 0;
+    background: #fff;
+    box-shadow: var(--shadow-rest);
+  }
+  .tile__deck img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+  .tile__media :global(svg),
+  .tile__media :global(.case-art) {
+    width: 100%;
+    height: 100%;
+  }
+
+  .tile h3 { font-size: var(--text-h4); }
+  .tile__go {
+    margin-top: auto;
+  }
+
+  .tile__arr { transition: transform var(--dur-2) var(--ease-standard); }
+
+  /* ============================ principles =========================== */
+  /* How I lead — three plain statements on the paper. Space does the grouping:
+     within an item --space-2, between items --grid-gap (≥ 2×), and the block
+     sits nearer its chapter note than the glass below it. */
+  .prin {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-6) var(--grid-gap);
+  }
+  /* One sheet of the tiles' white stock: the principles are a paper object, not loose text. */
+  .prin--sheet {
+    position: relative;
+    z-index: 0;
+    /* Narrower than the glass and tucked 160px under it, like a sheet slid into a folder
+       (Uttham's call: on the measure it looked off here). The top margin leaves room for
+       the sticker to clear the ruler's label; the bottom padding is the tuck plus one
+       step, so only a small band of paper shows between the last line and the glass. */
+    margin: var(--space-6) var(--group-gap) calc(-1 * var(--space-11));
+    padding: var(--group-gap) var(--group-gap) calc(var(--space-6) + var(--space-11));
+    background: var(--paper-1);
+    border: 1px solid var(--line-1);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-rest);
+  }
+  /* "How I lead" is an amber sticker holding the sheet's top-left corner to the
+     paper, the way the hi! sticker holds the hero photo. Handwriting, tilted, stuck. */
+  .prin__title {
+    /* Stuck on the sheet's top edge, centred — the way a label goes on a folder
+       rather than dog-eared into the corner (Uttham, 2026-09-20). */
+    position: absolute;
+    top: calc(var(--space-4) * -1);
+    left: 50%;
+    translate: -50% 0;
+    z-index: 2;
+    margin: 0;
+    padding: var(--space-1) var(--space-3) calc(var(--space-1) + 2px);
+    background: var(--amber-500);
+    color: var(--ink-900);
+    font-family: var(--font-hand);
+    font-size: var(--text-note);
+    font-weight: 600;
+    line-height: var(--lh-heading);
+    letter-spacing: 0;
+    text-transform: none;
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-stuck);
+    rotate: -5deg;
+  }
+
+  /* Each principle is three rows on a shared grid, so titles, taglines and bodies
+     line up across the columns and the sheet reads as a table, not three floating blocks. */
+  .prin__item { display: grid; grid-template-rows: subgrid; grid-row: span 3; row-gap: 0; align-content: start; }
+  .prin__item + .prin__item { padding-inline-start: var(--space-6); border-inline-start: 1px dashed var(--line-mark); }
+  .prin__item h3 { margin: 0; font-size: var(--text-h4); letter-spacing: var(--track-heading); line-height: var(--lh-heading); text-wrap: balance; }
+  .prin__item :where(p) { margin: 0; color: var(--ink-600); text-wrap: pretty; }
+  .prin__item .prin__tag { margin-top: var(--space-2); padding-bottom: var(--space-3); color: var(--ink-600); font-family: var(--font-paper); font-size: var(--text-small); font-weight: 500; letter-spacing: var(--track-label); text-transform: uppercase; border-bottom: 1px solid var(--line-1); }
+  .prin__item .prin__tag + p { margin-top: var(--space-3); font-size: var(--text-small); line-height: var(--lh-body); }
+  .prin__item :where(p) :global(.em) { color: var(--ink-900); font-weight: 600; }
+
+  /* ============================ contact ============================== */
+  .contact-panel--after-prin { position: relative; z-index: 1; margin-top: 0; }
+
+  .contact-panel {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    gap: var(--group-gap);
+    align-items: center;
+    border-radius: var(--radius-sm);
+    padding: var(--bolted-panel-padding) var(--panel-padding);
+    overflow: visible;
+  }
+
+  .contact-panel__body { max-width: 640px; }
+
+  /* me & the bike — the stickers live on this photo */
+  .contact-panel__photo {
+    position: relative;
+    /* Reserve the badge's space inside this group instead of over the bolts or past the glass. */
+    padding-top: var(--space-6);
+    padding-inline-end: var(--space-7);
+  }
+
+  .contact-panel__photo :global(.instax) {
+    width: min(100%, 340px);
+    margin-inline: auto;
+  }
+
+  .contact-panel__photo :global(.instax__ph) {
+    /* The missing-photo label needs its own clear area between the badges. */
+    max-width: var(--space-11);
+    margin-bottom: var(--space-8);
+  }
+
+  .contact-panel__photo :global(.moto--forest) {
+    position: absolute;
+    width: clamp(96px, 9vw, 124px);
+    /* hangs off the frame's top-right corner, about a third on the photo */
+    top: calc(var(--space-2) * -1);
+    right: 0;
+    z-index: 3;
+  }
+
+  .contact-panel__photo :global(.moto--speed) {
+    position: absolute;
+    width: clamp(136px, 13vw, 172px);
+    /* hangs off the photo's right edge below the badge, clear of the caption strip */
+    top: 44%;
+    right: calc(var(--space-6) * -1);
+    z-index: 3;
+  }
+
+
+  /* Contact copy is etched on glass; handwritten notes remain separate. */
+  .contact-panel__title {
+    max-width: 16ch;
+    margin: 0;
+    font-family: var(--font-glass);
+    font-weight: 600;
+    font-size: var(--text-h3);
+    line-height: var(--lh-heading);
+    letter-spacing: var(--track-heading);
+  }
+
+  .contact-panel__sub {
+    max-width: 560px;
+    margin: var(--space-2) 0 0;
+    color: var(--ink-600);
+    font-family: var(--font-glass);
+    font-weight: 400;
+    font-size: var(--text-body-lg);
+    line-height: var(--lh-body);
+  }
+
+  /* contact actions are sticky notes stuck to the acrylic */
+  .note-row {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-5);
+    /* the notes are tilted, so they need a full group gap below the deck */
+    margin: var(--group-gap) 0 0;
+    padding: 0;
+  }
+
+  .note-row li {
+    /* wide enough for the full email address on one line */
+    width: clamp(232px, 18vw, 260px);
+    max-width: 100%;
+  }
+
+  .note-link {
+    --note-tilt: -2deg;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    width: 100%;
+    min-height: var(--space-9);
+    padding: var(--space-4) var(--space-4) var(--space-3);
+    background: var(--amber-400);
+    border: 1px solid var(--line-1);
+    border-radius: var(--radius-sm);
+    color: var(--ink-900);
+    text-decoration: none;
+    font-family: var(--font-hand);
+    font-size: var(--text-note);
+    font-weight: 500;
+    line-height: var(--lh-heading);
+    rotate: var(--note-tilt);
+    box-shadow: var(--shadow-stuck);
+    transition:
+      rotate var(--dur-2) var(--ease-standard),
+      translate var(--dur-2) var(--ease-standard),
+      box-shadow var(--dur-2) var(--ease-standard);
+  }
+
+  .note-link:focus-visible {
+    outline: 2px solid var(--amber-text);
+    outline-offset: var(--space-1);
+  }
+
+  /* Pressed flat: tilt returns, lift gone, shadow shrinks. */
+  .note-link:active {
+    rotate: var(--note-tilt);
+    translate: 0 0;
+    box-shadow: var(--shadow-press);
+    transition-duration: var(--dur-1);
+    transition-timing-function: var(--ease-enter);
+  }
+
+  .note-link small {
+    white-space: nowrap;
+    font-family: var(--font-paper);
+    font-size: var(--text-small);
+    font-weight: 400;
+    letter-spacing: 0;
+    line-height: var(--lh-body);
+    color: var(--ink-900);
+    overflow-wrap: anywhere;
+    word-break: normal;
+    text-transform: none;
+  }
+
+  .note-link__arrow {
+    margin-top: auto;
+    align-self: flex-end;
+    font-size: var(--text-body-lg);
+  }
+
+  /* ============================ ai space ============================= */
+  /* ============================ footer =============================== */
+  .site-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    /* the bottom clears the floating page navigator */
+    padding-block: var(--section-y-sm) var(--space-9);
+    color: var(--ink-600);
+    font-size: var(--text-small);
+  }
+  .site-footer__colophon { display: inline-flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; }
+  /* the credit is a small stuck-on note, the same stock as the sticky notes */
+  .footer-sticker {
+    display: inline-block;
+    padding: var(--space-1) var(--space-3);
+    background: var(--amber-400);
+    color: var(--ink-900);
+    font-family: var(--font-hand);
+    font-size: var(--text-body);
+    font-weight: 600;
+    line-height: var(--lh-heading);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-stuck);
+    rotate: var(--note-tilt, 2deg);
+  }
+
+  /* The slab and scene occupy the same foundation grid as the paper guides.
+     The caption remains attached to the scene within its column span. */
+  .hero {
+    display: grid;
+    grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
+    gap: var(--group-gap) var(--grid-gap);
+    width: min(calc(100% - var(--margin-side) * 2), var(--container-max));
+    margin-inline: auto;
+  }
+
+  @media (min-width: 641px) and (max-width: 900px) {
+    .hero__aside { grid-column: 2 / -2; }
+  }
+
+  @media (min-width: 901px) and (max-width: 1023px) {
+    .hero__aside { grid-column: 3 / -3; }
+  }
+
+  @media (min-width: 1024px) {
+    .hero {
+      grid-template-rows: auto auto;
+      row-gap: 0;
+    }
+    .hero__stage {
+      grid-column: 1 / 9;
+      grid-row: 1 / 3;
+      display: grid;
+      grid-template-rows: subgrid;
+    }
+    .hero__aside {
+      grid-column: 9 / -1;
+      grid-row: 2;
+      align-self: center;
+    }
+  }
+
+  @media (max-width: 1023px) {
+    .contact-panel { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  }
+  @media (max-width: 639px) {
+    .contact-panel { grid-template-columns: 1fr; }
+    .contact-panel__photo { width: min(100%, 340px); margin: 0 auto; }
+  }
+  @media (max-width: 900px) {
+    /* the three principles stay side by side down to phone width; the body drops to small text */
+    .prin { gap: var(--space-6) var(--grid-gap); }
+    .prin__item + .prin__item { padding-inline-start: var(--space-4); }
+  }
+
+  /* ============================ narrow ============================== */
+  @media (max-width: 767px) {
+    .prin { grid-template-columns: 1fr; gap: var(--space-6); }
+    .prin__item { display: flex; flex-direction: column; }
+    .prin__item + .prin__item { padding-inline-start: 0; border-inline-start: 0; padding-top: var(--space-5); border-top: 1px dashed var(--line-mark); }
+    .prin--sheet { margin-inline: var(--space-4); }
+    .tiles { grid-template-columns: 1fr; gap: var(--space-7); }
+    .tile-reveal:nth-child(n) { transition-delay: 0ms; }
+    .contact-panel__photo :global(.moto--speed) { right: calc(var(--space-4) * -1); }
+    .note-row { gap: var(--space-4); }
+    .note-row li { width: 232px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .rv, .rv.is-in, .tile:active, .tile:hover .tile__arr { transform: none; }
+    .note-link:active { rotate: var(--note-tilt); translate: none; }
+  }
+</style>

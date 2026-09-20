@@ -1,0 +1,327 @@
+---
+import Base from '../../layouts/Base.astro';
+import Header from '../../components/Header.astro';
+import GridOverlay from '../../components/GridOverlay.astro';
+import CaseIndex from '../../components/CaseIndex.astro';
+import { Image } from 'astro:assets';
+import { studies } from '../../data/studies';
+import { rich } from '../../lib/rich';
+
+// Phone screens exported from the Mall Figma files and cards cropped from the deck, keyed by file name.
+const screenFiles = import.meta.glob<ImageMetadata>('../../assets/{mall,cards}/*.{jpg,png}', { eager: true, import: 'default' });
+const screens: Record<string, ImageMetadata> = Object.fromEntries(
+  Object.entries(screenFiles).map(([path, img]) => [path.split('/').pop()!.replace(/\.(jpg|png)$/, ''), img])
+);
+
+export function getStaticPaths() {
+  return studies.map((study) => ({ params: { slug: study.slug }, props: { study } }));
+}
+
+const { study } = Astro.props;
+const hasArtwork = Boolean(study.deck || study.cover);
+---
+
+<Base title={`${study.title} — Uttham Udatthu`} description={study.summary.replace(/\^\^|\*\*/g, '')}>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <Header active="projects" />
+
+  <main id="main" class="case-page" tabindex="-1">
+    <GridOverlay />
+    <section class="case-hero" data-next-cursor-exclude>
+      <div class="case-hero__container">
+        <a class="back-link text-link" href="/#work">← All projects</a>
+        <p class="eyebrow">{study.kicker} · {study.year}</p>
+        {study.deck ? (
+          <h1 class="case-hero__deck-title"><span class="case-hero__lead">{study.deck.title[0]}</span> {study.deck.title[1]}</h1>
+        ) : (
+          <h1>{study.title}</h1>
+        )}
+        <p class="case-hero__summary" set:html={rich(study.deck ? study.deck.subtitle : study.summary)} />
+        {study.deck && (
+          <p class="case-hero__byline">{study.deck.byline} · <a class="text-link" href={study.deck.pdf} download>Download the deck (PDF) ↓</a></p>
+        )}
+      </div>
+    </section>
+
+    <section class="case-artboard" aria-label={`${study.title} visual study`} data-next-cursor-exclude>
+      <div class="case-artboard__paper glass">
+        <span class="bolt bolt--tl" aria-hidden="true"></span>
+        <span class="bolt bolt--tr" aria-hidden="true"></span>
+        <span class="bolt bolt--bl" aria-hidden="true"></span>
+        <span class="bolt bolt--br" aria-hidden="true"></span>
+        {study.deck && screens[study.deck.screen] && (
+          <div class="deck-cover">
+            <div class="phone deck-cover__phone"><Image src={screens[study.deck.screen]} alt={`${study.title}: ${study.deck.title.join(' ')}`} widths={[300, 600]} sizes="300px" /></div>
+          </div>
+        )}
+        {study.cover && screens[study.cover.image] && (
+          <figure class="cover-card">
+            <Image src={screens[study.cover.image]} alt={study.cover.caption} widths={[760, 1520]} sizes="(max-width: 900px) 100vw, 760px" />
+            <figcaption>{study.cover.caption}</figcaption>
+          </figure>
+        )}
+        {!hasArtwork && <p>Case-study artwork is being prepared.</p>}
+      </div>
+    </section>
+
+    {study.chapters && (
+      <section class="case-story" aria-label={`${study.title} story`} data-next-cursor-exclude>
+        {study.chapters.map((chapter) => {
+          const shots = chapter.figure?.screens?.map((key) => ({ key, img: screens[key] })).filter((s) => s.img) ?? [];
+          const card = chapter.figure?.image ? screens[chapter.figure.image] : null;
+          const embed = chapter.figure?.embed;
+          const figureClass = ['chapter__figure', 'glass', shots.length && 'chapter__figure--screens', card && 'chapter__figure--card', embed && 'chapter__figure--embed', chapter.figure?.tone && `chapter__figure--${chapter.figure.tone}`].filter(Boolean).join(' ');
+          return (
+          <article class="chapter">
+            <div class="chapter__text">
+              <p class="eyebrow">{chapter.eyebrow}</p>
+              <h2 class="chapter__heading">{chapter.heading}</h2>
+              {[chapter.body].flat().map((para) => <p class="chapter__body" set:html={rich(para)} />)}
+              {chapter.numbers && (
+                <dl class="chapter__numbers">
+                  {chapter.numbers.map((n) => (
+                    <div>
+                      <dt>{n.value}</dt>
+                      <dd>{n.label}</dd>
+                    </div>
+                  ))}
+                </dl>
+              )}
+              {chapter.working && (
+                <details class="chapter__working">
+                  <summary><span class="chapter__working-tick" aria-hidden="true"></span>{chapter.working.label}</summary>
+                  <ul>
+                    {chapter.working.items.map((item) => <li set:html={rich(item)} />)}
+                  </ul>
+                </details>
+              )}
+            </div>
+            {(chapter.quote || chapter.verbatim || chapter.notes) && (
+              <div class="chapter__side">
+                {chapter.quote && (
+                  <blockquote class="chapter__quote">
+                    <p set:html={chapter.quote.text.replace(chapter.quote.mark, `<mark class="hl">${chapter.quote.mark}</mark>`)} />
+                  </blockquote>
+                )}
+                {chapter.notes && (
+                  <div class="chapter__notes">
+                    {chapter.notes.map((n) => (
+                      <aside class="chapter__note" style={`--note-tilt: ${n.tilt}`}>
+                        <p>{n.text}</p>
+                        <small>— {n.source}</small>
+                      </aside>
+                    ))}
+                  </div>
+                )}
+                {chapter.verbatim && (
+                  <aside class="chapter__note" style="--note-tilt: -2deg">
+                    <p>“{chapter.verbatim.text}”</p>
+                    <small>— {chapter.verbatim.source}</small>
+                  </aside>
+                )}
+              </div>
+            )}
+            {chapter.figure && (
+              <figure class={figureClass}>
+                <span class="bolt bolt--tl" aria-hidden="true"></span>
+                <span class="bolt bolt--tr" aria-hidden="true"></span>
+                <span class="bolt bolt--bl" aria-hidden="true"></span>
+                <span class="bolt bolt--br" aria-hidden="true"></span>
+                {chapter.figure.callout && <p class="chapter__callout">{chapter.figure.callout}</p>}
+                {embed ? (
+                  <div class="chapter__embed">
+                    <div class="phone phone--live"><iframe src={embed} title={chapter.figure.label} loading="lazy"></iframe></div>
+                    <a class="text-link chapter__embed-link" href={embed} target="_blank" rel="noopener">Open the prototype in a new tab ↗</a>
+                  </div>
+                ) : card ? (
+                  <div class="chapter__card"><Image src={card} alt={chapter.figure.label} widths={[720, 1440]} sizes="(max-width: 900px) 100vw, 720px" /></div>
+                ) : shots.length ? (
+                  <div class="phone-row">
+                    {shots.map(({ key, img }) => (
+                      <div class="phone"><Image src={img} alt={`${study.title} screen: ${key.replace(/-/g, ' ')}`} widths={[190, 380]} sizes="190px" /></div>
+                    ))}
+                  </div>
+                ) : (
+                  <p class="chapter__placeholder">{chapter.figure.label}</p>
+                )}
+                <figcaption>{chapter.figure.caption}</figcaption>
+              </figure>
+            )}
+          </article>
+          );
+        })}
+      </section>
+    )}
+
+    <section class="case-details" data-next-cursor-exclude>
+      <div class="case-details__container">
+        <div>
+          <p class="eyebrow">Focus</p>
+          <p class="case-details__focus" set:html={rich(study.focus)} />
+        </div>
+        <div>
+          <p class="eyebrow">Scope</p>
+          <ul>{study.scope.map((item) => <li>{item}</li>)}</ul>
+        </div>
+      </div>
+      <p class="case-details__note">A fuller walkthrough, including confidential outcomes, is available in an interview.</p>
+    </section>
+  </main>
+  <section class="more-cases" aria-label="More cases">
+    <CaseIndex items={studies.filter((s) => s.slug !== study.slug)} label="More cases" />
+  </section>
+</Base>
+
+<style>
+  .case-page { position: relative; min-height: 100svh; overflow: visible; padding-top: calc(var(--header-height) + var(--section-y-sm)); }
+  .case-hero, .case-details { position: relative; z-index: 1; }
+  .case-hero__container, .case-details__container { width: min(calc(100% - var(--margin-side) * 2), var(--container-max)); margin: 0 auto; }
+  .case-hero__container > * {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity var(--dur-3) var(--ease-enter), transform var(--dur-3) var(--ease-enter);
+  }
+  .case-hero__container > :nth-child(2) { transition-delay: var(--stagger-1); }
+  .case-hero__container > :nth-child(3) { transition-delay: calc(var(--stagger-1) * 2); }
+  .case-hero__container > :nth-child(4) { transition-delay: calc(var(--stagger-1) * 3); }
+  .case-hero__container > :nth-child(5) { transition-delay: calc(var(--stagger-1) * 4); }
+  @starting-style {
+    .case-hero__container > * { opacity: 0; transform: translateY(12px); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .case-hero__container > * {
+      transform: none;
+      transition-property: opacity;
+      transition-delay: 0ms;
+    }
+    @starting-style {
+      .case-hero__container > * { opacity: 0; transform: none; }
+    }
+  }
+  .back-link { margin-bottom: var(--group-gap); }
+  .eyebrow { margin: 0; color: var(--ink-600); font-family: var(--font-paper); font-size: var(--text-eyebrow); font-weight: 500; letter-spacing: var(--track-label); text-transform: uppercase; }
+  h1 { max-width: 900px; margin: var(--content-gap) 0 0; font-size: var(--text-hero); font-weight: 600; letter-spacing: var(--track-display); line-height: var(--lh-display); }
+  .case-hero__deck-title { font-weight: 400; }
+  .case-hero__summary :global(.em) { color: var(--ink-900); font-weight: 600; }
+  .case-hero__lead { font-weight: 600; }
+  .case-hero__byline { margin: var(--content-gap) 0 0; color: var(--ink-600); font-size: var(--text-small); }
+  .case-hero__summary { max-width: 650px; margin: var(--content-gap) 0 0; color: var(--ink-600); font-size: var(--text-body-lg); line-height: var(--lh-body); }
+  .case-artboard {
+    position: relative;
+    z-index: 1;
+    isolation: isolate;
+    width: min(calc(100% - var(--margin-side) * 2), var(--container-max));
+    --art-min: min(56vw, 570px);
+    min-height: var(--art-min);
+    margin: var(--group-gap) auto 0;
+  }
+  /* the shared liquid-glass material (.glass, global.css) — same warm,
+     bolted surface as the hero slab and contact panel */
+  .case-artboard__paper {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    min-height: var(--art-min);
+    overflow: hidden;
+    border-radius: var(--radius-sm);
+    /* Padding belongs to the frame, so every artwork and placeholder clears
+       both hardware rails. Preserve the reading width on narrow screens. */
+    padding: var(--bolt-content-inset) var(--panel-padding);
+  }
+  .case-artboard__paper :global(.case-art) { position: relative; z-index: 1; width: 100%; height: 100%; min-height: 0; padding: 0; }
+  .case-artboard__paper > p { position: relative; z-index: 1; display: grid; place-items: center; margin: 0; padding: 0; text-align: center; font-weight: 500; color: var(--ink-600); font-family: var(--font-glass); font-size: var(--text-eyebrow); letter-spacing: var(--track-label); text-transform: uppercase; }
+  /* ---- the story: chapters on paper, screens on glass (plans/019) ---- */
+  .case-story { position: relative; z-index: 1; width: min(calc(100% - var(--margin-side) * 2), var(--container-max)); margin: var(--section-y-sm) auto 0; display: grid; gap: var(--section-y-sm); }
+  .chapter { display: grid; grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); gap: var(--content-gap) var(--group-gap); align-items: start; }
+  .chapter__side { grid-column: 2; display: flex; flex-direction: column; gap: var(--content-gap); align-self: center; }
+  .chapter__notes { display: flex; flex-wrap: wrap; gap: var(--space-5); padding-inline: var(--space-4); }
+  .chapter__notes .chapter__note { flex: 1 1 200px; max-width: 26ch; margin: 0; }
+  /* the deck's cover: slide 1 rebuilt — the phone on the lavender panel */
+  /* The cover is a card ON the glass, not a fill OF it: it keeps a margin on
+     every side so the pane reads as the surface underneath rather than as a
+     frame around a full-bleed image (Uttham, 2026-09-20). The phone is sized
+     off the cover's height so it always stands flush on the bottom edge
+     instead of being cut mid-screen. */
+  .deck-cover {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    place-items: end center;
+    width: min(100%, 680px);
+    margin-inline: auto;
+    height: calc(var(--art-min) - 2 * var(--bolt-content-inset));
+    padding: var(--space-7) var(--space-7) 0;
+    background: var(--mall-lavender);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+  }
+  .deck-cover__phone {
+    width: auto;
+    height: 100%;
+    max-width: 60%;
+    flex: none;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom: 0;
+  }
+  .deck-cover__phone img { object-position: top; }
+  /* a study without a deck opens on one render, as a card on the pane */
+  .cover-card { position: relative; z-index: 1; width: min(100%, 760px); margin: var(--space-6) auto; display: flex; flex-direction: column; gap: var(--space-4); }
+  .cover-card img { display: block; width: 100%; height: auto; border-radius: var(--radius-sm); border: 1px solid var(--line-1); box-shadow: var(--shadow-rest); }
+  .cover-card figcaption { margin: 0; font-family: var(--font-hand); font-size: var(--text-note); color: var(--ink-600); }
+  /* a card cropped from the deck, cut where the slide cut it */
+  .chapter__figure--card, .chapter__figure--embed { grid-column: 1 / -1; min-height: 0; display: flex; flex-direction: column; align-items: center; gap: var(--space-5); padding: var(--bolted-panel-padding); overflow: hidden; }
+  .chapter__figure--card .chapter__card { width: min(100%, 720px); }
+  .chapter__figure--card .chapter__card img { display: block; width: 100%; height: auto; border-radius: var(--radius-sm); }
+  .chapter__figure.chapter__figure--embed figcaption { position: static; order: -1; align-self: flex-start; }
+  .chapter__embed { display: flex; flex-direction: column; align-items: center; gap: var(--space-4); width: 100%; }
+  .chapter__embed .phone--live { width: 360px; max-width: 100%; height: 720px; max-height: 80vh; aspect-ratio: auto; flex: none; translate: 0; }
+  .chapter__embed .phone--live iframe { display: block; width: 100%; height: 100%; border: 0; background: #fff; }
+  .chapter__embed-link { font-size: var(--text-small); }
+  .chapter__figure.chapter__figure--card figcaption { position: static; order: -1; align-self: flex-start; }
+  .chapter__callout { position: absolute; top: var(--bolt-content-inset); right: var(--bolt-content-inset); z-index: 1; margin: 0; max-width: 24ch; text-align: right; font-family: var(--font-hand); font-size: var(--text-note); color: var(--ink-900); }
+  .chapter__figure--lavender { padding-bottom: var(--bolted-panel-padding); }
+  .chapter__figure--lavender .chapter__card { width: min(100%, 520px); padding: var(--space-7) var(--space-9) 0; background: var(--mall-lavender); border-radius: var(--radius-sm); }
+  .chapter__figure--lavender .chapter__card img { width: min(100%, 300px); margin: 0 auto; }
+  .chapter__figure.chapter__figure--lavender figcaption { order: 0; align-self: center; }
+  .chapter__body :global(.em), .case-details__focus :global(.em), .chapter__working :global(.em) { color: var(--ink-900); font-weight: 600; }
+  .chapter__body :global(.em--lg) { font-size: 1.28em; line-height: 1.25; }
+  .chapter__figure--screens { grid-column: 1 / -1; min-height: 0; display: flex; flex-direction: column; gap: var(--space-6); padding: var(--bolted-panel-padding); overflow: hidden; }
+  .chapter__figure.chapter__figure--screens figcaption { position: static; align-self: flex-start; padding-top: var(--space-7); }
+  .phone-row { display: flex; justify-content: center; align-items: flex-start; gap: var(--space-6); width: 100%; }
+  .phone { flex: 0 1 190px; min-width: 0; aspect-ratio: 9 / 18; border-radius: var(--radius-media); border: 1px solid var(--line-1); background: #fff; overflow: hidden; box-shadow: var(--shadow-rest); }
+  .phone:nth-child(even) { translate: 0 var(--space-7); }
+  .phone img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+  .chapter__text { display: flex; flex-direction: column; gap: var(--space-3); max-width: 52ch; }
+  .chapter__heading { margin: 0; font-size: var(--text-h3); font-weight: 600; letter-spacing: var(--track-heading); line-height: var(--lh-heading); text-wrap: balance; }
+  .chapter__body { margin: 0; color: var(--ink-600); font-size: var(--text-body); line-height: var(--lh-body); text-wrap: pretty; }
+  .chapter__figure { position: relative; margin: 0; display: grid; place-items: center; min-height: 320px; padding: var(--bolt-content-inset) var(--panel-padding); border-radius: var(--radius-sm); }
+  .chapter__placeholder { margin: 0; color: var(--ink-600); font-size: var(--text-eyebrow); font-weight: 500; letter-spacing: var(--track-label); text-transform: uppercase; text-align: center; }
+  .chapter__figure figcaption { position: absolute; left: var(--bolt-content-inset); bottom: var(--space-5); margin: 0; font-family: var(--font-hand); font-size: var(--text-note); color: var(--ink-600); }
+  .chapter__quote { margin: 0; padding-inline: var(--space-4); }
+  .chapter__quote p { margin: 0; font-family: var(--font-hand); font-size: var(--text-annotation); font-weight: 500; line-height: var(--lh-statement); color: var(--ink-900); text-wrap: balance; }
+  .chapter__numbers { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-5); margin: var(--space-4) 0 0; }
+  .chapter__numbers dt { font-size: var(--text-h2); font-weight: 600; letter-spacing: var(--track-heading); line-height: var(--lh-display); }
+  .chapter__numbers dd { margin: var(--space-1) 0 0; color: var(--ink-600); font-size: var(--text-small); line-height: var(--lh-body); }
+  .chapter__working { margin: var(--space-3) 0 0; border-top: 1px dashed var(--line-mark); padding-top: var(--space-3); }
+  .chapter__working summary { display: flex; align-items: center; gap: var(--space-2); cursor: pointer; list-style: none; color: var(--ink-600); font-size: var(--text-eyebrow); font-weight: 500; letter-spacing: var(--track-label); text-transform: uppercase; }
+  .chapter__working summary::-webkit-details-marker { display: none; }
+  .chapter__working-tick { width: var(--tick-size); height: 1px; background: var(--line-mark); transition: rotate var(--dur-2) ease; }
+  .chapter__working[open] .chapter__working-tick { rotate: 90deg; }
+  .chapter__working ul { display: grid; gap: var(--space-2); margin: var(--space-3) 0 0; padding: 0 0 0 var(--space-4); list-style: '— '; color: var(--ink-600); font-size: var(--text-small); line-height: var(--lh-body); }
+  .chapter__working li { border: 0; border-radius: 0; padding: 0; letter-spacing: 0; text-transform: none; font-size: inherit; font-weight: 400; }
+  .chapter__note { align-self: flex-start; margin-inline-start: var(--space-4); max-width: 34ch; padding: var(--space-5) var(--space-5) var(--space-4); background: var(--amber-400); border: 1px solid var(--line-1); border-radius: var(--radius-sm); box-shadow: var(--shadow-stuck); rotate: var(--note-tilt); font-family: var(--font-hand); color: var(--ink-900); }
+  .chapter__note p { margin: 0; font-size: var(--text-note); font-weight: 500; line-height: var(--lh-heading); }
+  .chapter__note small { display: block; margin-top: var(--space-3); font-family: var(--font-paper); font-size: var(--text-small); color: var(--ink-600); }
+  .case-details { padding: var(--section-y-sm) 0; }
+  .more-cases { position: relative; z-index: 1; width: min(calc(100% - var(--margin-side) * 2), var(--container-max)); margin: 0 auto var(--section-y-sm); }
+  .case-details__container { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); gap: var(--group-gap); }
+  .case-details__focus { max-width: 660px; margin: var(--content-gap) 0 0; font-size: var(--text-h3); font-weight: 600; letter-spacing: var(--track-heading); line-height: var(--lh-heading); }
+  ul { display: flex; flex-wrap: wrap; gap: var(--space-2); margin: var(--content-gap) 0 0; padding: 0; list-style: none; }
+  li { border: 1px solid var(--line-1); border-radius: var(--radius-pill); padding: var(--space-2) var(--space-3); color: var(--ink-600); font-size: var(--text-eyebrow); font-weight: 500; letter-spacing: var(--track-label); text-transform: uppercase; }
+  .case-details__note { width: min(calc(100% - var(--margin-side) * 2), var(--container-max)); margin: var(--group-gap) auto 0; color: var(--ink-600); font-family: var(--font-paper); font-size: var(--text-small); }
+  @media (min-width: 641px) and (max-width: 900px) { .case-details__container { gap: var(--space-7); } .case-artboard { --art-min: min(62vw, 500px); } }
+  @media (max-width: 900px) { .chapter { grid-template-columns: 1fr; } .chapter__side { grid-column: 1; } .chapter__figure { min-height: 240px; } .phone-row { gap: var(--space-4); } .phone { flex-basis: 150px; } .phone:nth-child(even) { translate: 0 var(--space-5); } }
+  @media (max-width: 640px) { .phone-row { flex-wrap: wrap; } .phone { flex-basis: calc(50% - var(--space-2)); } .phone:nth-child(even) { translate: 0; } }
+  @media (max-width: 640px) { .chapter__numbers { grid-template-columns: 1fr; gap: var(--space-4); } .back-link { margin-bottom: var(--group-gap); } .case-details__container { grid-template-columns: 1fr; gap: var(--group-gap); } .case-artboard { --art-min: 290px; margin-top: var(--group-gap); } }
+</style>

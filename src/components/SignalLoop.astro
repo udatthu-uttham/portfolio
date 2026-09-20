@@ -1,0 +1,500 @@
+---
+// Uttham's side-view signal-loop motion art — the hero's one animation.
+// The story (from the bio): green = the team flows in harmony; red = his
+// help — the amber ramp — is set down and the team rides over it, then help
+// withdraws and the light goes green again. Spec: plans/001.
+//
+// The rider asset is inlined ONCE at build so each <use> can wear its own
+// livery through CSS variables (an <image href> can't be recolored per copy).
+import { readFileSync } from 'node:fs';
+import TownBackdrop from './TownBackdrop.astro';
+
+const raw = readFileSync(new URL('../../public/assets/scene/bike-rider.svg', import.meta.url), 'utf8');
+const amberFills = (raw.match(/fill="#F3B44A"/g) || []).length + (raw.match(/fill="#C8871F"/g) || []).length;
+const suitFills = (raw.match(/fill="#39363F"/g) || []).length;
+if (amberFills !== 4 || suitFills !== 2) {
+  throw new Error(`bike-rider.svg changed: expected 4 amber + 2 suit fills, found ${amberFills} + ${suitFills}`);
+}
+const bikeInner = raw
+  .replace(/^[\s\S]*?<svg[^>]*>/, '')
+  .replace(/<\/svg>\s*$/, '')
+  .replaceAll('fill="#F3B44A"', 'style="fill:var(--livery,#F3B44A)"')
+  .replaceAll('fill="#C8871F"', 'style="fill:var(--livery-shade,#C8871F)"')
+  .replace(/(<path d="M56\.2024[^"]*" )fill="#39363F"/, '$1style="fill:var(--helmet,var(--suit,#39363F))"')
+  .replaceAll('fill="#39363F"', 'style="fill:var(--suit,#39363F)"');
+
+// Keep the same motorcycle; swap only the rear rider's silhouette.
+const humanShape = /<g clip-path="url\(#clip1_2011_420\)">[\s\S]*?<\/g>/;
+if (!humanShape.test(bikeInner)) throw new Error('Expected the separate rider group for the bot variant');
+const botBikeInner = bikeInner.replace(humanShape, `
+  <g stroke="var(--suit,#39363F)" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M43 44 L50 53 L43 68" fill="none" stroke-width="8" />
+    <path d="M43 44 L50 53 L43 68" fill="none" stroke="#A9A6AB" stroke-width="4" />
+    <circle cx="50" cy="53" r="4" fill="var(--livery,#6e9a9c)" stroke-width="2" />
+    <rect x="39" y="68" width="12" height="5" rx="1" fill="#A9A6AB" stroke-width="2" />
+    <path d="M55 27 L51 35" stroke-width="5" />
+    <path d="M46 31 L57 36 L49 49 L37 44Z" fill="var(--livery,#6e9a9c)" stroke-width="2" />
+    <path d="M46 36 L51 39 M43 40 L48 43" stroke="var(--paper-0)" stroke-width="2" />
+    <path d="M55 36 L63 41 L71 32" fill="none" stroke-width="7" />
+    <path d="M55 36 L63 41 L71 32" fill="none" stroke="#A9A6AB" stroke-width="3.5" />
+    <circle cx="63" cy="41" r="3.5" fill="var(--livery,#6e9a9c)" stroke-width="2" />
+    <path d="M70 32 L72 28 L76 30 M71 32 L75 34" fill="none" stroke-width="2.5" />
+    <path d="M49 8 V3" stroke-width="2" />
+    <circle cx="49" cy="2.5" r="2" fill="var(--livery,#6e9a9c)" stroke-width="1" />
+    <path d="M45 8 L59 6 L67 10 V15 L71 18 L67 20 V26 L53 29 L44 25Z" fill="#DDDCDE" stroke-width="2" />
+    <path d="M45 8 L53 12 V29 L44 25Z" fill="#A9A6AB" stroke-width="1.5" />
+    <circle cx="47" cy="18" r="4" fill="var(--livery,#6e9a9c)" stroke-width="2" />
+    <rect x="60" y="13" width="4" height="5" rx=".5" fill="var(--suit,#39363F)" stroke="none" />
+    <path d="M62 23 H67" stroke-width="2" />
+    <!-- Compact electric drive panel; no exhaust on this motorcycle. -->
+    <path d="M54 47 H66 L62 61 H53Z" fill="var(--livery-shade,#4f7779)" stroke-width="1.5" />
+    <path d="M60 49 L56 55 H59 L56 60 L63 53 H60 L63 49Z" fill="var(--paper-0)" stroke="none" />
+  </g>`).replaceAll('clip0_2011_420', 'bot-bike-clip').replaceAll('clip1_2011_420', 'bot-rider-clip');
+
+// The crossing anchors the ramp and jump. The vehicle signal overlaps the
+// ramp's left edge, keeping its foreground pole clear of the backflip.
+const CROSSING_ANCHOR_X = 570;
+const SIGNAL_X = CROSSING_ANCHOR_X - 160;
+const RAMP_OFFSET = CROSSING_ANCHOR_X - 420;
+// Solid ink stripes stay legible on the paper road. They widen slightly
+// toward the near curb to follow the scene's shallow perspective.
+const CROSSING_STRIPES = Array.from({ length: 5 }, (_, index) => {
+  const center = CROSSING_ANCHOR_X - 20;
+  const halfWidth = 36 + index * 3;
+  const top = 554 + index * 16;
+  const bottom = top + 10 + index * 0.5;
+  return `${center - halfWidth},${top} ${center + halfWidth},${top} ${center + halfWidth + 2},${bottom} ${center - halfWidth - 2},${bottom}`;
+});
+---
+
+<div class="signal-loop">
+  <!-- no <title>/<desc>: browsers surface them as hover tooltips -->
+  <svg
+    viewBox="0 278 720 416"
+    role="img"
+    aria-label="Two people on motorcycles and a small AI bot on an electric bike ride through a town. On red, an amber ramp helps them jump across the zebra crossing. A different combination of riders completes a backflip each cycle, then everyone lands beyond the crossing and the signal turns green.">
+    <defs>
+      <g id="provided-bike">
+        <g transform="translate(-53.5 -53.5)" set:html={bikeInner} />
+      </g>
+      <g id="bot-bike">
+        <g transform="translate(-53.5 -53.5)" set:html={botBikeInner} />
+      </g>
+
+      <!-- both paths start far enough west that the whole 262-unit formation
+           is off-canvas when it enters, and end far enough east to exit -->
+      <path id="green-path" d="M-330 590 H790"></path>
+      <clipPath id="town-behind-road" clipPathUnits="userSpaceOnUse">
+        <rect x="-8" y="240" width="736" height="305" />
+      </clipPath>
+      <!-- The centre path matches the small kicker under the front wheel.
+           Separate flight geometry lets selected riders spin only in air. -->
+      <path id="hop-approach" d={`M-440 590 H${CROSSING_ANCHOR_X - 200} C${CROSSING_ANCHOR_X - 178} 590 ${CROSSING_ANCHOR_X - 156} 568 ${CROSSING_ANCHOR_X - 140} 556`} />
+      <path id="hop-flight" d={`M${CROSSING_ANCHOR_X - 140} 556 C${CROSSING_ANCHOR_X - 100} 520 ${CROSSING_ANCHOR_X - 60} 500 ${CROSSING_ANCHOR_X - 20} 500 C${CROSSING_ANCHOR_X + 30} 500 ${CROSSING_ANCHOR_X + 70} 545 ${CROSSING_ANCHOR_X + 96} 572 C${CROSSING_ANCHOR_X + 110} 586 ${CROSSING_ANCHOR_X + 124} 590 ${CROSSING_ANCHOR_X + 140} 590`} />
+      <!-- rear wheel down first, then level: no dip below the road line -->
+      <path id="hop-out" d={`M${CROSSING_ANCHOR_X + 140} 590 H1100`} />
+    </defs>
+
+    <!-- A dense town in two depths, sharing one stroke weight. Bases end at
+         548 so only 3 units tuck behind the far curb, with trunks intact. -->
+    <g clip-path="url(#town-behind-road)" aria-hidden="true">
+      <TownBackdrop />
+    </g>
+
+    <!-- The road fill masks every environmental base cleanly behind the curb. -->
+    <rect x="-8" y="545" width="736" height="95" fill="var(--paper-0)"></rect>
+    <g class="ink">
+      <path class="quiet" d="M-8 545 H728" />
+      <path d="M-8 640 H728" />
+      <path d={`M35 592 H154 M188 592 H238 M300 592 H${CROSSING_ANCHOR_X - 196} M${CROSSING_ANCHOR_X + 52} 592 H709`}></path>
+    </g>
+    <!-- One clear zebra crossing; lane dashes stop before it and resume after. -->
+    <g class="signal__crossing" aria-hidden="true">
+      {CROSSING_STRIPES.map((points) => <polygon points={points} />)}
+    </g>
+
+    <!-- Foreground roadside rocks: beyond the near curb, outside the lane. -->
+    <g class="ink rocks" aria-hidden="true">
+      <path d="M83 665 C87 658 96 658 101 664 L99 672 L87 674 L81 670 Z M112 670 C116 665 123 665 127 670 L125 676 L116 677 L110 674 Z"></path>
+      <path transform="translate(-100 0)" d="M325 666 C330 659 339 659 344 665 L342 673 L330 675 L324 671 Z M354 671 C358 666 365 667 368 672 L366 678 L357 678 L352 675 Z"></path>
+      <path d="M501 668 C506 661 515 662 520 668 L518 676 L507 678 L500 674 Z M531 664 C536 658 545 659 550 665 L548 673 L537 675 L530 671 Z"></path>
+      <path d="M662 670 C667 664 675 665 679 670 L677 677 L668 678 L661 675 Z"></path>
+    </g>
+
+    <!-- A little handmade kicker: curved deck, rounded lip, two supports,
+         a tiny star cutout and rubber feet planted on the wheel baseline. -->
+    <g transform={`translate(${RAMP_OFFSET} 0)`} aria-hidden="true">
+    <g id="ramp" class="ramp ink">
+      <path class="ramp__body" d="M242 618 C268 618 300 600 316 560 Q319 556 323 560 L323 616 Q323 619 319 619 H244 Q240 619 242 618Z" />
+      <path class="ramp__deck" d="M243 614 C269 614 297 595 313 559 Q318 552 324 558" />
+      <path d="M270 617 V608 M311 617 V582" />
+      <path class="ramp__star" d="m293 593 2 4 5 1-4 3 1 5-4-3-4 3 1-5-4-3 5-1Z" />
+      <path class="ramp__feet" d="M247 621 H258 M311 621 H323" />
+    </g>
+    </g>
+
+    <g class="rider-exhaust" aria-hidden="true">
+      {Array.from({ length: 8 }).map(() => <circle r="0" opacity="0" />)}
+    </g>
+
+    <!-- The team: two people and a bot at the rear, with uneven spacing, a hair of
+         scale variance and an out-of-phase road bob. data-rider = lead in
+         path units ahead of the shared point; smallest drawn first. -->
+    <g class="bike rider rider--a" data-rider="0" data-scale=".94" data-phase="4.2"><use href="#bot-bike"></use></g>
+    <g class="bike rider rider--b" data-power="combustion" data-rider="118" data-scale=".97" data-phase="2.1"><use href="#provided-bike"></use></g>
+    <g class="bike rider rider--c" data-power="combustion" data-rider="262" data-scale="1" data-phase="0"><use href="#provided-bike"></use></g>
+
+    <!-- A foreground signal planted on the shoulder. The road ends at 640;
+         the footing starts at 664, leaving a clear gap beyond the near curb.
+         Placed at the ramp's left edge, clear of the backflip. Drawn after the
+         riders to preserve the foreground depth. -->
+    <g class="ink signal-strong" transform={`translate(${SIGNAL_X - 600} 0)`}>
+      <path class="signal__footing" d="M588 664 H612 L618 674 Q600 682 582 674Z" />
+      <path d="M600 670 V420 M590 426 H610" />
+      <path class="signal__housing" d="M578 290 Q574 290 574 296 V414 Q574 420 580 420 H620 Q626 420 626 414 V296 Q626 290 620 290Z" />
+      <g id="signal" class="signal">
+        <circle class="signal__lamp signal__lamp--red ink" cx="600" cy="322" r="13" />
+        <circle class="signal__lamp signal__lamp--green ink" cx="600" cy="382" r="13" />
+      </g>
+    </g>
+  </svg>
+</div>
+
+<style>
+  .signal-loop {
+    width: 100%;
+  }
+
+  .signal-loop svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .ink {
+    fill: none;
+    stroke: var(--graphite);
+    stroke-opacity: 1;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .quiet {
+    stroke-opacity: 0.55;
+  }
+
+  .signal__housing { fill: var(--paper-0); }
+  .signal__footing { fill: var(--paper-2); }
+  .signal__crossing { fill: var(--ink-600); }
+
+  .signal__lamp {
+    fill: var(--paper-0);
+    transition: fill var(--dur-1) var(--ease-standard);
+  }
+  .signal.is-green .signal__lamp--green {
+    fill: #59a66a;
+  }
+  .signal.is-red .signal__lamp--red {
+    fill: #d4615b;
+  }
+
+  .bike {
+    opacity: 0;
+    transform-box: fill-box;
+    transform-origin: center;
+    will-change: transform, opacity;
+  }
+
+  .rider-exhaust { fill: var(--ink-600); pointer-events: none; }
+
+  /* Liveries: muted, OKLCH-quiet hues that read as different people without
+     competing with the one amber. Helmets vary in value so the difference
+     survives colour-blindness. */
+  .rider--a { --livery: #6e9a9c; --livery-shade: #4f7779; }
+  .rider--b { --livery: #7b86a8; --livery-shade: #5b6588; --helmet: #a9a6ab; }
+  .rider--c { --livery: #a5809a; --livery-shade: #82617a; --helmet: #74707b; }
+
+  .ramp {
+    opacity: 0;
+    will-change: transform, opacity;
+  }
+  .ramp__body {
+    /* the one amber, but quiet: a pale tint of it, not a solid block */
+    fill: var(--paper-2);
+    fill: color-mix(in oklab, var(--amber-400) 45%, var(--paper-1));
+  }
+  .ramp__deck { stroke: var(--amber-700); stroke-width: 4; }
+  .ramp__star { fill: var(--paper-0); stroke-width: 1.25; }
+  .ramp__feet { stroke-width: 3; }
+  .rocks {
+    stroke-width: 2;
+    stroke-opacity: 0.65;
+  }
+
+  .signal-strong {
+    stroke-width: 3.2;
+  }
+  .signal-strong .ink {
+    stroke-width: 3.2;
+  }
+</style>
+
+<script>
+  // ---- beats (seconds) and geometry (SVG units) — see plans/001 ----------
+  const GREEN_DURATION = 2.3; // the team crosses in harmony
+  const GREEN_ENTER = 0.2;
+  const GREEN_EXIT = 2.28;
+  const RED_REST = 0.3; // empty road under a red lamp before help arrives
+  const RAMP_LAND = 0.55; // help is SET DOWN (ease-out), not dropped from the sky
+  const RAMP_LIFT = 0.45; // help withdraws (ease-in) once the team is through
+  const RAMP_FROM = -90; // starts just above the road
+  const HOP_ENTER = 0.45; // the team appears west while the ramp settles
+  const SPEED = 530; // units/s — same road speed as the green crossing
+  const EXIT_MARGIN = 300; // path units past which the rear rider is off-canvas east
+
+  const root = document.querySelector('.signal-loop');
+  const signal = root.querySelector('#signal');
+  const ramp = root.querySelector('#ramp');
+  const greenPath = root.querySelector('#green-path');
+  const approach = root.querySelector('#hop-approach');
+  const flight = root.querySelector('#hop-flight');
+  const out = root.querySelector('#hop-out');
+  const riders = [...root.querySelectorAll('[data-rider]')].map((el) => ({
+    el,
+    lead: Number(el.dataset.rider) || 0,
+    scale: Number(el.dataset.scale) || 0.97,
+    phase: Number(el.dataset.phase) || 0,
+    flips: false,
+    exhaust: el.dataset.power === 'combustion',
+    lastExhaust: -Infinity,
+  }));
+  const exhaustPuffs = [...root.querySelectorAll('.rider-exhaust circle')].map((el) => ({ el, born: -1, x: 0, y: 0 }));
+  let nextPuff = 0;
+  const GREEN_TOTAL = greenPath.getTotalLength();
+  const L_APPROACH = approach.getTotalLength();
+  const L_FLIGHT = flight.getTotalLength();
+  const L_OUT = out.getTotalLength();
+  const HOP_TOTAL = L_APPROACH + L_FLIGHT + L_OUT;
+  // Keep the help in place until the final rider has landed past the crossing.
+  const LIFT_AT = HOP_ENTER + (L_APPROACH + L_FLIGHT + 60) / SPEED;
+  const RED_DURATION = Math.max(
+    HOP_ENTER + (HOP_TOTAL - EXIT_MARGIN) / SPEED,
+    LIFT_AT + RAMP_LIFT
+  ) + RED_REST;
+  const CYCLE = GREEN_DURATION + RED_DURATION;
+  const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
+  let frameId = 0;
+  let running = false;
+  let inView = false;
+  let elapsed = 0;
+  let lastTime = null;
+  let flipCycle = -1;
+  let flipMask = 0;
+
+  // Mostly solo flips, sometimes pairs, rarely all three. Equal weights for
+  // each rider; excluding the previous set guarantees a new combination.
+  function chooseFlipMask(previous, random = Math.random) {
+    const choices = [
+      { mask: 1, weight: 7 }, { mask: 2, weight: 7 }, { mask: 4, weight: 7 },
+      { mask: 3, weight: 2.5 }, { mask: 5, weight: 2.5 }, { mask: 6, weight: 2.5 },
+      { mask: 7, weight: 1.5 },
+    ].filter(({ mask }) => mask !== previous);
+    let draw = random() * choices.reduce((sum, { weight }) => sum + weight, 0);
+    for (const { mask, weight } of choices) {
+      draw -= weight;
+      if (draw < 0) return mask;
+    }
+    return choices[choices.length - 1].mask;
+  }
+
+  const easeOutCubic = (p) => 1 - (1 - p) ** 3;
+  const easeInCubic = (p) => p ** 3;
+
+  function hopPoint(at) {
+    if (at < L_APPROACH) return pointAtLength(approach, L_APPROACH, at);
+    if (at < L_APPROACH + L_FLIGHT) {
+      return {
+        ...pointAtLength(flight, L_FLIGHT, at - L_APPROACH),
+        flightProgress: (at - L_APPROACH) / L_FLIGHT,
+      };
+    }
+    return pointAtLength(out, L_OUT, at - L_APPROACH - L_FLIGHT);
+  }
+
+  function pointAtLength(path, total, at) {
+    const a = Math.max(0, Math.min(total, at));
+    const previous = path.getPointAtLength(Math.max(0, a - 1));
+    const point = path.getPointAtLength(a);
+    const angle = (Math.atan2(point.y - previous.y, point.x - previous.x) * 180) / Math.PI;
+    return { x: point.x, y: point.y, angle };
+  }
+
+  // scale about the bike's centre would lift its wheels off the road line;
+  // (1 - scale) * 27.5 puts them back. The bob is deliberately tiny.
+  function place(rider, point, angle, seconds) {
+    const bob = Math.sin(seconds * 10 + rider.phase);
+    const y = point.y + (1 - rider.scale) * 27.5 - 1.2 * bob;
+    rider.el.style.opacity = 1;
+    rider.el.setAttribute(
+      'transform',
+      `translate(${point.x} ${y}) rotate(${angle + 0.8 * bob}) scale(${rider.scale})`
+    );
+    // Sparse, world-space puffs stay behind the human motorcycles. Never
+    // emit in flight, from the EV, or in the reduced-motion still frame.
+    if (running && !motionPreference.matches && rider.exhaust && point.y >= 578 &&
+        point.x > 0 && point.x < 760 && Math.abs(angle) < 14 && elapsed - rider.lastExhaust > 330) {
+      const puff = exhaustPuffs[nextPuff++ % exhaustPuffs.length];
+      if (puff) {
+        rider.lastExhaust = elapsed;
+        puff.born = elapsed;
+        puff.x = point.x - 50 * rider.scale;
+        puff.y = y + 10 * rider.scale;
+      }
+    }
+  }
+
+  function renderExhaust(clear = false) {
+    exhaustPuffs.forEach((puff) => {
+      const progress = (elapsed - puff.born) / 650;
+      if (clear || puff.born < 0 || progress >= 1) {
+        puff.el.setAttribute('opacity', '0');
+        if (clear) puff.born = -1;
+        return;
+      }
+      puff.el.setAttribute('cx', String(puff.x - progress * 14));
+      puff.el.setAttribute('cy', String(puff.y - progress * 10));
+      puff.el.setAttribute('r', String(3 + progress * 8));
+      puff.el.setAttribute('opacity', String(0.16 * Math.sin(progress * Math.PI)));
+    });
+  }
+
+  function hideRiders() {
+    riders.forEach((rider) => { rider.el.style.opacity = 0; });
+  }
+
+  function setSignal(state) {
+    signal.classList.toggle('is-green', state === 'green');
+    signal.classList.toggle('is-red', state === 'red');
+  }
+
+  function setRamp(red) {
+    if (red === null || red < RED_REST) {
+      ramp.style.opacity = 0;
+      ramp.setAttribute('transform', `translate(0 ${RAMP_FROM})`);
+      return;
+    }
+    let offset;
+    let opacity;
+    if (red >= LIFT_AT) {
+      const up = Math.min(1, (red - LIFT_AT) / RAMP_LIFT);
+      offset = RAMP_FROM * easeInCubic(up);
+      opacity = 1 - up;
+    } else {
+      const down = Math.min(1, (red - RED_REST) / RAMP_LAND);
+      offset = RAMP_FROM * (1 - easeOutCubic(down));
+      opacity = Math.min(1, down / 0.3);
+    }
+    ramp.style.opacity = opacity;
+    ramp.setAttribute('transform', `translate(0 ${offset})`);
+  }
+
+  function render(time) {
+    if (lastTime !== null) elapsed += time - lastTime;
+    lastTime = time;
+    const seconds = (elapsed / 1000) % CYCLE;
+    hideRiders();
+
+    if (seconds < GREEN_DURATION) {
+      setSignal('green');
+      setRamp(null);
+      if (seconds >= GREEN_ENTER) {
+        const progress = Math.min(1, (seconds - GREEN_ENTER) / (GREEN_EXIT - GREEN_ENTER));
+        const base = GREEN_TOTAL * progress;
+        riders.forEach((rider) => {
+          const surge = 7 * Math.sin(seconds * 2.2 + rider.phase); // slow lead/lag
+          place(rider, pointAtLength(greenPath, GREEN_TOTAL, base + rider.lead + surge), 0, seconds);
+        });
+      }
+    } else {
+      const cycle = Math.floor(elapsed / 1000 / CYCLE);
+      if (cycle !== flipCycle) {
+        flipCycle = cycle;
+        flipMask = chooseFlipMask(flipMask);
+        riders.forEach((rider, index) => { rider.flips = Boolean(flipMask & (1 << index)); });
+      }
+      const red = seconds - GREEN_DURATION;
+      setSignal('red');
+      setRamp(red);
+      if (red >= HOP_ENTER) {
+        const shared = (red - HOP_ENTER) * SPEED;
+        riders.forEach((rider) => {
+          const at = shared + rider.lead;
+          if (at < 0 || at > HOP_TOTAL) return;
+          const point = hopPoint(at);
+          let angle = point.angle;
+          if (rider.flips && point.flightProgress !== undefined) {
+            // One full backflip, with time to spot the landing. Smoothstep
+            // eases the rotation in and out without an angular snap.
+            const spin = Math.max(0, Math.min(1, (point.flightProgress - 0.04) / 0.8));
+            angle -= 360 * spin * spin * (3 - 2 * spin);
+          }
+          place(rider, point, angle, seconds);
+        });
+      }
+    }
+
+    renderExhaust();
+    if (running && !motionPreference.matches) frameId = requestAnimationFrame(render);
+  }
+
+  // reduced-motion still frame: the team mid-crossing under a green light
+  function settle() {
+    renderExhaust(true);
+    setSignal('green');
+    setRamp(null);
+    riders.forEach((rider) => {
+      place(rider, pointAtLength(greenPath, GREEN_TOTAL, GREEN_TOTAL * 0.52 + rider.lead), 0, 0);
+    });
+  }
+
+  function start() {
+    if (running || !inView || document.hidden || motionPreference.matches) return;
+    running = true;
+    frameId = requestAnimationFrame(render);
+  }
+
+  // Freeze the scene clock too, so re-entry continues the same beat.
+  function pause() {
+    running = false;
+    lastTime = null;
+    if (frameId) cancelAnimationFrame(frameId);
+    frameId = 0;
+  }
+
+  function stop() {
+    pause();
+    settle();
+  }
+
+  motionPreference.addEventListener('change', (event) => {
+    if (event.matches) stop();
+    else start();
+  });
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) pause();
+    else start();
+  });
+
+  // plans/002 — no rAF work while the hero is off-screen
+  const visibility = new IntersectionObserver(
+    ([entry]) => {
+      inView = entry.isIntersecting;
+      if (inView) start();
+      else pause();
+    },
+    { threshold: 0 }
+  );
+  visibility.observe(root);
+  if (motionPreference.matches) settle();
+</script>

@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Contact dispatch</title>
+    <style>
+      :root {
+        --paper: #fcfaf2;
+        --ink: #66635f;
+        --surface: #dedede;
+        --green: #59a66a;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        min-height: 100vh;
+        margin: 0;
+        display: grid;
+        place-items: center;
+        background: transparent;
+        font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+      }
+
+      .panel {
+        width: min(720px, 100vw);
+        aspect-ratio: 7 / 8;
+        overflow: hidden;
+        background: var(--paper);
+      }
+
+      svg { display: block; width: 100%; height: 100%; }
+
+      .ink {
+        fill: none;
+        stroke: var(--ink);
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      .surface { fill: var(--surface); stroke: none; }
+      .road { fill: var(--surface); stroke: var(--ink); stroke-width: 2; stroke-linejoin: round; }
+      .lane {
+        fill: none;
+        stroke: var(--ink);
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-dasharray: 15 19;
+      }
+      .caption { fill: var(--ink); font-size: 13px; letter-spacing: .12em; text-transform: uppercase; }
+      .caption--muted { fill: rgb(102 99 95 / 64%); }
+      .route-label { fill: var(--ink); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
+      .parcel { will-change: transform, opacity; }
+      .pulse { transform-box: fill-box; transform-origin: center; }
+      .postbox {
+        filter: brightness(0) saturate(100%) invert(40%) sepia(5%) saturate(440%) hue-rotate(357deg) brightness(95%) contrast(85%);
+      }
+    </style>
+  </head>
+  <body>
+    <main class="panel" aria-label="Animated contact dispatch artwork">
+      <svg viewBox="0 0 720 823" role="img" aria-labelledby="title description">
+        <title id="title">Contact dispatch</title>
+        <desc id="description">A message card travels along a calm route and arrives at a post box.</desc>
+
+        <defs>
+          <path id="delivery-path" d="M-56 510 H544 C590 510 622 483 647 430" />
+
+          <g id="message-card">
+            <rect x="-24" y="-15" width="48" height="30" rx="3" fill="var(--paper)" stroke="var(--ink)" stroke-width="2" />
+            <path d="M-21 -11 L0 3 L21 -11 M-21 11 L-6 -2 M21 11 L6 -2" class="ink" />
+          </g>
+        </defs>
+
+        <text class="caption" x="34" y="48">04 / contact dispatch</text>
+        <text id="phase-label" class="caption caption--muted" x="686" y="48" text-anchor="end">post open</text>
+
+        <g aria-hidden="true">
+          <image href="assets/scene/building-one.svg" x="38" y="390" width="104" height="109" />
+          <image href="assets/scene/tree-round.svg" x="151" y="394" width="91" height="91" />
+          <image href="assets/scene/building-two.svg" x="259" y="391" width="119" height="104" />
+          <image href="assets/scene/tree-cluster.svg" x="401" y="395" width="90" height="90" />
+        </g>
+
+        <g class="ink">
+          <path d="M44 598 H676" />
+          <path d="M95 620 H171 M210 620 H272 M453 620 H531 M571 620 H640" />
+          <path d="M141 608 V631 M328 608 V631 M576 608 V631" />
+        </g>
+
+        <path class="road" d="M-56 480 H754 V540 H-56 Z" />
+        <path class="lane" d="M-14 510 H734" />
+
+        <g class="ink" aria-label="Roadside stone clusters">
+          <path d="M74 595 C78 585 91 583 98 592 L99 598 H75 Z M104 598 C108 591 117 591 121 598 Z" />
+          <path d="M203 598 C207 588 220 586 227 596 L226 601 H203 Z M233 599 C237 593 245 593 249 599 Z" />
+          <path d="M420 598 C425 587 440 586 447 596 L446 601 H419 Z M453 598 C458 592 466 593 470 599 Z" />
+          <path d="M600 599 C605 588 620 587 627 597 L626 602 H600 Z M632 600 C637 593 646 594 650 600 Z" />
+        </g>
+
+        <image class="postbox" href="assets/contact/postbox.svg" x="587" y="365" width="120" height="132" />
+
+        <g id="parcel" class="parcel" opacity="0" transform="translate(-56 533)"><use href="#message-card" /></g>
+        <circle id="pulse" class="pulse ink" cx="647" cy="438" r="10" opacity="0" />
+
+        <text class="caption caption--muted" x="34" y="778">a note is enough</text>
+        <text class="caption caption--muted" x="686" y="778" text-anchor="end">one line open</text>
+      </svg>
+    </main>
+
+    <script>
+      const route = document.querySelector('#delivery-path');
+      const parcel = document.querySelector('#parcel');
+      const pulse = document.querySelector('#pulse');
+      const phaseLabel = document.querySelector('#phase-label');
+      const CYCLE = 4.8;
+
+      function pointAt(progress) {
+        const length = route.getTotalLength();
+        const at = Math.max(0, Math.min(length, length * progress));
+        const previous = route.getPointAtLength(Math.max(0, at - 1));
+        const point = route.getPointAtLength(at);
+        return {
+          x: point.x,
+          y: point.y,
+          angle: Math.atan2(point.y - previous.y, point.x - previous.x) * 180 / Math.PI,
+        };
+      }
+
+      function render(time) {
+        const seconds = (time / 1000) % CYCLE;
+        const travel = Math.min(1, seconds / 3.25);
+        const point = pointAt(travel);
+        parcel.setAttribute('transform', `translate(${point.x} ${point.y}) rotate(${point.angle})`);
+        parcel.style.opacity = seconds < 3.45 ? 1 : 0;
+
+        const arrived = seconds > 3.25 && seconds < 4.1;
+        phaseLabel.textContent = arrived ? 'message received' : 'post open';
+        const pulseProgress = Math.max(0, Math.min(1, (seconds - 3.25) / .65));
+        pulse.setAttribute('r', `${10 + 22 * pulseProgress}`);
+        pulse.style.opacity = arrived ? 1 - pulseProgress : 0;
+
+        requestAnimationFrame(render);
+      }
+
+      requestAnimationFrame(render);
+    </script>
+  </body>
+</html>

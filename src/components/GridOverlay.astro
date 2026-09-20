@@ -1,0 +1,32 @@
+---
+// The measure — two dashed hairlines at the content container's edges, the
+// shared paper substrate behind every page. Snapped to whole pixels so a
+// fractional margin never blurs one edge away (plans/018). Sections cross it
+// with SectionRule, whose ticks mark the columns.
+---
+
+<div class="grid-overlay" aria-hidden="true"></div>
+
+<style>
+  .grid-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    /* the container's inset from the viewport edge, as the layout computes it, rounded */
+    --edge: round(down, max(var(--margin-side), (100% - var(--container-max)) / 2), 1px);
+  }
+
+  .grid-overlay::before,
+  .grid-overlay::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 0;
+    border-left: 1px dashed var(--line-0);
+  }
+
+  .grid-overlay::before { left: var(--edge); }
+  .grid-overlay::after { right: var(--edge); }
+</style>

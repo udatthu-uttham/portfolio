@@ -1,0 +1,153 @@
+---
+// Resona, rendered the way its report actually looks: a light page, DM-Sans-ish
+// type, magenta #9f2089, soft pink and yellow tints, 12px radii. The layout
+// follows the real research page (header → study card → quality strip → key
+// finding → theme → insight cards with verbatims, an "AI asks" doubt, and
+// how-might-we prompts).
+// DATA IS INVENTED: a bike-parts marketplace study, made-up riders, made-up
+// Hinglish lines. Nothing here is a real participant or a real recording.
+const participants = ['Ravi', 'Meena', 'Arjun', 'Priya'];
+const stats = [['4', 'riders'], ['18', 'observations'], ['3', 'clusters'], ['5', 'insights'], ['8', 'HMWs']];
+---
+<div class="rs" aria-label="Resona research report on an invented study">
+  <header class="rs__top">
+    <span class="rs__avatar" aria-hidden="true"></span>
+    <span class="rs__who">
+      <b>Meena Rao</b>
+      <span class="rs__tags"><i>Rider studies</i><i>Gen-AI research</i></span>
+    </span>
+    <span class="rs__heart" aria-hidden="true">♡</span>
+  </header>
+
+  <article class="rs__study">
+    <div class="rs__titlerow">
+      <h4>Why riders skip the fitment check</h4>
+      <span class="rs__actions"><span class="rs__btn rs__btn--warm">↺ Re-run</span><span class="rs__btn">Export PDF</span></span>
+    </div>
+    <p class="rs__meta">▢ 12 March 2026 &nbsp;·&nbsp; First-time buyers, Tier 2 &nbsp;·&nbsp; <b>Deductive coding + affinity mapping</b></p>
+    <p class="rs__people">{participants.map((n) => <span>{n}</span>)}</p>
+    <p class="rs__guide">▤ Discussion guide attached</p>
+    <p class="rs__audio">♫ 4 audio files <span class="rs__btn rs__btn--tiny">+ Add audio</span></p>
+
+    <p class="rs__stats">
+      <span class="rs__quality">Quality <b>82/100</b></span>
+      {stats.map(([n, l]) => <span><b>{n}</b> {l}</span>)}
+    </p>
+
+    <div class="rs__finding">
+      <span class="rs__label">Key finding</span>
+      <p>First-time riders read the fitment badge as an ad, not a check. They trust <b>a friend’s bike model in the reviews</b> over anything the card says, so the badge has to borrow that proof rather than compete with it.</p>
+    </div>
+    <p class="rs__method">Method: Deductive coding + affinity mapping</p>
+
+    <section class="rs__theme">
+      <p class="rs__label rs__label--brand">Theme 1</p>
+      <h5>Does the fitment badge read as a check?</h5>
+      <p class="rs__sub">Evaluate whether riders understand the badge means the part was verified against their bike.</p>
+      <p class="rs__label">Insights</p>
+
+      <div class="rs__cards">
+        <div class="rs__card rs__card--ask">
+          <p class="rs__cardhead"><span>⚠ Needs your input</span><span>78% insight score</span></p>
+          <p class="rs__insight">The word “fitment” reads as a sponsored label, so the check is ignored</p>
+          <blockquote class="rs__quote">“Ye toh ad hai na? Fit hoga ki nahi, woh toh reviews mein dekhna padega.”<cite>S2_P1 ~14:02</cite></blockquote>
+          <p class="rs__ai"><b>AI asks:</b> Claims 3 of 4 riders read it as an ad, but only S2 said so. <span class="rs__btn rs__btn--tiny">Clarify</span></p>
+          <p class="rs__label">How might we</p>
+          <p class="rs__hmw">How might we phrase the check as the rider’s own bike, not as a badge?</p>
+        </div>
+
+        <div class="rs__card">
+          <p class="rs__cardhead rs__cardhead--brand"><span>Does the fitment badge read as a check?</span></p>
+          <p class="rs__chips"><span>3 of 4 participants</span><span class="is-high">Insight score: HIGH</span></p>
+          <p class="rs__insight">Riders trust a reviewer with the same bike more than a platform check</p>
+          <p class="rs__design">Design: show “fits Splendor Plus, says Ravi” next to the badge, pulled from a verified review.</p>
+          <blockquote class="rs__quote">“Splendor wale bhai ne likha fit ho gaya, toh mujhe pakka lag gaya.”<cite>S3_P1 ~08:41</cite></blockquote>
+          <p class="rs__label">How might we</p>
+          <p class="rs__hmw">How might we let a rider see one review from their own bike before anything else?</p>
+        </div>
+      </div>
+    </section>
+  </article>
+</div>
+
+<style>
+  .rs {
+    --rs-brand: #9f2089;
+    --rs-bg: #f8f8ff;
+    --rs-ink: #333;
+    --rs-mute: #6f6f7a;
+    --rs-line: #ececf2;
+    --rs-pink: #fbe9f6;
+    --rs-yellow: #fff6dc;
+    --rs-green: #e7f4ea;
+    --rs-green-ink: #1d7a3b;
+    --rs-r: 12px;
+    display: flex; flex-direction: column; gap: 10px;
+    padding: 10px 12px 14px;
+    background: var(--rs-bg); color: var(--rs-ink);
+    font-family: var(--font-paper);
+    font-size: 10.5px; line-height: 1.4;
+    text-align: left; text-transform: none; letter-spacing: 0;
+  }
+  .rs p, .rs h4, .rs h5, .rs blockquote { margin: 0; }
+  .rs__top { display: flex; align-items: center; gap: 8px; padding: 2px 2px 4px; }
+  .rs__avatar { width: 26px; height: 26px; border-radius: 50%; background: linear-gradient(135deg, #f2b7d9, var(--rs-brand)); }
+  .rs__who { display: flex; flex-direction: column; gap: 3px; font-size: 11px; }
+  .rs__tags { display: flex; gap: 4px; }
+  .rs__tags i { font-style: normal; font-size: 8.5px; padding: 1px 6px; border-radius: 6px; background: #ece9ff; color: #4b3f9e; }
+  .rs__tags i + i { background: var(--rs-yellow); color: #8a5a00; }
+  .rs__heart { margin-left: auto; color: var(--rs-brand); font-size: 14px; }
+
+  .rs__study { display: flex; flex-direction: column; gap: 7px; padding: 12px 12px 14px; background: #fff; border: 1px solid var(--rs-line); border-radius: var(--rs-r); box-shadow: 0 6px 18px -12px rgba(40, 20, 60, .35); }
+  .rs__titlerow { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+
+  /* Phone layout: the title takes the full width and the actions drop beneath
+     it, instead of a desktop title row being squeezed into a 268px frame. */
+  @container frame (max-width: 320px) {
+    .rs__titlerow { flex-direction: column; align-items: stretch; gap: 6px; }
+    .rs__actions { justify-content: flex-start; }
+    .rs__titlerow h4 { font-size: 12.5px; line-height: 1.25; }
+  }
+  .rs__titlerow h4 { font-size: 13px; font-weight: 700; letter-spacing: -0.01em; }
+  .rs__actions { display: flex; gap: 5px; }
+  .rs__btn { display: inline-block; padding: 3px 8px; border: 1px solid var(--rs-brand); border-radius: 6px; color: var(--rs-brand); font-size: 8.5px; font-weight: 600; white-space: nowrap; }
+  .rs__btn--warm { border-color: #e6b800; color: #8a5a00; background: var(--rs-yellow); }
+  .rs__btn--tiny { padding: 1px 6px; font-size: 8px; border-color: #cfcfda; color: var(--rs-ink); font-weight: 500; }
+  .rs__meta { color: var(--rs-mute); font-size: 9.5px; }
+  .rs__meta b { color: var(--rs-ink); font-weight: 600; }
+  .rs__people { display: flex; gap: 4px; flex-wrap: wrap; }
+  .rs__people span { padding: 1px 6px; border-radius: 5px; background: var(--rs-green); color: var(--rs-green-ink); font-size: 8.5px; font-weight: 600; }
+  .rs__guide { padding: 4px 8px; border-radius: 6px; background: var(--rs-pink); color: var(--rs-brand); font-size: 9px; font-weight: 500; }
+  .rs__audio { display: flex; align-items: center; gap: 6px; color: var(--rs-mute); font-size: 9px; }
+  .rs__stats { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding-top: 6px; border-top: 1px solid var(--rs-line); color: var(--rs-mute); font-size: 9px; }
+  .rs__stats b { color: var(--rs-ink); font-weight: 600; }
+  .rs__quality { padding: 2px 7px; border-radius: 6px; background: var(--rs-green); color: var(--rs-green-ink); }
+  .rs__quality b { color: var(--rs-green-ink); }
+
+  .rs__label { font-size: 8px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--rs-mute); }
+  .rs__label--brand { color: var(--rs-brand); }
+  .rs__finding { display: flex; flex-direction: column; gap: 4px; padding: 10px 12px; border-radius: var(--rs-r); background: var(--rs-pink); border: 1px solid #f0c9e6; }
+  .rs__finding p { font-size: 10.5px; font-weight: 600; line-height: 1.45; }
+  .rs__finding b { color: var(--rs-brand); }
+  .rs__method { align-self: flex-start; padding: 2px 8px; border-radius: 6px; background: #f1f1f6; color: var(--rs-mute); font-size: 8.5px; }
+
+  .rs__theme { display: flex; flex-direction: column; gap: 5px; margin-top: 4px; padding-left: 10px; border-left: 2px solid var(--rs-brand); }
+  .rs__theme h5 { font-size: 12px; font-weight: 700; }
+  .rs__sub { color: var(--rs-mute); font-size: 9.5px; }
+  .rs__cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 4px; }
+  .rs__card { display: flex; flex-direction: column; gap: 6px; padding: 9px 10px 10px; border: 1px solid var(--rs-line); border-radius: var(--rs-r); background: #fff; }
+  .rs__card--ask { background: #fffcf2; border-color: #f3e2a8; }
+  .rs__cardhead { display: flex; justify-content: space-between; gap: 6px; font-size: 8.5px; font-weight: 600; color: #8a5a00; }
+  .rs__cardhead--brand { color: var(--rs-brand); text-transform: uppercase; letter-spacing: .06em; font-size: 8px; }
+  .rs__chips { display: flex; gap: 4px; flex-wrap: wrap; }
+  .rs__chips span { padding: 1px 6px; border-radius: 5px; background: #f1f1f6; color: var(--rs-mute); font-size: 8px; font-weight: 600; }
+  .rs__chips .is-high { background: var(--rs-green); color: var(--rs-green-ink); }
+  .rs__insight { font-size: 10.5px; font-weight: 600; line-height: 1.4; }
+  .rs__design { color: var(--rs-mute); font-size: 9px; font-style: italic; }
+  .rs__quote { display: flex; flex-direction: column; gap: 3px; padding: 7px 9px; border-radius: 8px; background: #f6f6fb; color: #4a4a55; font-size: 9px; font-style: italic; line-height: 1.4; }
+  .rs__card--ask .rs__quote { background: #fff3cf; }
+  .rs__quote cite { font-style: normal; font-size: 8px; color: var(--rs-brand); font-weight: 600; }
+  .rs__ai { display: flex; align-items: center; flex-wrap: wrap; gap: 4px; color: #8a5a00; font-size: 9px; }
+  .rs__hmw { font-size: 9.5px; color: var(--rs-ink); }
+  @media (max-width: 640px) { .rs__cards { grid-template-columns: 1fr; } .rs__titlerow { flex-direction: column; align-items: flex-start; } }
+</style>

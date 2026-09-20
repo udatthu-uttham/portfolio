@@ -1,0 +1,157 @@
+---
+// Moto-culture die-cut stickers — type-led badges in ink/amber/white, the
+// kind that end up all over a touring bike. Each variant is a hand-set SVG:
+//   forest — circular badge   · "26 HRS FOREST RIDE"
+//   speed  — slanted banner   · "500 KM IN 5 HRS"
+//   tiger  — shield           · "TIGER SPORT 660 · BLR"
+interface Props {
+  variant: 'forest' | 'speed' | 'tiger';
+  rotate?: number;
+}
+
+const { variant, rotate = 0 } = Astro.props;
+
+const labels: Record<string, string> = {
+  forest: 'Ride log: 26 hours, one forest ride',
+  speed: 'Ride log: 500 kilometres in 5 hours',
+  tiger: 'The bike: Triumph Tiger Sport 660, Bengaluru',
+};
+---
+
+<span class:list={['moto', `moto--${variant}`]} style={`--moto-tilt: ${rotate}deg;`}>
+  {
+    variant === 'forest' && (
+      <svg viewBox="0 0 160 160" role="img" aria-label={labels.forest}>
+        <circle cx="80" cy="80" r="78" fill="var(--paper-1)" />
+        <circle cx="80" cy="80" r="70" fill="var(--ink-900)" />
+        <circle cx="80" cy="80" r="44" fill="var(--amber-500)" />
+        <defs>
+          <path id="moto-arc-top" d="M 24,80 A 56,56 0 0 1 136,80" fill="none" />
+        </defs>
+        <text class="ms-arc">
+          <textPath href="#moto-arc-top" startOffset="50%" text-anchor="middle">
+            FOREST RIDE
+          </textPath>
+        </text>
+        <text class="ms-center" x="80" y="76" text-anchor="middle">26</text>
+        <text class="ms-center-sub" x="80" y="98" text-anchor="middle">HOURS</text>
+        <text class="ms-bottom" x="80" y="128" text-anchor="middle">★ NON·STOP ★</text>
+      </svg>
+    )
+  }
+  {
+    variant === 'speed' && (
+      <svg viewBox="0 0 230 110" role="img" aria-label={labels.speed}>
+        <path d="M 28,6 H 226 L 206,104 H 8 Z" fill="var(--paper-1)" />
+        <path d="M 34,14 H 217 L 200,96 H 17 Z" fill="var(--ink-900)" />
+        <path d="M 46,40 h 22 M 42,56 h 16 M 38,72 h 22" stroke="var(--amber-500)" stroke-width="5" stroke-linecap="round" />
+        <text class="ms-speed" x="82" y="62">500 KM</text>
+        <text class="ms-speed-sub" x="84" y="84">IN 5 HRS FLAT</text>
+      </svg>
+    )
+  }
+  {
+    variant === 'tiger' && (
+      <svg viewBox="0 0 140 168" role="img" aria-label={labels.tiger}>
+        <path d="M70,4 L132,24 V84 C132,126 106,150 70,164 C34,150 8,126 8,84 V24 Z" fill="var(--paper-1)" />
+        <path d="M70,13 L124,30 V84 C124,120 102,142 70,155 C38,142 16,120 16,84 V30 Z" fill="var(--ink-900)" />
+        <defs>
+          <clipPath id="moto-shield-clip">
+            <path d="M70,13 L124,30 V84 C124,120 102,142 70,155 C38,142 16,120 16,84 V30 Z" />
+          </clipPath>
+        </defs>
+        <rect x="12" y="78" width="116" height="30" fill="var(--amber-500)" clip-path="url(#moto-shield-clip)" />
+        <text class="ms-shield-top" x="70" y="52" text-anchor="middle">TIGER</text>
+        <text class="ms-shield-mid" x="70" y="71" text-anchor="middle">SPORT</text>
+        <text class="ms-shield-band" x="70" y="100" text-anchor="middle">660</text>
+        <text class="ms-shield-foot" x="70" y="134" text-anchor="middle">BLR · IND</text>
+      </svg>
+    )
+  }
+</span>
+
+<style>
+  .moto {
+    display: block;
+    rotate: var(--moto-tilt);
+    filter: var(--drop-stuck);
+  }
+
+  .moto svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .moto text {
+    font-family: var(--font-paper);
+  }
+
+  /* forest badge */
+  .ms-arc {
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.32em;
+    fill: var(--paper-1);
+  }
+  .ms-center {
+    font-size: 34px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    fill: var(--ink-900);
+  }
+  .ms-center-sub {
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.28em;
+    fill: var(--ink-900);
+  }
+  .ms-bottom {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    fill: var(--amber-500);
+  }
+
+  /* speed banner */
+  .ms-speed {
+    font-size: 36px;
+    font-weight: 600;
+    font-style: italic;
+    letter-spacing: 0.01em;
+    fill: var(--paper-1);
+  }
+  .ms-speed-sub {
+    font-size: 13px;
+    font-weight: 500;
+    font-style: italic;
+    letter-spacing: 0.3em;
+    fill: var(--amber-500);
+  }
+
+  /* tiger shield */
+  .ms-shield-top {
+    font-size: 25px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    fill: var(--paper-1);
+  }
+  .ms-shield-mid {
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.4em;
+    fill: var(--paper-1);
+  }
+  .ms-shield-band {
+    font-size: 25px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    fill: var(--ink-900);
+  }
+  .ms-shield-foot {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.26em;
+    fill: var(--amber-500);
+  }
+</style>

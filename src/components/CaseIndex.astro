@@ -1,0 +1,65 @@
+---
+// The second layer of the Projects section: every case that is not on the
+// board, one ruler-styled row each — year, kicker, title, one line, arrow.
+// No media, so it scales to twenty cases without the page growing much.
+// Also used at the end of a case page as "More cases".
+import type { Study } from '../data/studies';
+import { rich } from '../lib/rich';
+
+interface Props { items: Study[]; label?: string }
+const { items, label } = Astro.props;
+---
+{items.length > 0 && (
+  <nav class="case-index" aria-label={label ?? 'More cases'}>
+    {label && <p class="case-index__label">{label}</p>}
+    <ol class="case-index__list">
+      {items.map((s) => (
+        <li class="case-index__row">
+          <a class="case-index__link" href={`/work/${s.slug}`}>
+            <span class="case-index__year">{s.year}</span>
+            <span class="case-index__kicker">{s.kicker}</span>
+            <span class="case-index__title">{s.title}</span>
+            <span class="case-index__line" set:html={rich(s.summary)} />
+            <span class="case-index__arr" aria-hidden="true">→</span>
+          </a>
+        </li>
+      ))}
+    </ol>
+  </nav>
+)}
+
+<style>
+  .case-index { position: relative; z-index: 1; }
+  .case-index__label { margin: 0 0 var(--space-3); color: var(--ink-600); font-family: var(--font-paper); font-size: var(--text-eyebrow); font-weight: 500; letter-spacing: var(--track-label); text-transform: uppercase; }
+  .case-index__list { margin: 0; padding: 0; list-style: none; border-top: 1px dashed var(--line-mark); }
+  .case-index__row { border-bottom: 1px dashed var(--line-mark); }
+  .case-index__link {
+    display: grid;
+    grid-template-columns: 6ch auto minmax(0, 1fr) minmax(0, 1.6fr) auto;
+    align-items: baseline;
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-2);
+    color: inherit;
+    text-decoration: none;
+  }
+  .case-index__year { color: var(--ink-600); font-family: var(--font-paper); font-size: var(--text-eyebrow); font-weight: 500; font-variant-numeric: tabular-nums; letter-spacing: var(--track-label); white-space: nowrap; }
+  .case-index__kicker { align-self: center; padding: var(--space-1) var(--space-3); border: 1px solid var(--line-1); border-radius: var(--radius-pill); color: var(--ink-600); font-family: var(--font-paper); font-size: var(--text-eyebrow); font-weight: 500; letter-spacing: var(--track-label); text-transform: uppercase; white-space: nowrap; }
+  .case-index__title { font-size: var(--text-h4); font-weight: 600; letter-spacing: var(--track-heading); line-height: var(--lh-heading); color: var(--ink-900); }
+  .case-index__line { color: var(--ink-600); font-size: var(--text-small); line-height: var(--lh-body); text-wrap: pretty; }
+  .case-index__line :global(.em) { color: var(--ink-900); font-weight: 600; }
+  .case-index__arr { color: var(--ink-600); transition: transform var(--dur-2) var(--ease-standard), color var(--dur-2) var(--ease-standard); }
+  /* hover is colour and the arrow nudge only — nothing lifts or moves */
+  .case-index__link:hover .case-index__title { color: var(--amber-600, var(--ink-900)); }
+  .case-index__link:hover .case-index__arr { transform: translateX(4px); color: var(--ink-900); }
+  .case-index__link:focus-visible { outline: 2px solid var(--ink-900); outline-offset: 2px; }
+  @media (max-width: 900px) {
+    .case-index__link { grid-template-columns: 6ch auto minmax(0, 1fr) auto; }
+    .case-index__line { grid-column: 3 / span 1; grid-row: 2; }
+  }
+  @media (max-width: 640px) {
+    .case-index__link { grid-template-columns: auto auto minmax(0, 1fr); row-gap: var(--space-2); }
+    .case-index__title { grid-column: 1 / -1; grid-row: 2; }
+    .case-index__line { grid-column: 1 / -1; grid-row: 3; }
+    .case-index__arr { grid-column: 3; grid-row: 1; justify-self: end; }
+  }
+</style>

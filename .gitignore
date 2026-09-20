@@ -1,0 +1,23 @@
+# dependencies
+node_modules/
+
+# astro / build
+dist/
+.astro/
+
+# local scratch and backups
+tmp/
+.DS_Store
+
+# env and secrets
+.env
+.env.*
+!.env.example
+
+# unused root dump
+Ride.png
+
+# research / tooling caches
+.tastemaker/
+.ui-forensics/
+.claude/

@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Side-view signal loop</title>
+    <style>
+      :root {
+        --paper: #fcfaf2;
+        --graphite: #66635f;
+        --surface-gray: #dedede;
+        --amber: #f3b44a;
+        --green: #59a66a;
+        --red: #d4615b;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        min-height: 100vh;
+        margin: 0;
+        display: grid;
+        place-items: center;
+        background: transparent;
+        font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+      }
+
+      .panel {
+        width: min(720px, 100vw);
+        aspect-ratio: 7 / 8;
+        overflow: hidden;
+        background: var(--paper);
+        box-shadow: 0 18px 55px rgb(58 55 46 / 12%);
+      }
+
+      svg { display: block; width: 100%; height: 100%; }
+
+      .ink {
+        fill: none;
+        stroke: var(--graphite);
+        stroke-opacity: 1;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      .quiet { stroke-opacity: 1; }
+
+      .signal__lamp { fill: var(--paper); transition: fill 140ms ease; }
+      .signal.is-green .signal__lamp--green { fill: var(--green); }
+      .signal.is-red .signal__lamp--red { fill: var(--red); }
+
+      .bike { opacity: 0; transform-box: fill-box; transform-origin: center; will-change: transform, opacity; }
+      .environment-asset { opacity: 1; }
+      .ramp { opacity: 0; will-change: transform, opacity; }
+      .dust { opacity: 0; }
+      .rocks { stroke-width: 2; stroke-opacity: 1; }
+
+      .signal-strong { stroke-width: 2; }
+      .signal-strong .ink { stroke-width: 2; }
+
+      .caption {
+        fill: var(--graphite);
+        font-size: 13px;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+      }
+
+      .caption--muted { fill: rgb(102 99 95 / 64%); }
+    </style>
+  </head>
+  <body>
+    <main class="panel" aria-label="Two-beat side-view motorcycle signal animation">
+      <svg viewBox="0 0 720 823" role="img" aria-labelledby="title description">
+        <title id="title">Motorcycle and signal loop</title>
+        <desc id="description">A motorcycle crosses a green signal normally, then another motorcycle hits a roadside ramp and backflips past the red signal.</desc>
+
+        <defs>
+          <!-- A compact original sport-tourer silhouette, drawn to read at a small display size. -->
+          <g id="side-bike" class="ink">
+            <path d="M-43 17 C-49 25 -48 39 -41 46 C-34 53 -23 52 -17 45 C-12 37 -13 24 -20 18 C-27 12 -37 11 -43 17"/>
+            <path d="M20 17 C15 25 16 39 23 45 C29 51 40 50 45 42 C50 34 48 21 42 17 C35 12 25 12 20 17"/>
+            <path d="M-31 18 L-12 7 L14 10 L6 24 L-16 28 Z"/>
+            <path d="M-14 7 L1 -10 L24 -8 L31 5 L16 14"/>
+            <path d="M24 -8 L27 -27 L36 -30 L42 -22 L41 -11"/>
+            <path d="M-17 28 L-30 39 L-23 44 L-7 33 M6 24 L19 34 L25 31"/>
+            <path d="M7 23 C19 24 30 30 39 38 L35 42 C26 35 17 32 6 32"/>
+            <path d="M-10 -8 C-16 -14 -17 -27 -10 -35 C-3 -42 9 -39 13 -30 C17 -21 12 -12 5 -9 C-1 -7 -6 -7 -10 -8 M-10 -27 C-4 -24 5 -24 12 -28"/>
+            <path d="M-11 -8 C-21 -3 -27 5 -31 16 L-43 20 M8 -8 C18 -4 23 4 24 13 L33 17"/>
+            <path d="M-26 8 C-16 13 2 13 22 7 M-43 20 L-51 18 M33 17 L42 15"/>
+          </g>
+
+          <!-- Supplied bike-and-rider vector, kept together so the rider follows the flip cleanly. -->
+          <g id="provided-bike">
+            <image href="assets/scene/bike-rider.svg" x="-53.5" y="-53.5" width="107" height="107" preserveAspectRatio="xMidYMid meet"/>
+          </g>
+
+          <path id="green-path" d="M-70 590 H790"/>
+          <path id="flip-approach" d="M-60 590 C92 590 180 590 239 585 C261 570 269 525 278 509"/>
+          <path id="flip-flight" d="M278 509 C360 300 600 340 820 590"/>
+        </defs>
+
+        <text class="caption" x="34" y="48">03 / signal study</text>
+        <text id="phase-label" class="caption caption--muted" x="686" y="48" text-anchor="end">green / proceed</text>
+
+        <!-- Alternating buildings and trees all share the north curb as their ground line. -->
+        <g class="environment-asset" aria-hidden="true">
+          <image href="assets/scene/building-one.svg" x="16" y="451" width="100" height="104"/>
+          <image href="assets/scene/tree-round.svg" x="130" y="465" width="80" height="80"/>
+          <image href="assets/scene/building-two.svg" x="220" y="444" width="115" height="101"/>
+          <image href="assets/scene/tree-cluster.svg" x="340" y="467" width="78" height="78"/>
+          <image href="assets/scene/building-one.svg" x="460" y="458" width="92" height="96"/>
+          <image href="assets/scene/tree-round.svg" x="566" y="470" width="75" height="75"/>
+          <image href="assets/scene/building-two.svg" x="635" y="471" width="84" height="74"/>
+        </g>
+
+        <!-- The road fill masks every environmental base cleanly behind the curb. -->
+        <rect x="-8" y="545" width="736" height="95" fill="var(--paper)"/>
+        <g class="ink">
+          <path d="M-8 545 H728 M-8 640 H728"/>
+          <path d="M35 592 H154 M188 592 H238 M383 592 H485 M523 592 H624 M658 592 H709"/>
+          <path d="M58 571 V584 M159 571 V584 M532 571 V584 M650 571 V584" class="quiet"/>
+        </g>
+
+        <!-- South-side roadside rocks: beyond the far curb, never in the travel lane. -->
+        <g class="ink rocks" aria-hidden="true">
+          <path d="M83 665 C87 658 96 658 101 664 L99 672 L87 674 L81 670 Z M112 670 C116 665 123 665 127 670 L125 676 L116 677 L110 674 Z"/>
+          <path d="M325 666 C330 659 339 659 344 665 L342 673 L330 675 L324 671 Z M354 671 C358 666 365 667 368 672 L366 678 L357 678 L352 675 Z"/>
+          <path d="M531 668 C536 661 545 662 550 668 L548 676 L537 678 L530 674 Z M561 664 C566 658 575 659 580 665 L578 673 L567 675 L560 671 Z"/>
+          <path d="M662 670 C667 664 675 665 679 670 L677 677 L668 678 L661 675 Z"/>
+        </g>
+
+        <!-- The signal is deliberately stronger than the environmental line work. -->
+        <g class="ink signal-strong">
+          <path d="M432 545 L432 232 M414 232 L450 232 L450 342 L414 342 Z M421 342 L443 342"/>
+          <g id="signal" class="signal">
+            <circle class="signal__lamp signal__lamp--red ink" cx="432" cy="264" r="10"/>
+            <circle class="signal__lamp signal__lamp--green ink" cx="432" cy="314" r="10"/>
+          </g>
+        </g>
+
+        <!-- The ramp falls in only during the red phase; its lip matches the takeoff point. -->
+        <image id="ramp" class="ramp environment-asset" href="assets/scene/ramp.svg" x="248" y="526" width="99" height="71" aria-hidden="true"/>
+        <g id="dust" class="dust ink"><path d="M253 596 L236 603 M260 599 L244 609 M269 594 L266 607"/></g>
+
+        <g id="bike-green" class="bike"><use href="#provided-bike" /></g>
+        <g id="bike-red" class="bike"><use href="#provided-bike" /></g>
+
+        <text class="caption caption--muted" x="34" y="778">west → east</text>
+        <text class="caption caption--muted" x="686" y="778" text-anchor="end">five-second loop</text>
+      </svg>
+    </main>
+
+    <script>
+      const GREEN_DURATION = 2;
+      const GREEN_ENTER = .28;
+      const GREEN_EXIT = 1.98;
+      const RAMP_LAND = .45;
+      const RAMP_SETTLE = .14;
+      const BIKE_ENTER = .80;
+      const APPROACH_DURATION = .62;
+      const TAKEOFF = BIKE_ENTER + APPROACH_DURATION;
+      const FLIGHT_DURATION = 1.77;
+      const RED_DURATION = BIKE_ENTER + APPROACH_DURATION + FLIGHT_DURATION;
+      const CYCLE = GREEN_DURATION + RED_DURATION;
+      const greenBike = document.querySelector('#bike-green');
+      const redBike = document.querySelector('#bike-red');
+      const signal = document.querySelector('#signal');
+      const ramp = document.querySelector('#ramp');
+      const dust = document.querySelector('#dust');
+      const phaseLabel = document.querySelector('#phase-label');
+      const greenPath = document.querySelector('#green-path');
+      const approach = document.querySelector('#flip-approach');
+      const flight = document.querySelector('#flip-flight');
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      function pointAt(path, progress) {
+        const length = path.getTotalLength();
+        const at = Math.max(0, Math.min(length, length * progress));
+        const previous = path.getPointAtLength(Math.max(0, at - 1));
+        const point = path.getPointAtLength(at);
+        const angle = Math.atan2(point.y - previous.y, point.x - previous.x) * 180 / Math.PI;
+        return { x: point.x, y: point.y, angle };
+      }
+
+      function place(bike, point, angle, opacity = 1) {
+        bike.style.opacity = opacity;
+        bike.setAttribute('transform', `translate(${point.x} ${point.y}) rotate(${angle}) scale(.97)`);
+      }
+
+      function setSignal(state) {
+        signal.classList.toggle('is-green', state === 'green');
+        signal.classList.toggle('is-red', state === 'red');
+      }
+
+      function setRamp(redSeconds) {
+        if (redSeconds === null) {
+          ramp.style.opacity = 0;
+          ramp.setAttribute('transform', 'translate(0 -740)');
+          return;
+        }
+
+        const dropProgress = Math.min(1, redSeconds / RAMP_LAND);
+        const landingBounce = redSeconds > RAMP_LAND
+          ? -8 * Math.sin(Math.min(1, (redSeconds - RAMP_LAND) / RAMP_SETTLE) * Math.PI)
+          : 0;
+        const dropOffset = -740 * (1 - dropProgress * dropProgress * dropProgress) + landingBounce;
+        ramp.style.opacity = dropProgress === 0 ? 0 : 1;
+        ramp.setAttribute('transform', `translate(0 ${dropOffset})`);
+      }
+
+      function render(time) {
+        const seconds = (time / 1000) % CYCLE;
+        greenBike.style.opacity = 0;
+        redBike.style.opacity = 0;
+        dust.style.opacity = 0;
+
+        if (seconds < GREEN_DURATION) {
+          setRamp(null);
+          setSignal('green');
+          phaseLabel.textContent = 'green / proceed';
+          if (seconds >= GREEN_ENTER) {
+            const progress = Math.min(1, (seconds - GREEN_ENTER) / (GREEN_EXIT - GREEN_ENTER));
+            const point = pointAt(greenPath, progress);
+            place(greenBike, point, point.angle);
+          }
+        } else {
+          const redSeconds = seconds - GREEN_DURATION;
+          setRamp(redSeconds);
+          setSignal('red');
+          phaseLabel.textContent = redSeconds < BIKE_ENTER ? 'red / ramp deploys' : 'red / take the jump';
+
+          if (redSeconds >= BIKE_ENTER && redSeconds < TAKEOFF) {
+            const point = pointAt(approach, (redSeconds - BIKE_ENTER) / APPROACH_DURATION);
+            place(redBike, point, 0);
+          } else if (redSeconds >= TAKEOFF) {
+            const flightProgress = Math.min(1, (redSeconds - TAKEOFF) / FLIGHT_DURATION);
+            const point = pointAt(flight, flightProgress);
+            place(redBike, point, -360 * flightProgress);
+            dust.style.opacity = flightProgress < .16 ? 1 : 0;
+          }
+        }
+
+        if (!reduceMotion) requestAnimationFrame(render);
+      }
+
+      if (reduceMotion) {
+        setSignal('red');
+        setRamp(RED_DURATION);
+        phaseLabel.textContent = 'red / jump completed';
+        place(redBike, pointAt(flight, 1), -360);
+      } else {
+        requestAnimationFrame(render);
+      }
+    </script>
+  </body>
+</html>

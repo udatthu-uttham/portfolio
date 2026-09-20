@@ -1,0 +1,430 @@
+---
+interface Props {
+  href: string;
+  label: string;
+  cursorLabel?: string;
+  floating?: boolean;
+}
+
+const { href, label, cursorLabel = label, floating = true } = Astro.props;
+---
+
+<a
+  class="page-next cta cta--primary"
+  data-page-next
+  data-page-next-flow={floating ? undefined : ''}
+  href={href}
+  aria-label={`Next: ${label}`}>
+  <span class="page-next__icon" aria-hidden="true">↓</span>
+  <span class="page-next__copy">
+    <span class="page-next__eyebrow">Next section</span>
+    <span class="page-next__label">{label}</span>
+    <span class="page-next__desktop-label">{cursorLabel}</span>
+  </span>
+  <svg class="page-next__arrow" viewBox="0 0 84 86" fill="none" aria-hidden="true">
+    <path d="M6 9C42 4 63 17 63 50V67" />
+    <path d="M48 53L63 68L78 53" />
+  </svg>
+</a>
+
+<!-- The cursor label is visual-only. The anchor above remains the one
+     keyboard and screen-reader control. -->
+<div class="page-next__cursor" data-page-next-cursor aria-hidden="true">
+  <div class="page-next__cursor-content">
+    <span class="page-next__cursor-label">{cursorLabel}</span>
+    <svg class="page-next__cursor-arrow" viewBox="0 0 84 86" fill="none">
+      <path d="M6 9C42 4 63 17 63 50V67" />
+      <path d="M48 53L63 68L78 53" />
+    </svg>
+  </div>
+</div>
+
+<style>
+  .page-next {
+    position: fixed;
+    right: max(var(--margin-side), env(safe-area-inset-right));
+    bottom: max(var(--space-5), env(safe-area-inset-bottom));
+    z-index: var(--z-float);
+    width: var(--space-7);
+    min-height: var(--space-7);
+    max-width: var(--space-7);
+    gap: 0;
+    overflow: hidden;
+    padding: 0;
+    white-space: normal;
+    transition:
+      transform var(--dur-1) var(--ease-standard),
+      opacity var(--dur-1) var(--ease-standard);
+    /* a floating control, not a sticker on a surface: no lean, no shouting */
+    --cta-tilt: 0deg;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  .page-next__icon {
+    display: grid;
+    width: var(--space-7);
+    flex: 0 0 var(--space-7);
+    place-items: center;
+    font-size: var(--text-h4);
+    line-height: 1;
+  }
+
+  .page-next__copy {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-1);
+    opacity: 0;
+    font-size: var(--text-small);
+    line-height: var(--lh-heading);
+    transform: translateX(-6px);
+    transition: opacity var(--dur-1) var(--ease-standard), transform var(--dur-2) var(--ease-standard);
+  }
+
+  .page-next__eyebrow {
+    color: var(--ink-600);
+    font-family: var(--font-glass);
+    font-size: var(--text-eyebrow);
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+  }
+
+  .page-next__label {
+    font-size: var(--text-small);
+  }
+
+  .page-next__desktop-label,
+  .page-next__arrow {
+    display: none;
+  }
+
+  .page-next.is-active,
+  .page-next:focus-visible {
+    width: auto;
+    max-width: min(260px, calc(100vw - var(--margin-side) * 2));
+    gap: var(--space-2);
+    padding-right: var(--space-5);
+  }
+
+  .page-next.is-active .page-next__copy,
+  .page-next:focus-visible .page-next__copy {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  /* A fine-pointer-only, cursor-adjacent cue. It never receives pointer
+     events; the linked button remains the accessible control. */
+  .page-next__cursor {
+    position: fixed;
+    z-index: calc(var(--z-float) + 1);
+    left: 0;
+    top: 0;
+    /* Direct compositor positioning; the inner cue owns its entrance scale. */
+    transform: translate3d(-100%, -100%, 0);
+    width: 280px;
+    height: 112px;
+    color: var(--ink-900);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--dur-1) var(--ease-standard);
+    will-change: transform, opacity;
+  }
+
+  .page-next__cursor.is-visible {
+    opacity: 1;
+  }
+
+  .page-next__cursor-content {
+    position: absolute;
+    inset: 0;
+    transform: scale(0.96);
+    transition: transform var(--dur-2) var(--ease-enter);
+  }
+
+  .page-next__cursor.is-visible .page-next__cursor-content {
+    transform: scale(1);
+  }
+
+  .page-next__cursor-label {
+    position: absolute;
+    top: 2px;
+    left: 0;
+    font-family: var(--font-hand);
+    font-size: var(--text-annotation);
+    font-weight: 500;
+    letter-spacing: var(--track-heading);
+    line-height: var(--lh-display);
+    white-space: nowrap;
+  }
+
+  .page-next__cursor-arrow {
+    position: absolute;
+    right: -14px;
+    bottom: -18px;
+    width: 84px;
+    height: 86px;
+    color: var(--graphite);
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 4;
+  }
+
+  .page-next.is-cursor-hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .page-next[data-page-next-flow] {
+    position: relative;
+    right: auto;
+    bottom: auto;
+    display: flex;
+    width: fit-content;
+    max-width: min(260px, calc(100vw - var(--margin-side) * 2));
+    gap: var(--space-2);
+    margin: 0 auto var(--section-y-sm);
+    padding-right: var(--space-5);
+  }
+
+  .page-next[data-page-next-flow] .page-next__copy {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  :global(body.has-next-cursor) {
+    cursor: none;
+  }
+
+  :global(body.has-next-cursor) :global([data-page-next-hint]) {
+    opacity: 0;
+  }
+
+  /* The parked handwritten cue stays in its established bottom-centre
+     position. It only yields to the pointer-following cue in the lower
+     navigation zone. */
+  @media (min-width: 641px) and (hover: hover) and (pointer: fine) {
+    .page-next:not([data-page-next-flow]) {
+      right: auto;
+      bottom: max(var(--space-5), env(safe-area-inset-bottom));
+      left: 50%;
+      z-index: var(--z-float);
+      width: auto;
+      min-height: 86px;
+      max-width: none;
+      gap: 0;
+      overflow: visible;
+      padding: 0;
+      color: var(--ink-900);
+      background: transparent;
+      border: 0;
+      border-radius: 0;
+      box-shadow: none;
+      transform: translateX(-50%);
+    }
+
+    .page-next:not([data-page-next-flow]):hover,
+    .page-next:not([data-page-next-flow]):focus-visible,
+    .page-next:not([data-page-next-flow]).is-active {
+      width: auto;
+      max-width: none;
+      gap: 0;
+      padding: 0;
+      color: var(--ink-900);
+      background: transparent;
+      box-shadow: none;
+      transform: translateX(-50%);
+    }
+
+    .page-next:not([data-page-next-flow]):active {
+      background: transparent;
+      box-shadow: none;
+      transform: translateX(-50%) scale(0.97);
+    }
+
+    .page-next:not([data-page-next-flow]) .page-next__icon,
+    .page-next:not([data-page-next-flow]) .page-next__eyebrow,
+    .page-next:not([data-page-next-flow]) .page-next__label {
+      display: none;
+    }
+
+    .page-next:not([data-page-next-flow]) .page-next__copy {
+      display: block;
+      opacity: 1;
+      transform: none;
+    }
+
+    .page-next:not([data-page-next-flow]) .page-next__desktop-label {
+      display: block;
+      font-family: var(--font-hand);
+      font-size: var(--text-annotation);
+      font-weight: 500;
+      letter-spacing: var(--track-heading);
+      line-height: var(--lh-display);
+      white-space: nowrap;
+    }
+
+    .page-next:not([data-page-next-flow]) .page-next__arrow {
+      display: block;
+      width: 84px;
+      height: 86px;
+      margin: -4px 0 -12px -2px;
+      flex: 0 0 auto;
+      color: var(--graphite);
+      stroke: currentColor;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-width: 4;
+    }
+
+    .page-next[data-page-next-flow] {
+      position: relative;
+      right: auto;
+      bottom: auto;
+      width: fit-content;
+      margin: 0 auto var(--section-y-sm);
+    }
+
+    :global([data-page-next-hint]) {
+      opacity: 0;
+    }
+  }
+
+  @media (max-width: 640px), (hover: none), (pointer: coarse) {
+    .page-next {
+      position: relative;
+      right: auto;
+      bottom: auto;
+      display: flex;
+      width: fit-content;
+      max-width: min(260px, calc(100vw - var(--margin-side) * 2));
+      gap: var(--space-2);
+      margin: 0 auto var(--section-y-sm);
+      padding-right: var(--space-5);
+    }
+
+    .page-next__copy { opacity: 1; transform: translateX(0); }
+    .page-next__cursor { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .page-next, .page-next__copy, .page-next__cursor, .page-next__cursor-content { transition: none; }
+  }
+</style>
+
+<script>
+  const pageNext = document.querySelector('[data-page-next]');
+  const pageNextCursor = document.querySelector('[data-page-next-cursor]');
+  const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const interactiveSelector = 'a, button, input, textarea, select, summary, [role="button"], [contenteditable="true"], [data-next-cursor-exclude]';
+  const cursorWidth = 280;
+  const cursorHeight = 112;
+  const cursorRightOverflow = 14;
+  let cursorActive = false;
+  let pointerPress = null;
+
+  function setNextState(active) {
+    pageNext?.classList.toggle('is-active', active);
+  }
+
+  function isInteractiveTarget(target) {
+    return target instanceof Element && Boolean(target.closest(interactiveSelector));
+  }
+
+  function canUseNextCursor() {
+    return finePointer.matches && !reducedMotion.matches && window.innerWidth > 640;
+  }
+
+  function lowerZoneStart() {
+    return window.innerHeight * 0.5;
+  }
+
+  function isInsideViewport(event) {
+    return event.clientX >= 0 && event.clientX <= window.innerWidth
+      && event.clientY >= 0 && event.clientY <= window.innerHeight;
+  }
+
+  function setCursorState(active) {
+    cursorActive = active;
+    document.body.classList.toggle('has-next-cursor', active);
+    pageNextCursor?.classList.toggle('is-visible', active);
+    pageNext?.classList.toggle('is-cursor-hidden', active);
+  }
+
+  function updateForPointer(event) {
+    if (!isInsideViewport(event)) {
+      resetPointerCue();
+      return;
+    }
+
+    const canUseCursor = canUseNextCursor();
+    const inSafeZone = event.clientY >= lowerZoneStart() && !isInteractiveTarget(event.target);
+
+    if (canUseCursor && inSafeZone) {
+      const cursorX = Math.min(
+        Math.max(event.clientX, cursorWidth),
+        window.innerWidth - cursorRightOverflow
+      );
+      const cursorY = Math.min(Math.max(event.clientY, cursorHeight), window.innerHeight);
+      if (pageNextCursor) {
+        pageNextCursor.style.transform = `translate3d(${cursorX - cursorWidth}px, ${cursorY - cursorHeight}px, 0)`;
+      }
+      setNextState(false);
+      setCursorState(true);
+      return;
+    }
+
+    setCursorState(false);
+    setNextState(!canUseCursor && inSafeZone);
+  }
+
+  function resetPointerCue() {
+    pointerPress = null;
+    setCursorState(false);
+    setNextState(!canUseNextCursor());
+  }
+
+  window.addEventListener('pointermove', updateForPointer, { passive: true });
+  window.addEventListener('pointerout', (event) => {
+    if (event.relatedTarget === null) resetPointerCue();
+  });
+  document.documentElement.addEventListener('pointerleave', resetPointerCue, { passive: true });
+  window.addEventListener('mouseleave', resetPointerCue, { passive: true });
+  window.addEventListener('blur', resetPointerCue);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState !== 'visible') resetPointerCue();
+  });
+  window.addEventListener('resize', resetPointerCue, { passive: true });
+
+  // Make blank space below a finished composition act like the next link.
+  // Beginning and ending in the cue zone is required, so text selection and
+  // drags are never mistaken for navigation.
+  window.addEventListener('pointerdown', (event) => {
+    if (!cursorActive || event.button !== 0 || !event.isPrimary || isInteractiveTarget(event.target)) return;
+    pointerPress = { id: event.pointerId, x: event.clientX, y: event.clientY };
+  });
+
+  window.addEventListener('pointerup', (event) => {
+    if (!pointerPress || pointerPress.id !== event.pointerId) return;
+    const travelled = Math.hypot(event.clientX - pointerPress.x, event.clientY - pointerPress.y);
+    const shouldNavigate = cursorActive && travelled < 8 && !isInteractiveTarget(event.target);
+    pointerPress = null;
+    if (shouldNavigate && pageNext instanceof HTMLAnchorElement) window.location.assign(pageNext.href);
+  });
+  window.addEventListener('pointercancel', resetPointerCue);
+
+  pageNext?.addEventListener('focus', () => {
+    setCursorState(false);
+    setNextState(true);
+  });
+  pageNext?.addEventListener('blur', () => setNextState(false));
+
+  finePointer.addEventListener('change', resetPointerCue);
+  reducedMotion.addEventListener('change', resetPointerCue);
+
+  if (!canUseNextCursor()) {
+    setNextState(true);
+  }
+</script>

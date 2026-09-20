@@ -1,0 +1,97 @@
+---
+// Two authored rows of town scenery. Geometry uses scene units rather than
+// scaled SVG images, so every outline keeps the same weight at every size.
+const BASE = 548; // the road masks only the lowest 3 units
+const farBuildings = [
+  [-12, 36, 72], [28, 30, 92], [68, 42, 76], [114, 34, 98],
+  [165, 42, 68], [211, 31, 86], [258, 46, 96], [312, 32, 74],
+  [350, 41, 90], [403, 32, 70], [446, 43, 98], [497, 30, 78],
+  [546, 40, 88], [599, 35, 72], [648, 45, 96], [704, 32, 76],
+];
+const farTrees = [
+  [8, 34, 54], [91, 38, 58], [185, 35, 57], [291, 37, 61],
+  [382, 34, 58], [475, 39, 63], [572, 36, 59], [677, 40, 62],
+];
+const nearBuildings = [
+  [26, 42, 42], [109, 38, 54], [199, 43, 43], [286, 46, 52],
+  [381, 40, 42], [462, 44, 48], [553, 41, 42], [655, 44, 48],
+];
+const nearTrees = [
+  [-18, 36, 48], [8, 30, 40], [63, 38, 58], [88, 28, 42],
+  [145, 36, 53], [173, 30, 42], [238, 38, 59], [269, 27, 42],
+  [333, 35, 53], [358, 30, 44], [420, 39, 59], [449, 28, 42],
+  [507, 37, 55], [532, 29, 43], [594, 37, 57], [624, 31, 45],
+  [695, 38, 58], [722, 28, 43],
+];
+
+const building = ([x, width, height]: number[], index: number, near: boolean) => {
+  const gable = near && index % 2 === 0;
+  const roof = gable
+    ? `M0 ${height} V16 L${width / 2} 0 L${width} 16 V${height}Z`
+    : `M0 ${height} V8 H${width * .2} V0 H${width * .8} V8 H${width} V${height}Z`;
+  const rows = near ? 2 : 4;
+  const columns = width > 38 ? 3 : 2;
+  const windows = Array.from({ length: rows * columns }, (_, cell) => {
+    const col = cell % columns;
+    const row = Math.floor(cell / columns);
+    const wx = width * (col + 1) / (columns + 1);
+    const wy = 21 + row * (height - 32) / rows;
+    return `M${wx - 1.5} ${wy} h3 v4 h-3Z`;
+  }).join(' ');
+  return { x, width, height, roof, windows };
+};
+
+const tree = ([x, width, height]: number[]) => {
+  const p = (u: number, v: number) => `${(u * width).toFixed(2)} ${(v * height * .72).toFixed(2)}`;
+  const canopy = `M${p(.48, .04)} C${p(.6, -.03)} ${p(.76, .06)} ${p(.76, .2)} C${p(.92, .16)} ${p(1.04, .33)} ${p(.94, .46)} C${p(1.08, .63)} ${p(.94, .84)} ${p(.8, .84)} C${p(.74, 1)} ${p(.52, .98)} ${p(.44, .91)} C${p(.3, 1.06)} ${p(.12, .9)} ${p(.14, .79)} C${p(-.03, .8)} ${p(-.07, .58)} ${p(.06, .49)} C${p(-.06, .32)} ${p(.09, .13)} ${p(.25, .2)} C${p(.25, .06)} ${p(.36, -.03)} ${p(.48, .04)}Z`;
+  const trunk = `M${width * .43} ${height * .62} V${height} H${width * .57} V${height * .62}`;
+  const branches = `M${width * .5} ${height * .82} L${width * .34} ${height * .46} M${width * .48} ${height * .72} L${width * .7} ${height * .43}`;
+  return { x, height, canopy, trunk, branches };
+};
+
+const layers = [
+  { name: 'far', buildings: farBuildings, trees: farTrees },
+  { name: 'near', buildings: nearBuildings, trees: nearTrees },
+];
+---
+
+<g class="town" aria-hidden="true">
+  {layers.map((layer) => (
+    <g class:list={['town__layer', `town__layer--${layer.name}`]}>
+      {layer.buildings.map((dimensions, index) => {
+        const b = building(dimensions, index, layer.name === 'near');
+        return (
+          <g class="town__building" transform={`translate(${b.x} ${BASE - b.height})`}>
+            <path class="town__outline" d={b.roof} />
+            <path class="town__detail" d={b.windows} />
+            <path class="town__detail" d={`M${b.width / 2 - 3} ${b.height} v-10 h6 v10`} />
+          </g>
+        );
+      })}
+      {layer.trees.map((dimensions) => {
+        const t = tree(dimensions);
+        return (
+          <g class="town__tree" transform={`translate(${t.x} ${BASE - t.height})`}>
+            <path class="town__outline" d={t.trunk} />
+            <path class="town__outline" d={t.canopy} />
+            <path class="town__detail" d={t.branches} />
+          </g>
+        );
+      })}
+    </g>
+  ))}
+</g>
+
+<style>
+  .town__layer--far { --town-line: color-mix(in srgb, var(--graphite) 38%, transparent); }
+  .town__layer--near { --town-line: color-mix(in srgb, var(--graphite) 68%, transparent); }
+  .town__outline,
+  .town__detail {
+    stroke: var(--town-line);
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .town__outline { fill: var(--paper-0); }
+  .town__detail { fill: none; }
+</style>

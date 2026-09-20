@@ -1,0 +1,122 @@
+---
+// Instax-style instant-photo frame with a photo slot and placeholder fallback.
+interface Props {
+  label: string; // placeholder text shown until the photo arrives
+  caption?: string; // handwritten caption on the bottom border
+  rotate?: number; // hand-set tilt, degrees
+  aspect?: string; // photo window aspect ratio, defaults to instax mini
+}
+
+const { label, caption, rotate = 0, aspect = '46 / 62' } = Astro.props;
+---
+
+<figure
+  class="instax"
+  style={`--tilt: ${rotate}deg; --photo-aspect: ${aspect};`}
+>
+  <div class="instax__window">
+    <slot>
+      <span class="instax__ph">{label}</span>
+    </slot>
+  </div>
+  {caption && <figcaption class="instax__caption">{caption}</figcaption>}
+</figure>
+
+<style>
+  .instax {
+    /* instax mini proportions: thin border, deep chin */
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-2) var(--space-4);
+    background: var(--paper-1);
+    border: 1px solid var(--line-0);
+    border-radius: var(--radius-sm);
+    box-shadow:
+      var(--shadow-rest);
+    rotate: var(--tilt);
+    transition:
+      rotate var(--dur-2) var(--ease-standard),
+      translate var(--dur-2) var(--ease-standard),
+      box-shadow var(--dur-2) var(--ease-standard);
+  }
+
+  /* The one exception to the no-hover-motion rule: a photo lifts a little and
+     straightens toward true when you reach for it, the way you would pick one
+     up off a board. CSS only — no tilt tracking, no rAF (Uttham, 2026-09-20). */
+  @media (hover: hover) and (pointer: fine) {
+    .instax:hover {
+      rotate: calc(var(--tilt) * 0.45);
+      translate: 0 -3px;
+      box-shadow: var(--shadow-lift);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .instax { transition: none; }
+    .instax:hover { rotate: var(--tilt); translate: none; }
+  }
+
+  .instax__window {
+    position: relative;
+    border-radius: var(--radius-inset);
+    aspect-ratio: var(--photo-aspect);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background:
+      linear-gradient(160deg, rgba(22, 20, 14, 0.06), rgba(22, 20, 14, 0) 55%),
+      var(--paper-2);
+    text-align: center;
+  }
+
+  .instax__window :global(img) {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* instant-film stock: slightly muted, a touch more contrast */
+    filter: saturate(0.92) contrast(1.05);
+  }
+
+  /* Film: a vignette that falls toward the frame's edge, and a fine silver grain
+     from the paper's own noise recipe, multiplied so the photo keeps its colour. */
+  .instax__window::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      radial-gradient(ellipse 78% 72% at 50% 46%, transparent 55%, rgba(22, 20, 14, 0.38) 100%),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='1.6' intercept='-0.3'/%3E%3CfeFuncG type='linear' slope='1.6' intercept='-0.3'/%3E%3CfeFuncB type='linear' slope='1.6' intercept='-0.3'/%3E%3CfeFuncA type='table' tableValues='1 1'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' opacity='0.28'/%3E%3C/svg%3E");
+    background-size: 100% 100%, 180px 180px;
+    mix-blend-mode: multiply;
+  }
+
+  /* the placeholder has no photo to film */
+  .instax__window:has(.instax__ph)::after { display: none; }
+
+  .instax__ph {
+    padding: var(--space-3);
+    color: var(--ink-600);
+    font-family: var(--font-paper);
+    font-size: var(--text-eyebrow);
+    font-weight: 500;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    line-height: var(--lh-body);
+  }
+
+  .instax__caption {
+    font-family: var(--font-hand);
+    font-size: var(--text-note);
+    font-weight: 500;
+    color: var(--ink-600);
+    text-align: center;
+    line-height: var(--lh-heading);
+  }
+</style>
