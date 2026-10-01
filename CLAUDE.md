@@ -252,8 +252,26 @@ text (7/5 columns, 5/3 on the 8-column tablet grid); **phones float it as a mini
 player in the bottom-right corner** — it appears once the hero has gone, keeps
 following the reading, opens full size on a tap, hides on × ("Show preview"
 brings it back) and steps away at the end of the study. Content lives in `src/data/plp-case.ts`;
-the page is `src/components/CaseTeaser.astro`, opted in by `teaser` on the study,
-so Meesho Mall's page is untouched.
+the page is `src/components/CaseTeaser.astro`, opted in by `teaser` on the study.
+
+**Meesho Mall is the same teaser** (Uttham, 2026-10-01: "implement like we did
+for the first 1"), from `src/data/mall-case.ts`; its phone shows the Mall deck's
+own exports in `src/assets/mall/`, mapped per state (`screens.map`). What his
+layout marks as a placeholder — the v3 year, the Team row, the full study — stays
+off until he supplies it, and the gate card has no button while there is no full
+study behind it.
+
+**The teaser pages run on the homepage spacing ladder, stepped up for reading**
+(Uttham: "make sure there is lot of spacing … it should match that system"):
+`--section-y` between sections (the bus-discovery reference's 160px), `--head-gap`
+from a heading to its text, `--ct-sub` (`--group-gap`, never under 32px) to a
+sub-group and above its heading, `--space-4` between paragraphs, rows at
+`--space-5`. The table is in `docs/design-tokens.md`; never drop these pages back
+to `--section-y-sm`. **Every teaser page has ChatGPT-style scroll points**
+("so I can swiftly navigate inside the page"): a rail of ticks in the right
+gutter, the section being read drawn longer and darker, names on hover or focus,
+a click jumps; the full study's blocks join once it is open. Not on phones,
+where the mini player owns the right edge.
 
 **The AI Space tool pages are teasers too** (Uttham, 2026-10-01: "do similar
 teaser for ai space things … the right side is running preview as we did for
@@ -283,9 +301,11 @@ that path.
 gate only"): a speed bump, not protection — the text ships in the page and this
 repo is public. Only the password's SHA-256 is stored, set with
 `npm run case-password`; with none set, the dev server opens it with any entry
-and a production build for no one. **Research verbatims stay off the page until
-consent is confirmed** (`verbatim.consent`), and anything the brief marks
-"open" is left out, never shown as a placeholder.
+and a production build for no one. **A research verbatim his layout marks
+consent-open stays off the page** (`consent: false` on the quote — the
+product-cards fabric quote) until he confirms it; the Mall quotes are not so
+marked and were already public. Anything a brief marks "open" is left out,
+never shown as a placeholder.
 
 ## Uttham's copy is Uttham's
 
