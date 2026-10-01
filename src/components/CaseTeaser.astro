@@ -1,0 +1,794 @@
+---
+// The product-cards case study as Uttham laid it out (teaser layout, 2026-10-01):
+// a two-minute teaser on the left, a sticky phone on the right that swaps to
+// the screen for whatever is being read, and the full case study expanding in
+// place behind a light password gate. Built from the site's own pieces — paper
+// for the words, glass for the screens, the sticker CTA — not the reference's.
+//
+// Screens are Uttham's Figma exports in src/assets/plp/, named after the state
+// they show (see the README there). A state with no screen yet keeps the
+// previous one on the phone; the dev server says which screen is missing.
+import { Image } from 'astro:assets';
+import { rich } from '../lib/rich';
+import { CASE_PASSWORD_SHA256 } from '../data/case-gate';
+import type { plpCase } from '../data/plp-case';
+
+interface Props {
+  data: typeof plpCase;
+}
+const { data } = Astro.props;
+
+const files = import.meta.glob<ImageMetadata>('../assets/plp/*.{png,jpg,jpeg,webp}', { eager: true, import: 'default' });
+const screens: Record<string, ImageMetadata> = Object.fromEntries(
+  Object.entries(files).map(([path, img]) => [path.split('/').pop()!.replace(/\.(png|jpe?g|webp)$/, ''), img])
+);
+const shots = Object.keys(data.screens).filter((state) => screens[state]);
+const dev = import.meta.env.DEV;
+
+const sourceLink = `<a class="ct-source" href="${data.source.href}" target="_blank" rel="noopener" title="${data.source.title}">${data.source.label}</a>`;
+const dek = rich(data.dek).replace('{250m}', sourceLink);
+---
+
+<div class="ct">
+  <header class="ct-hero">
+    <a class="back-link text-link" href="/#work">← All projects</a>
+    <h1>{data.title}</h1>
+    <p class="ct-dek" set:html={dek} />
+    <dl class="ct-facts">
+      {data.facts.map((f) => (
+        <div class="ct-facts__row"><dt>{f.label}</dt><dd>{f.value}</dd></div>
+      ))}
+    </dl>
+  </header>
+
+  <div class="ct-layout">
+    <div class="ct-story">
+      <section class="ct-section" data-state={data.context.state}>
+        <h2>{data.context.heading}</h2>
+        {data.context.body.map((p) => <p class="ct-body" set:html={rich(p)} />)}
+      </section>
+
+      <section class="ct-section" data-state={data.problem.state}>
+        <h2>{data.problem.heading}</h2>
+        {data.problem.body.map((p) => <p class="ct-body" set:html={rich(p)} />)}
+      </section>
+
+      <section class="ct-section">
+        <h2>{data.scan.heading}</h2>
+        <p class="ct-body" set:html={rich(data.scan.lead)} />
+        <ul class="ct-steps">
+          {data.scan.steps.map((s) => (
+            <li class="ct-step" data-state={s.state}><b>{s.label}</b>{s.text}</li>
+          ))}
+        </ul>
+        {data.verbatim.consent && (
+          <aside class="ct-note">
+            <p>“{data.verbatim.text}”</p>
+            <small>{data.verbatim.translation}</small>
+          </aside>
+        )}
+      </section>
+
+      <section class="ct-section">
+        <h2>{data.strategy.heading}</h2>
+        <p class="ct-body" set:html={rich(data.strategy.lead)} />
+        {data.strategy.groups.map((g) => (
+          <>
+            <h3>{g.heading}</h3>
+            <ul class="ct-steps">
+              {g.steps.map((s) => (
+                <li class="ct-step" data-state={s.state}><b>{s.label}</b>{s.text}</li>
+              ))}
+            </ul>
+          </>
+        ))}
+      </section>
+
+      <section class="ct-section" data-state={data.outcome.state}>
+        <h2>{data.outcome.heading}</h2>
+        <p class="ct-body" set:html={rich(data.outcome.body)} />
+        <p class="ct-body ct-inside-lead">{data.outcome.insideLead}</p>
+        <ul class="ct-inside">
+          {data.outcome.inside.map((item) => <li>{item}</li>)}
+        </ul>
+
+        <div class="ct-gate" data-gate data-hash={CASE_PASSWORD_SHA256} data-dev={dev ? '1' : undefined}>
+          <p class="ct-gate__text">{data.outcome.gate}</p>
+          <button class="cta cta--primary" type="button" data-gate-open aria-expanded="false" aria-controls="full">{data.outcome.cta}</button>
+          <form class="ct-gate__form" data-gate-form hidden>
+            <label class="ct-gate__label" for="case-pass">Password</label>
+            <div class="ct-gate__row">
+              <input class="ct-gate__input" id="case-pass" name="password" type="password" autocomplete="current-password" required />
+              <button class="cta cta--secondary" type="submit">Open</button>
+            </div>
+            <p class="ct-gate__msg" data-gate-msg role="status" aria-live="polite"></p>
+          </form>
+        </div>
+      </section>
+
+      <section class="ct-full" id="full" aria-labelledby="full-title" hidden>
+        <h2 class="sr-only" id="full-title" tabindex="-1">The full case study</h2>
+        {data.experiments.map((e) => (
+          <article class="ct-exp" data-state={e.state}>
+            <div class="ct-exp__head">
+              <h3>{e.title}</h3>
+              {e.status && <p class="ct-exp__status">{e.status}</p>}
+            </div>
+            <div class="ct-exp__part"><p class="ct-exp__label">Why</p><p class="ct-body" set:html={rich(e.why)} /></div>
+            {e.how && <div class="ct-exp__part"><p class="ct-exp__label">How</p><p class="ct-body" set:html={rich(e.how)} /></div>}
+            {e.worked && <div class="ct-exp__part"><p class="ct-exp__label">What worked</p><p class="ct-body" set:html={rich(e.worked)} /></div>}
+          </article>
+        ))}
+      </section>
+    </div>
+
+    <aside class="ct-panel" aria-label="Card preview" data-case-panel>
+      <div class="ct-pane glass">
+        <span class="bolt bolt--tl" aria-hidden="true"></span>
+        <span class="bolt bolt--tr" aria-hidden="true"></span>
+        <span class="bolt bolt--bl" aria-hidden="true"></span>
+        <span class="bolt bolt--br" aria-hidden="true"></span>
+        <div class="ct-stage">
+          <div class="ct-phone">
+            {shots.map((state, i) => (
+              <Image
+                class="ct-screen"
+                data-screen={state}
+                src={screens[state]}
+                alt={data.screens[state]}
+                widths={[360, 720]}
+                sizes="360px"
+                loading={i < 2 ? 'eager' : 'lazy'}
+              />
+            ))}
+            {dev && <p class="ct-phone__dev" data-dev-label></p>}
+            {/* phones only: the mini phone opens the screen full size */}
+            <button class="ct-pip__enlarge" type="button" aria-label="Enlarge the preview" data-pip-enlarge></button>
+          </div>
+          <button class="ct-pip__close" type="button" aria-label="Hide the preview" data-pip-close><span aria-hidden="true">×</span></button>
+        </div>
+      </div>
+    </aside>
+  </div>
+  <span class="ct-end" data-case-end aria-hidden="true"></span>
+  <button class="ct-pip__restore cta cta--secondary" type="button" data-pip-restore hidden>Show preview</button>
+  <dialog class="ct-zoom" data-pip-zoom aria-label="Card preview, enlarged">
+    <img class="ct-zoom__img" data-pip-zoom-img alt="" />
+    <button class="ct-zoom__close" type="button" aria-label="Close the enlarged preview" data-pip-zoom-close><span aria-hidden="true">×</span></button>
+  </dialog>
+</div>
+
+<script>
+  // ---- the phone follows the reading -------------------------------------
+  // Every [data-state] on the left is a trigger. The one crossing the reading
+  // band — the middle tenth of the screen on a laptop, the middle of what the
+  // sticky phone leaves on a phone — picks the screen. A state without a screen
+  // keeps the last one, so the phone never goes blank mid-read.
+  const panel = document.querySelector<HTMLElement>('[data-case-panel]');
+  const root = document.querySelector<HTMLElement>('.ct');
+  if (panel && root) {
+    const shots = new Map(
+      [...panel.querySelectorAll<HTMLElement>('[data-screen]')].map((el) => [el.dataset.screen!, el])
+    );
+    const devLabel = panel.querySelector<HTMLElement>('[data-dev-label]');
+    const triggers = [...root.querySelectorAll<HTMLElement>('[data-state]')];
+    // A state with no screen yet shows the nearest earlier state's screen, in
+    // reading order — the same whether the reader scrolled down to it, jumped
+    // to it or reloaded on it.
+    const fallback = new Map<HTMLElement, HTMLElement | undefined>();
+    let lastShot: HTMLElement | undefined;
+    triggers.forEach((t) => {
+      lastShot = shots.get(t.dataset.state!) ?? lastShot;
+      fallback.set(t, lastShot);
+    });
+    let shown: HTMLElement | null = null;
+    let current: HTMLElement | null = null;
+
+    const show = (trigger: HTMLElement) => {
+      if (trigger === current) return;
+      current?.classList.remove('is-current');
+      trigger.classList.add('is-current');
+      current = trigger;
+      const state = trigger.dataset.state!;
+      panel.dataset.showing = state;
+      const own = shots.get(state);
+      const next = own ?? fallback.get(trigger) ?? null;
+      if (devLabel) devLabel.textContent = own ? '' : `No screen yet: ${state}`;
+      if (next === shown) return;
+      shown?.classList.remove('is-on');
+      next?.classList.add('is-on');
+      shown = next;
+    };
+
+    const wide = window.matchMedia('(min-width: 768px)');
+    const visible = new Set<HTMLElement>();
+    let io: IntersectionObserver | null = null;
+
+    const pick = () => {
+      if (!visible.size) return;
+      const mid = bandCentre();
+      let best: HTMLElement | null = null;
+      let bestD = Infinity;
+      visible.forEach((el) => {
+        const r = el.getBoundingClientRect();
+        const d = Math.abs((r.top + r.bottom) / 2 - mid);
+        if (d < bestD) { bestD = d; best = el; }
+      });
+      if (best) show(best);
+    };
+
+    // The reading band's centre, in viewport px: the middle of the screen at
+    // every width now that phones float the preview instead of stacking it.
+    const bandCentre = () => innerHeight / 2;
+
+    const observe = () => {
+      io?.disconnect();
+      visible.clear();
+      const mid = bandCentre();
+      const half = innerHeight * 0.05;
+      const top = Math.max(0, Math.round(mid - half));
+      const bottom = Math.max(0, Math.round(innerHeight - mid - half));
+      io = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => {
+            const el = e.target as HTMLElement;
+            if (e.isIntersecting) visible.add(el);
+            else visible.delete(el);
+          });
+          pick();
+        },
+        { rootMargin: `-${top}px 0px -${bottom}px 0px`, threshold: 0 }
+      );
+      triggers.forEach((t) => io!.observe(t));
+    };
+
+    // The observer only speaks when a row crosses the band's edge, and smooth
+    // scrolling keeps moving after it has spoken — so the choice is re-made on
+    // every scroll frame too, from the rows the observer says are in the band.
+    let frame = 0;
+    window.addEventListener('scroll', () => {
+      if (frame) return;
+      frame = requestAnimationFrame(() => { frame = 0; pick(); });
+    }, { passive: true });
+
+    if (triggers[0]) show(triggers[0]);
+    observe();
+    wide.addEventListener('change', observe);
+    let resizeTimer = 0;
+    window.addEventListener('resize', () => {
+      window.clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(observe, 150);
+    });
+    document.addEventListener('case:full-open', observe);
+  }
+
+  // ---- phones: the preview floats (learnt from the bus-discovery reference) --
+  // Below 768px there is no room beside the text, so the phone becomes a mini
+  // player in the bottom-right corner: it appears once the hero has gone, keeps
+  // following the reading, opens full size on a tap, hides on ×, and steps out
+  // of the way at the end of the study.
+  {
+    const panelEl = document.querySelector<HTMLElement>('[data-case-panel]');
+    const heroEl = document.querySelector<HTMLElement>('.ct-hero');
+    const endEl = document.querySelector<HTMLElement>('[data-case-end]');
+    const restore = document.querySelector<HTMLButtonElement>('[data-pip-restore]');
+    const close = document.querySelector<HTMLButtonElement>('[data-pip-close]');
+    const enlarge = document.querySelector<HTMLButtonElement>('[data-pip-enlarge]');
+    const zoom = document.querySelector<HTMLDialogElement>('[data-pip-zoom]');
+    const zoomImg = document.querySelector<HTMLImageElement>('[data-pip-zoom-img]');
+    const zoomClose = document.querySelector<HTMLButtonElement>('[data-pip-zoom-close]');
+    if (panelEl && heroEl && endEl && restore && close && enlarge && zoom && zoomImg && zoomClose) {
+      const phone = window.matchMedia('(max-width: 767.98px)');
+      let heroGone = false;
+      let atEnd = false;
+      let dismissed = false;
+      const sync = () => {
+        const inPlay = phone.matches && heroGone && !atEnd;
+        panelEl.classList.toggle('is-pip-on', inPlay && !dismissed);
+        restore.hidden = !(inPlay && dismissed);
+      };
+      new IntersectionObserver(([e]) => { heroGone = !e.isIntersecting && e.boundingClientRect.bottom <= 0; sync(); }).observe(heroEl);
+      new IntersectionObserver(([e]) => { atEnd = e.isIntersecting || e.boundingClientRect.top < 0; sync(); }).observe(endEl);
+      phone.addEventListener('change', sync);
+
+      close.addEventListener('click', () => { dismissed = true; sync(); restore.focus(); });
+      restore.addEventListener('click', () => { dismissed = false; sync(); enlarge.focus(); });
+
+      enlarge.addEventListener('click', () => {
+        const on = panelEl.querySelector<HTMLImageElement>('.ct-screen.is-on');
+        if (!on) return;
+        zoomImg.src = on.currentSrc || on.src;
+        zoomImg.alt = on.alt;
+        zoom.showModal();
+      });
+      zoomClose.addEventListener('click', () => zoom.close());
+      // a tap on the dimmed backdrop closes it too
+      zoom.addEventListener('click', (event) => { if (event.target === zoom) zoom.close(); });
+      zoom.addEventListener('close', () => enlarge.focus());
+    }
+  }
+
+  // ---- the light gate ------------------------------------------------------
+  // Uttham chose a light gate (2026-10-01): a speed bump, not protection — the
+  // full study is in the page. The password is compared by its SHA-256, which
+  // `npm run case-password` writes to src/data/case-gate.ts. With no password
+  // set, the dev server opens it with any entry and a production build for no one.
+  const gate = document.querySelector<HTMLElement>('[data-gate]');
+  const full = document.getElementById('full');
+  if (gate && full) {
+    const openBtn = gate.querySelector<HTMLButtonElement>('[data-gate-open]')!;
+    const form = gate.querySelector<HTMLFormElement>('[data-gate-form]')!;
+    const input = form.querySelector<HTMLInputElement>('input')!;
+    const msg = form.querySelector<HTMLElement>('[data-gate-msg]')!;
+    const hash = gate.dataset.hash ?? '';
+    const dev = gate.dataset.dev === '1';
+    const KEY = 'plp-case-full-open';
+
+    const reveal = (focus: boolean) => {
+      full.hidden = false;
+      openBtn.setAttribute('aria-expanded', 'true');
+      openBtn.hidden = true;
+      form.hidden = true;
+      gate.classList.add('is-open');
+      try { sessionStorage.setItem(KEY, '1'); } catch { /* storage blocked: it just won't stay open on reload */ }
+      document.dispatchEvent(new Event('case:full-open'));
+      if (focus) document.getElementById('full-title')?.focus({ preventScroll: false });
+    };
+
+    try { if (sessionStorage.getItem(KEY) === '1') reveal(false); } catch { /* storage blocked */ }
+
+    openBtn.addEventListener('click', () => {
+      form.hidden = false;
+      if (!hash && dev) msg.textContent = 'No password set yet (npm run case-password). On the dev server any entry opens it.';
+      input.focus();
+    });
+
+    const sha256 = async (text: string) => {
+      const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+      return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, '0')).join('');
+    };
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const value = input.value;
+      const ok = hash ? (await sha256(value)) === hash : dev && value.length > 0;
+      if (ok) {
+        input.value = '';
+        msg.textContent = '';
+        reveal(true);
+      } else {
+        msg.textContent = 'That password doesn’t match.';
+        input.select();
+      }
+    });
+  }
+</script>
+
+<style>
+  .ct {
+    position: relative;
+    z-index: 1;
+    width: min(calc(100% - var(--margin-side) * 2), var(--container-max));
+    margin: 0 auto;
+    /* the case page's chapter rung before "More cases" — what the old page's
+       details section gave it */
+    padding-bottom: var(--section-y-sm);
+  }
+
+  /* ---- hero: the case page's own entrance, the reference's content ---- */
+  .ct-hero > * {
+    transition: opacity var(--dur-3) var(--ease-enter), transform var(--dur-3) var(--ease-enter);
+  }
+  .ct-hero > :nth-child(2) { transition-delay: var(--stagger-1); }
+  .ct-hero > :nth-child(3) { transition-delay: calc(var(--stagger-1) * 2); }
+  .ct-hero > :nth-child(4) { transition-delay: calc(var(--stagger-1) * 3); }
+  @starting-style {
+    .ct-hero > * { opacity: 0; transform: translateY(12px); }
+  }
+  .back-link { margin-bottom: var(--group-gap); }
+  h1 {
+    max-width: 19ch;
+    margin: 0;
+    font-size: var(--text-hero);
+    font-weight: 600;
+    letter-spacing: var(--track-display);
+    line-height: var(--lh-display);
+    text-wrap: balance;
+  }
+  .ct-dek {
+    max-width: 600px;
+    margin: var(--content-gap) 0 0;
+    color: var(--ink-600);
+    font-size: var(--text-body-lg);
+    line-height: var(--lh-body);
+    text-wrap: pretty;
+  }
+  /* the one figure on the page, linked to where Meesho states it */
+  .ct-dek :global(.ct-source) {
+    color: var(--ink-900);
+    text-decoration: underline;
+    text-decoration-color: var(--amber-700);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+  }
+  .ct-dek :global(.ct-source:focus-visible) { outline: 2px solid var(--amber-text); outline-offset: 2px; }
+  /* Facts: label and value on one line each, the rules dashed like the
+     measure — never solid (the site draws no solid rules on paper). */
+  .ct-facts {
+    max-width: 600px;
+    margin: var(--group-gap) 0 0;
+    padding: var(--space-4) 0;
+    display: grid;
+    gap: var(--space-2);
+    border-block: 1px dashed var(--line-mark);
+  }
+  .ct-facts__row { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: var(--space-5); align-items: baseline; }
+  .ct-facts dt {
+    color: var(--ink-600);
+    font-size: var(--text-eyebrow);
+    font-weight: 500;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+  }
+  .ct-facts dd { margin: 0; color: var(--ink-900); font-size: var(--text-body); line-height: var(--lh-body); }
+
+  /* ---- the reading column and the phone beside it ---- */
+  .ct-layout { margin-top: var(--section-y-sm); }
+  .ct-story { display: grid; gap: var(--section-y-sm); min-width: 0; }
+  .ct-section, .ct-full { min-width: 0; }
+  h2 {
+    margin: 0;
+    font-size: var(--text-h3);
+    font-weight: 600;
+    letter-spacing: var(--track-heading);
+    line-height: var(--lh-heading);
+    text-wrap: balance;
+  }
+  h3 {
+    margin: var(--space-6) 0 0;
+    font-size: var(--text-h4);
+    font-weight: 600;
+    letter-spacing: var(--track-heading);
+    line-height: var(--lh-heading);
+  }
+  .ct-body {
+    max-width: 62ch;
+    margin: var(--space-3) 0 0;
+    color: var(--ink-600);
+    font-size: var(--text-body);
+    line-height: var(--lh-body);
+    text-wrap: pretty;
+  }
+  .ct-body :global(.em) { color: var(--ink-900); font-weight: 600; }
+  .ct-body :global(.em--lg) { font-size: 1.28em; line-height: 1.25; }
+
+  /* Ruled rows, the case index's dashed recipe: the label on its own line, the
+     line under it. The row being read takes an amber tick in the gutter —
+     colour only, nothing moves. */
+  .ct-steps { margin: var(--space-3) 0 0; padding: 0; list-style: none; }
+  .ct-step {
+    position: relative;
+    padding: var(--space-4) 0;
+    border-top: 1px dashed var(--line-mark);
+    color: var(--ink-600);
+    font-size: var(--text-body);
+    line-height: var(--lh-body);
+  }
+  .ct-step:last-child { border-bottom: 1px dashed var(--line-mark); }
+  .ct-step b { display: block; margin-bottom: var(--space-1); color: var(--ink-900); font-weight: 600; }
+  .ct-step::before {
+    content: '';
+    position: absolute;
+    left: calc(-1 * var(--space-4));
+    top: var(--space-4);
+    bottom: var(--space-4);
+    width: 2px;
+    background: transparent;
+    transition: background-color var(--dur-2) var(--ease-standard);
+  }
+  .ct-step.is-current::before { background: var(--amber-700); }
+
+  /* the verbatim, once consent is confirmed: the case page's sticky note */
+  .ct-note {
+    max-width: 34ch;
+    margin: var(--space-6) 0 0 var(--space-4);
+    padding: var(--space-5) var(--space-5) var(--space-4);
+    background: var(--amber-400);
+    border: 1px solid var(--line-1);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-stuck);
+    rotate: -2deg;
+    font-family: var(--font-hand);
+    color: var(--ink-900);
+  }
+  .ct-note p { margin: 0; font-size: var(--text-note); font-weight: 500; line-height: var(--lh-heading); }
+  .ct-note small { display: block; margin-top: var(--space-3); font-family: var(--font-paper); font-size: var(--text-small); color: var(--ink-900); }
+
+  .ct-inside-lead { margin-top: var(--space-6); }
+  .ct-inside {
+    display: grid;
+    gap: var(--space-2);
+    margin: var(--space-2) 0 0;
+    padding: 0 0 0 var(--space-4);
+    list-style: '— ';
+    color: var(--ink-600);
+    font-size: var(--text-body);
+    line-height: var(--lh-body);
+  }
+
+  /* ---- the gate: a paper card (the tiles' white stock, not glass — Uttham,
+     2026-10-01: "no need of glass for this, just use the card structure")
+     holding the one primary sticker ---- */
+  .ct-gate {
+    position: relative;
+    max-width: 560px;
+    margin-top: var(--space-6);
+    padding: var(--card-padding);
+    display: grid;
+    justify-items: start;
+    gap: var(--space-5);
+    background: var(--paper-1);
+    border: 1px solid var(--line-1);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-rest);
+  }
+  .ct-gate__text { margin: 0; color: var(--ink-600); font-size: var(--text-body); line-height: var(--lh-body); }
+  .ct-gate__form { display: grid; gap: var(--space-2); width: 100%; }
+  /* the global sticker sets display, which beats the hidden attribute */
+  .ct-gate [hidden] { display: none; }
+  .ct-gate__label {
+    color: var(--ink-600);
+    font-size: var(--text-eyebrow);
+    font-weight: 500;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+  }
+  .ct-gate__row { display: flex; flex-wrap: wrap; gap: var(--control-gap); align-items: center; }
+  /* a control, so the controls' square corner (--radius-control) */
+  .ct-gate__input {
+    flex: 1 1 200px;
+    min-width: 0;
+    min-height: var(--space-7);
+    padding: 0 var(--space-4);
+    /* ink-400 is ~3.5:1 on white: a control's edge must reach 3:1 (WCAG 1.4.11);
+       the ruler's --line-mark is 1.9:1 and left the field invisible on paper */
+    border: 1px solid var(--ink-400);
+    border-radius: var(--radius-control);
+    background: var(--paper-1);
+    color: var(--ink-900);
+    font: inherit;
+    font-size: var(--text-body);
+  }
+  .ct-gate__input:focus-visible { outline: 2px solid var(--amber-text); outline-offset: 2px; }
+  .ct-gate__msg { min-height: calc(var(--text-small) * var(--lh-body)); margin: 0; color: var(--ink-900); font-size: var(--text-small); }
+
+  /* ---- the full case study: one block per experiment, on paper ---- */
+  .ct-full { display: grid; gap: var(--section-y-sm); scroll-margin-top: calc(var(--header-height) + var(--content-gap)); }
+  .ct-full[hidden] { display: none; }
+  .ct-exp { display: grid; gap: var(--space-4); }
+  .ct-exp__head { display: grid; justify-items: start; gap: var(--space-3); }
+  .ct-exp__head h3 { margin: 0; font-size: var(--text-h3); }
+  /* status as the case index's pill — the one place a pill belongs */
+  .ct-exp__status {
+    margin: 0;
+    padding: var(--space-1) var(--space-3);
+    border: 1px solid var(--line-1);
+    border-radius: var(--radius-pill);
+    color: var(--ink-600);
+    font-size: var(--text-eyebrow);
+    font-weight: 500;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+  }
+  .ct-exp__part { display: grid; gap: var(--space-1); }
+  .ct-exp__part .ct-body { margin: 0; }
+  .ct-exp__label {
+    margin: 0;
+    color: var(--ink-600);
+    font-size: var(--text-eyebrow);
+    font-weight: 500;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+  }
+
+  /* ---- the phone: screens on glass, a card ON the pane ---- */
+  .ct-pane {
+    position: relative;
+    height: 100%;
+    padding: var(--bolt-content-inset) var(--panel-padding);
+    border-radius: var(--radius-sm);
+  }
+  /* sized off the stage's height AND width, so the phone always stands whole
+     inside the pane, never cut and never stretched */
+  .ct-stage { height: 100%; container-type: size; display: grid; place-items: center; }
+  .ct-phone {
+    position: relative;
+    width: min(100cqw, calc(100cqh * 9 / 19.5));
+    aspect-ratio: 9 / 19.5;
+    overflow: hidden;
+    border: 1px solid var(--line-1);
+    border-radius: var(--radius-media);
+    background: var(--paper-1);
+    box-shadow: var(--shadow-rest);
+  }
+  .ct-screen {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+    opacity: 0;
+    scale: 1.02;
+    transition: opacity var(--dur-2) var(--ease-exit), scale var(--dur-2) var(--ease-exit);
+  }
+  .ct-screen.is-on {
+    opacity: 1;
+    scale: 1;
+    transition: opacity var(--dur-4) var(--ease-enter), scale var(--dur-4) var(--ease-enter);
+  }
+  /* dev server only: which screen the phone is waiting for */
+  .ct-phone__dev {
+    position: absolute;
+    inset: auto var(--space-3) var(--space-3);
+    margin: 0;
+    color: var(--ink-600);
+    font-size: var(--text-eyebrow);
+    font-weight: 500;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    text-align: center;
+  }
+
+  /* the mini-player controls exist only on phones */
+  .ct-pip__enlarge, .ct-pip__close, .ct-pip__restore { display: none; }
+
+  /* Laptops and tablets: the phone stands beside the text, sticky under the
+     header. On the site's 12-column grid the story takes 7 columns and the
+     phone 5; on the 8-column tablet grid (≤900px) 5 and 3, which still leaves
+     a ~190px phone at 768px — bigger than any strip on top could. */
+  @media (min-width: 768px) {
+    .ct-layout {
+      display: grid;
+      grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
+      column-gap: var(--grid-gap);
+      align-items: start;
+    }
+    .ct-story { grid-column: 1 / 8; }
+    .ct-panel {
+      grid-column: 8 / -1;
+      grid-row: 1;
+      position: sticky;
+      top: calc(var(--header-height) + var(--content-gap));
+      height: min(calc(100svh - var(--header-height) - 2 * var(--content-gap)), 720px);
+    }
+  }
+  @media (min-width: 768px) and (max-width: 900px) {
+    .ct-story { grid-column: 1 / 6; }
+    .ct-panel { grid-column: 6 / -1; }
+  }
+
+  /* Phones: the text takes the full width and the phone floats as a mini
+     player in the bottom-right corner (the bus-discovery reference's answer).
+     No pane at this size — the phone itself is the floating object. */
+  @media (max-width: 767.98px) {
+    .ct-layout { display: block; }
+    .ct-panel {
+      position: fixed;
+      right: var(--margin-side);
+      bottom: calc(var(--space-5) + env(safe-area-inset-bottom, 0px));
+      z-index: var(--z-float);
+      width: 112px;
+      opacity: 0;
+      visibility: hidden;
+      translate: 0 var(--space-4);
+      transition:
+        opacity var(--dur-3) var(--ease-enter),
+        translate var(--dur-3) var(--ease-enter),
+        visibility 0s linear var(--dur-3);
+    }
+    .ct-panel.is-pip-on { opacity: 1; visibility: visible; translate: 0 0; transition-delay: 0s; }
+    .ct-pane {
+      height: auto;
+      padding: 0;
+      background: none;
+      border: 0;
+      box-shadow: none;
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+    }
+    .ct-pane .bolt { display: none; }
+    .ct-stage { position: relative; height: auto; container-type: normal; display: block; }
+    .ct-phone { width: 100%; border-radius: var(--radius-sm); box-shadow: var(--shadow-lift); }
+    .ct-phone__dev { display: none; }
+    .ct-pip__enlarge {
+      display: block;
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      padding: 0;
+      border: 0;
+      background: none;
+      cursor: zoom-in;
+    }
+    .ct-pip__enlarge:focus-visible { outline: 2px solid var(--amber-text); outline-offset: 2px; }
+    /* a control, so the controls' square corner */
+    .ct-pip__close {
+      display: grid;
+      place-items: center;
+      position: absolute;
+      top: calc(-1 * var(--space-3));
+      right: calc(-1 * var(--space-3));
+      z-index: 3;
+      width: var(--space-6);
+      height: var(--space-6);
+      padding: 0;
+      border: 0;
+      border-radius: var(--radius-control);
+      background: var(--ink-900);
+      color: var(--paper-1);
+      font-size: var(--text-body-lg);
+      line-height: 1;
+      box-shadow: var(--shadow-stuck);
+      cursor: pointer;
+    }
+    .ct-pip__close:focus-visible { outline: 2px solid var(--amber-text); outline-offset: 2px; }
+    .ct-pip__restore:not([hidden]) {
+      display: inline-flex;
+      position: fixed;
+      right: var(--margin-side);
+      bottom: calc(var(--space-5) + env(safe-area-inset-bottom, 0px));
+      z-index: var(--z-float);
+      background: var(--paper-1);
+    }
+    .ct-full { scroll-margin-top: calc(var(--header-height) + var(--content-gap)); }
+  }
+
+  /* the enlarged screen: a phone-sized card on a dimmed page */
+  .ct-zoom {
+    width: min(calc(100vw - 2 * var(--margin-side)), 420px);
+    max-height: calc(100svh - 2 * var(--space-7));
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-media);
+    background: var(--paper-1);
+    box-shadow: var(--shadow-lift);
+    overflow: visible;
+  }
+  .ct-zoom::backdrop { background: rgba(22, 20, 14, 0.55); }
+  .ct-zoom__img {
+    display: block;
+    width: 100%;
+    max-height: calc(100svh - 2 * var(--space-7));
+    object-fit: contain;
+    object-position: top;
+    border-radius: var(--radius-media);
+  }
+  .ct-zoom__close {
+    position: absolute;
+    top: calc(-1 * var(--space-3));
+    right: calc(-1 * var(--space-3));
+    display: grid;
+    place-items: center;
+    width: var(--space-7);
+    height: var(--space-7);
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-control);
+    background: var(--ink-900);
+    color: var(--paper-1);
+    font-size: var(--text-h4);
+    line-height: 1;
+    box-shadow: var(--shadow-stuck);
+    cursor: pointer;
+  }
+  .ct-zoom__close:focus-visible { outline: 2px solid var(--amber-text); outline-offset: 2px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ct-hero > * { transform: none; transition-property: opacity; transition-delay: 0ms; }
+    @starting-style {
+      .ct-hero > * { opacity: 0; transform: none; }
+    }
+    .ct-screen, .ct-screen.is-on { scale: none; }
+  }
+</style>

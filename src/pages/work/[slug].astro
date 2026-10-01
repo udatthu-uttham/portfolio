@@ -3,6 +3,7 @@ import Base from '../../layouts/Base.astro';
 import Header from '../../components/Header.astro';
 import GridOverlay from '../../components/GridOverlay.astro';
 import CaseIndex from '../../components/CaseIndex.astro';
+import CaseTeaser from '../../components/CaseTeaser.astro';
 import { Image } from 'astro:assets';
 import { studies } from '../../data/studies';
 import { rich } from '../../lib/rich';
@@ -21,12 +22,16 @@ const { study } = Astro.props;
 const hasArtwork = Boolean(study.deck || study.cover);
 ---
 
-<Base title={`${study.title} — Uttham Udatthu`} description={study.summary.replace(/\^\^|\*\*/g, '')}>
+<Base title={`${study.teaser ? study.teaser.title : study.title} — Uttham Udatthu`} description={study.summary.replace(/\^\^|\*\*/g, '')}>
   <a class="skip-link" href="#main">Skip to content</a>
   <Header active="projects" />
 
   <main id="main" class="case-page" tabindex="-1">
     <GridOverlay />
+    {study.teaser ? (
+      <CaseTeaser data={study.teaser} />
+    ) : (
+    <>
     <section class="case-hero" data-next-cursor-exclude>
       <div class="case-hero__container">
         <a class="back-link text-link" href="/#work">← All projects</a>
@@ -166,6 +171,8 @@ const hasArtwork = Boolean(study.deck || study.cover);
       </div>
       <p class="case-details__note">A fuller walkthrough, including confidential outcomes, is available in an interview.</p>
     </section>
+    </>
+    )}
   </main>
   <section class="more-cases" aria-label="More cases">
     <CaseIndex items={studies.filter((s) => s.slug !== study.slug)} label="More cases" />

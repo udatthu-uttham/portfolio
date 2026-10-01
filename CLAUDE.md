@@ -38,6 +38,13 @@ Not covered by this rule, and fine to keep: dates, version numbers, and the
 method detail of Uttham's own research (number of rounds, sample sizes,
 locations).
 
+**A public figure Meesho itself published is fine — linked to where Meesho says
+it** (Uttham's case-study brief, 2026-10-01: "Public figures are fine when
+sourced… Link it."). Today that is one number: **250 million shoppers**, from
+Meesho's Q3 FY26 Shareholders' Letter (251 million annual transacting users),
+linked on its first mention to the BSE filing. Outcome metrics stay off the site
+even when public — no lifts, rates or conversion.
+
 ## Motion: magnetic sheets only where a hand would peel them
 
 **Project tiles and AI Space cards keep the magnetic tilt; nothing else moves on
@@ -223,6 +230,34 @@ square to the head (the collar goes) so it still reads as a face at 16px.
 `apple-touch-icon.png` (180×180, opaque) sits on `--paper-1`, the white sheet
 stock, with an 8% margin, because iOS paints a transparent touch icon black. Linked once, in `src/layouts/Base.astro`. If the avatar changes,
 regenerate all three from it — never draw a separate mark.
+
+## Case study pages: the teaser layout
+
+**The product-cards case study (`/work/a-line-of-card-height`) is Uttham's teaser
+layout, built as he drew it** (2026-10-01, "PLP card case study — teaser
+layout.html": "I want that as it is"). Text only on the left — Context, Problem,
+the scan order, Strategy, Outcome — and **a sticky phone on the right that swaps
+to the screen for whatever is being read** (the bus-discovery reference). Every
+element with a `data-state` picks a screen; **the screens are Uttham's Figma
+exports, never coded mock-ups** ("I will give the figma screens, use them, no
+need to code"), dropped into `src/assets/plp/` named after their state (the
+README there lists them). A state without a screen shows the nearest earlier state's
+screen, and the dev server names the missing one. **Responsive, learnt from the
+same reference:** laptops and tablets (≥768px) keep the phone sticky beside the
+text (7/5 columns, 5/3 on the 8-column tablet grid); **phones float it as a mini
+player in the bottom-right corner** — it appears once the hero has gone, keeps
+following the reading, opens full size on a tap, hides on × ("Show preview"
+brings it back) and steps away at the end of the study. Content lives in `src/data/plp-case.ts`;
+the page is `src/components/CaseTeaser.astro`, opted in by `teaser` on the study,
+so Meesho Mall's page is untouched.
+
+**The full case study opens in place behind a light gate** (Uttham chose "Light
+gate only"): a speed bump, not protection — the text ships in the page and this
+repo is public. Only the password's SHA-256 is stored, set with
+`npm run case-password`; with none set, the dev server opens it with any entry
+and a production build for no one. **Research verbatims stay off the page until
+consent is confirmed** (`verbatim.consent`), and anything the brief marks
+"open" is left out, never shown as a placeholder.
 
 ## Uttham's copy is Uttham's
 
