@@ -41,7 +41,7 @@ const principles = [
   {
     // Uttham, 2026-10-01: "rather than saying speed … optimising the process
     // and leveraging AI tooling to accelerate & improve efficiency".
-    title: 'Design the workflow, and the AI in it.',
+    title: 'Boosting design workflows for improving efficiency.',
     tag: 'Automate repetitive tasks, boosting workflows with AI.',
   },
 ];
@@ -1049,7 +1049,8 @@ const principles = [
        section bigger"). The photo sets the panel's height, so its width is the
        screen's content budget (100svh − header − one section gap) minus what
        else Contact stacks above and around it (ruler, How I lead sheet, panel
-       hardware: ~285px, measured), divided by the whole print's height per
+       hardware: ~295px, measured with the third principle's title on three
+       lines, 2026-10-01), divided by the whole print's height per
        width, caption and border included (~1.23). It was 400px and 1.07 until
        2026-10-01, which left ~90px of the screen unused and the photo no bigger
        than a note — "it looks like a block of 4 cards", Uttham. It stays ≥150px
@@ -1068,7 +1069,7 @@ const principles = [
        bolt is owed. One within-card step in from the right edge clears it at
        every size, and the cap below gives the notes that step back. */
     --photo-inset: var(--space-4);
-    --photo-w: clamp(150px, min(calc((100svh - var(--header-height) - var(--section-y) - 285px) / 1.23), calc(100cqw - var(--notes-min) - var(--group-gap) - var(--photo-inset))), 340px);
+    --photo-w: clamp(150px, min(calc((100svh - var(--header-height) - var(--section-y) - 295px) / 1.23), calc(100cqw - var(--notes-min) - var(--group-gap) - var(--photo-inset))), 340px);
   }
 
   .contact-panel__photo :global(.instax) {

@@ -1,5 +1,5 @@
 // AI Space — the tools, not the case studies. These are evidence for the third
-// leadership principle ("Design the workflow, and the AI in it."): tools that
+// leadership principle ("Boosting design workflows for improving efficiency."): tools that
 // automate repetitive tasks and boost a team's workflow with AI.
 //
 // CONFIDENTIALITY (locked 2026-09-20): every preview renders SYNTHETIC data.

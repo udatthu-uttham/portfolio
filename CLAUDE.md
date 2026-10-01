@@ -174,7 +174,7 @@ clickability"). The three notes sit in **one row at their own size** — two lin
 each, label and arrow then address, all three the widest one's width — and are
 **never stretched across the leftover glass**, and never narrower than their
 content (nothing wraps). They keep their tilt, hover lift and arrow. The photo is
-**as big as the screen's height allows** (`--photo-w`: budget − 285px, ÷ 1.23,
+**as big as the screen's height allows** (`--photo-w`: budget − 295px, ÷ 1.23,
 150–340px), sized off the content budget, not its column, and sits one
 `--space-4` in from the panel's right edge so its tilted corner clears the bolts
 by the 16px they are owed. **No badges on the photo for now** (2026-10-01, "for

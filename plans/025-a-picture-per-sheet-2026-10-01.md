@@ -40,7 +40,8 @@ the tape sat on the title.
   focussed, while the 3 CTAs retain their clickability"):
   - The notes are two lines (the label and its arrow, then the address).
   - They sit at their own size and are not stretched across the leftover glass.
-  - The photo reserve was re-measured: 285px and 1.23, not 400px and 1.07.
+  - The photo reserve was re-measured: 285px and 1.23, not 400px and 1.07 (295px later the same day,
+    once the third principle's new title took three lines).
   - The print sits `--space-4` in from the right edge, so it clears the bolts by 18–21px.
     The full-size print had left 15px, against the 16px owed.
 
