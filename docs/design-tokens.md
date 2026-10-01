@@ -56,7 +56,10 @@ screen too (see the screen contract below).
 | — Section pad | `--section-pad` | `calc(var(--section-y) / 2)` | 48 / 56 / 70 / 73 / 79 / 80 | Top and bottom pad of every homepage section; the hero adds `--header-height` to its top |
 | — Hero | *(none)* | `min-height: 100svh` | one whole screen | Not a rung: the first screen, content centred under the fixed header |
 | 2 · Heading → its content | `--head-gap` + board padding | `--space-5` + `--space-7` = 72px | 72px flat | A section's sentence to the first card |
-| 3 · Card inset | `--card-padding` | `clamp(16px, 2.2vw, 32px)` | 16 → 32 | Padding inside a sheet |
+| 3 · Card inset | `--card-padding` | `clamp(16px, 2.2vw, 32px)` | 16 → 32 | Padding inside a sheet (sides and bottom) |
+| — Sheet top | `--sheet-top` | `max(--card-padding, --tape-bite + --space-4)` | 34px at every width today | A taped sheet's top padding: clears the tape by one within-card step |
+| — Tape bite | `--tape-bite` | `18px` | flat | The part of the tape lying on the sheet: the 32×87px strip turned 92° stands 35px tall, centred on the edge |
+| — Sheet content | `--sheet-in` | budget − `--sec-chrome` − sheet padding, `clamp(360px, …, 480px)` | 396 / 470 / 480 at 1280×800 / 1440×900 / ≥1324×967 | Content height of a Projects or AI Space sheet on a laptop (≥1024px), so the section is one screen |
 | 4 · Within a card | `--space-4` / `--space-2` | 16px / 8px | flat | Stack between a card's blocks / between answer lines |
 | — Supporting detail | `--section-y-sm` | `clamp(48px, 5vw, 72px)` | 48 → 72 | Case-page chapters, case details, page navigator, footer |
 | — Content gap | `--content-gap` | `clamp(16px, 2vw, 24px)` | 16 → 24 | Related text and grid gutters |
@@ -89,10 +92,19 @@ top-aligns, which is the old layout.
 
 **Two costs come with the contract, and both are known.** A section shorter than
 its budget is centred, and the slack above and below its content sits on no rung
-— so on tall screens the between-section gap grows past `--section-y`. And
-Projects and AI Space are taller than the budget at most laptop sizes, so they
-grow from their top pad down and break the one-screen promise; **whether to
-shrink their tiles is Uttham's call, not a spacing fix.**
+— so on tall screens the between-section gap grows past `--section-y`. And a
+Projects or AI Space sheet has a 360px content floor so a phone stays legible:
+below it the section grows rather than the phone shrinking. Measured on
+2026-10-01 (plans/025): **Projects fits from 1024×768 up; AI Space fits from
+1324×967 up and runs 38px over at 1280×800**; both run over at 1280×720.
+
+**The tape owes the sheet's content one within-card step** (2026-10-01). It is
+anchored to half its own height on the sheet's top edge, so 17.5px of it lies on
+the paper; `--sheet-top` = `max(--card-padding, --tape-bite + --space-4)` puts the
+title 16.5px below it at every width. With `--card-padding` alone the title sat
+under the tape on a phone (0px) and 11px from it at 1280px. Measured: the tape
+rises 16.5px above every sheet and its lower edge is 16.5px above the title, at
+375, 768, 1024, 1280, 1440 and 1920px.
 
 Headings and their labels form one group; descriptions stay nearer to their
 heading than the next group. Principle receipts have additional separation from
@@ -128,7 +140,7 @@ The hero statement fills the glass panel's padded content width. Its portrait tu
 
 **The hi! sticker is stuck onto the portrait's top-right corner** (2026-10-01, superseding the 2026-09-19 "a third on the photo, two thirds on the board" placement, which measured under 1% of the bubble on the print). `--hi-size: clamp(52px, 5vw, 72px)`; offsets `top: −0.25 × --hi-size`, `right: −0.42 × --hi-size` (were −0.22 / −0.8), which puts ~40% of the painted bubble over the print and 15–22% over the image, well right of the face, at every size. `--hello-w: clamp(120px, 13vw, 164px)` names the portrait's width so the sticker can pivot on the print's centre during the develop shake; the sticker's 12deg tilt and `--drop-stuck` live on `.hi-bubble`, leaving its wrapper free to turn with the print.
 
-**Contact fits one screen** (2026-10-01). The three principles are a title and a tagline each — the body paragraphs are gone at Uttham's request — the contact notes sit in one row, and the photo is sized to the screen rather than to its column. The exact sizes are still being tuned and are not recorded here until they settle.
+**Contact fits one screen, and the photo is its focus** (2026-10-01). The three principles are a title and a tagline each — the body paragraphs are gone at Uttham's request. The contact notes sit in one row at their own size: two lines (label and arrow, then address), padding `--space-3 --space-4`, all three the widest one's width when there is room and each its own when there is not, never stretched across the leftover glass and never wrapping. The photo is `--photo-w: clamp(150px, min((100svh − header − --section-y − 285px) / 1.23, 100cqw − --notes-min − --group-gap − --photo-inset), 340px)` — 285px is what Contact stacks besides the print, 1.23 the print's height per width with its caption — and sits `--photo-inset` (`--space-4`) in from the panel's right edge, which keeps its tilted corner 18–21px from the bolts. Measured: photo 242 / 309 / 340px wide at 1280×800 / 1440×900 / 1324×967 (was 171 / 248 / 323); notes ~213×73px, down from ~255px wide and ~110px tall when they stretched; Contact fits from 1024×768 up and is 11px over at 1280×720 (was 35).
 
 ## Responsive layout
 

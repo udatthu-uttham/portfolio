@@ -104,6 +104,13 @@ both already sprung once:
 - **Never anchor the washi tape to the board's padding.** It is anchored to half
   its own height, so retuning the gap above the board cannot slide it inside a
   card.
+- **Never let a sheet's content start under its tape.** The tape is 35px tall
+  centred on the sheet's top edge, so 17.5px of it lies on the paper
+  (`--tape-bite`, 18px). A taped sheet's top padding is `--sheet-top` =
+  `max(--card-padding, --tape-bite + --space-4)` — the title clears the tape by
+  one within-card step (16px) at every width. At `--card-padding` alone it
+  cleared it by 0px on a phone (Uttham, 2026-10-01: "the washi tape is so
+  tightly spaced with the product card").
 
 **The hero is not a rung: it is one whole screen, and so is every section after
 it** (Uttham, 2026-10-01: "in one viewport so many elements are there, I want to
@@ -129,10 +136,12 @@ Two costs, stated so nobody "fixes" them by accident:
   `100svh − --header-height − --section-y`; a section shorter than that is
   centred and the slack lands on no rung, so the between-section gap is *at
   least* `--section-y` and grows with the viewport.
-- **Projects and AI Space are taller than one laptop screen and do not fit.**
-  Taller content grows its section from the top pad down — nothing clips — but
-  those two break the one-screen promise. Whether to shrink their tiles is a
-  layout decision pending with Uttham, not a spacing fix.
+- **A sheet is sized to the screen, with a floor.** On a laptop each Projects
+  and AI Space sheet gets `--sheet-in` of content height — the budget less the
+  section's chrome and the sheet's padding, clamped 360–480px — and the picture
+  takes what the copy leaves. Below the floor the section grows instead of the
+  phone shrinking, so AI Space runs ~38px past one screen at 1280×800 and both
+  run over at 1280×720 (plans/025 has the table). That is the trade, not a bug.
 
 The full table and what supersedes what live in `docs/design-tokens.md`; the
 ladder pass is `plans/023`, the screen contract is `plans/024`. Re-measure
@@ -157,24 +166,43 @@ is what "end to end" asks for.
 contact section should be in one viewport, let's remove the paragraph section for
 the How I lead section"). The three principles are **a title and a tagline each,
 nothing more** — the body paragraphs are gone, and that is the owner's cut, not a
-compression, so "Uttham's copy is Uttham's" holds. The three contact notes sit
-in **one row**, each **never narrower than its own content** (nothing wraps — the
-email stays on one line) and sharing whatever the photo leaves. The bike photo is
-**as big as the screen's height allows** (`--photo-w`, 170–340px): it sets the
-panel's height, so it is sized off the content budget, not its column. **No badges
-on the photo for now** (2026-10-01, "for now remove the stickers") —
-`MotoSticker.astro` is kept so they are one import away from coming back.
+compression, so "Uttham's copy is Uttham's" holds. **The bike photo is the panel's
+focus; the notes are its actions** (Uttham, 2026-10-01: "it looks like block of 4
+cards, I want the image to be more focussed, while the 3 CTAs retain their
+clickability"). The three notes sit in **one row at their own size** — two lines
+each, label and arrow then address, all three the widest one's width — and are
+**never stretched across the leftover glass**, and never narrower than their
+content (nothing wraps). They keep their tilt, hover lift and arrow. The photo is
+**as big as the screen's height allows** (`--photo-w`: budget − 285px, ÷ 1.23,
+150–340px), sized off the content budget, not its column, and sits one
+`--space-4` in from the panel's right edge so its tilted corner clears the bolts
+by the 16px they are owed. **No badges on the photo for now** (2026-10-01, "for
+now remove the stickers") — `MotoSticker.astro` is kept so they are one import
+away from coming back.
 
 ## AI Space and Projects are the same object
 
-**An AI Space card is a Projects tile** (Uttham, 2026-09-21): same tape, title,
-lead line, the same 4/3 glass well, and an action that reads like "Read the case".
-**No pill-and-year row on any homepage tile** (2026-10-01: "we don't need this
-whole section") — the kicker and year stay in the data for the case pages, the
-guide pages and the case index. Two cards, never three. The well holds **one phone standing
-flush on the bottom edge and nothing else** — no step list, no page list, no
-caption beside it. Keep the two sections within sight of each other in height:
-if a card is running long, take it out of the layout, not out of the copy.
+**An AI Space card is a Projects tile** (Uttham, 2026-09-21): same tape, paper,
+title, lead line, glass well and an action that reads like "Read the case".
+**Every card carries its own picture, on its own taped sheet** (Uttham,
+2026-10-01: "why we are having image of one card, we should have for both") —
+never one shared stage that several cards switch between; that was tried the
+same day and reversed. **No pill-and-year row on any homepage tile** (2026-10-01:
+"we don't need this whole section") — the kicker and year stay in the data for
+the case pages, the guide pages and the case index. The old "two cards, never
+three" cap is lifted (2026-10-01: "lets change that rule to 3"); each section
+has two sheets today.
+
+How the two differ, because their content does: **a case sheet stacks** — title,
+lead, the well, the action — and on a laptop its well takes the height the copy
+leaves, so the cover sits as a card on the pane; **a tool sheet sets its copy on
+the left and its phone on the right** wherever the sheet is at least 540px wide
+(the phone column is `clamp(220px, 40cqw, 280px)`), and stacks like a case sheet
+below that. The well holds **one phone standing flush on the bottom edge and
+nothing else** — no step list, no page list, no caption beside it — and the phone
+is as tall as the well, so it takes a handset's proportions rather than a fixed
+9/15. Keep the two sections within sight of each other in height: if a card is
+running long, take it out of the layout, not out of the copy.
 
 ## Uttham's copy is Uttham's
 
