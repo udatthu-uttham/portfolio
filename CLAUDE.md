@@ -204,11 +204,15 @@ has two sheets today.
 **A tool card is its name, its one line, the phone and the copy action —
 nothing else** (Uttham, 2026-10-01: "remove the explanation on the main AI space
 cards to optimise content, these descriptions can be in l2 page"). The "how it
-helps" lines live on the tool's guide page, `/ai/<slug>`, word for word under
+helps" lines live on the tool's teaser page, `/ai/<slug>`, word for word under
 "How it helps", and **the whole card opens that page** the way a case card opens
-its case: the title's link stretches over the sheet, and the copy action and the
-prototype's phone link sit above it. No visible "read more" was added — the
-action row stays "just Copy the plan, nothing else here".
+its case: the title's link stretches over the sheet and only the copy action
+sits above it. **The phones are running previews with no link or pill of their
+own** (Uttham, 2026-10-01: "in the ai prototype card, no need to add view
+prototype link, clicking on the card will move to ai space teaser page") — a
+click anywhere on the card, the phone included, opens the teaser; the full-size
+prototype is opened from the teaser page instead. No visible "read more" was
+added — the action row stays "just Copy the plan, nothing else here".
 
 How the two differ: **a case sheet stacks** — title, lead, the well, the action —
 and on a laptop its well takes the height the copy leaves, so the cover sits as a
@@ -250,6 +254,30 @@ following the reading, opens full size on a tap, hides on × ("Show preview"
 brings it back) and steps away at the end of the study. Content lives in `src/data/plp-case.ts`;
 the page is `src/components/CaseTeaser.astro`, opted in by `teaser` on the study,
 so Meesho Mall's page is untouched.
+
+**The AI Space tool pages are teasers too** (Uttham, 2026-10-01: "do similar
+teaser for ai space things … the right side is running preview as we did for
+the project case studies, similar for the first ai tool as well"). `/ai/<slug>`
+is the same `CaseTeaser`, in live mode with `frame="phone"`: **the left column is
+the white-label guide and the sticky phone runs the tool itself**, in the
+teaser's own 9/19.5 phone (the tool fills it). Left, in order: the guide's title
+and intro as the hero, facts (Tool, Kind, Year), How it helps (the card's line,
+then the helps as ruled rows), What you get, What you need, The prompt — the
+bolted glass panel with the page's one primary sticker, "Copy the prompt", which
+copies the `<pre>` word for word — and What to change for your team. **No copy
+lives in `src/data/ai-teasers.ts`**: it arranges `tools.ts` and `guides.ts` and
+says which step each row shows. **Resona follows the reading** (`follow`): every
+row names one of its own steps — prepare, setup, record, synth, insights — and
+the phone shows that step; the homepage card keeps its loop. **The prototype
+just runs, and can be used in the phone** (`interactive`); driving its routes
+from the reading would pull it out of the reader's hands, so its rows carry no
+state, and "Open the prototype ↗" under the facts opens it full size. On phones
+a live phone opens full size *in place* on a tap (moving an iframe into the
+dialog would reload it), centred under the header over a dimmed page; × or the
+page shrinks it, a second × hides it. A page that ends on its last rows (these
+do) lets the reading band slide down over the last half screen, so those rows
+still drive the phone; a page with rows that all reach the middle never takes
+that path.
 
 **The full case study opens in place behind a light gate** (Uttham chose "Light
 gate only"): a speed bump, not protection — the text ships in the page and this
