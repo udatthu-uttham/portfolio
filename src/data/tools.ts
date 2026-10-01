@@ -1,6 +1,6 @@
 // AI Space — the tools, not the case studies. These are evidence for the third
-// leadership principle ("raise the org's speed limit"): things built so a team
-// can do in a day what used to take a sprint.
+// leadership principle ("Design the workflow, and the AI in it."): tools built
+// so a team's process has fewer handoffs and less rework.
 //
 // CONFIDENTIALITY (locked 2026-09-20): every preview renders SYNTHETIC data.
 // No real record contents, no Figma file key, no colleagues' records, no
