@@ -69,3 +69,28 @@ Verified at 1280×800: five points; Strategy current when it is in view; focus o
 every name; clicking Outcome lands its heading at 100px (header 76 + 24) and makes it current; the
 rail sits 25–37px from the edge against a 72px gutter. Meesho Mall: its five sections. 768×1024:
 ticks 9–21px from the edge, the rail's box at the container edge. 375×812: hidden, no overflow.
+
+## Bookmarks replace the ticks; paper replaces the glass (same day)
+
+Uttham: "for the phone preview no need to use the glass, use the card component, glass is only
+used when you want to keep something between. also the navigation in l2 instead of dots can we use
+bookmarks that we do on books, with small titles, so people can navigate the subsections inside the
+page".
+
+- The sticky phone stands on a paper card (`--paper-1`, `--line-1`, `--radius-sm`, `--shadow-rest`,
+  `--card-padding`); the bolts are gone. The AI pages' prompt panel is the same card, the prompt in
+  the recessed well (`--paper-2`, `--radius-inset`) and set in General Sans (it was monospace, against
+  the locked two-family rule).
+- The tick rail is replaced by bookmarks: index tabs (`--mark-w` 120px) on the card's right edge,
+  sticking out `--space-4` past it, spread evenly down the edge; the card keeps a column for them so
+  the phone never sits under a tab. One per section and per sub-group heading (shorter, tucked
+  under its section); the full study and its eight blocks join once it is open (7 → 16 tabs on the
+  product cards; the list scrolls and keeps the current tab in view when they outgrow the card).
+  Titles are the headings, two lines at most; the full title is the tab's tooltip. The current tab
+  is the amber note stock; hover is border and colour only.
+- Tablet grid (768–1023px): 32px stubs, titles on hover or focus. Phones: none.
+
+Verified at 1280×800: seven tabs (Strategy's two sub-groups among them), the current one amber;
+clicking "2. Add what helps them decide" lands it at 100px and makes it current; unlocked, sixteen.
+1024×768: phone 214px, tabs clear of it. 768×1024: stubs. Mall: eight tabs including v3's three
+sub-groups. AI pages: five; no glass left in any teaser.

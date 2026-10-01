@@ -267,11 +267,23 @@ study behind it.
 from a heading to its text, `--ct-sub` (`--group-gap`, never under 32px) to a
 sub-group and above its heading, `--space-4` between paragraphs, rows at
 `--space-5`. The table is in `docs/design-tokens.md`; never drop these pages back
-to `--section-y-sm`. **Every teaser page has ChatGPT-style scroll points**
-("so I can swiftly navigate inside the page"): a rail of ticks in the right
-gutter, the section being read drawn longer and darker, names on hover or focus,
-a click jumps; the full study's blocks join once it is open. Not on phones,
-where the mini player owns the right edge.
+to `--section-y-sm`. **Every teaser page navigates by bookmarks, like a book's index tabs**
+(Uttham, 2026-10-01: "instead of dots can we use bookmarks that we do on books,
+with small titles, so people can navigate the subsections inside the page"):
+paper tabs with small titles stuck on the phone card's right edge, sticking out
+past it, spread down the edge — one per section and per sub-group heading (a
+sub-group's tab shorter, tucked under its section's), the full study and its
+blocks joining once it is open. The one being read is on the amber note stock;
+a click jumps. On the tablet grid they shrink to stubs whose titles open on
+hover or focus; not on phones, where the mini player owns the right edge.
+
+**Glass only where something sits between** (Uttham, 2026-10-01: "for the phone
+preview no need to use the glass, use the card component, glass is only used
+when you want to keep something between"). On the teaser pages the phone and the
+AI prompt panel stand on the paper card (`--paper-1`, `--line-1`, `--radius-sm`,
+`--shadow-rest`, `--card-padding`), the prompt in the sheet's recessed well
+(`--paper-2`); glass is for a pane with something tucked behind it, as the hero
+portrait is behind its slab.
 
 **The AI Space tool pages are teasers too** (Uttham, 2026-10-01: "do similar
 teaser for ai space things … the right side is running preview as we did for

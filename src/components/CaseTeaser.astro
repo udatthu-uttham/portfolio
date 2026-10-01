@@ -67,6 +67,20 @@ const dek = rich(data.dek).replace('{source}', sourceLink);
 // to it. Prefixed, so none can collide with the homepage scrollspy's about /
 // work / ai / contact.
 const idFor = (text: string) => `s-${text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`;
+
+// The bookmarks, in reading order: each section, each sub-group heading inside
+// it, and — once the full study is open — the study and its blocks.
+type Mark = { id: string; title: string; sub?: boolean; full?: boolean };
+const marks: Mark[] = data.sections.flatMap((section) => [
+  { id: idFor(section.heading), title: section.heading },
+  ...section.blocks.flatMap((b) =>
+    (b.kind === 'steps' || b.kind === 'rows') && b.heading ? [{ id: idFor(b.heading), title: b.heading, sub: true }] : []
+  ),
+]);
+if (data.gate && data.experiments?.length) {
+  marks.push({ id: 'full-title', title: 'The full case study', full: true });
+  data.experiments.forEach((e) => marks.push({ id: idFor(e.title), title: e.title, sub: true, full: true }));
+}
 ---
 
 <div class="ct">
@@ -95,7 +109,7 @@ const idFor = (text: string) => `s-${text.toLowerCase().replace(/[^a-z0-9]+/g, '
               <p class="ct-body" set:html={rich(block.text)} />
             ) : block.kind === 'steps' ? (
               <>
-                {block.heading && <h3>{block.heading}</h3>}
+                {block.heading && <h3 id={idFor(block.heading)}>{block.heading}</h3>}
                 <ul class="ct-steps">
                   {block.steps.map((s) => (
                     <li class="ct-step" data-state={s.state}><b>{s.label}</b>{s.text}</li>
@@ -118,7 +132,7 @@ const idFor = (text: string) => `s-${text.toLowerCase().replace(/[^a-z0-9]+/g, '
               </>
             ) : block.kind === 'rows' ? (
               <>
-                {block.heading && <h3>{block.heading}</h3>}
+                {block.heading && <h3 id={idFor(block.heading)}>{block.heading}</h3>}
                 <ul class="ct-steps ct-rows">
                   {block.rows.map((r) => (
                     <li class="ct-step ct-row" data-state={r.state} set:html={rich(r.text)} />
@@ -126,11 +140,7 @@ const idFor = (text: string) => `s-${text.toLowerCase().replace(/[^a-z0-9]+/g, '
                 </ul>
               </>
             ) : block.kind === 'prompt' ? (
-              <div class="ct-prompt glass" data-prompt>
-                <span class="bolt bolt--tl" aria-hidden="true"></span>
-                <span class="bolt bolt--tr" aria-hidden="true"></span>
-                <span class="bolt bolt--bl" aria-hidden="true"></span>
-                <span class="bolt bolt--br" aria-hidden="true"></span>
+              <div class="ct-prompt" data-prompt>
                 <div class="ct-prompt__head">
                   <button class="cta cta--primary" type="button" data-copy-prompt data-copied="Copied">{block.copy}</button>
                   <span class="sr-only" role="status" data-copy-status></span>
@@ -180,11 +190,7 @@ const idFor = (text: string) => `s-${text.toLowerCase().replace(/[^a-z0-9]+/g, '
     </div>
 
     <aside class:list={['ct-panel', { 'ct-panel--live': live }]} aria-label={data.panelLabel ?? 'Preview'} data-case-panel data-map={JSON.stringify(stateToShot)}>
-      <div class="ct-pane glass">
-        <span class="bolt bolt--tl" aria-hidden="true"></span>
-        <span class="bolt bolt--tr" aria-hidden="true"></span>
-        <span class="bolt bolt--bl" aria-hidden="true"></span>
-        <span class="bolt bolt--br" aria-hidden="true"></span>
+      <div class="ct-pane">
         <div class="ct-stage">
           {livePhone ? (
             <div class="ct-phone ct-phone--live">
@@ -216,33 +222,22 @@ const idFor = (text: string) => `s-${text.toLowerCase().replace(/[^a-z0-9]+/g, '
           <button class="ct-pip__close" type="button" aria-label="Hide the preview" data-pip-close><span aria-hidden="true">×</span></button>
         </div>
       </div>
+      {/* Bookmarks (Uttham, 2026-10-01: "instead of dots can we use bookmarks
+          that we do on books, with small titles, so people can navigate the
+          subsections inside the page"): index tabs stuck on the phone card's
+          right edge, sticking out past it, one per section and sub-group, the
+          one being read on the amber note stock. A click jumps. */}
+      <nav class="ct-marks" aria-label="On this page" data-marks>
+        <ol class="ct-marks__list">
+          {marks.map((m) => (
+            <li class:list={['ct-marks__item', { 'ct-marks__item--sub': m.sub, 'ct-marks__full': m.full }]} hidden={m.full || undefined}>
+              <a class="ct-marks__tab" href={`#${m.id}`} title={m.title} data-mark>{m.title}</a>
+            </li>
+          ))}
+        </ol>
+      </nav>
     </aside>
   </div>
-  {/* Scroll points (Uttham, 2026-10-01: "section type scroll points, that we
-      see in chatgpt and reference portfolio… so I can swiftly navigate inside
-      the page"): a tick per section in the right gutter, the one being read
-      drawn longer and darker; hover or focus opens the names; a click jumps.
-      The full study's blocks join once it is opened. */}
-  <nav class="ct-points" aria-label="On this page" data-points>
-    <ol class="ct-points__list">
-      {data.sections.map((section) => (
-        <li>
-          <a class="ct-points__link" href={`#${idFor(section.heading)}`} data-point>
-            <span class="ct-points__label">{section.heading}</span>
-            <span class="ct-points__tick" aria-hidden="true"></span>
-          </a>
-        </li>
-      ))}
-      {hasFull && data.experiments!.map((e) => (
-        <li class="ct-points__full" hidden>
-          <a class="ct-points__link" href={`#${idFor(e.title)}`} data-point>
-            <span class="ct-points__label">{e.title}</span>
-            <span class="ct-points__tick" aria-hidden="true"></span>
-          </a>
-        </li>
-      ))}
-    </ol>
-  </nav>
   <span class="ct-end" data-case-end aria-hidden="true"></span>
   <button class="ct-pip__restore cta cta--secondary" type="button" data-pip-restore hidden>Show preview</button>{livePhone && <div class="ct-pip__scrim" data-pip-scrim hidden></div>}
   {!live && (
@@ -456,14 +451,15 @@ const idFor = (text: string) => `s-${text.toLowerCase().replace(/[^a-z0-9]+/g, '
     }
   }
 
-  // ---- scroll points: which section is being read --------------------------
-  // The current point is the last section whose top has passed 40% of the
+  // ---- bookmarks: which section or sub-group is being read ----------------
+  // The current bookmark is the last heading whose top has passed 40% of the
   // screen — re-checked each scroll frame, and when the full study opens (its
-  // blocks join the rail then).
+  // bookmarks join then). It is scrolled into view inside its own list, so a
+  // long list never hides the current tab.
   {
-    const nav = document.querySelector<HTMLElement>('[data-points]');
+    const nav = document.querySelector<HTMLElement>('[data-marks]');
     if (nav) {
-      const links = [...nav.querySelectorAll<HTMLAnchorElement>('a[data-point]')];
+      const links = [...nav.querySelectorAll<HTMLAnchorElement>('a[data-mark]')];
       const targets = links.map((a) => document.getElementById(decodeURIComponent(a.hash.slice(1))));
       let current: HTMLAnchorElement | null = null;
       const update = () => {
@@ -476,6 +472,13 @@ const idFor = (text: string) => `s-${text.toLowerCase().replace(/[^a-z0-9]+/g, '
         current?.removeAttribute('aria-current');
         (next as HTMLAnchorElement | null)?.setAttribute('aria-current', 'location');
         current = next;
+        const list = nav.querySelector<HTMLElement>('.ct-marks__list');
+        const tab = current as HTMLAnchorElement | null;
+        if (list && tab && list.scrollHeight > list.clientHeight) {
+          const lr = list.getBoundingClientRect();
+          const tr = tab.getBoundingClientRect();
+          if (tr.top < lr.top || tr.bottom > lr.bottom) list.scrollTop += tr.top - lr.top - lr.height / 2 + tr.height / 2;
+        }
       };
       let frame = 0;
       window.addEventListener('scroll', () => {
@@ -484,7 +487,7 @@ const idFor = (text: string) => `s-${text.toLowerCase().replace(/[^a-z0-9]+/g, '
       }, { passive: true });
       window.addEventListener('resize', update);
       document.addEventListener('case:full-open', () => {
-        nav.querySelectorAll<HTMLElement>('.ct-points__full').forEach((li) => { li.hidden = false; });
+        nav.querySelectorAll<HTMLElement>('.ct-marks__full').forEach((li) => { li.hidden = false; });
         update();
       });
       update();
@@ -761,23 +764,28 @@ const idFor = (text: string) => `s-${text.toLowerCase().replace(/[^a-z0-9]+/g, '
 
   /* ---- the prompt: the guide's bolted glass panel, the prompt as a white
      card ON it (CLAUDE.md, Images) and the page's one primary sticker ---- */
+  /* a paper card, not glass — glass is for something kept between (Uttham,
+     2026-10-01); the prompt sits in the sheet's recessed well (--paper-2) */
   .ct-prompt {
     position: relative;
     margin-top: var(--group-gap);
-    padding: var(--bolt-content-inset) var(--panel-padding);
-    border-radius: var(--radius-sm);
+    padding: var(--card-padding);
     display: grid;
     gap: var(--space-4);
+    background: var(--paper-1);
+    border: 1px solid var(--line-1);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-rest);
   }
   .ct-prompt__head { display: flex; align-items: center; }
   .ct-prompt__text {
     margin: 0;
     padding: var(--card-padding);
-    background: var(--paper-1);
-    border: 1px solid var(--line-1);
-    border-radius: var(--radius-sm);
+    background: var(--paper-2);
+    border-radius: var(--radius-inset);
     color: var(--ink-900);
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    /* the site's two families only — no monospace (locked 2026-09-07) */
+    font-family: var(--font-paper);
     font-size: var(--text-small);
     line-height: var(--lh-body);
     white-space: pre-wrap;
@@ -872,12 +880,17 @@ const idFor = (text: string) => `s-${text.toLowerCase().replace(/[^a-z0-9]+/g, '
     text-transform: uppercase;
   }
 
-  /* ---- the phone: screens on glass, a card ON the pane ---- */
+  /* ---- the phone, on a paper card (Uttham, 2026-10-01: "no need to use the
+     glass, use the card component, glass is only used when you want to keep
+     something between"). The card's right padding holds the bookmarks. ---- */
   .ct-pane {
     position: relative;
     height: 100%;
-    padding: var(--bolt-content-inset) var(--panel-padding);
+    padding: var(--card-padding);
+    background: var(--paper-1);
+    border: 1px solid var(--line-1);
     border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-rest);
   }
   /* sized off the stage's height AND width, so the phone always stands whole
      inside the pane, never cut and never stretched */
@@ -921,83 +934,88 @@ const idFor = (text: string) => `s-${text.toLowerCase().replace(/[^a-z0-9]+/g, '
     text-align: center;
   }
 
-  /* ---- scroll points: a rail of ticks in the right gutter ---- */
-  .ct-section, .ct-exp { scroll-margin-top: calc(var(--header-height) + var(--content-gap)); }
-  .ct-points { display: none; }
+  /* ---- bookmarks: index tabs on the phone card's right edge ---- */
+  .ct-section, .ct-exp, .ct-section h3[id] { scroll-margin-top: calc(var(--header-height) + var(--content-gap)); }
+  .ct-marks { display: none; }
   @media (min-width: 768px) {
-    .ct-points {
-      /* the rail's inner padding; halved on the 8-column grid, where the
-         gutter is 40px, so the rail's box never reaches the phone pane */
-      --pt-pad: var(--space-4);
+    .ct-panel {
+      /* a tab's width, and how far it sticks out past the card's edge into the
+         gutter (always less than the gutter) */
+      --mark-w: 120px;
+      --mark-out: var(--space-4);
+    }
+    /* the card keeps a column for the tabs; the phone stands in the rest */
+    .ct-pane { padding-right: calc(var(--card-padding) + var(--mark-w) - var(--mark-out)); }
+    .ct-marks {
       display: block;
-      position: fixed;
-      top: 50%;
-      /* centred in the gutter beside the container, clear of the phone pane */
-      /* the list's own 16px padding sits inside this, so the ticks end up
-         centred in the gutter */
-      right: max(0px, calc((var(--margin-side) - var(--space-5)) / 2 - var(--pt-pad)));
-      translate: 0 -50%;
-      z-index: var(--z-float);
+      position: absolute;
+      top: var(--card-padding);
+      bottom: var(--card-padding);
+      right: calc(-1 * var(--mark-out));
+      width: var(--mark-w);
+      z-index: 2;
     }
-    .ct-points__list {
-      display: grid;
-      justify-items: end;
-      gap: var(--space-1);
-      margin: 0;
-      /* the same padding open and closed, so opening never shifts the ticks */
-      padding: var(--space-3) var(--pt-pad);
-      list-style: none;
-      border: 1px solid transparent;
-      border-radius: var(--radius-sm);
-      transition: background-color var(--dur-2) var(--ease-standard), border-color var(--dur-2) var(--ease-standard), box-shadow var(--dur-2) var(--ease-standard);
-    }
-    .ct-points__full[hidden] { display: none; }
-    /* a hit area taller than the tick: 24px per point */
-    .ct-points__link {
+    /* spread down the card's edge, as tabs are down a book's — evenly, and
+       never closer than --space-1 once the full study's tabs join */
+    .ct-marks__list {
       display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      gap: var(--space-3);
-      min-height: var(--space-5);
+      flex-direction: column;
+      align-items: flex-end;
+      justify-content: space-evenly;
+      gap: var(--space-1);
+      height: 100%;
+      max-height: 100%;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      overflow-y: auto;
+      scrollbar-width: none;
+    }
+    .ct-marks__list::-webkit-scrollbar { display: none; }
+    .ct-marks__item { width: 100%; }
+    .ct-marks__item[hidden] { display: none; }
+    /* a sub-group's tab is shorter, so it reads as tucked under its section's */
+    .ct-marks__item--sub { width: calc(100% - var(--space-4)); }
+    /* a tab: the sheet's white stock, its outer end rounded, stuck on */
+    .ct-marks__tab {
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      overflow: hidden;
+      padding: var(--space-2) var(--space-3);
+      background: var(--paper-1);
+      border: 1px solid var(--line-1);
+      border-radius: var(--radius-inset) var(--radius-sm) var(--radius-sm) var(--radius-inset);
+      box-shadow: var(--shadow-stuck);
       color: var(--ink-600);
-      font-size: var(--text-small);
+      font-size: var(--text-eyebrow);
+      font-weight: 500;
       line-height: var(--lh-heading);
       text-decoration: none;
+      transition: background-color var(--dur-2) var(--ease-standard), border-color var(--dur-2) var(--ease-standard), color var(--dur-2) var(--ease-standard);
     }
-    .ct-points__tick {
-      flex: none;
-      width: var(--space-3);
-      height: 2px;
-      background: var(--line-mark);
-      transition: background-color var(--dur-2) var(--ease-standard);
+    .ct-marks__item--sub .ct-marks__tab { color: var(--ink-600); font-weight: 400; }
+    /* the section being read: the amber note stock — a state, not a hover */
+    .ct-marks__tab[aria-current='location'] {
+      background: var(--amber-400);
+      border-color: var(--amber-700);
+      color: var(--ink-900);
+      font-weight: 600;
     }
-    /* the section being read: a longer, darker tick (state, not hover) */
-    .ct-points__link[aria-current='location'] { color: var(--ink-900); font-weight: 600; }
-    .ct-points__link[aria-current='location'] .ct-points__tick { width: var(--space-5); background: var(--ink-900); }
-    /* closed, the names take no room (so the rail never covers the page) but
-       stay in the accessibility tree; open on hover or focus, on a paper card */
-    .ct-points__label {
-      max-width: 0;
-      overflow: hidden;
-      white-space: nowrap;
-      opacity: 0;
-      transition: opacity var(--dur-2) var(--ease-standard);
-    }
-    .ct-points:is(:hover, :focus-within) .ct-points__list {
-      background: var(--paper-1);
-      border-color: var(--line-1);
-      box-shadow: var(--shadow-rest);
-    }
-    .ct-points:is(:hover, :focus-within) .ct-points__label { max-width: 26ch; opacity: 1; text-overflow: ellipsis; }
     @media (hover: hover) and (pointer: fine) {
-      .ct-points__link:hover { color: var(--ink-900); }
-      .ct-points__link:hover .ct-points__tick { background: var(--ink-600); }
-      .ct-points__link[aria-current='location']:hover .ct-points__tick { background: var(--ink-900); }
+      .ct-marks__tab:hover { border-color: var(--ink-400); color: var(--ink-900); }
     }
-    .ct-points__link:focus-visible { outline: 2px solid var(--amber-text); outline-offset: 2px; }
+    .ct-marks__tab:focus-visible { outline: 2px solid var(--amber-text); outline-offset: 2px; }
   }
-  @media (min-width: 768px) and (max-width: 900px) {
-    .ct-points { --pt-pad: var(--space-2); }
+  /* The 8-column tablet grid leaves no room for titled tabs beside the phone:
+     the tabs shrink to coloured stubs, and the titles open on hover or focus. */
+  @media (min-width: 768px) and (max-width: 1023.98px) {
+    .ct-panel { --mark-w: var(--space-6); --mark-out: var(--space-3); }
+    .ct-marks__item--sub { width: calc(100% - var(--space-2)); }
+    .ct-marks__tab { padding: 0; min-height: var(--space-5); color: transparent; -webkit-line-clamp: 1; }
+    .ct-marks:is(:hover, :focus-within) { width: 220px; }
+    .ct-marks:is(:hover, :focus-within) .ct-marks__tab { padding: var(--space-2) var(--space-3); color: var(--ink-600); }
+    .ct-marks:is(:hover, :focus-within) .ct-marks__tab[aria-current='location'] { color: var(--ink-900); }
   }
 
   /* the mini-player controls exist only on phones */
