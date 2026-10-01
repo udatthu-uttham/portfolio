@@ -8,24 +8,15 @@
 // counts. The one figure on the page, 250 million, is public and sourced
 // (Meesho's Q3 FY26 Shareholders' Letter, 251M annual transacting users) and
 // is linked where it first appears. Research verbatims stay off the page until
-// consent is confirmed (`verbatim.consent`). Items the brief marks "open" are
+// consent is confirmed (`consent` on the quote). Items the brief marks "open" are
 // left out rather than shown as placeholders.
 
-export type CaseStep = { state: string; label: string; text: string };
+import type { CaseTeaserData } from './case-teaser';
 
-export type Experiment = {
-  state: string;
-  title: string;
-  status?: string; // omitted while the brief marks it open
-  why: string;
-  how?: string; // omitted while the brief marks it open
-  worked?: string; // omitted while the brief marks it open
-};
-
-export const plpCase = {
+export const plpCase: CaseTeaserData = {
   title: 'Helping shoppers understand products better at first glance',
-  // {250m} becomes the sourced link; the sentence is under 15 words, so no bold.
-  dek: 'Rethinking Meesho’s product card for {250m} people who browse by picture.',
+  // {source} becomes the sourced link; the sentence is under 15 words, so no bold.
+  dek: 'Rethinking Meesho’s product card for {source} people who browse by picture.',
   source: {
     label: '250 million',
     href: 'https://www.bseindia.com/xml-data/corpfiling/AttachHis/b7bfb190-04cb-45a5-8cfd-4f70013eff2e.pdf#page=9',
@@ -36,72 +27,88 @@ export const plpCase = {
     { label: 'Research', value: 'Delhi, Bengaluru, Jaipur' },
     { label: 'Timeline', value: 'One year' },
   ],
+  panelLabel: 'Card preview',
 
-  context: {
-    state: 'before',
-    heading: 'Context',
-    body: ['Most Meesho shoppers are **new to e-commerce** and live in tier 3 and tier 4 towns. They browse whenever they have a few free minutes, and **they scan by picture**: the image first, everything else later.'],
-  },
-  problem: {
-    state: 'before-annotated',
-    heading: 'Problem',
-    body: [
-      'Over time, **more than ten teams** had added their own features to the card. Each addition made it taller, so **shoppers saw fewer products on every screen**, and the pictures they rely on got harder to compare.',
-      'Help 250 million shoppers **find the right product faster**, across different categories and different reasons for browsing.',
-    ],
-  },
-  scan: {
-    heading: 'What shoppers look at, in order',
-    lead: 'Across sessions in Delhi, Bengaluru and Jaipur, the same order held. **Shoppers triage the card; they do not read it.**',
-    steps: [
-      { state: 'scan-picture', label: '1. The picture', text: 'People tap the picture, not the text.' },
-      { state: 'scan-price', label: '2. The price', text: 'The only text read while scanning.' },
-      { state: 'scan-title', label: '3. The title area', text: 'Glanced at, rarely read.' },
-      { state: 'scan-rating', label: '4. The rating', text: 'Used as a threshold, not a value.' },
-      { state: 'scan-tags', label: '5. The tags', text: 'Noticed only when colour pulls the eye.' },
-    ] as CaseStep[],
-  },
-  // Off the page until the participant's consent is confirmed (brief §1, open item 3).
-  verbatim: {
-    consent: false,
-    text: 'Fabric pahle andar jaake dekhti thi, ab idhar se hi pata lag raha hai.',
-    translation: 'I used to open the product to check the fabric. Now I can tell from here.',
-  },
-  strategy: {
-    heading: 'Strategy',
-    lead: 'We worked on the card **in two directions, one experiment at a time**, each measured on its own.',
-    groups: [
-      {
-        heading: '1. Remove what slows them down',
-        steps: [
-          { state: 'cleanup', label: 'Cleanup', text: 'Took off elements shoppers didn’t use. Every element now lives in a named zone with a cap.' },
-          { state: 'titles', label: 'Clearer titles', text: 'Seller titles replaced by the few facts that matter: fabric, pack size.' },
-          { state: 'stagger', label: 'Staggered feed', text: 'Cards at their natural height, so more fit on a screen.' },
-          { state: 'list', label: 'List or grid by category', text: 'Rows where details decide, grid where looks decide.' },
-        ] as CaseStep[],
-      },
-      {
-        heading: '2. Add what helps them decide',
-        steps: [
-          { state: 'scroll', label: 'Swipeable images', text: 'See more of the product without opening it.' },
-          { state: 'bigimg', label: 'Bigger images for fashion', text: 'Where the look is the decision.' },
-          { state: 'cash', label: 'Cash price', text: 'The price they’ll actually pay on delivery.' },
-          { state: 'date', label: 'Delivery date', text: 'A clear day count instead of a promise.' },
-        ] as CaseStep[],
-      },
-    ],
-  },
-  outcome: {
-    state: 'after',
-    heading: 'Outcome',
-    body: '**The new card is live** for 250 million shoppers. Results are confidential for a listed company; I walk through them in interviews.',
-    insideLead: 'In the full case study:',
-    inside: [
-      'Each of the eight changes: why, how, what worked',
-      'The research: method, sample, scan-order evidence',
-      'Before and after screens for every change',
-    ],
-    gate: 'The full case study expands here. Live, it sits behind a password that comes with my application.',
+  sections: [
+    {
+      state: 'before',
+      heading: 'Context',
+      blocks: [
+        { kind: 'p', text: 'Most Meesho shoppers are **new to e-commerce** and live in tier 3 and tier 4 towns. They browse whenever they have a few free minutes, and **they scan by picture**: the image first, everything else later.' },
+      ],
+    },
+    {
+      state: 'before-annotated',
+      heading: 'Problem',
+      blocks: [
+        { kind: 'p', text: 'Over time, **more than ten teams** had added their own features to the card. Each addition made it taller, so **shoppers saw fewer products on every screen**, and the pictures they rely on got harder to compare.' },
+        { kind: 'p', text: 'Help 250 million shoppers **find the right product faster**, across different categories and different reasons for browsing.' },
+      ],
+    },
+    {
+      heading: 'What shoppers look at, in order',
+      blocks: [
+        { kind: 'p', text: 'Across sessions in Delhi, Bengaluru and Jaipur, the same order held. **Shoppers triage the card; they do not read it.**' },
+        {
+          kind: 'steps',
+          steps: [
+            { state: 'scan-picture', label: '1. The picture', text: 'People tap the picture, not the text.' },
+            { state: 'scan-price', label: '2. The price', text: 'The only text read while scanning.' },
+            { state: 'scan-title', label: '3. The title area', text: 'Glanced at, rarely read.' },
+            { state: 'scan-rating', label: '4. The rating', text: 'Used as a threshold, not a value.' },
+            { state: 'scan-tags', label: '5. The tags', text: 'Noticed only when colour pulls the eye.' },
+          ],
+        },
+        // Off the page until the participant's consent is confirmed (brief §1, open item 3).
+        { kind: 'quote', consent: false, text: '“Fabric pahle andar jaake dekhti thi, ab idhar se hi pata lag raha hai.”', source: 'I used to open the product to check the fabric. Now I can tell from here.' },
+      ],
+    },
+    {
+      heading: 'Strategy',
+      blocks: [
+        { kind: 'p', text: 'We worked on the card **in two directions, one experiment at a time**, each measured on its own.' },
+        {
+          kind: 'steps',
+          heading: '1. Remove what slows them down',
+          steps: [
+            { state: 'cleanup', label: 'Cleanup', text: 'Took off elements shoppers didn’t use. Every element now lives in a named zone with a cap.' },
+            { state: 'titles', label: 'Clearer titles', text: 'Seller titles replaced by the few facts that matter: fabric, pack size.' },
+            { state: 'stagger', label: 'Staggered feed', text: 'Cards at their natural height, so more fit on a screen.' },
+            { state: 'list', label: 'List or grid by category', text: 'Rows where details decide, grid where looks decide.' },
+          ],
+        },
+        {
+          kind: 'steps',
+          heading: '2. Add what helps them decide',
+          steps: [
+            { state: 'scroll', label: 'Swipeable images', text: 'See more of the product without opening it.' },
+            { state: 'bigimg', label: 'Bigger images for fashion', text: 'Where the look is the decision.' },
+            { state: 'cash', label: 'Cash price', text: 'The price they’ll actually pay on delivery.' },
+            { state: 'date', label: 'Delivery date', text: 'A clear day count instead of a promise.' },
+          ],
+        },
+      ],
+    },
+    {
+      state: 'after',
+      heading: 'Outcome',
+      blocks: [
+        { kind: 'p', text: '**The new card is live** for 250 million shoppers. Results are confidential for a listed company; I walk through them in interviews.' },
+        {
+          kind: 'inside',
+          lead: 'In the full case study:',
+          items: [
+            'Each of the eight changes: why, how, what worked',
+            'The research: method, sample, scan-order evidence',
+            'Before and after screens for every change',
+          ],
+        },
+        { kind: 'gate' },
+      ],
+    },
+  ],
+  gate: {
+    text: 'The full case study expands here. Live, it sits behind a password that comes with my application.',
     cta: 'Read the full case study',
   },
 
@@ -170,10 +177,12 @@ export const plpCase = {
       how: 'A day count at the foot of the card. Three tests, including one with a “FAST” mark in front of the number.',
       worked: '**The date did the work; the word in front of it carried nothing.** Third test scaled.',
     },
-  ] as Experiment[],
+  ],
 
-  // What each phone screen shows, for its alt text.
+  // Uttham's exports in src/assets/plp/, each named after its state.
   screens: {
+    dir: 'plp',
+    alts: {
     before: 'The old product card',
     'before-annotated': 'The old card, each element labelled with the team that added it',
     'scan-picture': 'The old card with only the picture lit',
@@ -190,5 +199,6 @@ export const plpCase = {
     cash: 'The new card with the cash-price row lit',
     date: 'The new card with the delivery date lit',
     after: 'The new product card',
-  } as Record<string, string>,
+    },
+  },
 };

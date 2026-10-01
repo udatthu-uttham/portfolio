@@ -1,150 +1,178 @@
 ---
-// The product-cards case study as Uttham laid it out (teaser layout, 2026-10-01):
-// a two-minute teaser on the left, a sticky phone on the right that swaps to
-// the screen for whatever is being read, and the full case study expanding in
-// place behind a light password gate. Built from the site's own pieces — paper
-// for the words, glass for the screens, the sticker CTA — not the reference's.
+// A teaser page as Uttham laid it out (2026-10-01): a two-minute read on the
+// left, a sticky preview on the right that follows the reading, and — where a
+// study has one — the full case study expanding in place behind a light
+// password gate. Built from the site's own pieces: paper for the words, glass
+// for the screens, the sticker CTA. Content comes in as CaseTeaserData
+// (src/data/case-teaser.ts); the product-cards and Meesho Mall case studies and
+// the AI Space tool pages all render through here.
 //
-// Screens are Uttham's Figma exports in src/assets/plp/, named after the state
-// they show (see the README there). A state with no screen yet keeps the
-// previous one on the phone; the dev server says which screen is missing.
+// Two kinds of preview. Screens: Uttham's Figma exports, picked per state from
+// src/assets/<screens.dir>/ (a state with no screen shows the nearest earlier
+// one; the dev server names the missing one). Live: a `preview` slot — a
+// running tool — which hears each state as a `case:state` event.
 import { Image } from 'astro:assets';
 import { rich } from '../lib/rich';
 import { CASE_PASSWORD_SHA256 } from '../data/case-gate';
-import type { plpCase } from '../data/plp-case';
+import type { CaseTeaserData } from '../data/case-teaser';
 
 interface Props {
-  data: typeof plpCase;
+  data: CaseTeaserData;
 }
 const { data } = Astro.props;
+const live = Astro.slots.has('preview');
 
-const files = import.meta.glob<ImageMetadata>('../assets/plp/*.{png,jpg,jpeg,webp}', { eager: true, import: 'default' });
-const screens: Record<string, ImageMetadata> = Object.fromEntries(
-  Object.entries(files).map(([path, img]) => [path.split('/').pop()!.replace(/\.(png|jpe?g|webp)$/, ''), img])
+const files = import.meta.glob<ImageMetadata>('../assets/{plp,mall}/*.{png,jpg,jpeg,webp}', { eager: true, import: 'default' });
+const library: Record<string, ImageMetadata> = Object.fromEntries(
+  Object.entries(files).map(([path, img]) => {
+    const [dir, name] = path.split('/').slice(-2);
+    return [`${dir}/${name.replace(/\.(png|jpe?g|webp)$/, '')}`, img];
+  })
 );
-const shots = Object.keys(data.screens).filter((state) => screens[state]);
+// every state on the page, in reading order
+const states = [
+  ...new Set([
+    ...data.sections.flatMap((s) => [s.state, ...s.blocks.flatMap((b) => (b.kind === 'steps' ? b.steps.map((st) => st.state) : []))]),
+    ...(data.experiments ?? []).map((e) => e.state),
+  ].filter((x): x is string => Boolean(x))),
+];
+// state → the screen file that shows it, for the states that have one
+const stateToShot: Record<string, string> = {};
+if (data.screens && !live) {
+  for (const state of states) {
+    const key = `${data.screens.dir}/${data.screens.map?.[state] ?? state}`;
+    if (library[key]) stateToShot[state] = key;
+  }
+}
+const shots = [...new Set(Object.values(stateToShot))];
+const altFor = (key: string) => {
+  const state = Object.keys(stateToShot).find((s) => stateToShot[s] === key)!;
+  return data.screens?.alts[state] ?? '';
+};
 const dev = import.meta.env.DEV;
+const back = data.back ?? { href: '/#work', label: '← All projects' };
+const hasFull = Boolean(data.gate && data.experiments?.length);
 
-const sourceLink = `<a class="ct-source" href="${data.source.href}" target="_blank" rel="noopener" title="${data.source.title}">${data.source.label}</a>`;
-const dek = rich(data.dek).replace('{250m}', sourceLink);
+const sourceLink = data.source
+  ? `<a class="ct-source" href="${data.source.href}" target="_blank" rel="noopener" title="${data.source.title}">${data.source.label}</a>`
+  : '';
+const dek = rich(data.dek).replace('{source}', sourceLink);
 ---
 
 <div class="ct">
   <header class="ct-hero">
-    <a class="back-link text-link" href="/#work">← All projects</a>
+    <a class="back-link text-link" href={back.href}>{back.label}</a>
     <h1>{data.title}</h1>
     <p class="ct-dek" set:html={dek} />
-    <dl class="ct-facts">
-      {data.facts.map((f) => (
-        <div class="ct-facts__row"><dt>{f.label}</dt><dd>{f.value}</dd></div>
-      ))}
-    </dl>
+    {data.facts.length > 0 && (
+      <dl class="ct-facts">
+        {data.facts.map((f) => (
+          <div class="ct-facts__row"><dt>{f.label}</dt><dd>{f.value}</dd></div>
+        ))}
+      </dl>
+    )}
   </header>
 
   <div class="ct-layout">
     <div class="ct-story">
-      <section class="ct-section" data-state={data.context.state}>
-        <h2>{data.context.heading}</h2>
-        {data.context.body.map((p) => <p class="ct-body" set:html={rich(p)} />)}
-      </section>
+      {data.sections.map((section) => (
+        <section class="ct-section" data-state={section.state}>
+          <h2>{section.heading}</h2>
+          {section.blocks.map((block) =>
+            block.kind === 'p' ? (
+              <p class="ct-body" set:html={rich(block.text)} />
+            ) : block.kind === 'steps' ? (
+              <>
+                {block.heading && <h3>{block.heading}</h3>}
+                <ul class="ct-steps">
+                  {block.steps.map((s) => (
+                    <li class="ct-step" data-state={s.state}><b>{s.label}</b>{s.text}</li>
+                  ))}
+                </ul>
+              </>
+            ) : block.kind === 'quote' ? (
+              block.consent !== false && (
+                <aside class="ct-note">
+                  <p>{block.text}</p>
+                  <small>{block.source}</small>
+                </aside>
+              )
+            ) : block.kind === 'inside' ? (
+              <>
+                <p class="ct-body ct-inside-lead">{block.lead}</p>
+                <ul class="ct-inside">
+                  {block.items.map((item) => <li>{item}</li>)}
+                </ul>
+              </>
+            ) : (
+              data.gate && (
+                <div class="ct-gate" data-gate data-hash={CASE_PASSWORD_SHA256} data-dev={dev ? '1' : undefined}>
+                  <p class="ct-gate__text">{data.gate.text}</p>
+                  {hasFull && (
+                    <>
+                      <button class="cta cta--primary" type="button" data-gate-open aria-expanded="false" aria-controls="full">{data.gate.cta}</button>
+                      <form class="ct-gate__form" data-gate-form hidden>
+                        <label class="ct-gate__label" for="case-pass">Password</label>
+                        <div class="ct-gate__row">
+                          <input class="ct-gate__input" id="case-pass" name="password" type="password" autocomplete="current-password" required />
+                          <button class="cta cta--secondary" type="submit">Open</button>
+                        </div>
+                        <p class="ct-gate__msg" data-gate-msg role="status" aria-live="polite"></p>
+                      </form>
+                    </>
+                  )}
+                </div>
+              )
+            )
+          )}
+        </section>
+      ))}
 
-      <section class="ct-section" data-state={data.problem.state}>
-        <h2>{data.problem.heading}</h2>
-        {data.problem.body.map((p) => <p class="ct-body" set:html={rich(p)} />)}
-      </section>
-
-      <section class="ct-section">
-        <h2>{data.scan.heading}</h2>
-        <p class="ct-body" set:html={rich(data.scan.lead)} />
-        <ul class="ct-steps">
-          {data.scan.steps.map((s) => (
-            <li class="ct-step" data-state={s.state}><b>{s.label}</b>{s.text}</li>
+      {hasFull && (
+        <section class="ct-full" id="full" aria-labelledby="full-title" hidden>
+          <h2 class="sr-only" id="full-title" tabindex="-1">The full case study</h2>
+          {data.experiments!.map((e) => (
+            <article class="ct-exp" data-state={e.state}>
+              <div class="ct-exp__head">
+                <h3>{e.title}</h3>
+                {e.status && <p class="ct-exp__status">{e.status}</p>}
+              </div>
+              <div class="ct-exp__part"><p class="ct-exp__label">Why</p><p class="ct-body" set:html={rich(e.why)} /></div>
+              {e.how && <div class="ct-exp__part"><p class="ct-exp__label">How</p><p class="ct-body" set:html={rich(e.how)} /></div>}
+              {e.worked && <div class="ct-exp__part"><p class="ct-exp__label">What worked</p><p class="ct-body" set:html={rich(e.worked)} /></div>}
+            </article>
           ))}
-        </ul>
-        {data.verbatim.consent && (
-          <aside class="ct-note">
-            <p>“{data.verbatim.text}”</p>
-            <small>{data.verbatim.translation}</small>
-          </aside>
-        )}
-      </section>
-
-      <section class="ct-section">
-        <h2>{data.strategy.heading}</h2>
-        <p class="ct-body" set:html={rich(data.strategy.lead)} />
-        {data.strategy.groups.map((g) => (
-          <>
-            <h3>{g.heading}</h3>
-            <ul class="ct-steps">
-              {g.steps.map((s) => (
-                <li class="ct-step" data-state={s.state}><b>{s.label}</b>{s.text}</li>
-              ))}
-            </ul>
-          </>
-        ))}
-      </section>
-
-      <section class="ct-section" data-state={data.outcome.state}>
-        <h2>{data.outcome.heading}</h2>
-        <p class="ct-body" set:html={rich(data.outcome.body)} />
-        <p class="ct-body ct-inside-lead">{data.outcome.insideLead}</p>
-        <ul class="ct-inside">
-          {data.outcome.inside.map((item) => <li>{item}</li>)}
-        </ul>
-
-        <div class="ct-gate" data-gate data-hash={CASE_PASSWORD_SHA256} data-dev={dev ? '1' : undefined}>
-          <p class="ct-gate__text">{data.outcome.gate}</p>
-          <button class="cta cta--primary" type="button" data-gate-open aria-expanded="false" aria-controls="full">{data.outcome.cta}</button>
-          <form class="ct-gate__form" data-gate-form hidden>
-            <label class="ct-gate__label" for="case-pass">Password</label>
-            <div class="ct-gate__row">
-              <input class="ct-gate__input" id="case-pass" name="password" type="password" autocomplete="current-password" required />
-              <button class="cta cta--secondary" type="submit">Open</button>
-            </div>
-            <p class="ct-gate__msg" data-gate-msg role="status" aria-live="polite"></p>
-          </form>
-        </div>
-      </section>
-
-      <section class="ct-full" id="full" aria-labelledby="full-title" hidden>
-        <h2 class="sr-only" id="full-title" tabindex="-1">The full case study</h2>
-        {data.experiments.map((e) => (
-          <article class="ct-exp" data-state={e.state}>
-            <div class="ct-exp__head">
-              <h3>{e.title}</h3>
-              {e.status && <p class="ct-exp__status">{e.status}</p>}
-            </div>
-            <div class="ct-exp__part"><p class="ct-exp__label">Why</p><p class="ct-body" set:html={rich(e.why)} /></div>
-            {e.how && <div class="ct-exp__part"><p class="ct-exp__label">How</p><p class="ct-body" set:html={rich(e.how)} /></div>}
-            {e.worked && <div class="ct-exp__part"><p class="ct-exp__label">What worked</p><p class="ct-body" set:html={rich(e.worked)} /></div>}
-          </article>
-        ))}
-      </section>
+        </section>
+      )}
     </div>
 
-    <aside class="ct-panel" aria-label="Card preview" data-case-panel>
+    <aside class:list={['ct-panel', { 'ct-panel--live': live }]} aria-label={data.panelLabel ?? 'Preview'} data-case-panel data-map={JSON.stringify(stateToShot)}>
       <div class="ct-pane glass">
         <span class="bolt bolt--tl" aria-hidden="true"></span>
         <span class="bolt bolt--tr" aria-hidden="true"></span>
         <span class="bolt bolt--bl" aria-hidden="true"></span>
         <span class="bolt bolt--br" aria-hidden="true"></span>
         <div class="ct-stage">
-          <div class="ct-phone">
-            {shots.map((state, i) => (
-              <Image
-                class="ct-screen"
-                data-screen={state}
-                src={screens[state]}
-                alt={data.screens[state]}
-                widths={[360, 720]}
-                sizes="360px"
-                loading={i < 2 ? 'eager' : 'lazy'}
-              />
-            ))}
-            {dev && <p class="ct-phone__dev" data-dev-label></p>}
-            {/* phones only: the mini phone opens the screen full size */}
-            <button class="ct-pip__enlarge" type="button" aria-label="Enlarge the preview" data-pip-enlarge></button>
-          </div>
+          {live ? (
+            <div class="ct-live"><slot name="preview" /></div>
+          ) : (
+            <div class="ct-phone">
+              {shots.map((key, i) => (
+                <Image
+                  class="ct-screen"
+                  data-screen={key}
+                  src={library[key]}
+                  alt={altFor(key)}
+                  widths={[360, 720]}
+                  sizes="360px"
+                  loading={i < 2 ? 'eager' : 'lazy'}
+                />
+              ))}
+              {dev && <p class="ct-phone__dev" data-dev-label></p>}
+              {/* phones only: the mini phone opens the screen full size */}
+              <button class="ct-pip__enlarge" type="button" aria-label="Enlarge the preview" data-pip-enlarge></button>
+            </div>
+          )}
           <button class="ct-pip__close" type="button" aria-label="Hide the preview" data-pip-close><span aria-hidden="true">×</span></button>
         </div>
       </div>
@@ -152,10 +180,12 @@ const dek = rich(data.dek).replace('{250m}', sourceLink);
   </div>
   <span class="ct-end" data-case-end aria-hidden="true"></span>
   <button class="ct-pip__restore cta cta--secondary" type="button" data-pip-restore hidden>Show preview</button>
-  <dialog class="ct-zoom" data-pip-zoom aria-label="Card preview, enlarged">
-    <img class="ct-zoom__img" data-pip-zoom-img alt="" />
-    <button class="ct-zoom__close" type="button" aria-label="Close the enlarged preview" data-pip-zoom-close><span aria-hidden="true">×</span></button>
-  </dialog>
+  {!live && (
+    <dialog class="ct-zoom" data-pip-zoom aria-label="Preview, enlarged">
+      <img class="ct-zoom__img" data-pip-zoom-img alt="" />
+      <button class="ct-zoom__close" type="button" aria-label="Close the enlarged preview" data-pip-zoom-close><span aria-hidden="true">×</span></button>
+    </dialog>
+  )}
 </div>
 
 <script>
@@ -167,9 +197,12 @@ const dek = rich(data.dek).replace('{250m}', sourceLink);
   const panel = document.querySelector<HTMLElement>('[data-case-panel]');
   const root = document.querySelector<HTMLElement>('.ct');
   if (panel && root) {
-    const shots = new Map(
+    const byKey = new Map(
       [...panel.querySelectorAll<HTMLElement>('[data-screen]')].map((el) => [el.dataset.screen!, el])
     );
+    // state → its screen, resolved at build time (data-map); empty in live mode
+    const stateMap: Record<string, string> = JSON.parse(panel.dataset.map || '{}');
+    const shots = { get: (state: string) => byKey.get(stateMap[state]) };
     const devLabel = panel.querySelector<HTMLElement>('[data-dev-label]');
     const triggers = [...root.querySelectorAll<HTMLElement>('[data-state]')];
     // A state with no screen yet shows the nearest earlier state's screen, in
@@ -191,6 +224,8 @@ const dek = rich(data.dek).replace('{250m}', sourceLink);
       current = trigger;
       const state = trigger.dataset.state!;
       panel.dataset.showing = state;
+      // a live preview (a running tool in the slot) follows along by event
+      document.dispatchEvent(new CustomEvent('case:state', { detail: { state } }));
       const own = shots.get(state);
       const next = own ?? fallback.get(trigger) ?? null;
       if (devLabel) devLabel.textContent = own ? '' : `No screen yet: ${state}`;
@@ -277,7 +312,7 @@ const dek = rich(data.dek).replace('{250m}', sourceLink);
     const zoom = document.querySelector<HTMLDialogElement>('[data-pip-zoom]');
     const zoomImg = document.querySelector<HTMLImageElement>('[data-pip-zoom-img]');
     const zoomClose = document.querySelector<HTMLButtonElement>('[data-pip-zoom-close]');
-    if (panelEl && heroEl && endEl && restore && close && enlarge && zoom && zoomImg && zoomClose) {
+    if (panelEl && heroEl && endEl && restore && close) {
       const phone = window.matchMedia('(max-width: 767.98px)');
       let heroGone = false;
       let atEnd = false;
@@ -292,19 +327,22 @@ const dek = rich(data.dek).replace('{250m}', sourceLink);
       phone.addEventListener('change', sync);
 
       close.addEventListener('click', () => { dismissed = true; sync(); restore.focus(); });
-      restore.addEventListener('click', () => { dismissed = false; sync(); enlarge.focus(); });
+      restore.addEventListener('click', () => { dismissed = false; sync(); (enlarge ?? close).focus(); });
 
-      enlarge.addEventListener('click', () => {
-        const on = panelEl.querySelector<HTMLImageElement>('.ct-screen.is-on');
-        if (!on) return;
-        zoomImg.src = on.currentSrc || on.src;
-        zoomImg.alt = on.alt;
-        zoom.showModal();
-      });
-      zoomClose.addEventListener('click', () => zoom.close());
-      // a tap on the dimmed backdrop closes it too
-      zoom.addEventListener('click', (event) => { if (event.target === zoom) zoom.close(); });
-      zoom.addEventListener('close', () => enlarge.focus());
+      // screens mode only: a live tool has no single screen to enlarge
+      if (enlarge && zoom && zoomImg && zoomClose) {
+        enlarge.addEventListener('click', () => {
+          const on = panelEl.querySelector<HTMLImageElement>('.ct-screen.is-on');
+          if (!on) return;
+          zoomImg.src = on.currentSrc || on.src;
+          zoomImg.alt = on.alt;
+          zoom.showModal();
+        });
+        zoomClose.addEventListener('click', () => zoom.close());
+        // a tap on the dimmed backdrop closes it too
+        zoom.addEventListener('click', (event) => { if (event.target === zoom) zoom.close(); });
+        zoom.addEventListener('close', () => enlarge.focus());
+      }
     }
   }
 
@@ -503,6 +541,11 @@ const dek = rich(data.dek).replace('{250m}', sourceLink);
   }
   .ct-note p { margin: 0; font-size: var(--text-note); font-weight: 500; line-height: var(--lh-heading); }
   .ct-note small { display: block; margin-top: var(--space-3); font-family: var(--font-paper); font-size: var(--text-small); color: var(--ink-900); }
+  /* a paragraph after a tilted note clears its corner by a group step */
+  .ct-note + .ct-body { margin-top: var(--space-6); }
+
+  /* live mode: a running tool fills the stage; the tool sizes its own frame */
+  .ct-live { position: relative; width: 100%; height: 100%; }
 
   .ct-inside-lead { margin-top: var(--space-6); }
   .ct-inside {
