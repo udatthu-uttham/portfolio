@@ -137,6 +137,20 @@ measurements; plans/016, /018 and /023 are superseded on this point.
 
 On the homepage, each section pads half a section gap at both ends (`--section-pad`); never give one section the whole `--section-y` on either side, or the boundary doubles. A section's heading sits `--head-gap` (24px) above its board, and the board adds `--tape-overhang` (48px) of its own — 72px in total, against a 96–160px section gap, so the heading reads as belonging to what follows it. The tape overhangs a sheet's top edge by ~16.5px, which is the floor that board padding has to beat; at 24px only 7.5px of paper showed above the tape and the heading looked glued to the cards. Case details use compact-section spacing because they support the artwork immediately above.
 
+**Case-study teaser pages run on the homepage ladder, stepped up for reading** (2026-10-01, Uttham: "as the reference website shared, make sure there is lot of spacing… it should match that system"; plans/029). The bus-discovery reference pads each chapter 80px top and bottom (160 apart), its heading 18px over the text, its intro 32–48px over what follows. `CaseTeaser.astro` (both case studies, and the AI Space tool pages):
+
+| Gap | Token | 375 / 1280 / 1440 |
+| --- | --- | --- |
+| Below the header | `--section-pad` | 48 / 70 / 79 |
+| Hero → story, section → section, story → More cases, full-study block → block | `--section-y` | 96 / 141 / 158 |
+| Heading → its text | `--head-gap` | 24 |
+| Text → a sub-group (rows, note, list, gate card), and above a sub-group heading | `--ct-sub` = `max(--group-gap, --space-6)` | 32 / 45 / 48 |
+| Sub-group heading → its rows; paragraph → paragraph | `--space-4` | 16 |
+| Row padding / row label → its line | `--space-5` / `--space-2` | 24 / 8 |
+| Gate card inset | `--card-padding` | 16 / 28 / 32 |
+
+Each is a clear step under the one above at every width (the `--space-6` floor keeps a sub-group heading 2:1 over its rows on phones, where `--group-gap` alone is 24). These pages used `--section-y-sm` between sections until this pass; it stays the rung for the old chapter template only.
+
 The hero statement fills the glass panel's padded content width. Its portrait tucks 32px behind the glass and sits 64px from the panel's left edge, clear of the corner bolts. Panel top and bottom padding follows the hardware rules below. The scene and its handwritten explanation form one figure: caption first, artwork 12px below it, with a shared left edge. Its width follows whole foundation columns, as described below. Contact notes share the same size, and the photo group reserves 32px above its frame for the attached badge.
 
 **The hi! sticker is stuck onto the portrait's top-right corner** (2026-10-01, superseding the 2026-09-19 "a third on the photo, two thirds on the board" placement, which measured under 1% of the bubble on the print). `--hi-size: clamp(52px, 5vw, 72px)`; offsets `top: −0.25 × --hi-size`, `right: −0.42 × --hi-size` (were −0.22 / −0.8), which puts ~40% of the painted bubble over the print and 15–22% over the image, well right of the face, at every size. `--hello-w: clamp(120px, 13vw, 164px)` names the portrait's width so the sticker can pivot on the print's centre during the develop shake; the sticker's 12deg tilt and `--drop-stuck` live on `.hi-bubble`, leaving its wrapper free to turn with the print.

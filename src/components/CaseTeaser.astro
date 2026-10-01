@@ -57,6 +57,11 @@ const sourceLink = data.source
   ? `<a class="ct-source" href="${data.source.href}" target="_blank" rel="noopener" title="${data.source.title}">${data.source.label}</a>`
   : '';
 const dek = rich(data.dek).replace('{source}', sourceLink);
+
+// Every section and full-study block gets an id, so the scroll points can jump
+// to it. Prefixed, so none can collide with the homepage scrollspy's about /
+// work / ai / contact.
+const idFor = (text: string) => `s-${text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`;
 ---
 
 <div class="ct">
@@ -76,7 +81,7 @@ const dek = rich(data.dek).replace('{source}', sourceLink);
   <div class="ct-layout">
     <div class="ct-story">
       {data.sections.map((section) => (
-        <section class="ct-section" data-state={section.state}>
+        <section class="ct-section" id={idFor(section.heading)} data-state={section.state}>
           <h2>{section.heading}</h2>
           {section.blocks.map((block) =>
             block.kind === 'p' ? (
@@ -132,7 +137,7 @@ const dek = rich(data.dek).replace('{source}', sourceLink);
         <section class="ct-full" id="full" aria-labelledby="full-title" hidden>
           <h2 class="sr-only" id="full-title" tabindex="-1">The full case study</h2>
           {data.experiments!.map((e) => (
-            <article class="ct-exp" data-state={e.state}>
+            <article class="ct-exp" id={idFor(e.title)} data-state={e.state}>
               <div class="ct-exp__head">
                 <h3>{e.title}</h3>
                 {e.status && <p class="ct-exp__status">{e.status}</p>}
@@ -178,6 +183,31 @@ const dek = rich(data.dek).replace('{source}', sourceLink);
       </div>
     </aside>
   </div>
+  {/* Scroll points (Uttham, 2026-10-01: "section type scroll points, that we
+      see in chatgpt and reference portfolio… so I can swiftly navigate inside
+      the page"): a tick per section in the right gutter, the one being read
+      drawn longer and darker; hover or focus opens the names; a click jumps.
+      The full study's blocks join once it is opened. */}
+  <nav class="ct-points" aria-label="On this page" data-points>
+    <ol class="ct-points__list">
+      {data.sections.map((section) => (
+        <li>
+          <a class="ct-points__link" href={`#${idFor(section.heading)}`} data-point>
+            <span class="ct-points__label">{section.heading}</span>
+            <span class="ct-points__tick" aria-hidden="true"></span>
+          </a>
+        </li>
+      ))}
+      {hasFull && data.experiments!.map((e) => (
+        <li class="ct-points__full" hidden>
+          <a class="ct-points__link" href={`#${idFor(e.title)}`} data-point>
+            <span class="ct-points__label">{e.title}</span>
+            <span class="ct-points__tick" aria-hidden="true"></span>
+          </a>
+        </li>
+      ))}
+    </ol>
+  </nav>
   <span class="ct-end" data-case-end aria-hidden="true"></span>
   <button class="ct-pip__restore cta cta--secondary" type="button" data-pip-restore hidden>Show preview</button>
   {!live && (
@@ -346,6 +376,41 @@ const dek = rich(data.dek).replace('{source}', sourceLink);
     }
   }
 
+  // ---- scroll points: which section is being read --------------------------
+  // The current point is the last section whose top has passed 40% of the
+  // screen — re-checked each scroll frame, and when the full study opens (its
+  // blocks join the rail then).
+  {
+    const nav = document.querySelector<HTMLElement>('[data-points]');
+    if (nav) {
+      const links = [...nav.querySelectorAll<HTMLAnchorElement>('a[data-point]')];
+      const targets = links.map((a) => document.getElementById(decodeURIComponent(a.hash.slice(1))));
+      let current: HTMLAnchorElement | null = null;
+      const update = () => {
+        const line = innerHeight * 0.4;
+        let next: HTMLAnchorElement | null = null;
+        targets.forEach((t, i) => {
+          if (t && !t.closest('[hidden]') && t.getBoundingClientRect().top <= line) next = links[i];
+        });
+        if (next === current) return;
+        current?.removeAttribute('aria-current');
+        (next as HTMLAnchorElement | null)?.setAttribute('aria-current', 'location');
+        current = next;
+      };
+      let frame = 0;
+      window.addEventListener('scroll', () => {
+        if (frame) return;
+        frame = requestAnimationFrame(() => { frame = 0; update(); });
+      }, { passive: true });
+      window.addEventListener('resize', update);
+      document.addEventListener('case:full-open', () => {
+        nav.querySelectorAll<HTMLElement>('.ct-points__full').forEach((li) => { li.hidden = false; });
+        update();
+      });
+      update();
+    }
+  }
+
   // ---- the light gate ------------------------------------------------------
   // Uttham chose a light gate (2026-10-01): a speed bump, not protection — the
   // full study is in the page. The password is compared by its SHA-256, which
@@ -408,9 +473,11 @@ const dek = rich(data.dek).replace('{source}', sourceLink);
     z-index: 1;
     width: min(calc(100% - var(--margin-side) * 2), var(--container-max));
     margin: 0 auto;
-    /* the case page's chapter rung before "More cases" — what the old page's
-       details section gave it */
-    padding-bottom: var(--section-y-sm);
+    /* a whole section gap before "More cases", as between every section */
+    padding-bottom: var(--section-y);
+    /* the sub-group step: --group-gap, floored at --space-6 so a group heading
+       keeps 2:1 over its 16px to its rows even where --group-gap is 24 */
+    --ct-sub: max(var(--group-gap), var(--space-6));
   }
 
   /* ---- hero: the case page's own entrance, the reference's content ---- */
@@ -455,7 +522,7 @@ const dek = rich(data.dek).replace('{source}', sourceLink);
   .ct-facts {
     max-width: 600px;
     margin: var(--group-gap) 0 0;
-    padding: var(--space-4) 0;
+    padding: var(--space-5) 0;
     display: grid;
     gap: var(--space-2);
     border-block: 1px dashed var(--line-mark);
@@ -471,8 +538,22 @@ const dek = rich(data.dek).replace('{source}', sourceLink);
   .ct-facts dd { margin: 0; color: var(--ink-900); font-size: var(--text-body); line-height: var(--lh-body); }
 
   /* ---- the reading column and the phone beside it ---- */
-  .ct-layout { margin-top: var(--section-y-sm); }
-  .ct-story { display: grid; gap: var(--section-y-sm); min-width: 0; }
+  /* THE SPACING LADDER, the homepage's own (CLAUDE.md), stepped up for reading
+     — Uttham, 2026-10-01: "as the reference website shared, make sure there is
+     lot of spacing… it should match that system". The reference pads each
+     chapter 80px top and bottom (160 apart), heading 18px over its text, intro
+     32–48px over what follows. Here:
+       between sections, hero → story, story → More cases   --section-y (96–160)
+       heading → its text                                    --head-gap (24)
+       text → a sub-group (rows, note, list, gate), and
+       above a sub-group's heading              --ct-sub: --group-gap, ≥32 (32–48)
+       sub-group heading → its rows                          --space-4 (16)
+       paragraph → paragraph                                 --space-4 (16)
+       row padding / label → line                            --space-5 / --space-2
+     Each step is a clear step under the one above, so a heading always sits
+     nearer its own text than the section before it (law of proximity). */
+  .ct-layout { margin-top: var(--section-y); }
+  .ct-story { display: grid; gap: var(--section-y); min-width: 0; }
   .ct-section, .ct-full { min-width: 0; }
   h2 {
     margin: 0;
@@ -483,7 +564,7 @@ const dek = rich(data.dek).replace('{source}', sourceLink);
     text-wrap: balance;
   }
   h3 {
-    margin: var(--space-6) 0 0;
+    margin: var(--ct-sub) 0 0;
     font-size: var(--text-h4);
     font-weight: 600;
     letter-spacing: var(--track-heading);
@@ -491,7 +572,7 @@ const dek = rich(data.dek).replace('{source}', sourceLink);
   }
   .ct-body {
     max-width: 62ch;
-    margin: var(--space-3) 0 0;
+    margin: var(--space-4) 0 0;
     color: var(--ink-600);
     font-size: var(--text-body);
     line-height: var(--lh-body);
@@ -503,23 +584,25 @@ const dek = rich(data.dek).replace('{source}', sourceLink);
   /* Ruled rows, the case index's dashed recipe: the label on its own line, the
      line under it. The row being read takes an amber tick in the gutter —
      colour only, nothing moves. */
-  .ct-steps { margin: var(--space-3) 0 0; padding: 0; list-style: none; }
+  h2 + .ct-body { margin-top: var(--head-gap); }
+  .ct-steps { margin: var(--ct-sub) 0 0; padding: 0; list-style: none; }
+  h3 + .ct-steps { margin-top: var(--space-4); }
   .ct-step {
     position: relative;
-    padding: var(--space-4) 0;
+    padding: var(--space-5) 0;
     border-top: 1px dashed var(--line-mark);
     color: var(--ink-600);
     font-size: var(--text-body);
     line-height: var(--lh-body);
   }
   .ct-step:last-child { border-bottom: 1px dashed var(--line-mark); }
-  .ct-step b { display: block; margin-bottom: var(--space-1); color: var(--ink-900); font-weight: 600; }
+  .ct-step b { display: block; margin-bottom: var(--space-2); color: var(--ink-900); font-weight: 600; }
   .ct-step::before {
     content: '';
     position: absolute;
     left: calc(-1 * var(--space-4));
-    top: var(--space-4);
-    bottom: var(--space-4);
+    top: var(--space-5);
+    bottom: var(--space-5);
     width: 2px;
     background: transparent;
     transition: background-color var(--dur-2) var(--ease-standard);
@@ -529,7 +612,7 @@ const dek = rich(data.dek).replace('{source}', sourceLink);
   /* the verbatim, once consent is confirmed: the case page's sticky note */
   .ct-note {
     max-width: 34ch;
-    margin: var(--space-6) 0 0 var(--space-4);
+    margin: var(--ct-sub) 0 0 var(--space-4);
     padding: var(--space-5) var(--space-5) var(--space-4);
     background: var(--amber-400);
     border: 1px solid var(--line-1);
@@ -542,16 +625,16 @@ const dek = rich(data.dek).replace('{source}', sourceLink);
   .ct-note p { margin: 0; font-size: var(--text-note); font-weight: 500; line-height: var(--lh-heading); }
   .ct-note small { display: block; margin-top: var(--space-3); font-family: var(--font-paper); font-size: var(--text-small); color: var(--ink-900); }
   /* a paragraph after a tilted note clears its corner by a group step */
-  .ct-note + .ct-body { margin-top: var(--space-6); }
+  .ct-note + .ct-body { margin-top: var(--ct-sub); }
 
   /* live mode: a running tool fills the stage; the tool sizes its own frame */
   .ct-live { position: relative; width: 100%; height: 100%; }
 
-  .ct-inside-lead { margin-top: var(--space-6); }
+  .ct-inside-lead { margin-top: var(--ct-sub); }
   .ct-inside {
     display: grid;
     gap: var(--space-2);
-    margin: var(--space-2) 0 0;
+    margin: var(--space-3) 0 0;
     padding: 0 0 0 var(--space-4);
     list-style: '— ';
     color: var(--ink-600);
@@ -565,7 +648,7 @@ const dek = rich(data.dek).replace('{source}', sourceLink);
   .ct-gate {
     position: relative;
     max-width: 560px;
-    margin-top: var(--space-6);
+    margin-top: var(--ct-sub);
     padding: var(--card-padding);
     display: grid;
     justify-items: start;
@@ -606,9 +689,9 @@ const dek = rich(data.dek).replace('{source}', sourceLink);
   .ct-gate__msg { min-height: calc(var(--text-small) * var(--lh-body)); margin: 0; color: var(--ink-900); font-size: var(--text-small); }
 
   /* ---- the full case study: one block per experiment, on paper ---- */
-  .ct-full { display: grid; gap: var(--section-y-sm); scroll-margin-top: calc(var(--header-height) + var(--content-gap)); }
+  .ct-full { display: grid; gap: var(--section-y); scroll-margin-top: calc(var(--header-height) + var(--content-gap)); }
   .ct-full[hidden] { display: none; }
-  .ct-exp { display: grid; gap: var(--space-4); }
+  .ct-exp { display: grid; gap: var(--space-6); }
   .ct-exp__head { display: grid; justify-items: start; gap: var(--space-3); }
   .ct-exp__head h3 { margin: 0; font-size: var(--text-h3); }
   /* status as the case index's pill — the one place a pill belongs */
@@ -623,7 +706,7 @@ const dek = rich(data.dek).replace('{source}', sourceLink);
     letter-spacing: var(--track-label);
     text-transform: uppercase;
   }
-  .ct-exp__part { display: grid; gap: var(--space-1); }
+  .ct-exp__part { display: grid; gap: var(--space-2); }
   .ct-exp__part .ct-body { margin: 0; }
   .ct-exp__label {
     margin: 0;
@@ -681,6 +764,85 @@ const dek = rich(data.dek).replace('{source}', sourceLink);
     letter-spacing: var(--track-label);
     text-transform: uppercase;
     text-align: center;
+  }
+
+  /* ---- scroll points: a rail of ticks in the right gutter ---- */
+  .ct-section, .ct-exp { scroll-margin-top: calc(var(--header-height) + var(--content-gap)); }
+  .ct-points { display: none; }
+  @media (min-width: 768px) {
+    .ct-points {
+      /* the rail's inner padding; halved on the 8-column grid, where the
+         gutter is 40px, so the rail's box never reaches the phone pane */
+      --pt-pad: var(--space-4);
+      display: block;
+      position: fixed;
+      top: 50%;
+      /* centred in the gutter beside the container, clear of the phone pane */
+      /* the list's own 16px padding sits inside this, so the ticks end up
+         centred in the gutter */
+      right: max(0px, calc((var(--margin-side) - var(--space-5)) / 2 - var(--pt-pad)));
+      translate: 0 -50%;
+      z-index: var(--z-float);
+    }
+    .ct-points__list {
+      display: grid;
+      justify-items: end;
+      gap: var(--space-1);
+      margin: 0;
+      /* the same padding open and closed, so opening never shifts the ticks */
+      padding: var(--space-3) var(--pt-pad);
+      list-style: none;
+      border: 1px solid transparent;
+      border-radius: var(--radius-sm);
+      transition: background-color var(--dur-2) var(--ease-standard), border-color var(--dur-2) var(--ease-standard), box-shadow var(--dur-2) var(--ease-standard);
+    }
+    .ct-points__full[hidden] { display: none; }
+    /* a hit area taller than the tick: 24px per point */
+    .ct-points__link {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: var(--space-3);
+      min-height: var(--space-5);
+      color: var(--ink-600);
+      font-size: var(--text-small);
+      line-height: var(--lh-heading);
+      text-decoration: none;
+    }
+    .ct-points__tick {
+      flex: none;
+      width: var(--space-3);
+      height: 2px;
+      background: var(--line-mark);
+      transition: background-color var(--dur-2) var(--ease-standard);
+    }
+    /* the section being read: a longer, darker tick (state, not hover) */
+    .ct-points__link[aria-current='location'] { color: var(--ink-900); font-weight: 600; }
+    .ct-points__link[aria-current='location'] .ct-points__tick { width: var(--space-5); background: var(--ink-900); }
+    /* closed, the names take no room (so the rail never covers the page) but
+       stay in the accessibility tree; open on hover or focus, on a paper card */
+    .ct-points__label {
+      max-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity var(--dur-2) var(--ease-standard);
+    }
+    .ct-points:is(:hover, :focus-within) .ct-points__list {
+      background: var(--paper-1);
+      border-color: var(--line-1);
+      box-shadow: var(--shadow-rest);
+    }
+    .ct-points:is(:hover, :focus-within) .ct-points__label { max-width: 26ch; opacity: 1; text-overflow: ellipsis; }
+    @media (hover: hover) and (pointer: fine) {
+      .ct-points__link:hover { color: var(--ink-900); }
+      .ct-points__link:hover .ct-points__tick { background: var(--ink-600); }
+      .ct-points__link[aria-current='location']:hover .ct-points__tick { background: var(--ink-900); }
+    }
+    .ct-points__link:focus-visible { outline: 2px solid var(--amber-text); outline-offset: 2px; }
+  }
+  @media (min-width: 768px) and (max-width: 900px) {
+    .ct-points { --pt-pad: var(--space-2); }
   }
 
   /* the mini-player controls exist only on phones */
