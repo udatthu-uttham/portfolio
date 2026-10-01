@@ -938,8 +938,11 @@ const principles = [
 
   .contact-panel {
     position: relative;
+    /* A size container, so the photo can be capped by the width the notes
+       leave as well as by the screen's height (see --photo-w). */
+    container: contact / inline-size;
     display: grid;
-    /* the body takes the width; the photo column is only as wide as the photo and its badges */
+    /* the body takes the width; the photo column is only as wide as the photo */
     grid-template-columns: minmax(0, 1fr) auto;
     gap: var(--group-gap);
     align-items: center;
@@ -964,7 +967,13 @@ const principles = [
        The two moto badges came off the photo on 2026-10-01 ("for now remove
        the stickers") along with the space reserved for them; MotoSticker.astro
        is kept so they are one import away from coming back. */
-    --photo-w: clamp(170px, calc((100svh - var(--header-height) - var(--section-y) - 400px) / 1.07), 340px);
+    /* …and never wider than what the three notes leave. Sized off height alone,
+       a tall but narrow window (~1050px wide) grew the photo to its cap and
+       slid it over the third note (2026-10-01). The notes measure 530px at
+       their narrowest (213 + 136 + 133 + two 24px gaps); 560 keeps a margin
+       for Caveat's wider labels. 100cqw is the panel's content width. */
+    --notes-min: 560px;
+    --photo-w: clamp(150px, min(calc((100svh - var(--header-height) - var(--section-y) - 400px) / 1.07), calc(100cqw - var(--notes-min) - var(--group-gap))), 340px);
   }
 
   .contact-panel__photo :global(.instax) {
@@ -1048,6 +1057,18 @@ const principles = [
   .note-link:focus-visible {
     outline: 2px solid var(--amber-text);
     outline-offset: var(--space-1);
+  }
+
+  /* Hover: the note straightens, lifts and casts a deeper shadow — the
+     original rule, restored on 2026-10-01 at Uttham's request ("the hover
+     animations on these cards are also gone"). It had been retired with the
+     2026-09-20 no-hover-motion pass; this supersedes that for the notes. */
+  @media (hover: hover) and (pointer: fine) {
+    .note-link:hover {
+      rotate: 0deg;
+      translate: 0 var(--lift-y);
+      box-shadow: var(--shadow-lift);
+    }
   }
 
   /* Pressed flat: tilt returns, lift gone, shadow shrinks. */
@@ -1144,8 +1165,10 @@ const principles = [
     }
   }
 
-  @media (max-width: 900px) {
-    /* the panel stacks: notes first, then the photo centred beneath them */
+  @media (max-width: 960px) {
+    /* The panel stacks: notes first, then the photo centred beneath them.
+       At 960px, not 900: below this the three notes and even a 150px photo
+       no longer fit side by side (the notes need 560 of a ~780px panel). */
     .contact-panel { grid-template-columns: 1fr; }
     .contact-panel__photo { --photo-w: 240px; justify-self: center; }
   }
@@ -1175,6 +1198,6 @@ const principles = [
 
   @media (prefers-reduced-motion: reduce) {
     .rv, .rv.is-in, .tile:active, .tile:hover .tile__arr { transform: none; }
-    .note-link:active { rotate: var(--note-tilt); translate: none; }
+    .note-link:hover, .note-link:active { rotate: var(--note-tilt); translate: none; }
   }
 </style>

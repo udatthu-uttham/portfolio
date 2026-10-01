@@ -45,10 +45,17 @@ hover** (Uttham, 2026-09-20, late — this reinstates the tilt after it was reti
 earlier the same day). `initMagneticTiles` in `src/scripts/motion.js` drives any
 element carrying `data-magnetic`: pivot at the taped top edge, the free area
 lifts toward the pointer, fine pointers only, reduced motion respected. Instax
-photos, stickers and notes never lift, tilt, straighten or peel — with the one
+photos and stickers never lift, tilt, straighten or peel — with the one
 exception below; the `magnetic` prop on `InstaxFrame` stays retired. Other hover
 states are colour, border and the arrow nudge only. Entrance reveals and the
 pointer ride are unaffected.
+
+**The contact notes lift on hover again** (Uttham, 2026-10-01: "the hover
+animations on these cards are also gone, please fix them"). On a fine pointer a
+note **straightens to 0°, rises `--lift-y` (2px) and takes `--shadow-lift`**;
+pressing it returns the tilt and flattens the shadow; reduced motion keeps the
+tilt and drops the lift. This is the original rule from before the 2026-09-20
+no-hover pass, restored as it was — not a new one.
 
 **The one exception is the hero portrait, which develops** (Uttham, 2026-10-01:
 "make it grey, and once people hover, we can have the instax effect of shaking
