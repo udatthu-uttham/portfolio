@@ -20,6 +20,12 @@ const {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <!-- The header's avatar, cropped square to the head so it still reads as a
+         face at 16px. The touch icon sits on the white sheet stock (--paper-1): iOS paints a
+         transparent icon black. -->
+    <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <!-- scroll-reveal content starts at opacity 0 for the IntersectionObserver;
          without JS nothing would ever un-hide it -->
     <noscript>

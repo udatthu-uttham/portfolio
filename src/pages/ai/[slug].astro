@@ -25,6 +25,16 @@ const tool = tools.find((t) => t.slug === guide.slug);
       <h1>{guide.title}</h1>
       <p class="guide__intro" set:html={rich(guide.intro)} />
 
+      {/* How it helps the team: Uttham's own lines, moved here from the
+          homepage card on 2026-10-01 so the card stays a name, a line and a
+          phone. Same source as before (tools.ts), every word. */}
+      {tool && tool.helps.length > 0 && (
+        <section>
+          <h2 class="eyebrow">How it helps</h2>
+          <ul>{tool.helps.map((line) => <li set:html={rich(line)} />)}</ul>
+        </section>
+      )}
+
       <div class="guide__cols">
         <section>
           <h2 class="eyebrow">What you get</h2>

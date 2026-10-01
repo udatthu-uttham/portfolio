@@ -140,8 +140,9 @@ Two costs, stated so nobody "fixes" them by accident:
   and AI Space sheet gets `--sheet-in` of content height — the budget less the
   section's chrome and the sheet's padding, clamped 360–480px — and the picture
   takes what the copy leaves. Below the floor the section grows instead of the
-  phone shrinking, so AI Space runs ~38px past one screen at 1280×800 and both
-  run over at 1280×720 (plans/025 has the table). That is the trade, not a bug.
+  phone shrinking, so Projects and AI Space run a little over at 1280×720;
+  Contact does too, by 11px, from its photo and notes rather than a sheet
+  (plans/025 has the table). That is the trade, not a bug.
 
 The full table and what supersedes what live in `docs/design-tokens.md`; the
 ladder pass is `plans/023`, the screen contract is `plans/024`. Re-measure
@@ -193,16 +194,35 @@ the case pages, the guide pages and the case index. The old "two cards, never
 three" cap is lifted (2026-10-01: "lets change that rule to 3"); each section
 has two sheets today.
 
-How the two differ, because their content does: **a case sheet stacks** — title,
-lead, the well, the action — and on a laptop its well takes the height the copy
-leaves, so the cover sits as a card on the pane; **a tool sheet sets its copy on
-the left and its phone on the right** wherever the sheet is at least 540px wide
-(the phone column is `clamp(220px, 40cqw, 280px)`), and stacks like a case sheet
-below that. The well holds **one phone standing flush on the bottom edge and
+**A tool card is its name, its one line, the phone and the copy action —
+nothing else** (Uttham, 2026-10-01: "remove the explanation on the main AI space
+cards to optimise content, these descriptions can be in l2 page"). The "how it
+helps" lines live on the tool's guide page, `/ai/<slug>`, word for word under
+"How it helps", and **the whole card opens that page** the way a case card opens
+its case: the title's link stretches over the sheet, and the copy action and the
+prototype's phone link sit above it. No visible "read more" was added — the
+action row stays "just Copy the plan, nothing else here".
+
+How the two differ: **a case sheet stacks** — title, lead, the well, the action —
+and on a laptop its well takes the height the copy leaves, so the cover sits as a
+card on the pane; **a tool sheet sets its copy on the left and its phone on the
+right** wherever the sheet is at least 540px wide (the phone column is
+`clamp(220px, 40cqw, 280px)`), with the name, line and action **one block centred
+against the phone's glass well**, and stacks like a case sheet below that. The well holds **one phone standing flush on the bottom edge and
 nothing else** — no step list, no page list, no caption beside it — and the phone
 is as tall as the well, so it takes a handset's proportions rather than a fixed
 9/15. Keep the two sections within sight of each other in height: if a card is
 running long, take it out of the layout, not out of the copy.
+
+## Favicon: the header avatar
+
+**The site's favicon is the header avatar** (Uttham, 2026-10-01: "use the header
+icon as website favicon too"), generated from `public/assets/avatar.png`: cropped
+square to the head (the collar goes) so it still reads as a face at 16px.
+`favicon.ico` (16/32/48) and `favicon-192.png` are transparent;
+`apple-touch-icon.png` (180×180, opaque) sits on `--paper-1`, the white sheet
+stock, with an 8% margin, because iOS paints a transparent touch icon black. Linked once, in `src/layouts/Base.astro`. If the avatar changes,
+regenerate all three from it — never draw a separate mark.
 
 ## Uttham's copy is Uttham's
 

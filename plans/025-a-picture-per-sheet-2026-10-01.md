@@ -66,9 +66,36 @@ Also confirmed:
 - The tilt runs on each sheet at its own 4° / 2.5°.
 - The production build passes (5 pages).
 
+## Later the same day: the tool card loses its answers
+
+Uttham: "remove the explanation on the main AI space cards to optimise content, these
+descriptions can be in l2 page".
+
+- The three "how it helps" lines left the homepage card. They now sit on `/ai/<slug>` under
+  "How it helps", between the intro and "What you get". They are rendered from the same
+  `tools.ts` `helps` array, so the words are unchanged.
+- **The card opens the guide.** Nothing on the card linked to `/ai/<slug>`; the action row had
+  been cut to the copy button on Uttham's word. So the title's link stretches over the whole
+  sheet, as a case card is one link. Only the controls rise above it — the copy button, and the
+  prototype's well with `pointer-events: none` everywhere but its phone (a size container is its
+  own stacking context, so the phone alone could not rise). Every bit of paper and glass that is
+  not a control opens the guide.
+- **The copy block is centred against the phone's glass well**, 12px above the phone's own
+  centre, because the phone starts 24px down the well. It holds the name, its line and the
+  action, 16px from line to action. With the answers gone, a bottom-pinned action left 209–260px of
+  bare paper under the line.
+- Measured at 1280×800: AI Space is 571 against a 583 budget, so it **fits** (it was 38px over).
+  The block's centre sits 0px from the well's centre. Hit-testing confirms the click targets:
+  the title, lead, Resona phone and blank paper go to the guide; "Copy the prompt" copies; the
+  prototype phone opens the prototype.
+- **Favicon:** the header avatar, cropped square to the head — `favicon.ico` (16/32/48) and
+  `favicon-192.png` transparent, `apple-touch-icon.png` opaque on `--paper-1` (#FFFFFF). Linked
+  in `Base.astro`.
+- Reviewed by a six-lens workflow with a skeptic per lens. Confirmed and fixed: dead click zones
+  from lifting whole rows, a `:has()` sharing a selector list with the copy button, a square
+  focus ring, stale comments and docs, and the touch icon's retired paper hex.
+
 ## Open
 
-- **AI Space is 38px over at 1280×800.** The copy is Uttham's and stays whole, and the phone keeps
-  its floor. The levers left are the heading sentence or a narrower phone; neither was taken.
 - **1280×720** runs over in all three sections; this is the screen-contract cost plans/024
   already records.

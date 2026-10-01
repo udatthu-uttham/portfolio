@@ -95,8 +95,9 @@ its budget is centred, and the slack above and below its content sits on no rung
 — so on tall screens the between-section gap grows past `--section-y`. And a
 Projects or AI Space sheet has a 360px content floor so a phone stays legible:
 below it the section grows rather than the phone shrinking. Measured on
-2026-10-01 (plans/025): **Projects fits from 1024×768 up; AI Space fits from
-1324×967 up and runs 38px over at 1280×800**; both run over at 1280×720.
+2026-10-01 (plans/025): **Projects fits from 1024×768 up; AI Space from 1280×800
+up** (since its cards dropped the "how it helps" lines; at 1024 its sheets go one
+per row and the section runs long); both run over at 1280×720.
 
 **The tape owes the sheet's content one within-card step** (2026-10-01). It is
 anchored to half its own height on the sheet's top edge, so 17.5px of it lies on

@@ -168,7 +168,9 @@ const principles = [
       <!-- Two sheets on the same board as Projects, each with its own tape and
            its own running phone. Where the sheet is wide enough the copy reads on
            the left and the phone stands on the right; narrower, they stack. The
-           copy is Uttham's, every word; the previews run on mock data (tools.ts). -->
+           card is the tool's name, its one line and the phone; how it helps the
+           team is on its guide page, which the whole card opens (Uttham,
+           2026-10-01). The previews run on mock data (tools.ts). -->
       <div class="workboard">
         <div class="tiles tiles--ai">
           {
@@ -177,11 +179,8 @@ const principles = [
                 <article class="tile tile--ai" data-magnetic>
                   <img class="tape" src="/assets/stickers/washi.svg" alt="" aria-hidden="true" />
                   <div class="tool__copy">
-                    <h3>{tool.name}</h3>
+                    <h3><a class="tool__link" href={`/ai/${tool.slug}`}>{tool.name}</a></h3>
                     <p class="tile__desc" set:html={rich(tool.what)} />
-                    <ul class="tool__helps">
-                      {tool.helps.map((line) => <li set:html={rich(line)} />)}
-                    </ul>
                   </div>
 
                   <div class="tile__media tile__media--tool glass">
@@ -825,10 +824,36 @@ const principles = [
   .tiles--ai { grid-template-columns: repeat(auto-fit, minmax(min(100%, 540px), 1fr)); }
   .tile--ai { gap: var(--space-4); }
 
-  /* An AI card is not a link — nothing about it should suggest a destination,
-     so it keeps the paper and the shadow but drops the tile's hover border. */
+  /* An AI card opens its guide page, as a case card opens its case — but it
+     holds a button and (on the prototype) a link of its own, so it cannot BE a
+     link. The title's link stretches over the whole sheet instead, and the copy
+     action and the phone's own link sit above it. */
+  .tool__link { color: inherit; text-decoration: none; }
+  .tool__link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    /* the sheet's radius, named: a pseudo-element inherits from its own <a>,
+       so `inherit` gave the focus ring square corners on a rounded sheet */
+    border-radius: var(--radius-sm);
+  }
+  .tool__link:focus-visible { outline: none; }
+  .tool__link:focus-visible::after { outline: 2px solid var(--amber-text); outline-offset: var(--space-1); }
+  /* Only the controls rise above the stretched link, never their rows, so
+     every bit of paper and glass that is not a control opens the guide.
+     The copy button is already positioned (.text-link). The prototype's phone
+     is a link inside a size container — its own stacking context — so its well
+     has to rise, and lets clicks through everywhere but the phone. The :has()
+     rule stands alone: a browser without :has() drops only it, and the copy
+     button keeps working. */
+  .tile--ai .tool__go { z-index: 2; }
+  .tile--ai .tile__media--tool:has(a) { z-index: 2; pointer-events: none; }
+  .tile--ai .tile__media--tool :global(a) { pointer-events: auto; }
+  /* The sheet takes the case tile's hover border, but its arrow belongs to the
+     copy action, so only hovering that action nudges it. */
   @media (hover: hover) and (pointer: fine) {
-    .tile--ai:hover { border-color: var(--line-1); }
+    .tile--ai:hover .tile__arr { transform: none; }
   }
 
   /* The Projects well exactly — 4/3, phone standing flush on the bottom edge,
@@ -842,9 +867,9 @@ const principles = [
   }
 
 
-  /* The lead line is one line here, not the two a case tile reserves: the
-     answers under it carry the rest, and the reserved second line would put
-     this sheet past a Projects sheet for nothing. */
+  /* The lead does not reserve the two lines a case tile does: a tool sheet's
+     well need not line up with a neighbour's, and an empty reserved line would
+     only open a gap between the line and the action. */
   .tile--ai .tile__desc { min-height: 0; }
 
   /* On a phone the well is only as wide as the screen, so it goes taller —
@@ -853,25 +878,6 @@ const principles = [
   @media (max-width: 560px) {
     .tile__media--tool { aspect-ratio: 2 / 3; padding: var(--space-4) var(--space-4) 0; }
   }
-
-  /* Two-line answers need the body leading and a real gap between them, or the
-     block reads as one grey paragraph (Uttham, 2026-09-25). */
-  .tool__helps {
-    display: grid;
-    gap: var(--space-2);
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    color: var(--ink-600);
-    font-size: var(--text-small);
-    line-height: var(--lh-body);
-    text-wrap: pretty;
-  }
-  /* The dash is drawn, not laid out: rich() returns a mix of text nodes and
-     <strong>, and any grid or flex on the li would scatter those into cells. */
-  .tool__helps li { position: relative; padding-left: var(--space-4); }
-  .tool__helps li::before { content: '—'; position: absolute; left: 0; color: var(--ink-400); }
-  .tool__helps :global(.em) { color: var(--ink-900); font-weight: 600; }
 
   /* The action reads exactly like a case tile's "Read the case" — same amber
      rule, same arrow nudge — so the two sections end the same way. */
@@ -923,8 +929,14 @@ const principles = [
       --well-w: clamp(220px, 40cqw, 280px);
       display: grid;
       grid-template-columns: minmax(0, 1fr) var(--well-w);
-      grid-template-rows: minmax(0, 1fr) auto;
-      grid-template-areas: "copy well" "foot well";
+      /* The name, its line and the action are one block, centred against the
+         phone's glass well (the phone itself starts 24px down it, so the block
+         sits 12px above the phone's own centre). With the answers gone to the
+         guide page (2026-10-01), pinning
+         the action to the bottom left 210–260px of bare paper between it and
+         the line — the gap read as a hole, not as breathing room. */
+      grid-template-rows: minmax(0, 1fr) auto auto minmax(0, 1fr);
+      grid-template-areas: ". well" "copy well" "foot well" ". well";
       gap: var(--space-4) var(--space-5);
       min-height: calc(var(--sheet-in) + var(--sheet-top) + var(--card-padding) + 2px);
     }

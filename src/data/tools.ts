@@ -7,9 +7,11 @@
 // participant audio or verbatims, no Meesho figures. The previews show the
 // mechanism; the contents are always invented.
 //
-// LAYOUT (Uttham, 2026-09-21): two cards, built out of the Projects tile —
-// tape, pill, year, title, lead line, the answers, a 4/3 glass well, and the
-// replicate link. The long version of "how to build it" lives on /ai/<slug>.
+// LAYOUT (Uttham, 2026-09-21; 2026-10-01): two cards, built out of the Projects
+// tile — tape, title, lead line, the phone in its glass well, and the replicate
+// action. `helps` is NOT on the card: it moved to the tool's guide page,
+// /ai/<slug>, which the whole card opens, along with the long version of "how
+// to build it".
 //
 // THE COPY IS UTTHAM'S (2026-09-21): `what` and `helps` are his own words, and
 // only grammar and the bold rule have been touched. Do NOT shorten them to fit
@@ -21,7 +23,7 @@ export type Tool = {
   name: string;
   year: string;
   what: string; // the card's lead line. Highlights in **bold**.
-  helps: string[]; // how it helps, one point each. Highlights in **bold**.
+  helps: string[]; // how it helps, one point each, shown on /ai/<slug>. Highlights in **bold**.
   action: string; // the label on the replicate link
   used?: { label: string; href: string }; // where it shows up in the case studies
   visit?: { label: string; href: string }; // a live thing you can open yourself
