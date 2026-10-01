@@ -10,7 +10,10 @@
 // Two kinds of preview. Screens: Uttham's Figma exports, picked per state from
 // src/assets/<screens.dir>/ (a state with no screen shows the nearest earlier
 // one; the dev server names the missing one). Live: a `preview` slot — a
-// running tool — which hears each state as a `case:state` event.
+// running tool — which hears each state as a `case:state` event. With
+// `frame="phone"` the slot stands in the teaser's own phone (the screens' 9/19.5
+// frame, the mini player's tap-to-enlarge) and the tool just fills it; without
+// it the tool sizes its own frame.
 import { Image } from 'astro:assets';
 import { rich } from '../lib/rich';
 import { CASE_PASSWORD_SHA256 } from '../data/case-gate';
@@ -18,9 +21,11 @@ import type { CaseTeaserData } from '../data/case-teaser';
 
 interface Props {
   data: CaseTeaserData;
+  frame?: 'phone'; // live mode only: stand the tool in the teaser's own phone
 }
-const { data } = Astro.props;
+const { data, frame } = Astro.props;
 const live = Astro.slots.has('preview');
+const livePhone = live && frame === 'phone';
 
 const files = import.meta.glob<ImageMetadata>('../assets/{plp,mall}/*.{png,jpg,jpeg,webp}', { eager: true, import: 'default' });
 const library: Record<string, ImageMetadata> = Object.fromEntries(
@@ -32,7 +37,7 @@ const library: Record<string, ImageMetadata> = Object.fromEntries(
 // every state on the page, in reading order
 const states = [
   ...new Set([
-    ...data.sections.flatMap((s) => [s.state, ...s.blocks.flatMap((b) => (b.kind === 'steps' ? b.steps.map((st) => st.state) : []))]),
+    ...data.sections.flatMap((s) => [s.state, ...s.blocks.flatMap((b) => (b.kind === 'steps' ? b.steps.map((st) => st.state) : b.kind === 'rows' ? b.rows.map((r) => r.state) : []))]),
     ...(data.experiments ?? []).map((e) => e.state),
   ].filter((x): x is string => Boolean(x))),
 ];
@@ -70,6 +75,8 @@ const dek = rich(data.dek).replace('{source}', sourceLink);
           <div class="ct-facts__row"><dt>{f.label}</dt><dd>{f.value}</dd></div>
         ))}
       </dl>
+    )}{data.visit && (
+      <a class="text-link ct-visit" href={data.visit.href} target="_blank" rel="noopener">{data.visit.label} <span aria-hidden="true">↗</span></a>
     )}
   </header>
 
@@ -104,6 +111,27 @@ const dek = rich(data.dek).replace('{source}', sourceLink);
                   {block.items.map((item) => <li>{item}</li>)}
                 </ul>
               </>
+            ) : block.kind === 'rows' ? (
+              <>
+                {block.heading && <h3>{block.heading}</h3>}
+                <ul class="ct-steps ct-rows">
+                  {block.rows.map((r) => (
+                    <li class="ct-step ct-row" data-state={r.state} set:html={rich(r.text)} />
+                  ))}
+                </ul>
+              </>
+            ) : block.kind === 'prompt' ? (
+              <div class="ct-prompt glass" data-prompt>
+                <span class="bolt bolt--tl" aria-hidden="true"></span>
+                <span class="bolt bolt--tr" aria-hidden="true"></span>
+                <span class="bolt bolt--bl" aria-hidden="true"></span>
+                <span class="bolt bolt--br" aria-hidden="true"></span>
+                <div class="ct-prompt__head">
+                  <button class="cta cta--primary" type="button" data-copy-prompt data-copied="Copied">{block.copy}</button>
+                  <span class="sr-only" role="status" data-copy-status></span>
+                </div>
+                <pre class="ct-prompt__text" data-prompt-text>{block.text}</pre>
+              </div>
             ) : (
               data.gate && (
                 <div class="ct-gate" data-gate data-hash={CASE_PASSWORD_SHA256} data-dev={dev ? '1' : undefined}>
@@ -153,7 +181,14 @@ const dek = rich(data.dek).replace('{source}', sourceLink);
         <span class="bolt bolt--bl" aria-hidden="true"></span>
         <span class="bolt bolt--br" aria-hidden="true"></span>
         <div class="ct-stage">
-          {live ? (
+          {livePhone ? (
+            <div class="ct-phone ct-phone--live">
+              <div class="ct-live ct-live--framed"><slot name="preview" /></div>
+              {/* phones only: the mini phone grows to full size in place (an
+                  iframe moved into a dialog would reload) */}
+              <button class="ct-pip__enlarge" type="button" aria-label="Enlarge the preview" data-pip-enlarge></button>
+            </div>
+          ) : live ? (
             <div class="ct-live"><slot name="preview" /></div>
           ) : (
             <div class="ct-phone">
@@ -179,7 +214,7 @@ const dek = rich(data.dek).replace('{source}', sourceLink);
     </aside>
   </div>
   <span class="ct-end" data-case-end aria-hidden="true"></span>
-  <button class="ct-pip__restore cta cta--secondary" type="button" data-pip-restore hidden>Show preview</button>
+  <button class="ct-pip__restore cta cta--secondary" type="button" data-pip-restore hidden>Show preview</button>{livePhone && <div class="ct-pip__scrim" data-pip-scrim hidden></div>}
   {!live && (
     <dialog class="ct-zoom" data-pip-zoom aria-label="Preview, enlarged">
       <img class="ct-zoom__img" data-pip-zoom-img alt="" />
@@ -240,21 +275,43 @@ const dek = rich(data.dek).replace('{source}', sourceLink);
     let io: IntersectionObserver | null = null;
 
     const pick = () => {
-      if (!visible.size) return;
-      const mid = bandCentre();
+      const tail = tailBand();
+      const pool: Iterable<HTMLElement> = tail === null ? visible : triggers;
+      if (tail === null && !visible.size) return;
+      const mid = tail ?? bandCentre();
       let best: HTMLElement | null = null;
       let bestD = Infinity;
-      visible.forEach((el) => {
+      for (const el of pool) {
         const r = el.getBoundingClientRect();
         const d = Math.abs((r.top + r.bottom) / 2 - mid);
         if (d < bestD) { bestD = d; best = el; }
-      });
+      }
       if (best) show(best);
     };
 
     // The reading band's centre, in viewport px: the middle of the screen at
     // every width now that phones float the preview instead of stacking it.
     const bandCentre = () => innerHeight / 2;
+
+    // Where a page ends on its last rows (the AI Space pages have nothing
+    // after them), those rows can never scroll up to the middle, so the
+    // preview would never reach them. Only then, over the last half screen of
+    // scrolling, the band slides from the middle down to the last row's centre
+    // and every trigger is a candidate. A page whose rows all reach the middle
+    // (a case study, with "More cases" after it) never takes this path.
+    const tailBand = (): number | null => {
+      const last = triggers[triggers.length - 1];
+      if (!last) return null;
+      const half = innerHeight / 2;
+      const maxScroll = document.documentElement.scrollHeight - innerHeight;
+      const r = last.getBoundingClientRect();
+      const lastMid = r.top + scrollY + r.height / 2;
+      if (lastMid <= maxScroll + half) return null;
+      const remaining = maxScroll - scrollY;
+      if (remaining >= half) return null;
+      const t = 1 - Math.max(0, remaining) / half;
+      return half + t * (lastMid - maxScroll - half);
+    };
 
     const observe = () => {
       io?.disconnect();
@@ -301,7 +358,9 @@ const dek = rich(data.dek).replace('{source}', sourceLink);
   // Below 768px there is no room beside the text, so the phone becomes a mini
   // player in the bottom-right corner: it appears once the hero has gone, keeps
   // following the reading, opens full size on a tap, hides on ×, and steps out
-  // of the way at the end of the study.
+  // of the way at the end of the study. A live tool in the teaser's phone
+  // (frame="phone") opens full size in place instead of in the dialog — moving
+  // an iframe reloads it — and × or the dimmed page shrinks it back.
   {
     const panelEl = document.querySelector<HTMLElement>('[data-case-panel]');
     const heroEl = document.querySelector<HTMLElement>('.ct-hero');
@@ -312,13 +371,25 @@ const dek = rich(data.dek).replace('{source}', sourceLink);
     const zoom = document.querySelector<HTMLDialogElement>('[data-pip-zoom]');
     const zoomImg = document.querySelector<HTMLImageElement>('[data-pip-zoom-img]');
     const zoomClose = document.querySelector<HTMLButtonElement>('[data-pip-zoom-close]');
+    const scrim = document.querySelector<HTMLElement>('[data-pip-scrim]');
     if (panelEl && heroEl && endEl && restore && close) {
       const phone = window.matchMedia('(max-width: 767.98px)');
       let heroGone = false;
       let atEnd = false;
       let dismissed = false;
+      // live phone only: the mini player grown to full size where it stands
+      let big = false;
+      const hideLabel = close.getAttribute('aria-label') ?? '';
+      const grow = (on: boolean) => {
+        if (!scrim || big === on) return;
+        big = on;
+        panelEl.classList.toggle('is-pip-big', on);
+        scrim.hidden = !on;
+        close.setAttribute('aria-label', on ? 'Shrink the preview' : hideLabel);
+      };
       const sync = () => {
         const inPlay = phone.matches && heroGone && !atEnd;
+        if (!inPlay) grow(false);
         panelEl.classList.toggle('is-pip-on', inPlay && !dismissed);
         restore.hidden = !(inPlay && dismissed);
       };
@@ -326,10 +397,14 @@ const dek = rich(data.dek).replace('{source}', sourceLink);
       new IntersectionObserver(([e]) => { atEnd = e.isIntersecting || e.boundingClientRect.top < 0; sync(); }).observe(endEl);
       phone.addEventListener('change', sync);
 
-      close.addEventListener('click', () => { dismissed = true; sync(); restore.focus(); });
+      close.addEventListener('click', () => {
+        if (big) { grow(false); enlarge?.focus(); return; }
+        dismissed = true; sync(); restore.focus();
+      });
       restore.addEventListener('click', () => { dismissed = false; sync(); (enlarge ?? close).focus(); });
 
-      // screens mode only: a live tool has no single screen to enlarge
+      // screens: the current screen opens in the dialog. A live tool has no
+      // single screen to show there, so the teaser's live phone grows in place.
       if (enlarge && zoom && zoomImg && zoomClose) {
         enlarge.addEventListener('click', () => {
           const on = panelEl.querySelector<HTMLImageElement>('.ct-screen.is-on');
@@ -342,9 +417,50 @@ const dek = rich(data.dek).replace('{source}', sourceLink);
         // a tap on the dimmed backdrop closes it too
         zoom.addEventListener('click', (event) => { if (event.target === zoom) zoom.close(); });
         zoom.addEventListener('close', () => enlarge.focus());
+      } else if (enlarge && scrim) {
+        const shrink = () => { grow(false); enlarge.focus(); };
+        enlarge.addEventListener('click', () => { grow(true); close.focus(); });
+        scrim.addEventListener('click', shrink);
+        document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && big) shrink(); });
       }
     }
   }
+
+  // ---- the prompt: copied word for word --------------------------------------
+  // The panel's <pre> is the source, so what is read and what is copied are the
+  // same text. Clipboard blocked (an insecure origin, a denied permission): the
+  // prompt is selected and the old copy command tried, so the reader can still
+  // take it.
+  document.querySelectorAll<HTMLElement>('[data-prompt]').forEach((panel) => {
+    const btn = panel.querySelector<HTMLButtonElement>('[data-copy-prompt]');
+    const text = panel.querySelector<HTMLElement>('[data-prompt-text]');
+    const status = panel.querySelector<HTMLElement>('[data-copy-status]');
+    if (!btn || !text) return;
+    const label = btn.textContent ?? '';
+    const done = btn.dataset.copied ?? 'Copied';
+    let timer = 0;
+    btn.addEventListener('click', async () => {
+      let ok = true;
+      try {
+        await navigator.clipboard.writeText(text.textContent ?? '');
+      } catch {
+        const range = document.createRange();
+        range.selectNodeContents(text);
+        const selection = window.getSelection();
+        selection?.removeAllRanges();
+        selection?.addRange(range);
+        try { ok = document.execCommand('copy'); } catch { ok = false; }
+      }
+      if (!ok) return;
+      btn.textContent = done;
+      if (status) status.textContent = done;
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => {
+        btn.textContent = label;
+        if (status) status.textContent = '';
+      }, 1600);
+    });
+  });
 
   // ---- the light gate ------------------------------------------------------
   // Uttham chose a light gate (2026-10-01): a speed bump, not protection — the
@@ -420,6 +536,7 @@ const dek = rich(data.dek).replace('{source}', sourceLink);
   .ct-hero > :nth-child(2) { transition-delay: var(--stagger-1); }
   .ct-hero > :nth-child(3) { transition-delay: calc(var(--stagger-1) * 2); }
   .ct-hero > :nth-child(4) { transition-delay: calc(var(--stagger-1) * 3); }
+  .ct-hero > :nth-child(5) { transition-delay: calc(var(--stagger-1) * 4); }
   @starting-style {
     .ct-hero > * { opacity: 0; transform: translateY(12px); }
   }
@@ -469,6 +586,8 @@ const dek = rich(data.dek).replace('{source}', sourceLink);
     text-transform: uppercase;
   }
   .ct-facts dd { margin: 0; color: var(--ink-900); font-size: var(--text-body); line-height: var(--lh-body); }
+  /* a live thing the reader can open themselves, under the facts */
+  .ct-visit { margin-top: var(--group-gap); }
 
   /* ---- the reading column and the phone beside it ---- */
   .ct-layout { margin-top: var(--section-y-sm); }
@@ -525,6 +644,12 @@ const dek = rich(data.dek).replace('{source}', sourceLink);
     transition: background-color var(--dur-2) var(--ease-standard);
   }
   .ct-step.is-current::before { background: var(--amber-700); }
+  /* a row of prose rather than a label and its line: the highlight is the bold */
+  .ct-row :global(.em) { color: var(--ink-900); font-weight: 600; }
+  /* rows or the prompt straight under a section's h2 take the heading's own
+     gap, as a first paragraph does; after text they are a sub-group */
+  .ct-section > h2 + .ct-rows,
+  .ct-section > h2 + .ct-prompt { margin-top: var(--head-gap); }
 
   /* the verbatim, once consent is confirmed: the case page's sticky note */
   .ct-note {
@@ -546,6 +671,34 @@ const dek = rich(data.dek).replace('{source}', sourceLink);
 
   /* live mode: a running tool fills the stage; the tool sizes its own frame */
   .ct-live { position: relative; width: 100%; height: 100%; }
+  /* …unless it stands in the teaser's own phone (frame="phone"): then the
+     phone is the frame, sized like the screens, and the tool fills it */
+  .ct-live--framed { position: absolute; inset: 0; width: auto; height: auto; }
+
+  /* ---- the prompt: the guide's bolted glass panel, the prompt as a white
+     card ON it (CLAUDE.md, Images) and the page's one primary sticker ---- */
+  .ct-prompt {
+    position: relative;
+    margin-top: var(--group-gap);
+    padding: var(--bolt-content-inset) var(--panel-padding);
+    border-radius: var(--radius-sm);
+    display: grid;
+    gap: var(--space-4);
+  }
+  .ct-prompt__head { display: flex; align-items: center; }
+  .ct-prompt__text {
+    margin: 0;
+    padding: var(--card-padding);
+    background: var(--paper-1);
+    border: 1px solid var(--line-1);
+    border-radius: var(--radius-sm);
+    color: var(--ink-900);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: var(--text-small);
+    line-height: var(--lh-body);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
 
   .ct-inside-lead { margin-top: var(--space-6); }
   .ct-inside {
@@ -684,7 +837,7 @@ const dek = rich(data.dek).replace('{source}', sourceLink);
   }
 
   /* the mini-player controls exist only on phones */
-  .ct-pip__enlarge, .ct-pip__close, .ct-pip__restore { display: none; }
+  .ct-pip__enlarge, .ct-pip__close, .ct-pip__restore, .ct-pip__scrim { display: none; }
 
   /* Laptops and tablets: the phone stands beside the text, sticky under the
      header. On the site's 12-column grid the story takes 7 columns and the
@@ -785,6 +938,29 @@ const dek = rich(data.dek).replace('{source}', sourceLink);
       background: var(--paper-1);
     }
     .ct-full { scroll-margin-top: calc(var(--header-height) + var(--content-gap)); }
+
+    /* A live tool in the teaser's phone opens full size where it stands: the
+       panel grows to a handset-sized phone centred in the screen under the
+       header (never wider than the tool's own 320px viewport, never taller
+       than the room the header leaves), over a dimmed page, and the tool takes
+       the pointer. The teaser is its own stacking context under the header, so
+       the header stays on top and in use. */
+    .ct-panel.is-pip-big {
+      --pip-big-w: min(calc(100vw - 2 * var(--margin-side)), 320px, calc((100svh - var(--header-height) - 2 * var(--space-5)) * 9 / 19.5));
+      inset: var(--header-height) 0 0;
+      width: var(--pip-big-w);
+      height: calc(var(--pip-big-w) * 19.5 / 9);
+      margin: auto;
+    }
+    .ct-panel.is-pip-big .ct-phone { border-radius: var(--radius-media); }
+    .ct-panel.is-pip-big .ct-pip__enlarge { display: none; }
+    .ct-pip__scrim:not([hidden]) {
+      display: block;
+      position: fixed;
+      inset: 0;
+      z-index: calc(var(--z-float) - 1);
+      background: rgba(22, 20, 14, 0.55);
+    }
   }
 
   /* the enlarged screen: a phone-sized card on a dimmed page */

@@ -9,9 +9,11 @@
 //
 // LAYOUT (Uttham, 2026-09-21; 2026-10-01): two cards, built out of the Projects
 // tile — tape, title, lead line, the phone in its glass well, and the replicate
-// action. `helps` is NOT on the card: it moved to the tool's guide page,
+// action. `helps` is NOT on the card: it moved to the tool's teaser page,
 // /ai/<slug>, which the whole card opens, along with the long version of "how
-// to build it".
+// to build it". The phone on the card is a running preview with no link of its
+// own; on the teaser page the same tool runs in the sticky phone
+// (src/data/ai-teasers.ts arranges the page).
 //
 // THE COPY IS UTTHAM'S (2026-09-21): `what` and `helps` are his own words, and
 // only grammar and the bold rule have been touched. Do NOT shorten them to fit
@@ -26,7 +28,7 @@ export type Tool = {
   helps: string[]; // how it helps, one point each, shown on /ai/<slug>. Highlights in **bold**.
   action: string; // the label on the replicate link
   used?: { label: string; href: string }; // where it shows up in the case studies
-  visit?: { label: string; href: string }; // a live thing you can open yourself
+  visit?: { label: string; href: string }; // a live thing you can open yourself: the teaser's "Open the prototype ↗", and the preview's src
 };
 
 export const tools: Tool[] = [

@@ -171,8 +171,9 @@ const principles = [
            its own running phone. Where the sheet is wide enough the copy reads on
            the left and the phone stands on the right; narrower, they stack. The
            card is the tool's name, its one line and the phone; how it helps the
-           team is on its guide page, which the whole card opens (Uttham,
-           2026-10-01). The previews run on mock data (tools.ts). -->
+           team is on its teaser page, which the whole card opens (Uttham,
+           2026-10-01). The phones are running previews and nothing else — no
+           link or pill of their own. The previews run on mock data (tools.ts). -->
       <div class="workboard">
         <div class="tiles tiles--ai">
           {
@@ -187,9 +188,7 @@ const principles = [
 
                   <div class="tile__media tile__media--tool glass">
                     {tool.slug === 'resona' && <ResonaPreview />}
-                    {tool.slug === 'realistic-prototype' && tool.visit && (
-                      <ProtoPreview href={tool.visit.href} label={tool.visit.label} />
-                    )}
+                    {tool.slug === 'realistic-prototype' && tool.visit && <ProtoPreview src={tool.visit.href} />}
                   </div>
 
                   <div class="tool__foot">
@@ -826,10 +825,12 @@ const principles = [
   .tiles--ai { grid-template-columns: repeat(auto-fit, minmax(min(100%, 540px), 1fr)); }
   .tile--ai { gap: var(--space-4); }
 
-  /* An AI card opens its guide page, as a case card opens its case — but it
-     holds a button and (on the prototype) a link of its own, so it cannot BE a
-     link. The title's link stretches over the whole sheet instead, and the copy
-     action and the phone's own link sit above it. */
+  /* An AI card opens its teaser page, as a case card opens its case — but it
+     holds the copy button, so it cannot BE a link. The title's link stretches
+     over the whole sheet instead, and the copy action sits above it. The phones
+     are running previews with no link of their own (Uttham, 2026-10-01: "no
+     need to add view prototype link, clicking on the card will move to ai
+     space teaser page"), so the well needs no way through. */
   .tool__link { color: inherit; text-decoration: none; }
   .tool__link::after {
     content: '';
@@ -842,16 +843,10 @@ const principles = [
   }
   .tool__link:focus-visible { outline: none; }
   .tool__link:focus-visible::after { outline: 2px solid var(--amber-text); outline-offset: var(--space-1); }
-  /* Only the controls rise above the stretched link, never their rows, so
-     every bit of paper and glass that is not a control opens the guide.
-     The copy button is already positioned (.text-link). The prototype's phone
-     is a link inside a size container — its own stacking context — so its well
-     has to rise, and lets clicks through everywhere but the phone. The :has()
-     rule stands alone: a browser without :has() drops only it, and the copy
-     button keeps working. */
+  /* Only the copy button rises above the stretched link, never its row, so
+     every bit of paper and glass — the phone included — opens the teaser.
+     The button is already positioned (.text-link). */
   .tile--ai .tool__go { z-index: 2; }
-  .tile--ai .tile__media--tool:has(a) { z-index: 2; pointer-events: none; }
-  .tile--ai .tile__media--tool :global(a) { pointer-events: auto; }
   /* The sheet takes the case tile's hover border, but its arrow belongs to the
      copy action, so only hovering that action nudges it. */
   @media (hover: hover) and (pointer: fine) {

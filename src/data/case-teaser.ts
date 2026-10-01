@@ -8,12 +8,15 @@
 // `preview` slot (a live tool) it is announced as a `case:state` event instead.
 
 export type CaseStep = { state?: string; label: string; text: string };
+export type CaseRow = { state?: string; text: string }; // one ruled row of prose; highlights in **bold**
 
 export type CaseBlock =
   | { kind: 'p'; text: string } // a paragraph; highlights in **bold**
   | { kind: 'steps'; heading?: string; steps: CaseStep[] } // an optional h3 over ruled rows
   | { kind: 'quote'; text: string; source: string; consent?: boolean } // a sticky note; consent: false keeps it off the page
   | { kind: 'inside'; lead: string; items: string[] } // "In the full case study:" and its list
+  | { kind: 'rows'; heading?: string; rows: CaseRow[] } // ruled rows of prose, each its own trigger (the AI Space pages)
+  | { kind: 'prompt'; text: string; copy: string } // the bolted glass prompt panel: `text` verbatim, `copy` the button's label
   | { kind: 'gate' }; // the light-gate card (needs `gate` on the page)
 
 export type CaseSection = { state?: string; heading: string; blocks: CaseBlock[] };
@@ -32,6 +35,7 @@ export type CaseTeaserData = {
   dek: string; // `{source}` becomes the sourced link below
   source?: { label: string; href: string; title: string };
   back?: { href: string; label: string }; // defaults to "← All projects"
+  visit?: { href: string; label: string }; // a live thing to open in its own tab, under the facts ("Open the prototype ↗")
   facts: { label: string; value: string }[];
   sections: CaseSection[];
   gate?: { text: string; cta: string };

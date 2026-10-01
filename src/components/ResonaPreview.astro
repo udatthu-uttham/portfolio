@@ -15,9 +15,21 @@
 // synthesise, insights — and loops, so the card shows a user completing the
 // flow rather than a single frozen screen.
 //
+// ON THE TEASER PAGE (/ai/resona, 2026-10-01) the same app runs in the
+// teaser's sticky phone: `fill` drops this component's own 9/15 frame so the
+// screen fills the phone it is given, and `follow` swaps the loop for the
+// reading — each `case:state` naming a step (prepare, setup, record, synth,
+// insights) shows that step. The homepage card keeps the loop.
+//
 // DATA IS INVENTED (locked 2026-09-20): a bike-parts marketplace study, made-up
 // riders, made-up Hinglish lines. No real participant, recording or colleague,
 // and no Meesho figures.
+
+interface Props {
+  fill?: boolean; // fill the frame it is given (the teaser's phone) instead of drawing its own
+  follow?: boolean; // show the step the teaser's reading names, instead of looping
+}
+const { fill = false, follow = false } = Astro.props;
 
 // A fixed, hand-picked waveform, so the bars never reshuffle between renders.
 const wave = [3, 6, 4, 9, 13, 7, 11, 5, 8, 14, 6, 10, 4, 12, 7, 9, 5, 13, 8, 4, 10, 6, 11, 5];
@@ -46,7 +58,7 @@ const latest = [
 ];
 ---
 
-<div class="rp" data-resona>
+<div class:list={['rp', { 'rp--fill': fill }]} data-resona data-follow={follow ? '' : undefined}>
   <div class="rp__phone" data-rp-stage>
     <div class="rp__screen" aria-label="Resona walking through one research run on an invented study">
       <!-- the app bar is the same on every step -->
@@ -177,6 +189,23 @@ const latest = [
     let timer = 0;
 
     const paint = () => screens.forEach((s, n) => s.classList.toggle('is-on', n === i));
+
+    // Following the teaser's reading: no loop — the step the reader is on is
+    // the step on the phone. A state that names no step keeps the last one.
+    // The teaser may have announced its first state before this ran, so the
+    // panel's data-showing is read once as well.
+    if (root.hasAttribute('data-follow')) {
+      const go = (state?: string) => {
+        const n = screens.findIndex((s) => s.dataset.step === state);
+        if (n < 0 || n === i) return;
+        i = n;
+        paint();
+      };
+      document.addEventListener('case:state', (event) => go((event as CustomEvent<{ state: string }>).detail?.state));
+      go(document.querySelector<HTMLElement>('[data-case-panel]')?.dataset.showing);
+      paint();
+      return;
+    }
     // Recording earns a longer beat than a form; the report earns the longest.
     const hold = () => [4200, 3800, 3400, 2400, 5600][i] ?? 3400;
     const stop = () => window.clearTimeout(timer);
@@ -228,6 +257,17 @@ const latest = [
     border-radius: 18px 18px 0 0;
     background: #fff;
     box-shadow: var(--shadow-rest);
+  }
+
+  /* In the teaser's phone the frame is the teaser's: the screen fills it. */
+  .rp--fill { display: block; }
+  .rp--fill .rp__phone {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: auto;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
   }
 
   /* ---- the app itself, at a real phone's own size ---------------------- */

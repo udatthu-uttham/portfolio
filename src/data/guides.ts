@@ -2,6 +2,10 @@
 // on another team can paste the prompt into Claude Code or a Claude Project and
 // be running the same afternoon. Nothing in here names Meesho data, people,
 // files or figures — that is the point of white-label.
+//
+// Rendered on /ai/<slug> as a teaser (src/data/ai-teasers.ts arranges it). The
+// lines carry their highlights in **bold** (CLAUDE.md); the prompt never does —
+// it is copied as plain text, word for word.
 export type Guide = {
   slug: string; // matches Tool.slug
   title: string;
@@ -18,16 +22,16 @@ export const guides: Guide[] = [
     title: 'Build your own research allrounder',
     intro: 'It is a pipeline, not a chat: **a study set up, sessions recorded, a coded report out**. The discussion guide is the coding frame, every insight must cite a timestamp, the model is told to **doubt itself out loud** when a claim outruns the evidence, and every finished study **stays searchable for the next one.**',
     get: [
-      'A setup step that pins the objective, cohort, method and discussion guide before a single recording is loaded.',
-      'Transcripts with speakers separated and each utterance tagged to a section of your discussion guide.',
-      'Observations clustered into themes, insights scored by how many participants support them, verbatims pinned to timestamps.',
-      'A key finding, how-might-we prompts per theme, and an “AI asks” list of claims that need your clarification.',
+      'A setup step that **pins the objective, cohort, method and discussion guide** before a single recording is loaded.',
+      'Transcripts with speakers separated and **each utterance tagged to a section of your discussion guide**.',
+      'Observations clustered into themes, **insights scored by how many participants support them**, verbatims pinned to timestamps.',
+      'A key finding, how-might-we prompts per theme, and **an “AI asks” list of claims that need your clarification**.',
       'A report that exports cleanly and re-runs when a recording is added.',
-      'A store of finished studies anyone can search, so the next study starts from what is already known.',
+      'A store of finished studies anyone can search, so **the next study starts from what is already known**.',
     ],
     need: [
-      'Transcription with speaker diarization for your languages (a Whisper-class model handles Hindi and Hinglish acceptably).',
-      'A long-context model for the synthesis pass, and a place to run it: a script, a Claude Project, or a small web app.',
+      '**Transcription with speaker diarization for your languages** (a Whisper-class model handles Hindi and Hinglish acceptably).',
+      '**A long-context model for the synthesis pass**, and a place to run it: a script, a Claude Project, or a small web app.',
       'Your discussion guide, with sections and objectives written out.',
       'Consent from participants for recording and machine transcription.',
     ],
@@ -51,9 +55,9 @@ Work in this order and show your work:
 
 Output as structured sections in this order: Key finding · Quality (observations, clusters, insights, HMWs counted) · Themes with insights · AI asks · How might we.`,
     adapt: [
-      'Swap the scoring thresholds for your sample sizes. With four participants, “3 of 4” is HIGH; with twelve it is not.',
-      'Keep verbatims in the participant’s language and translate in a footnote. Translation flattens the hesitation you are looking for.',
-      'Add voice features later, if at all: pauses, sighs and pitch help spot the gap between what was said and what was felt, but the timestamp rule does most of the work.',
+      '**Swap the scoring thresholds for your sample sizes.** With four participants, “3 of 4” is HIGH; with twelve it is not.',
+      '**Keep verbatims in the participant’s language** and translate in a footnote. Translation flattens the hesitation you are looking for.',
+      '**Add voice features later, if at all**: pauses, sighs and pitch help spot the gap between what was said and what was felt, but **the timestamp rule does most of the work**.',
     ],
   },
   {
@@ -61,16 +65,16 @@ Output as structured sections in this order: Key finding · Quality (observation
     title: 'Build a prototype people forget is a prototype',
     intro: 'Not a click-through. A **small web app with the real product\u2019s shape** \u2014 a catalogue that reads like the catalogue, a cart that adds up, a payment step that fails when you make it fail. Participants stop performing for you, because **there is nothing to perform for.**',
     get: [
-      'A running app on a URL you can send to a moderator, a participant, or a stakeholder.',
-      'Every page a participant could wander into \u2014 feed, category, product, cart, payment, order placed, past orders \u2014 not only the ones on the happy path.',
-      'A mock catalogue with prices, ratings, review counts and delivery promises that read like the real thing.',
-      'Checkout and payment that run end to end on dummy instruments, so complex flows become testable.',
-      'A place to drop a new feature or a new content row in and watch people meet it cold.',
+      '**A running app on a URL** you can send to a moderator, a participant, or a stakeholder.',
+      '**Every page a participant could wander into** \u2014 feed, category, product, cart, payment, order placed, past orders \u2014 not only the ones on the happy path.',
+      'A mock catalogue with prices, ratings, review counts and delivery promises that **read like the real thing**.',
+      'Checkout and payment that **run end to end on dummy instruments**, so complex flows become testable.',
+      'A place to drop a new feature or a new content row in and **watch people meet it cold**.',
     ],
     need: [
-      'A front-end you can stand up quickly \u2014 Vite and React is plenty \u2014 and any static host.',
-      'A catalogue fixture: a few hundred items with images, prices and ratings. Invent them; do not export production data.',
-      'The product\u2019s real type scale, spacing and components, taken from the design system rather than eyeballed.',
+      '**A front-end you can stand up quickly** \u2014 Vite and React is plenty \u2014 and any static host.',
+      'A catalogue fixture: a few hundred items with images, prices and ratings. **Invent them; do not export production data.**',
+      '**The product\u2019s real type scale, spacing and components**, taken from the design system rather than eyeballed.',
       'A phone to test on. Everything about this falls apart on a desktop window.',
     ],
     prompt: `Build me a realistic, clickable prototype of a mobile shopping app as a small Vite + React web app. Treat it as a research rig, not a demo.
@@ -93,9 +97,9 @@ Rules, in order of importance:
 
 Ask me what I am trying to learn before you start, then tell me which screens that makes load-bearing.`,
     adapt: [
-      'Swap the catalogue fixture for your own category. The shape of the data matters more than the volume \u2014 get the outliers in.',
-      'If you need to test a surface that does not exist yet, build it behind a flag rather than forking the prototype. One build, many sessions.',
-      'Hand participants a device with the prototype already open. A URL bar is the fastest way to remind someone they are in a test.',
+      'Swap the catalogue fixture for your own category. **The shape of the data matters more than the volume** \u2014 get the outliers in.',
+      'If you need to test a surface that does not exist yet, **build it behind a flag** rather than forking the prototype. One build, many sessions.',
+      '**Hand participants a device with the prototype already open.** A URL bar is the fastest way to remind someone they are in a test.',
     ],
   },
 ];
