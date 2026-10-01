@@ -4,4 +4,4 @@
 //   npm run case-password
 // While it is empty, the dev server opens the full study with any input and a
 // production build opens it for no one.
-export const CASE_PASSWORD_SHA256 = '';
+export const CASE_PASSWORD_SHA256 = '2e123adde4821a9de7aa68fcd90a3e1bf458fccfdc3c9b864b8e6328fe613bd2';
