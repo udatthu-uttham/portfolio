@@ -139,17 +139,17 @@ On the homepage, each section pads half a section gap at both ends (`--section-p
 
 **Case-study teaser pages run on the homepage ladder, stepped up for reading** (2026-10-01, Uttham: "as the reference website shared, make sure there is lot of spacing… it should match that system"; plans/029). The bus-discovery reference pads each chapter 80px top and bottom (160 apart), its heading 18px over the text, its intro 32–48px over what follows. `CaseTeaser.astro` (both case studies, and the AI Space tool pages):
 
+The stack, largest first:
+
 | Gap | Token | 375 / 1280 / 1440 |
 | --- | --- | --- |
-| Below the header | `--section-pad` | 48 / 70 / 79 |
 | Hero → story, section → section, story → More cases, full-study block → block | `--section-y` | 96 / 141 / 158 |
-| Heading → its text | `--head-gap` | 24 |
 | Text → a sub-group (rows, note, list, gate card), and above a sub-group heading | `--ct-sub` = `max(--group-gap, --space-6)` | 32 / 45 / 48 |
-| Sub-group heading → its rows; paragraph → paragraph | `--space-4` | 16 |
-| Row padding / row label → its line | `--space-5` / `--space-2` | 24 / 8 |
-| Gate card inset | `--card-padding` | 16 / 28 / 32 |
+| Heading → its text | `--head-gap` | 24 |
+| Sub-group heading → its rows; paragraph → paragraph; inside the gate card | `--space-4` | 16 |
+| Row label → its line | `--space-2` | 8 |
 
-Each is a clear step under the one above at every width (the `--space-6` floor keeps a sub-group heading 2:1 over its rows on phones, where `--group-gap` alone is 24). These pages used `--section-y-sm` between sections until this pass; it stays the rung for the old chapter template only.
+Each is a clear step under the one above at every width (the `--space-6` floor keeps a sub-group heading 2:1 over its rows on phones, where `--group-gap` alone is 24). Insets, outside the stack: below the header `--section-pad` (48 / 70 / 79), row padding `--space-5` (24), the gate card `--card-padding` (16 / 28 / 32) — never narrower than the card's own inner gap. These pages used `--section-y-sm` between sections until this pass; it stays the rung for the old chapter template only.
 
 The hero statement fills the glass panel's padded content width. Its portrait tucks 32px behind the glass and sits 64px from the panel's left edge, clear of the corner bolts. Panel top and bottom padding follows the hardware rules below. The scene and its handwritten explanation form one figure: caption first, artwork 12px below it, with a shared left edge. Its width follows whole foundation columns, as described below. Contact notes share the same size, and the photo group reserves 32px above its frame for the attached badge.
 

@@ -661,16 +661,17 @@ const idFor = (text: string) => `s-${text.toLowerCase().replace(/[^a-z0-9]+/g, '
      — Uttham, 2026-10-01: "as the reference website shared, make sure there is
      lot of spacing… it should match that system". The reference pads each
      chapter 80px top and bottom (160 apart), heading 18px over its text, intro
-     32–48px over what follows. Here:
+     32–48px over what follows. The stack, largest first — each a clear step
+     under the one above at every width, so a heading always sits nearer its
+     own text than the section before it (law of proximity):
        between sections, hero → story, story → More cases   --section-y (96–160)
-       heading → its text                                    --head-gap (24)
        text → a sub-group (rows, note, list, gate), and
        above a sub-group's heading              --ct-sub: --group-gap, ≥32 (32–48)
-       sub-group heading → its rows                          --space-4 (16)
-       paragraph → paragraph                                 --space-4 (16)
-       row padding / label → line                            --space-5 / --space-2
-     Each step is a clear step under the one above, so a heading always sits
-     nearer its own text than the section before it (law of proximity). */
+       heading → its text                                    --head-gap (24)
+       sub-group heading → its rows; paragraph → paragraph   --space-4 (16)
+       row label → its line; inside a card                   --space-2 / --space-4
+     Insets, apart from the stack: below the header --section-pad, row padding
+     --space-5, the gate card --card-padding. */
   .ct-layout { margin-top: var(--section-y); }
   .ct-story { display: grid; gap: var(--section-y); min-width: 0; }
   .ct-section, .ct-full { min-width: 0; }
@@ -805,7 +806,8 @@ const idFor = (text: string) => `s-${text.toLowerCase().replace(/[^a-z0-9]+/g, '
     padding: var(--card-padding);
     display: grid;
     justify-items: start;
-    gap: var(--space-5);
+    /* the homepage tile's within-a-card step: never wider than the inset */
+    gap: var(--space-4);
     background: var(--paper-1);
     border: 1px solid var(--line-1);
     border-radius: var(--radius-sm);
