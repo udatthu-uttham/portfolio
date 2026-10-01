@@ -30,7 +30,7 @@
 
 ## 3. What I need from Uttham to make it great
 
-1. **The shopper.** Who was the Mall buyer in 2021, in one or two lines a stranger would understand: where they live, what they buy, why "branded" was unfamiliar. The deck says "187 Mn+ users" but never describes a person.
+1. **The shopper.** Who was the Mall buyer in 2021, in one or two lines a stranger would understand: where they live, what they buy, why "branded" was unfamiliar. The deck quotes the user base only in aggregate and never describes a person.
 2. **The stakes.** Why did the business care about brands — margin, trust, competition? One sentence makes the bet legible.
 3. **The seller-labels fight.** Who wanted them, what you said, how the decision turned. This is the leading-from-the-front moment and the deck only hints at it.
 4. **The research, concretely.** How many diary studies and interviews, in which cities, over how long. The Lucknow verbatim suggests home visits; say so.

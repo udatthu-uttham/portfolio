@@ -1,5 +1,7 @@
 # Quiet sectioning — 2026-09-18
 
+> **Superseded 2026-10-01 by [plans/024](024-one-section-per-screen-2026-10-01.md)** on the peek: the hero now fills the first screen and nothing of Projects shows in it. The one-heading rule and the highlighter stand.
+
 Uttham: the handwritten chapter label plus sentence headline plus deck reads as the generated-site cliché
 ("every Claude website is having it"). Reference review (Freiberg, Coursey, Lovin: one plain heading and
 whitespace; Kowalski: a small label that *is* the heading; the anti-slop catalog: "remove the eyebrow; the

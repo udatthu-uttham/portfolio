@@ -178,9 +178,67 @@ function initScrollSpy() {
   sections.forEach((s) => io.observe(s));
 }
 
-// Hover motion is retired sitewide (Uttham, 2026-09-20): no magnetic tilt, no
-// lift, no straightening. Cards and photos stay put; hover is carried by colour
-// and the arrow alone. The `data-magnetic` hooks were removed with it.
+// Magnetic sheets — project tiles and AI Space cards only (Uttham, 2026-09-20, late).
+// This is the last tuning that was live before the tilt was retired earlier today
+// (recovered verbatim from the 19 Sep session); values are not to be re-invented.
+// Magnetic case-study pages — physically anchored at the top edge, where
+// the washi tape holds the sheet down. The pivot lives there (not the
+// card's center), so the taped top barely moves while the free area below
+// tilts and lifts toward the pointer, like someone peeling the sheet up
+// with a hand — the closer to the bottom, the more it lifts. Fine
+// pointers only; CSS hover is the fallback elsewhere.
+function initMagneticTiles() {
+  // Perspective magnifies the free bottom edge of tall, single-column cards
+  // into the next card's tape. Keep that effect on wider hover layouts only.
+  // GSAP reverts its transforms when resizing back into the mobile layout.
+  const media = gsap.matchMedia();
+  media.add('(min-width: 768px) and (hover: hover) and (pointer: fine)', () => {
+    const cleanup = [];
+    document.querySelectorAll('[data-magnetic]').forEach((el) => {
+      // Scale perspective with the sheet so wider/taller cards do not grow
+      // into the next row's tape or the board bolts when tilted.
+      // Tiles pivot at their tape; photos pivot where their stickers hold them.
+      gsap.set(el, { transformOrigin: el.dataset.magneticOrigin || '50% 0%' });
+      const updatePerspective = () => gsap.set(el, {
+        transformPerspective: Math.max(400, el.offsetHeight * 4, el.offsetWidth * 4),
+      });
+      updatePerspective();
+      const sizeObserver = new ResizeObserver(updatePerspective);
+      sizeObserver.observe(el);
+      const rxTo = gsap.quickTo(el, 'rotationX', { duration: DUR.micro, ease: 'power2.out' });
+      const ryTo = gsap.quickTo(el, 'rotationY', { duration: DUR.micro, ease: 'power2.out' });
+      const zTo = gsap.quickTo(el, 'z', { duration: DUR.micro, ease: 'power2.out' });
+
+      const enter = () => {
+        if (!motionPreference.matches) zTo(2);
+      };
+      const move = (event) => {
+        if (motionPreference.matches) return;
+        const rect = el.getBoundingClientRect();
+        const nx = (event.clientX - (rect.left + rect.width / 2)) / (rect.width / 2);
+        const ny = (event.clientY - rect.top) / rect.height;
+        rxTo(gsap.utils.clamp(0, 4, ny * 4));
+        ryTo(gsap.utils.clamp(-2.5, 2.5, nx * 2.5 * ny));
+        zTo(2 + ny * 2.5);
+      };
+      const leave = () => {
+        rxTo(0);
+        ryTo(0);
+        zTo(0);
+      };
+      el.addEventListener('pointerenter', enter);
+      el.addEventListener('pointermove', move);
+      el.addEventListener('pointerleave', leave);
+      cleanup.push(() => {
+        sizeObserver.disconnect();
+        el.removeEventListener('pointerenter', enter);
+        el.removeEventListener('pointermove', move);
+        el.removeEventListener('pointerleave', leave);
+      });
+    });
+    return () => cleanup.forEach((removeListeners) => removeListeners());
+  });
+}
 
 // Header avatar — hidden on landing (pages with the hero Instax photo only),
 // fades back in once that photo has scrolled fully above the viewport.
@@ -203,4 +261,5 @@ function initAvatarReveal() {
 
 initReveals();
 initScrollSpy();
+initMagneticTiles();
 initAvatarReveal();

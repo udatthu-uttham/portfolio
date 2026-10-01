@@ -3,7 +3,7 @@
 // reader can skim only the bold and still get the argument.
 //   **text**  → the normal highlight
 //   ^^text^^  → one bigger beat, used sparingly
-export const rich = (text: string) =>
-  text
+export const rich = (text: string | undefined | null) =>
+  (text ?? '')
     .replace(/\^\^(.+?)\^\^/g, '<strong class="em em--lg">$1</strong>')
     .replace(/\*\*(.+?)\*\*/g, '<strong class="em">$1</strong>');

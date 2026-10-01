@@ -4,6 +4,8 @@ Updated 2026-09-07. Based on the second supplied token JSON, with the user's lat
 
 Canonical export: `docs/design-tokens.json`. Implementation: `src/styles/global.css`. Keep these and this guide synchronized; do not reintroduce older typography recipes.
 
+Naming is locked as of 2026-10-01 (`docs/design-audit.md` §10, decision 1): **the existing prefixes stay**; category grouping happens through a prefix mapping table, never a rename.
+
 **Controls — one button family, three weights (locked 2026-09-07).** Every button is a die-cut *sticker*: sharp corners (`--radius-control`, 0), the sticker label voice (`--font-paper` 600 · `--text-small` · uppercase · `--track-label`), padding `--space-3 --space-5`, min-height `--space-7`, a −2° lean (`--cta-tilt`; a second sticker beside the first leans +1.5°), `--shadow-stuck` at rest. Hover (fine pointers only): straightens, lifts `--lift-y`, `--shadow-lift`. Press: flat, `--shadow-press`, `--dur-1`; release 100ms. Weight is the stock alone:
 
 | Class | Stock | Use |
@@ -39,21 +41,94 @@ Tracking: display `-0.03em`, headings `-0.015em`, uppercase labels `0.06em`; bod
 
 The spacing steps `--space-1` through `--space-12` are **4, 8, 12, 16, 24, 32, 48, 64, 96, 128, 160 and 200px**.
 
-| Role | Value | Application |
-| --- | --- | --- |
-| Section | `clamp(96px, 10vh, 144px)` | Separation between major sections |
-| Compact section | `clamp(48px, 5vw, 72px)` | Supporting case details and case-navigation separation |
-| Content gap | `clamp(16px, 2vw, 24px)` | Related text, card internals and card padding |
-| Group gap | `clamp(24px, 3.5vw, 48px)` | Column groups and panel side padding |
-| Control gap | `12px` | Controls that belong together |
+### The rhythm ladder (2026-09-25; four rungs and the screen contract, 2026-10-01)
 
-Headings and their labels form one group; descriptions stay nearer to their heading than the next group. Principle receipts have additional separation from their explanation. A single container owns the side gutter: never add container padding on top of the same margin. Card and panel padding aliases reuse the content/group values above. Artboard artwork has no extra nested padding.
+Every vertical gap on the homepage is one of four rungs, and **each rung is a
+clear step under the one above it**. That ratio is what makes grouping legible:
+proximity does the work, not borders (Law of Proximity — a heading belongs to
+its content because it is nearer to it than to the section before it). The hero
+is not a rung: it is one whole screen, and every section after it is at least a
+screen too (see the screen contract below).
 
-Homepage sections are separated by **the ruler**: a full-bleed 1px dashed hairline (`--line-0`) at the section's top edge, a 7px tick (`--line-mark`, `--tick-size`) at every column of the measure, and the section's name as a tracked uppercase label (`--text-eyebrow`, 500, `--track-label`) breaking the rule at the container's leading edge on a paper-coloured patch. The label is wayfinding in the nav's own voice, not a heading; the section's heading is its sentence (`.sec-sub`, h4 size, 500) 12px (`--space-3`) below the rule, while the rule itself sits a full section gap below the previous content — the ruler belongs to what follows it. Contact carries only the label; the footer only the rule. Caveat is marginalia only. The hero-to-Projects boundary uses `--section-y-sm` above and below the ruler so the ruler and heading show inside the first fold. (2026-09-18, replacing the one-heading guideline of the same morning after the separator mock; option 3 of plans/018.)
+| Rung | Token | Value | Resolves to | Application |
+| --- | --- | --- | --- | --- |
+| 1 · Between sections | `--section-y` | `clamp(96px, 11vw, 160px)` | 96 / 113 / 141 / 146 / 158 / 160 at ≤872 / 1024 / 1280 / 1324 / 1440 / ≥1455 | Split in half as `--section-pad`: every homepage section pads half a gap top and bottom, so two neighbours sum to one gap (plus centring slack) |
+| — Section pad | `--section-pad` | `calc(var(--section-y) / 2)` | 48 / 56 / 70 / 73 / 79 / 80 | Top and bottom pad of every homepage section; the hero adds `--header-height` to its top |
+| — Hero | *(none)* | `min-height: 100svh` | one whole screen | Not a rung: the first screen, content centred under the fixed header |
+| 2 · Heading → its content | `--head-gap` + board padding | `--space-5` + `--space-7` = 72px | 72px flat | A section's sentence to the first card |
+| 3 · Card inset | `--card-padding` | `clamp(16px, 2.2vw, 32px)` | 16 → 32 | Padding inside a sheet |
+| 4 · Within a card | `--space-4` / `--space-2` | 16px / 8px | flat | Stack between a card's blocks / between answer lines |
+| — Supporting detail | `--section-y-sm` | `clamp(48px, 5vw, 72px)` | 48 → 72 | Case-page chapters, case details, page navigator, footer |
+| — Content gap | `--content-gap` | `clamp(16px, 2vw, 24px)` | 16 → 24 | Related text and grid gutters |
+| — Group gap | `--group-gap` | `clamp(24px, 3.5vw, 48px)` | 24 → 48 | Column groups and panel side padding |
+| — Control gap | `--control-gap` | `12px` | flat | Controls that belong together |
 
-On the homepage, each section owns its top separation; do not add a second section-sized bottom gap to the preceding section. The work heading sits one content gap above its board, which supplies its own hardware padding. Case details use compact-section spacing because they support the artwork immediately above.
+**`--section-y` is measured in `vw`, not `vh`.** It was the one rhythm token on a
+viewport-*height* basis, and `10vh` needs a 960px-tall viewport just to clear its
+own 96px floor — so on every laptop it rendered a flat 96px and the documented
+96–144px range never once happened. Do not put it back on `vh`.
+
+**The hero boundary token is gone.** `--section-y-hero` (2026-09-25) was retired
+on 2026-10-01: the hero now fills the first screen, so there is no fold for
+Projects to peek into, and Projects takes `--section-y` like every section.
+
+**The screen contract (2026-10-01).** Every top-level section is one screen with
+its content centred (Uttham: "in one viewport so many elements are there, I want
+to just show one section"). The hero is `min-height: 100svh` under the fixed
+header, so it adds `--header-height` to its top pad; `#work`, `#ai` and
+`#contact` are `min-height: calc(100svh - var(--header-height))`. **Each pads
+`--section-pad` top and bottom**, so neighbouring pads meet at the boundary and
+content-to-content is at least one `--section-y`. Every `section[id]` lands a nav
+jump with `scroll-margin-top: var(--header-height)`, Contact included. The
+content budget is `100svh − --header-height − --section-y`: 503 / 583 / 745 /
+666 / 844px at 1280×720 / 1280×800 / 1324×967 / 1440×900 / 1920×1080 (computed
+from the CSS; plans/024 holds the measurements). Centring is block-level
+`align-content: center` (Chrome/Edge 123+, Firefox 125+, Safari 17.4+), chosen so
+the children keep normal flow and their collapsing margins; an older browser
+top-aligns, which is the old layout.
+
+**Two costs come with the contract, and both are known.** A section shorter than
+its budget is centred, and the slack above and below its content sits on no rung
+— so on tall screens the between-section gap grows past `--section-y`. And
+Projects and AI Space are taller than the budget at most laptop sizes, so they
+grow from their top pad down and break the one-screen promise; **whether to
+shrink their tiles is Uttham's call, not a spacing fix.**
+
+Headings and their labels form one group; descriptions stay nearer to their
+heading than the next group. Principle receipts have additional separation from
+their explanation. A single container owns the side gutter: never add container
+padding on top of the same margin. Artboard artwork has no extra nested padding.
+
+**Card padding is no longer an alias of the content gap** (2026-09-25, superseding
+plans/006). Uttham: "some cards are very heavily loaded, add breathing spaces."
+The sheets now carry a title, a lead line, three answers and a live preview, and
+at the content gap's 24px they read as a wall of text. `--card-padding` is its
+own `clamp(16px, 2.2vw, 32px)` — both ends land on the scale, so it is a
+considered value, not the ad-hoc number that alias existed to prevent. Panel
+padding still aliases the group gap.
+
+Homepage sections are separated by **the ruler**: a full-bleed 1px dashed hairline (`--line-0`) at the section's top edge, a 7px tick (`--line-mark`, `--tick-size`) at every column of the measure, and the section's name as a tracked uppercase label (`--text-eyebrow`, 500, `--track-label`) breaking the rule at the container's leading edge on a paper-coloured patch. The label is wayfinding in the nav's own voice, not a heading; the section's heading is its sentence (`.sec-sub`, h4 size, 500) 12px (`--space-3`) below the rule, while the rule itself sits a full section gap below the previous content — the ruler belongs to what follows it. Contact carries only the label; the footer only the rule. Caveat is marginalia only. Every boundary, the hero's included, is two half-gap pads meeting (`--section-pad` + `--section-pad`): the rule is 0px tall in flow at the top of the section's content box plus its 12px margin, so it sits at least one `--section-y` below the previous content and its sentence 12px below it. Projects takes the same `--section-y` as every section; the hero above it fills the first screen (2026-10-01). (2026-09-18, replacing the one-heading guideline of the same morning after the separator mock; option 3 of plans/018; retuned 2026-09-25; half-pad split 2026-10-01.)
+
+**The test is the screen, not the peek** (2026-10-01). Plans/016 and /018
+recorded "Projects top at 797 / 752 / 707px", and plans/023 restated the peek as
+a property — the Projects sentence inside the first viewport at 1440×900,
+1280×800 and 1024×768. That test is retired: the hero fills the first screen
+(`min-height: 100svh`, content centred) and every `.section` is at least
+`100svh − --header-height`, so **nothing of the next section shows until you
+scroll** (Uttham: "I want to just show one section"). State it as the test
+instead — at 1280×720, 1280×800, 1440×900 and 1920×1080 the hero's bottom pad
+edge is at or below the fold, and a nav jump to `#work`, `#ai` or `#contact`
+lands the ruler directly under the header with nothing of the previous section
+above it — and re-measure rather than trusting a number. Plans/024 holds the
+measurements; plans/016, /018 and /023 are superseded on this point.
+
+On the homepage, each section pads half a section gap at both ends (`--section-pad`); never give one section the whole `--section-y` on either side, or the boundary doubles. A section's heading sits `--head-gap` (24px) above its board, and the board adds `--tape-overhang` (48px) of its own — 72px in total, against a 96–160px section gap, so the heading reads as belonging to what follows it. The tape overhangs a sheet's top edge by ~16.5px, which is the floor that board padding has to beat; at 24px only 7.5px of paper showed above the tape and the heading looked glued to the cards. Case details use compact-section spacing because they support the artwork immediately above.
 
 The hero statement fills the glass panel's padded content width. Its portrait tucks 32px behind the glass and sits 64px from the panel's left edge, clear of the corner bolts. Panel top and bottom padding follows the hardware rules below. The scene and its handwritten explanation form one figure: caption first, artwork 12px below it, with a shared left edge. Its width follows whole foundation columns, as described below. Contact notes share the same size, and the photo group reserves 32px above its frame for the attached badge.
+
+**The hi! sticker is stuck onto the portrait's top-right corner** (2026-10-01, superseding the 2026-09-19 "a third on the photo, two thirds on the board" placement, which measured under 1% of the bubble on the print). `--hi-size: clamp(52px, 5vw, 72px)`; offsets `top: −0.25 × --hi-size`, `right: −0.42 × --hi-size` (were −0.22 / −0.8), which puts ~40% of the painted bubble over the print and 15–22% over the image, well right of the face, at every size. `--hello-w: clamp(120px, 13vw, 164px)` names the portrait's width so the sticker can pivot on the print's centre during the develop shake; the sticker's 12deg tilt and `--drop-stuck` live on `.hi-bubble`, leaving its wrapper free to turn with the print.
+
+**Contact fits one screen** (2026-10-01). The three principles are a title and a tagline each — the body paragraphs are gone at Uttham's request — the contact notes sit in one row, and the photo is sized to the screen rather than to its column. The exact sizes are still being tuned and are not recorded here until they settle.
 
 ## Responsive layout
 
@@ -65,6 +140,8 @@ The hero statement fills the glass panel's padded content width. Its portrait tu
 | Up to 360px | 20px | 92px | 4 / 16px |
 
 Container maximum: **1200px**. The four project cards form a 2×2 collection from 768px, and one column below 768px. Hero and contact groups stack below 1024px; principles stack at 900px and below; case details stack at 640px and below. Hero content remains in normal flow so short viewports can scroll without overlapping.
+
+`--container-max` (1200px) caps section content only. **The fixed header ignores it** (2026-10-01, Uttham: "the header top nav should always be end to end"): `.site-header__inner` is `width: 100%; padding-inline: var(--margin-side)`, so above ~1350px the bar's edges sit on the viewport gutter (80px at ≥1428px) while the sections' content stays centred at 1200px. `--margin-side` is the header's gutter at every breakpoint — `clamp(20px, 5.6vw, 80px)`, 40px at ≤900px, 20px at ≤640px — and its height is still `--header-height`.
 
 The measure: two 1px **dashed** hairlines (`--line-0`) at the content container's edges run the full page behind all content, snapped to whole pixels with `round()` so a fractional margin never blurs one edge. The rulers cross it at every section boundary with their ticks; the 12-column grid itself lives in the CSS, not on the paper. (2026-09-18, plans/018.)
 
@@ -104,6 +181,8 @@ The bot faces right in three-quarter profile on an electric bike with a small ba
 The signal scene represents two people and a small AI bot on matching motorcycles. At the start of each red-light cycle, choose a new flip combination: usually one rider, occasionally two, rarely all three, with no consecutive repeat. All riders have equal selection weight. Keep the choice fixed through the cycle and off-screen pauses; selected riders finish one eased backflip before landing. Reduced motion shows the group riding under green without animation. The caption refers to “people and AI agents” and stays above the scene. On desktop the caption-and-scene group is centred vertically against the glass slab, excluding the portrait above it.
 
 Durations: **150 / 220 / 400 / 600ms**. Sibling stagger: **70ms**. Standard/enter/exit easing: `cubic-bezier(.2,0,0,1)` / `cubic-bezier(.22,1,.36,1)` / `cubic-bezier(.3,0,1,.3)`.
+
+**Develop (hero portrait only, 2026-10-01).** `InstaxFrame`'s `develop` variant keeps three component-local durations **above the `--dur-*` ladder on purpose**, because a develop is slower than any UI feedback: `--develop-in: 800ms` (grey → colour, ease-out), `--develop-out: 1000ms` (colour → grey, ease-in-out) and `--develop-shake: 640ms` (keyframes `instax-develop-shake`, a five-swing decaying wobble of +2.5 / −2 / +1.3 / −0.7 / +0.3deg around the print's own tilt). The shake replaces the frame's hover lift; they never stack. The hero's hi! sticker repeats the literal 640ms and the same global keyframe name — keep the two in step. Fine pointers only; coarse pointers see full colour; reduced motion removes the shake, and the global `transition-duration: 0.01ms !important` override turns the colour fade into a switch.
 
 Tile entrances stagger by the current grid column. Case headings rise 12px and fade in. Hover movement is limited to a fine pointer with hover support; touch has active press feedback. CTA press is 150ms and release 100ms. Reduced motion removes spatial transitions and reduces durations to 0.01ms.
 

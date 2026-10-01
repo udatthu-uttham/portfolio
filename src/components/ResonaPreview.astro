@@ -1,153 +1,387 @@
 ---
-// Resona, rendered the way its report actually looks: a light page, DM-Sans-ish
-// type, magenta #9f2089, soft pink and yellow tints, 12px radii. The layout
-// follows the real research page (header → study card → quality strip → key
-// finding → theme → insight cards with verbatims, an "AI asks" doubt, and
-// how-might-we prompts).
-// DATA IS INVENTED: a bike-parts marketplace study, made-up riders, made-up
-// Hinglish lines. Nothing here is a real participant or a real recording.
-const participants = ['Ravi', 'Meena', 'Arjun', 'Priya'];
-const stats = [['4', 'riders'], ['18', 'observations'], ['3', 'clusters'], ['5', 'insights'], ['8', 'HMWs']];
+// Resona, rendered as its own app rather than a restyled one (CLAUDE.md): the
+// pink header wash, magenta #9f2089 actions, the Generate / Synthesize segmented
+// tabs, the dashed audio drop zone, the numbered insight card and the three-step
+// progress bar are all taken from the Gen-AI trials design file.
+//
+// HOW IT IS SIZED (Uttham, 2026-09-21): the screen is a real 320px phone
+// viewport laid out in real pixels — 15px headings, 12.5px body, 14px gutters —
+// and the whole thing is then scaled down as one piece, exactly the way the
+// prototype card scales its iframe, so the two previews sit at the same zoom.
+// Nothing stretches to fill the frame: the list runs off the bottom edge the
+// way it does on a phone, so this reads as a screenshot, not a diagram.
+//
+// The phone walks one run end to end — prepare, set the frame, record,
+// synthesise, insights — and loops, so the card shows a user completing the
+// flow rather than a single frozen screen.
+//
+// DATA IS INVENTED (locked 2026-09-20): a bike-parts marketplace study, made-up
+// riders, made-up Hinglish lines. No real participant, recording or colleague,
+// and no Meesho figures.
+
+// A fixed, hand-picked waveform, so the bars never reshuffle between renders.
+const wave = [3, 6, 4, 9, 13, 7, 11, 5, 8, 14, 6, 10, 4, 12, 7, 9, 5, 13, 8, 4, 10, 6, 11, 5];
+
+const latest = [
+  {
+    title: 'Which spares do first-time riders trust?',
+    quote: '“Fit hoga ki nahi, woh toh reviews mein dekhna padta hai”',
+    date: '12 Mar 2026',
+    people: ['Meena', 'Ravi', 'Arjun'],
+  },
+  {
+    title: 'Where the bike-model filter loses people',
+    quote: '“Model daalne ka mann nahi karta, seedha search karta hoon”',
+    date: '2 Feb 2026',
+    people: ['Priya', 'Kabir'],
+  },
+  // This one runs off the bottom edge on purpose: the store is longer than the
+  // screen, the way it is in use.
+  {
+    title: 'What a return costs a first-time buyer',
+    quote: '“Wapas bhejne mein do din lag jaate hain, phir bhi bhej dete hain”',
+    date: '19 Jan 2026',
+    people: ['Meena', 'Nusrat'],
+  },
+];
 ---
-<div class="rs" aria-label="Resona research report on an invented study">
-  <header class="rs__top">
-    <span class="rs__avatar" aria-hidden="true"></span>
-    <span class="rs__who">
-      <b>Meena Rao</b>
-      <span class="rs__tags"><i>Rider studies</i><i>Gen-AI research</i></span>
-    </span>
-    <span class="rs__heart" aria-hidden="true">♡</span>
-  </header>
 
-  <article class="rs__study">
-    <div class="rs__titlerow">
-      <h4>Why riders skip the fitment check</h4>
-      <span class="rs__actions"><span class="rs__btn rs__btn--warm">↺ Re-run</span><span class="rs__btn">Export PDF</span></span>
-    </div>
-    <p class="rs__meta">▢ 12 March 2026 &nbsp;·&nbsp; First-time buyers, Tier 2 &nbsp;·&nbsp; <b>Deductive coding + affinity mapping</b></p>
-    <p class="rs__people">{participants.map((n) => <span>{n}</span>)}</p>
-    <p class="rs__guide">▤ Discussion guide attached</p>
-    <p class="rs__audio">♫ 4 audio files <span class="rs__btn rs__btn--tiny">+ Add audio</span></p>
+<div class="rp" data-resona>
+  <div class="rp__phone" data-rp-stage>
+    <div class="rp__screen" aria-label="Resona walking through one research run on an invented study">
+      <!-- the app bar is the same on every step -->
+      <header class="rs-bar">
+        <span class="rs-ava" aria-hidden="true"></span>
+        <span class="rs-id">
+          <b>Uttham Udatthu</b>
+          <span class="rs-tags"><i>Design</i><i>Gen-AI Research</i></span>
+        </span>
+        <span class="rs-icons" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20s-7-4.6-7-9.4A3.9 3.9 0 0 1 12 8a3.9 3.9 0 0 1 7 2.6C19 15.4 12 20 12 20Z"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 10a6 6 0 1 1 12 0c0 4 1.4 5.4 1.4 5.4H4.6S6 14 6 10Z"/><path d="M10 18.5a2 2 0 0 0 4 0"/></svg>
+        </span>
+      </header>
 
-    <p class="rs__stats">
-      <span class="rs__quality">Quality <b>82/100</b></span>
-      {stats.map(([n, l]) => <span><b>{n}</b> {l}</span>)}
-    </p>
+      <div class="rs-body">
+        <!-- 1 · prepare — the home the researcher starts from -->
+        <section class="rs-step is-on" data-step="prepare">
+          <div class="rs-search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="6"/><path d="m16 16 4 4"/></svg>
+            <span>Search for any research</span>
+          </div>
+          <div class="rs-seg">
+            <span>Generate Questionnaire</span>
+            <span class="is-on">Synthesize Research</span>
+          </div>
+          <h4 class="rs-h">My Notes</h4>
+          <div class="rs-promo">
+            <span class="rs-halo" aria-hidden="true"></span>
+            <div>
+              <p class="rs-promo__t">Create your First Research</p>
+              <ol class="rs-promo__l"><li><b>Add</b> Research Audio</li><li><b>Validate</b> the Insights</li><li><b>Publish</b> your Research</li></ol>
+            </div>
+          </div>
+          <p class="rs-cta">Create</p>
+          <h4 class="rs-h">Latest Research</h4>
+          {latest.map((r) => (
+            <article class="rs-rec">
+              <p class="rs-rec__t">{r.title}</p>
+              <p class="rs-rec__q">{r.quote}</p>
+              <p class="rs-rec__p">{r.people.map((n) => <span>{n}</span>)}<b>{r.date}</b></p>
+            </article>
+          ))}
+        </section>
 
-    <div class="rs__finding">
-      <span class="rs__label">Key finding</span>
-      <p>First-time riders read the fitment badge as an ad, not a check. They trust <b>a friend’s bike model in the reviews</b> over anything the card says, so the badge has to borrow that proof rather than compete with it.</p>
-    </div>
-    <p class="rs__method">Method: Deductive coding + affinity mapping</p>
+        <!-- 2 · set the frame — the study's own brief, before any audio -->
+        <section class="rs-step" data-step="setup">
+          <h4 class="rs-h rs-h--page">New Notes</h4>
+          <div class="rs-field"><label>Goal / Objective <i>*</i></label><p class="rs-in is-filled">Why riders skip the fitment check</p></div>
+          <div class="rs-field"><label>Date of Research <i>*</i></label><p class="rs-in is-filled">12 March 2026</p></div>
+          <div class="rs-field"><label>Researchers <i>*</i></label><p class="rs-in rs-chips"><span>Meena ×</span><span>Ravi ×</span></p></div>
+          <div class="rs-field"><label>User Cohorts <i>*</i></label><p class="rs-in is-filled">First-time buyers, Tier 2</p></div>
+          <div class="rs-field"><label>Research Type <i>*</i></label><p class="rs-in is-filled rs-in--sel">Moderated interviews</p></div>
+          <div class="rs-field"><label>Add Audio Files <i>*</i></label><p class="rs-drop">Add Audio Files</p></div>
+          <p class="rs-row"><span class="rs-ghost">Go Back</span><span class="rs-cta rs-cta--half">Proceed</span></p>
+        </section>
 
-    <section class="rs__theme">
-      <p class="rs__label rs__label--brand">Theme 1</p>
-      <h5>Does the fitment badge read as a check?</h5>
-      <p class="rs__sub">Evaluate whether riders understand the badge means the part was verified against their bike.</p>
-      <p class="rs__label">Insights</p>
+        <!-- 3 · record — the listening sheet over the dimmed home -->
+        <section class="rs-step rs-step--sheet" data-step="record">
+          <div class="rs-sheet">
+            <p class="rs-sheet__top"><b>Recording</b><span aria-hidden="true">✕</span></p>
+            <span class="rs-halo rs-halo--lg" aria-hidden="true"></span>
+            <p class="rs-listen">Listening…</p>
+            <p class="rs-wave">
+              <b aria-hidden="true"></b>
+              <span class="rs-wave__bars" aria-hidden="true">{wave.map((h) => <i style={`--h:${h}`}></i>)}</span>
+            </p>
+            <p class="rs-cta">Save</p>
+          </div>
+        </section>
 
-      <div class="rs__cards">
-        <div class="rs__card rs__card--ask">
-          <p class="rs__cardhead"><span>⚠ Needs your input</span><span>78% insight score</span></p>
-          <p class="rs__insight">The word “fitment” reads as a sponsored label, so the check is ignored</p>
-          <blockquote class="rs__quote">“Ye toh ad hai na? Fit hoga ki nahi, woh toh reviews mein dekhna padega.”<cite>S2_P1 ~14:02</cite></blockquote>
-          <p class="rs__ai"><b>AI asks:</b> Claims 3 of 4 riders read it as an ad, but only S2 said so. <span class="rs__btn rs__btn--tiny">Clarify</span></p>
-          <p class="rs__label">How might we</p>
-          <p class="rs__hmw">How might we phrase the check as the rider’s own bike, not as a badge?</p>
-        </div>
+        <!-- 4 · synthesise — the wait, with the guide as the coding frame -->
+        <section class="rs-step rs-step--mid" data-step="synth">
+          <span class="rs-halo rs-halo--lg" aria-hidden="true"></span>
+          <p class="rs-listen">Synthesizing Audio Files…</p>
+          <p class="rs-prog"><b></b></p>
+          <p class="rs-note">4 recordings · coded against<br />the discussion guide</p>
+        </section>
 
-        <div class="rs__card">
-          <p class="rs__cardhead rs__cardhead--brand"><span>Does the fitment badge read as a check?</span></p>
-          <p class="rs__chips"><span>3 of 4 participants</span><span class="is-high">Insight score: HIGH</span></p>
-          <p class="rs__insight">Riders trust a reviewer with the same bike more than a platform check</p>
-          <p class="rs__design">Design: show “fits Splendor Plus, says Ravi” next to the badge, pulled from a verified review.</p>
-          <blockquote class="rs__quote">“Splendor wale bhai ne likha fit ho gaya, toh mujhe pakka lag gaya.”<cite>S3_P1 ~08:41</cite></blockquote>
-          <p class="rs__label">How might we</p>
-          <p class="rs__hmw">How might we let a rider see one review from their own bike before anything else?</p>
-        </div>
+        <!-- 5 · insights — the output the researcher argues with -->
+        <section class="rs-step" data-step="insights">
+          <h4 class="rs-h rs-h--page">Fitment check, Tier 2</h4>
+          <p class="rs-steps" aria-hidden="true"><b class="is-done"></b><b class="is-done"></b><b></b></p>
+          <div class="rs-ins">
+            <p class="rs-ins__t">Insights <span aria-hidden="true">✎</span></p>
+            <ol class="rs-ins__l">
+              <li>Riders read the fitment badge as an ad, not as a check.</li>
+              <li>A reviewer on the same bike outranks anything the card claims.</li>
+              <li>Nobody sets the bike model up front; they search the part name.</li>
+            </ol>
+          </div>
+          <p class="rs-fold">Opportunities</p>
+          <p class="rs-fold">Pain Points</p>
+          <p class="rs-cta rs-cta--pin">Confirm</p>
+        </section>
       </div>
-    </section>
-  </article>
+    </div>
+  </div>
+
 </div>
 
+<script>
+  // The screen is laid out at a real 320px phone width and scaled to whatever
+  // width the card gives the phone — the same trick the prototype card uses on
+  // its iframe, so the two previews end up at the same apparent zoom. --vh is
+  // the frame's height in the screen's own units, so the app always gets a
+  // viewport that ends exactly where the frame does.
+  const VW = 320;
+  document.querySelectorAll<HTMLElement>('[data-rp-stage]').forEach((phone) => {
+    const fit = () => {
+      const k = phone.clientWidth / VW;
+      if (!k) return;
+      phone.style.setProperty('--k', String(k));
+      phone.style.setProperty('--vh', `${phone.clientHeight / k}px`);
+    };
+    new ResizeObserver(fit).observe(phone);
+    fit();
+  });
+
+  // One run, looping: the phone advances a step every few seconds and the list
+  // beside it keeps up. Paused off-screen so an unseen card costs nothing, and
+  // held on the finished report under reduced motion.
+  document.querySelectorAll<HTMLElement>('[data-resona]').forEach((root) => {
+    const screens = [...root.querySelectorAll<HTMLElement>('[data-step]')];
+    if (screens.length < 2) return;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let i = 0;
+    let timer = 0;
+
+    const paint = () => screens.forEach((s, n) => s.classList.toggle('is-on', n === i));
+    // Recording earns a longer beat than a form; the report earns the longest.
+    const hold = () => [4200, 3800, 3400, 2400, 5600][i] ?? 3400;
+    const stop = () => window.clearTimeout(timer);
+    const tick = () => {
+      i = (i + 1) % screens.length;
+      paint();
+      timer = window.setTimeout(tick, hold());
+    };
+    const start = () => {
+      stop();
+      if (reduced.matches) { i = screens.length - 1; paint(); return; }
+      timer = window.setTimeout(tick, hold());
+    };
+
+    paint();
+    const io = new IntersectionObserver(
+      ([e]) => (e.isIntersecting ? start() : stop()),
+      { threshold: 0.15 }
+    );
+    io.observe(root);
+    reduced.addEventListener('change', start);
+  });
+</script>
+
 <style>
-  .rs {
-    --rs-brand: #9f2089;
-    --rs-bg: #f8f8ff;
-    --rs-ink: #333;
-    --rs-mute: #6f6f7a;
-    --rs-line: #ececf2;
-    --rs-pink: #fbe9f6;
-    --rs-yellow: #fff6dc;
-    --rs-green: #e7f4ea;
-    --rs-green-ink: #1d7a3b;
-    --rs-r: 12px;
-    display: flex; flex-direction: column; gap: 10px;
-    padding: 10px 12px 14px;
-    background: var(--rs-bg); color: var(--rs-ink);
+  /* ---- the well: one phone standing on the bottom edge, nothing else ---- */
+  .rp {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    width: 100%;
+    height: 100%;
+    text-align: left;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+  /* The same frame the Projects deck covers stand in, so the two sections read
+     as one shelf: 9/15, flush on the bottom edge, rounded only at the top. */
+  .rp__phone {
+    --k: 0.7;
+    position: relative;
+    flex: 0 1 auto;
+    height: 100%;
+    aspect-ratio: 9 / 15;
+    max-width: 100%;
+    overflow: hidden;
+    border: 1px solid var(--line-1);
+    border-bottom: 0;
+    border-radius: 18px 18px 0 0;
+    background: #fff;
+    box-shadow: var(--shadow-rest);
+  }
+
+  /* ---- the app itself, at a real phone's own size ---------------------- */
+  /* Everything below is in the plain pixels the app would use on a 320px
+     handset. The frame scales the whole screen at once, so the proportions are
+     a phone's, never a diagram's. */
+  .rp__screen {
+    --b: #9f2089; /* Resona magenta, from the design file */
+    --ink: #2e2e38;
+    --mute: #6f6f7a;
+    --line: #ececf2;
+    --pink: #fae2f4;
+    --wash: #ffe7fb;
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    width: 320px;
+    height: var(--vh, 533px);
+    transform-origin: top left;
+    scale: var(--k);
+    background: #fff;
+    color: var(--ink);
     font-family: var(--font-paper);
-    font-size: 10.5px; line-height: 1.4;
-    text-align: left; text-transform: none; letter-spacing: 0;
+    font-size: 12.5px;
+    line-height: 1.4;
   }
-  .rs p, .rs h4, .rs h5, .rs blockquote { margin: 0; }
-  .rs__top { display: flex; align-items: center; gap: 8px; padding: 2px 2px 4px; }
-  .rs__avatar { width: 26px; height: 26px; border-radius: 50%; background: linear-gradient(135deg, #f2b7d9, var(--rs-brand)); }
-  .rs__who { display: flex; flex-direction: column; gap: 3px; font-size: 11px; }
-  .rs__tags { display: flex; gap: 4px; }
-  .rs__tags i { font-style: normal; font-size: 8.5px; padding: 1px 6px; border-radius: 6px; background: #ece9ff; color: #4b3f9e; }
-  .rs__tags i + i { background: var(--rs-yellow); color: #8a5a00; }
-  .rs__heart { margin-left: auto; color: var(--rs-brand); font-size: 14px; }
+  .rp__screen :where(p, h4, ol, li) { margin: 0; }
 
-  .rs__study { display: flex; flex-direction: column; gap: 7px; padding: 12px 12px 14px; background: #fff; border: 1px solid var(--rs-line); border-radius: var(--rs-r); box-shadow: 0 6px 18px -12px rgba(40, 20, 60, .35); }
-  .rs__titlerow { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .rs-bar { display: flex; align-items: center; gap: 9px; flex: none; padding: 12px 14px 10px; background: linear-gradient(180deg, var(--wash), #fff); }
+  .rs-ava { flex: none; width: 31px; height: 31px; border-radius: 50%; background: linear-gradient(135deg, #f3bcdf, var(--b)); }
+  .rs-id { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+  .rs-id b { font-size: 14px; font-weight: 700; letter-spacing: -0.01em; }
+  .rs-tags { display: flex; gap: 4px; }
+  .rs-tags i { font-style: normal; font-size: 8.5px; font-weight: 600; padding: 2px 6px; border-radius: 5px; background: #efe9ff; color: #4b3f9e; white-space: nowrap; }
+  .rs-tags i + i { background: #fff3d6; color: #8a5a00; }
+  .rs-icons { display: flex; gap: 9px; margin-left: auto; color: var(--b); }
+  .rs-icons svg { width: 16px; height: 16px; }
 
-  /* Phone layout: the title takes the full width and the actions drop beneath
-     it, instead of a desktop title row being squeezed into a 268px frame. */
-  @container frame (max-width: 320px) {
-    .rs__titlerow { flex-direction: column; align-items: stretch; gap: 6px; }
-    .rs__actions { justify-content: flex-start; }
-    .rs__titlerow h4 { font-size: 12.5px; line-height: 1.25; }
+  /* The steps stack, so swapping one for another never re-lays the phone out.
+     Nothing stretches: content starts at the top and runs off the bottom edge
+     if it is longer than the screen, exactly as it does in the app. */
+  .rs-body { position: relative; flex: 1 1 auto; min-height: 0; }
+  .rs-step {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 4px 14px 14px;
+    overflow: hidden;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--dur-3) var(--ease-standard), visibility var(--dur-3) step-end;
   }
-  .rs__titlerow h4 { font-size: 13px; font-weight: 700; letter-spacing: -0.01em; }
-  .rs__actions { display: flex; gap: 5px; }
-  .rs__btn { display: inline-block; padding: 3px 8px; border: 1px solid var(--rs-brand); border-radius: 6px; color: var(--rs-brand); font-size: 8.5px; font-weight: 600; white-space: nowrap; }
-  .rs__btn--warm { border-color: #e6b800; color: #8a5a00; background: var(--rs-yellow); }
-  .rs__btn--tiny { padding: 1px 6px; font-size: 8px; border-color: #cfcfda; color: var(--rs-ink); font-weight: 500; }
-  .rs__meta { color: var(--rs-mute); font-size: 9.5px; }
-  .rs__meta b { color: var(--rs-ink); font-weight: 600; }
-  .rs__people { display: flex; gap: 4px; flex-wrap: wrap; }
-  .rs__people span { padding: 1px 6px; border-radius: 5px; background: var(--rs-green); color: var(--rs-green-ink); font-size: 8.5px; font-weight: 600; }
-  .rs__guide { padding: 4px 8px; border-radius: 6px; background: var(--rs-pink); color: var(--rs-brand); font-size: 9px; font-weight: 500; }
-  .rs__audio { display: flex; align-items: center; gap: 6px; color: var(--rs-mute); font-size: 9px; }
-  .rs__stats { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding-top: 6px; border-top: 1px solid var(--rs-line); color: var(--rs-mute); font-size: 9px; }
-  .rs__stats b { color: var(--rs-ink); font-weight: 600; }
-  .rs__quality { padding: 2px 7px; border-radius: 6px; background: var(--rs-green); color: var(--rs-green-ink); }
-  .rs__quality b { color: var(--rs-green-ink); }
+  .rs-step.is-on { opacity: 1; visibility: visible; transition: opacity var(--dur-3) var(--ease-standard), visibility 0s; }
+  .rs-step--mid { justify-content: center; align-items: center; gap: 16px; }
+  /* The recording sheet rises over the home it was started from, so the home
+     stays on screen — dimmed — for as long as the sheet is up. */
+  .rs-step--sheet { justify-content: flex-end; padding: 0; background: rgba(46, 46, 56, 0.42); }
+  .rs-body:has([data-step="record"].is-on) [data-step="prepare"] { opacity: 1; visibility: visible; }
 
-  .rs__label { font-size: 8px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--rs-mute); }
-  .rs__label--brand { color: var(--rs-brand); }
-  .rs__finding { display: flex; flex-direction: column; gap: 4px; padding: 10px 12px; border-radius: var(--rs-r); background: var(--rs-pink); border: 1px solid #f0c9e6; }
-  .rs__finding p { font-size: 10.5px; font-weight: 600; line-height: 1.45; }
-  .rs__finding b { color: var(--rs-brand); }
-  .rs__method { align-self: flex-start; padding: 2px 8px; border-radius: 6px; background: #f1f1f6; color: var(--rs-mute); font-size: 8.5px; }
+  .rs-search { display: flex; align-items: center; gap: 7px; flex: none; padding: 10px 12px; border: 1px solid var(--line); border-radius: 11px; color: var(--mute); font-size: 12px; box-shadow: 0 1px 3px rgba(40, 20, 60, 0.06); }
+  .rs-search svg { width: 14px; height: 14px; flex: none; }
 
-  .rs__theme { display: flex; flex-direction: column; gap: 5px; margin-top: 4px; padding-left: 10px; border-left: 2px solid var(--rs-brand); }
-  .rs__theme h5 { font-size: 12px; font-weight: 700; }
-  .rs__sub { color: var(--rs-mute); font-size: 9.5px; }
-  .rs__cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 4px; }
-  .rs__card { display: flex; flex-direction: column; gap: 6px; padding: 9px 10px 10px; border: 1px solid var(--rs-line); border-radius: var(--rs-r); background: #fff; }
-  .rs__card--ask { background: #fffcf2; border-color: #f3e2a8; }
-  .rs__cardhead { display: flex; justify-content: space-between; gap: 6px; font-size: 8.5px; font-weight: 600; color: #8a5a00; }
-  .rs__cardhead--brand { color: var(--rs-brand); text-transform: uppercase; letter-spacing: .06em; font-size: 8px; }
-  .rs__chips { display: flex; gap: 4px; flex-wrap: wrap; }
-  .rs__chips span { padding: 1px 6px; border-radius: 5px; background: #f1f1f6; color: var(--rs-mute); font-size: 8px; font-weight: 600; }
-  .rs__chips .is-high { background: var(--rs-green); color: var(--rs-green-ink); }
-  .rs__insight { font-size: 10.5px; font-weight: 600; line-height: 1.4; }
-  .rs__design { color: var(--rs-mute); font-size: 9px; font-style: italic; }
-  .rs__quote { display: flex; flex-direction: column; gap: 3px; padding: 7px 9px; border-radius: 8px; background: #f6f6fb; color: #4a4a55; font-size: 9px; font-style: italic; line-height: 1.4; }
-  .rs__card--ask .rs__quote { background: #fff3cf; }
-  .rs__quote cite { font-style: normal; font-size: 8px; color: var(--rs-brand); font-weight: 600; }
-  .rs__ai { display: flex; align-items: center; flex-wrap: wrap; gap: 4px; color: #8a5a00; font-size: 9px; }
-  .rs__hmw { font-size: 9.5px; color: var(--rs-ink); }
-  @media (max-width: 640px) { .rs__cards { grid-template-columns: 1fr; } .rs__titlerow { flex-direction: column; align-items: flex-start; } }
+  .rs-seg { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; flex: none; }
+  .rs-seg span { padding: 8px 3px; border: 1px solid var(--line); border-radius: 9px; color: var(--mute); font-size: 10px; font-weight: 600; text-align: center; }
+  .rs-seg .is-on { border-color: var(--b); background: var(--wash); color: var(--b); }
+
+  .rs-h { flex: none; font-size: 15px; font-weight: 700; letter-spacing: -0.01em; }
+  .rs-h--page { font-size: 17px; }
+
+  .rs-promo { display: flex; align-items: center; gap: 11px; flex: none; padding: 11px; border-radius: 11px; background: var(--pink); }
+  .rs-promo__t { font-size: 12.5px; font-weight: 700; }
+  .rs-promo .rs-promo__l { margin-top: 4px; padding-left: 15px; font-size: 10.5px; line-height: 1.5; color: #58505c; }
+  .rs-promo__l b { color: var(--ink); }
+
+  /* the app's own listening motif: a soft disc inside a magenta ring */
+  .rs-halo { position: relative; flex: none; width: 44px; height: 44px; border: 3px solid var(--b); border-radius: 50%; background: radial-gradient(circle at 50% 45%, #fff 30%, var(--pink) 75%); }
+  .rs-halo--lg { width: 94px; height: 94px; }
+  /* While it is listening the ring sends a second ring out, once a beat. */
+  .rs-halo--lg::before,
+  .rs-halo--lg::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border: 2px solid var(--b);
+    border-radius: 50%;
+    animation: rs-ring 2.4s var(--ease-standard) infinite;
+  }
+  .rs-halo--lg::after { animation-delay: 1.2s; }
+  @keyframes rs-ring {
+    from { transform: scale(1); opacity: 0.5; }
+    to { transform: scale(1.45); opacity: 0; }
+  }
+
+  .rs-cta { flex: none; padding: 12px; border-radius: 11px; background: var(--b); color: #fff; font-size: 14px; font-weight: 600; text-align: center; }
+  .rs-cta--half { flex: 1 1 0; }
+  .rs-step .rs-cta--pin { margin-top: auto; }
+  .rs-ghost { flex: 1 1 0; padding: 12px; border: 1px solid var(--b); border-radius: 11px; background: #fff; color: var(--b); font-size: 14px; font-weight: 600; text-align: center; }
+  .rs-step .rs-row { display: flex; gap: 9px; margin-top: auto; }
+
+  .rs-rec { display: flex; flex-direction: column; gap: 5px; flex: none; padding: 10px 11px; border: 1px solid var(--line); border-radius: 11px; }
+  .rs-rec__t { font-size: 12.5px; font-weight: 700; }
+  .rs-rec__q { color: var(--mute); font-size: 10.5px; font-style: italic; }
+  .rs-rec__p { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+  .rs-rec__p span { padding: 2px 6px; border-radius: 5px; background: #e5f3ef; color: #1d7a3b; font-size: 9.5px; font-weight: 600; }
+  .rs-rec__p b { margin-left: auto; color: var(--mute); font-size: 9.5px; font-weight: 500; }
+
+  .rs-field { display: flex; flex-direction: column; gap: 4px; flex: none; }
+  .rs-field label { font-size: 10.5px; font-weight: 700; }
+  .rs-field label i { color: #d33; font-style: normal; }
+  .rs-in { padding: 9px 11px; border: 1px solid var(--line); border-radius: 9px; color: var(--mute); font-size: 11.5px; }
+  .rs-in.is-filled { color: var(--ink); }
+  .rs-in--sel { position: relative; }
+  .rs-in--sel::after { content: '⌄'; position: absolute; right: 11px; top: 3px; color: var(--mute); }
+  .rs-chips { display: flex; gap: 4px; padding: 6px 9px; }
+  .rs-chips span { padding: 3px 7px; border-radius: 5px; background: var(--wash); color: var(--b); font-size: 10.5px; font-weight: 600; }
+  .rs-drop { padding: 12px; border: 1px dashed var(--b); border-radius: 9px; color: var(--b); font-size: 11.5px; font-weight: 600; text-align: center; }
+
+  .rs-sheet { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 13px 14px 16px; border-radius: 16px 16px 0 0; background: #fff; }
+  .rs-sheet__top { display: flex; justify-content: space-between; align-items: center; width: 100%; padding-bottom: 9px; border-bottom: 1px solid var(--line); font-size: 13px; color: var(--mute); }
+  .rs-sheet__top b { color: var(--ink); font-weight: 700; }
+  .rs-sheet .rs-cta { width: 100%; }
+  .rs-listen { font-size: 14px; font-weight: 700; }
+
+  .rs-wave { display: flex; align-items: center; gap: 9px; }
+  .rs-wave > b { flex: none; width: 28px; height: 28px; border-radius: 50%; background: var(--b); }
+  /* the pause glyph, drawn so it stays crisp at any scale */
+  .rs-wave > b::before { content: ''; display: block; width: 8px; height: 10px; margin: 9px auto; border-inline: 3px solid #fff; }
+  .rs-wave__bars { display: flex; align-items: center; gap: 2px; height: 20px; }
+  .rs-wave__bars i { width: 2px; height: calc(var(--h) * 1.4px); border-radius: 999px; background: var(--b); animation: rs-pulse 900ms var(--ease-standard) infinite alternate; animation-delay: calc(var(--h) * -37ms); }
+  @keyframes rs-pulse { from { transform: scaleY(0.45); } to { transform: scaleY(1); } }
+
+  .rs-prog { width: 62%; height: 4px; border-radius: 999px; background: var(--line); overflow: hidden; }
+  .rs-prog b { display: block; width: 45%; height: 100%; border-radius: inherit; background: var(--b); animation: rs-run 2.2s var(--ease-standard) infinite; }
+  @keyframes rs-run { from { transform: translateX(-100%); } to { transform: translateX(240%); } }
+  .rs-note { color: var(--mute); font-size: 10.5px; text-align: center; line-height: 1.5; }
+
+  .rs-steps { display: flex; gap: 6px; flex: none; }
+  .rs-steps b { flex: 1 1 0; height: 3px; border-radius: 999px; background: #d7d7d9; }
+  .rs-steps .is-done { background: #353543; }
+  .rs-ins { flex: none; padding: 13px 12px; border: 1px solid var(--line); border-radius: 13px; box-shadow: 0 6px 18px -14px rgba(40, 20, 60, 0.5); }
+  .rs-ins__t { font-size: 15px; font-weight: 700; text-align: center; }
+  .rs-ins__t span { color: var(--b); }
+  .rs-ins .rs-ins__l { margin-top: 9px; padding-left: 16px; display: flex; flex-direction: column; gap: 6px; color: #5a5a68; font-size: 11.5px; line-height: 1.45; }
+  .rs-fold { flex: none; padding: 10px; border: 1px solid var(--line); border-radius: 9px; font-size: 12.5px; font-weight: 600; text-align: center; }
+
+  /* The bars are ambient, not feedback — they stop with everything else. */
+  @media (prefers-reduced-motion: reduce) {
+    .rs-wave__bars i,
+    .rs-prog b,
+    .rs-halo--lg::before,
+    .rs-halo--lg::after { animation: none; }
+  }
 </style>

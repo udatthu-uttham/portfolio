@@ -21,7 +21,7 @@ const tool = tools.find((t) => t.slug === guide.slug);
     <GridOverlay />
     <article class="guide__wrap">
       <a class="text-link guide__back" href="/#ai">← AI Space</a>
-      <p class="eyebrow">{tool?.kicker} · White-label guide</p>
+      <p class="eyebrow">{[tool?.kicker, 'White-label guide'].filter(Boolean).join(' · ')}</p>
       <h1>{guide.title}</h1>
       <p class="guide__intro" set:html={rich(guide.intro)} />
 

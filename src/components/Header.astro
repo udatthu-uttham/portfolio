@@ -42,9 +42,15 @@ const { active = 'about' } = Astro.props;
     border-top: none;
   }
 
+  /* End to end at every width (Uttham, 2026-10-01: "the header top nav should
+     always be end to end"). The bar's content is NOT capped to
+     --container-max: the wordmark sits on the left gutter and the nav on the
+     right gutter of the viewport, whatever its width. The page sections below
+     keep their 1200px container — only the bar runs edge to edge. Height is
+     untouched: --header-height still sets the rhythm (min-height below). */
   .site-header__inner {
-    width: min(calc(100% - var(--margin-side) * 2), var(--container-max));
-    margin-inline: auto;
+    width: 100%;
+    padding-inline: var(--margin-side);
     display: flex;
     align-items: center;
     justify-content: space-between;

@@ -7,49 +7,52 @@
 // participant audio or verbatims, no Meesho figures. The previews show the
 // mechanism; the contents are always invented.
 //
-// One tool is "on the bench" at a time (plans/022): the list on the left picks
-// it, the frame on the right runs it, three answers sit under the frame, and a
-// white-label guide (src/data/guides.ts) lets another team replicate it.
+// LAYOUT (Uttham, 2026-09-21): two cards, built out of the Projects tile —
+// tape, pill, year, title, lead line, the answers, a 4/3 glass well, and the
+// replicate link. The long version of "how to build it" lives on /ai/<slug>.
+//
+// THE COPY IS UTTHAM'S (2026-09-21): `what` and `helps` are his own words, and
+// only grammar and the bold rule have been touched. Do NOT shorten them to fit
+// a layout — condensing them changed what they meant. If the card needs to be
+// shorter, take it out of the layout, not out of the sentence.
 export type Tool = {
   slug: string;
   kicker: string; // the pill: what kind of thing this is
   name: string;
   year: string;
-  claim: string; // the one line in the bench list. Highlights in **bold**.
-  what: string; // What is this. Highlights in **bold**.
-  helps: string; // How it helps at Meesho. Highlights in **bold**.
-  replicate: string; // How to replicate it, in one breath; the guide has the rest. Highlights in **bold**.
-  chrome: string; // the address bar inside the frame
-  status: string; // the small note beside the address bar
+  what: string; // the card's lead line. Highlights in **bold**.
+  helps: string[]; // how it helps, one point each. Highlights in **bold**.
+  action: string; // the label on the replicate link
   used?: { label: string; href: string }; // where it shows up in the case studies
-  featured?: boolean; // on the bench when the page loads
+  visit?: { label: string; href: string }; // a live thing you can open yourself
 };
 
 export const tools: Tool[] = [
   {
-    slug: 'context-layer',
-    kicker: 'Method',
-    name: 'Context Layer',
-    year: '2026—',
-    claim: 'Design decisions kept **durable, arguable and cumulative.**',
-    what: 'A repository of design experiments: **one markdown record per line of work**, written by an agent that interrogates you until the record is worth reading a year later. A Claude Project loads the records for debate; Figma renders them as cards.',
-    helps: 'Dozens of experiments run each cycle and the readouts used to die in weekly review decks. Now a designer can ask **“what have we learned about card height?”** and get an answer with sources, and the next cycle is planned against the records, not memory.',
-    replicate: 'A folder of markdown with fixed headings, a skill that asks the hard questions before it writes, and a debate skill inside a Claude Project. **No infrastructure**: a git repo, a Claude Project, one Figma file.',
-    chrome: 'context-layer / records / fitment-badge.md',
-    status: 'Synthetic record',
-    used: { label: 'A line of card height', href: '/work/a-line-of-card-height' },
-    featured: true,
-  },
-  {
     slug: 'resona',
     kicker: 'Internal tool',
-    name: 'Resona',
+    name: 'Research allrounder',
     year: '2026',
-    claim: 'Session recordings in, **a research report you can argue with** out.',
-    what: 'A research assistant for the design research pod: **session audio in, a coded research report out**, with insights scored by evidence and verbatims pinned to the second they were said.',
-    helps: 'Interviews arrive as Hindi and Hinglish audio. Synthesis that took the pod days now lands the same afternoon, and the report **flags its own overclaims** before anyone quotes them in a review.',
-    replicate: 'Transcription with speaker separation, the discussion guide as the coding frame, and a model pass that must cite a timestamp for every insight. **Make it ask when the evidence is thin.** That one rule is the product.',
-    chrome: 'resona / research / fitment-check',
-    status: 'Invented study',
+    what: 'A central tool for **research preparation and insight capture** — and for reaching past research, so each study is run better than the last.',
+    helps: [
+      '**Non-designers can be confident,** as this tool suggests the right research methods and research questions.',
+      '**They can learn, follow and improve,** as the tool actively listens to their research and upskills them.',
+      '**Centralised research storage** that is accessible to everyone.',
+    ],
+    action: 'Copy the prompt',
+  },
+  {
+    slug: 'realistic-prototype',
+    kicker: 'Research rig',
+    name: 'Realistic prototype',
+    year: '2026',
+    what: 'A web app that **looks like Meesho, with realistic user data,** built for better research.',
+    helps: [
+      '**Strong engagement from users,** as this web app has user data and Meesho design that emulate real app movements — giving great insights.',
+      '**Complex flows like checkout and payments become testable** — users can emulate checkout, run journeys and track their orders.',
+      '**Understand how people react to new features and content** — for example, Best of Jaipur product cards in the feed.',
+    ],
+    action: 'Copy the plan',
+    visit: { label: 'Open the prototype', href: '/proto/feed-ux/index.html' },
   },
 ];

@@ -6,7 +6,7 @@
 - Layer 1: featured tiles on the glass board (`Study.featured`), auto-fit grid — two share a row, a third fits at desktop, one column on phones.
 - Layer 2: `CaseIndex` rows under the board for every unfeatured case — year, kicker, title, one line, arrow. No media. Also used at the end of every case page as "More cases" (replaces PageNavigator there).
 - No filter pills (Uttham: "get rid of them"). Current work sorts first by array order.
-- Preview of the second layer with stand-in rows: `/mock/projects` (throwaway, delete after review).
+- Decision 20 Sep 2026 (late): no glass board; each tile’s media well is the glass (the first “option 2” mock). Mock pages deleted after the decision.
 
 ## AI Space
 - One bench (`ToolBench`): list on the left (kicker, name, one line), the selected tool's live preview on the right, three answers under it — What is this · How it helps at Meesho · How to replicate it — as three columns. Hover peeks, click commits, only one panel visible.

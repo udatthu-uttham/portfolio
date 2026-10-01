@@ -124,8 +124,30 @@
   --space-12: 200px;
 
   /* semantic rhythm — keeps page whitespace independent from control sizing */
-  --section-y: clamp(96px, 10vh, 144px);
-  --section-y-sm: clamp(48px, 5vw, 72px);
+  /* The rhythm ladder (2026-09-25). Each rung is a clear step under the one
+     above it, so proximity alone says what belongs to what — no borders doing
+     that work. Between sections > heading-to-its-content > card inset >
+     within a card. The hero is not a rung: it is one whole screen.
+
+     --section-y was the ONE rhythm token measured in vh while every other is
+     vw. 10vh needs a 960px-tall viewport just to clear its own 96px floor, so
+     on every laptop it rendered a flat 96px and the 96–144px range in the docs
+     never once happened. vw puts it on the same basis as its neighbours.
+
+     The hero-boundary rung (--section-y-hero) was retired on 2026-10-01: the
+     hero now fills the first screen, so there is no fold for Projects to peek
+     into and it takes a normal section gap.
+
+     The screen contract (2026-10-01): every homepage section is one screen
+     with its content centred, and pads itself by HALF a section gap top and
+     bottom. Two neighbours' pads meet at the boundary, so content-to-content
+     is always at least one --section-y, plus whatever centring slack the
+     shorter section has. A section's content budget is therefore
+     100svh - --header-height - --section-y. */
+  --section-y: clamp(96px, 11vw, 160px); /* between sections: 96 / 113 / 141 / 146 / 158 / 160 at <=872 / 1024 / 1280 / 1324 / 1440 / >=1455 */
+  --section-pad: calc(var(--section-y) / 2); /* each section's own top and bottom pad: 48 / 70 / 73 / 79 / 80 at <=872 / 1280 / 1324 / 1440 / >=1455 */
+  --section-y-sm: clamp(48px, 5vw, 72px); /* supporting detail inside a section */
+  --head-gap: var(--space-5); /* a section heading to its own content */
   --content-gap: clamp(16px, 2vw, 24px);
   --group-gap: clamp(24px, 3.5vw, 48px);
   --control-gap: 12px;
@@ -183,7 +205,13 @@
   --grid-columns: 12;
   --grid-gap: 24px;
   --panel-padding: var(--group-gap);
-  --card-padding: var(--content-gap);
+  /* SUPERSEDES plans/006's "card padding = content gap" alias (Uttham,
+     2026-09-25: "some cards are very heavily loaded, add breathing spaces").
+     These sheets carry a title, a lead line, three answers and a live preview;
+     at the content gap's 24px they read as a wall of text. Both ends land on
+     the scale — 16px (--space-4) to 32px (--space-6) — so this is a considered
+     value, not the ad-hoc number that alias existed to prevent. */
+  --card-padding: clamp(16px, 2.2vw, 32px);
   --bolt-inset: 18px; /* the glass material recipe */
   --bolt-size: 16px;
   --bolt-clearance: var(--space-4);

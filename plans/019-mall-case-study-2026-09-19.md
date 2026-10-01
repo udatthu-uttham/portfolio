@@ -7,19 +7,19 @@ Study" (30 slides), read in the Browser pane's presentation mode on 2026-09-19.
 
 | # | Beat | Content |
 |---|---|---|
-| 1 | Title | *From doubt to Desire: Building India's new trust in online brands.* Leading product & design strategy for brand discovery at scale for 187 Mn+ users. Uttham, Lead Product Designer. |
+| 1 | Title | *From doubt to Desire: Building India's new trust in online brands.* Leading product & design strategy for brand discovery at national scale. Uttham, Lead Product Designer. |
 | 2 | Chapters | Genesis (POC) · Challenges (Mall v2, market tension) · Re-design (strategic pivot) · Growth (v3, user & brand retention) · People (mentorship) · Now & Future (NMV, awards, verbatims). |
 | 3–6 | Genesis, v1 | Mall = branded products at competitive prices, better quality than unbranded. Testing began Oct 2021. v1 = "Mall" tags on product cards + a line under product details. Business objective: awareness of branded products → better quality for users, more revenue. "From day one, ambiguity was my world." Learned: limited comms → comprehension and awareness issues; people *will* pay a little extra for quality; "everything looks branded, there is no differentiation." |
-| 7 | Green light | Goal: make people understand what Mall is. Metric: NMV from 0.9 % to 5 %. Did detailed research, mapped pain points around discovery and comprehension. |
+| 7 | Green light | Goal: make people understand what Mall is. Metric: grow Mall's share of NMV to the level the business set. Did detailed research, mapped pain points around discovery and comprehension. |
 | 8–11 | v2 | More journey points (increase comms); pull-based browsing for discovery and comparison; end-to-end purchase journey revamp. Problems: low awareness, low discoverability. Journey map Home → Mall landing / category landing / PLP → PDP → brand storefront, with widgets, banners, identifiers. Screens: USPs on home, Mall pill + colour on PLP, USPs and brand content on PDP. |
-| 12–14 | What happened | Launch jump in orders and views; 2.9 % of Meesho NMV from Mall, quarterly award. Then flat. People selectively ignored Mall comms and stayed in their browsing hotspots; the concept felt abstract; business wanted seller labels for margin, which diluted comprehension. **Takeaway: "No amount of blue, or boldness, could shortcut genuine user belief. My advocacy and research shifted us toward real brands, not just seller labels."** Next: research, diary studies. |
+| 12–14 | What happened | Launch jump in orders and views; Mall's NMV share climbed, quarterly award. Then flat. People selectively ignored Mall comms and stayed in their browsing hotspots; the concept felt abstract; business wanted seller labels for margin, which diluted comprehension. **Takeaway: "No amount of blue, or boldness, could shortcut genuine user belief. My advocacy and research shifted us toward real brands, not just seller labels."** Next: research, diary studies. |
 | 15–17 | The pivot | Problems now: low awareness, low comprehension. Insights: the name Mall resonated with *company products*; people didn't care about USPs, only the products they want; old logo had poor readability (the "l" confused); tick + purple read as trust and stood out. Rebrand for noticeability (v3): a colour that gets attention in PLP; colour/logo abstraction stronger than the actual branding. User: "I did not find brands, but if Meesho suggests I would consider purchasing it." |
 | 18–24 | v3 | Bottom-nav entry + education modal (popular brands, celebrities); splash on first entries to Mall PDP/MLP ("entering a mall"); PLP FTUX for those who missed onboarding; PDP purple enclosure, brand entry point, brand content + performance; Mall landing for non-activated (brand logos, weekly names, category intent, product discovery) and activated users (local search, top categories, offers); order-confirmation animation reinforcing purple. |
 | 25 | Result | "People now recognize Mall by color. Anchored by celebrities and icons, Mall became recognizable, go-to place, and, finally, trusted." **Key learning: the solution was brand-led storytelling, not more UI tweaks.** |
-| 26 | Numbers | 100 % removal of seller labels · 5 % NMV from Meesho Mall · HUL… onboarding of big brands. |
+| 26 | Outcomes | Seller labels removed entirely · Mall hit the NMV share the business asked for · HUL… onboarding of big brands. |
 | 27 | People | Juniors struggled with unique users and a complex ecosystem → mentorship, advocacy, vision: hands-on brainstorming, teaching balance of business/product/user, leading ground-level research, thinking 10×. |
 | 28 | Verbatim | "Purple color means mall, these products directly come from mall and are company products, we can buy them without worrying about quality." — households of Lucknow. |
-| 29–30 | v4 | Brand-specific discount realisation; roadmap for big-brand launches and DRR; differentiate look-alike unbranded from branded. Launching two national brands; target 7 % NMV in three months. |
+| 29–30 | v4 | Brand-specific discount realisation; roadmap for big-brand launches and DRR; differentiate look-alike unbranded from branded. Launching two national brands; a higher NMV-share target set for the following quarter. |
 
 ## 2. What the site has today
 
@@ -39,7 +39,7 @@ optional figure on a glass artboard. Studies without chapters render exactly as 
 
 **Mall's chapters, five beats from thirty slides** (headings are placeholders in the site's voice; Uttham
 approves every word):
-1. **The bet** — what Mall is, Oct 2021, the ask: 0.9 % → 5 % of NMV. *Figure: v1 tags on cards.*
+1. **The bet** — what Mall is, Oct 2021, the ask: grow Mall's share of NMV to the level the business set. *Figure: v1 tags on cards.*
 2. **Bold wasn't enough** — v2's comms and journey points, the 2.9 % and the award, then flat; seller labels
    diluting the promise. *Figure: v2 PLP pill and PDP.*
 3. **The turn** — research: the name meant company products, USPs didn't matter, tick + purple = trust. The
@@ -55,7 +55,7 @@ numbers in the interface sans. No purple: the app's colour lives inside the scre
 
 ## 4. Decisions needed
 1. Split Mall from Gold, and what happens to Gold.
-2. Which numbers are public: 187 Mn+ users, 0.9 → 2.9 → 5 % NMV, the 7 % target, HUL by name, the award.
+2. Which numbers are public: **none are used yet.** Every business figure in this note was scrubbed to direction-only on 2026-10-01, before the repo went public, per CLAUDE.md's metrics rule. Percentage-point jumps and publicly announced numbers may be added later, deliberately and one at a time. HUL by name and the award are not figures.
 3. Visuals: export six phone frames from the deck as PNG at 2× (v1 tags; v2 PLP; v3 splash; v3 modal; v3
    landing; v3 PDP). The viewer screenshots are 800 px wide, too soft for the glass.
 4. Chapter count: five beats as above, or three (bet / turn / result) for a tighter page.

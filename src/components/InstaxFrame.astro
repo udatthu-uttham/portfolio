@@ -5,13 +5,16 @@ interface Props {
   caption?: string; // handwritten caption on the bottom border
   rotate?: number; // hand-set tilt, degrees
   aspect?: string; // photo window aspect ratio, defaults to instax mini
+  // Grey until a fine pointer reaches it, then the print shakes and develops
+  // to colour, like a fresh instant photo. Opt-in: the hero portrait only.
+  develop?: boolean;
 }
 
-const { label, caption, rotate = 0, aspect = '46 / 62' } = Astro.props;
+const { label, caption, rotate = 0, aspect = '46 / 62', develop = false } = Astro.props;
 ---
 
 <figure
-  class="instax"
+  class={develop ? 'instax instax--develop' : 'instax'}
   style={`--tilt: ${rotate}deg; --photo-aspect: ${aspect};`}
 >
   <div class="instax__window">
@@ -56,6 +59,63 @@ const { label, caption, rotate = 0, aspect = '46 / 62' } = Astro.props;
   @media (prefers-reduced-motion: reduce) {
     .instax { transition: none; }
     .instax:hover { rotate: var(--tilt); translate: none; }
+  }
+
+  /* Develop (hero portrait only, Uttham 2026-10-01): "make it grey, and once
+     people hover, … the instax effect of shaking and revealing the colored
+     version". The print waits in grey; reaching for it shakes it the way you
+     shake a fresh instant photo, and the colour comes up while it settles.
+     Leaving lets it fade back to grey, a little slower, without a shake.
+     Only the image greys — the paper border, the film grain and any caption
+     keep their colour. Touch and coarse pointers cannot hover, so they never
+     see the grey: outside the fine-pointer query the photo is full colour.
+     The durations sit past the --dur-* ladder on purpose: a develop is slower
+     than any UI feedback. Under reduced motion there is no shake, and the
+     global override in global.css makes the colour switch instead of fade. */
+  .instax--develop {
+    --develop-in: 800ms;   /* grey → colour, while the pointer is on the print */
+    --develop-out: 1000ms; /* colour → grey after it leaves */
+    --develop-shake: 640ms; /* the hero's hi! sticker rides this same shake */
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    /* The shake replaces the lift above; the two never stack. */
+    .instax.instax--develop:hover {
+      rotate: var(--tilt);
+      translate: none;
+      box-shadow: var(--shadow-rest);
+    }
+
+    /* Same function list in both states, so the filter interpolates. */
+    .instax--develop .instax__window :global(img) {
+      filter: grayscale(1) saturate(0.92) contrast(1.05);
+      transition: filter var(--develop-out) ease-in-out;
+    }
+
+    .instax--develop:hover .instax__window :global(img) {
+      filter: grayscale(0) saturate(0.92) contrast(1.05);
+      transition: filter var(--develop-in) ease-out;
+    }
+  }
+
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .instax--develop:hover {
+      animation: instax-develop-shake var(--develop-shake) ease-in-out;
+    }
+  }
+
+  /* A decaying wobble around the hand-set tilt: five swings, each smaller and
+     a little slower than the last, so the whole shake eases out. Keyframe
+     names are global in Astro; the hero's sticker reuses this one with its
+     own --tilt of 0. */
+  @keyframes instax-develop-shake {
+    0%   { rotate: var(--tilt); }
+    12%  { rotate: calc(var(--tilt) + 2.5deg); }
+    27%  { rotate: calc(var(--tilt) - 2deg); }
+    44%  { rotate: calc(var(--tilt) + 1.3deg); }
+    62%  { rotate: calc(var(--tilt) - 0.7deg); }
+    80%  { rotate: calc(var(--tilt) + 0.3deg); }
+    100% { rotate: var(--tilt); }
   }
 
   .instax__window {

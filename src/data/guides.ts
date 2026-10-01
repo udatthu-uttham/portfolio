@@ -14,51 +14,16 @@ export type Guide = {
 
 export const guides: Guide[] = [
   {
-    slug: 'context-layer',
-    title: 'Run your own Context Layer',
-    intro: 'A **record is a project**: one markdown file per line of work, with fixed headings, an ID, and outcomes written as direction only. An agent interviews you before it writes, so the record carries what the room argued and what stayed open, not just what shipped.',
-    get: [
-      'A `records/` folder, one file per line of work, plus a generated `index.md`.',
-      'A `LEARNINGS.md` of platform-level truths promoted only when more than one record supports them.',
-      'A `create-record` skill that interrogates you in two rounds, then writes the record and updates the index.',
-      'A `debate` skill that reasons across records to plan the next cycle.',
-    ],
-    need: [
-      'Claude Code on your machine and a git repository you control.',
-      'A Claude Project with the records folder attached as knowledge, for the debate side.',
-      'Fifteen minutes per record. The interrogation is the work; the writing is fast.',
-      'Optional: a Figma file where each record renders as a card.',
-    ],
-    prompt: `You are the archivist for our team's design experiments. A record is one line of work; the experiments inside it are numbered locally (Experiment 1, 2, 3).
-
-When I share a brief, links or a readout, do this:
-
-1. Interrogate before you write. Two rounds. Round one: what was the belief, what changed on screen, what was the metric, who owned it, which surfaces, when. Round two: what did the room argue, what did users say (verbatims with source labels), what would we argue differently now, what is still open. Do not accept a vague answer twice.
-
-2. Write records/<slug>.md with this front matter: id (REC-NNN, claim the next free id), name, slug, surface, status, owner, cycle, experiments, metric, outcome, hypothesis, dates, tags, sources, created, updated.
-
-3. Use exactly these headings, in this order: Scope · What changed · Experiments · User learnings · Data reads · Reflection · Open questions · Next-cycle ideas. Mark anything unknown as TBD rather than guessing.
-
-4. Metrics policy: direction-only. Record outcomes as direction and rough magnitude ("positive, small", "negative for the cash cohort"), never as figures. Convert any number I give you.
-
-5. A learning is promoted to LEARNINGS.md only when more than one record, or one strong piece of research, supports it. Give it the next L-NNN, say where it holds, cite the records.
-
-6. Regenerate records/index.md and end with three questions that would make this record stronger.`,
-    adapt: [
-      'Change the ID prefix and the heading list to your team’s vocabulary, then never change them again. The `debate` side depends on fixed headings.',
-      'Keep direction-only metrics if the repo lives outside your company’s systems. A git commit cannot be recalled.',
-      'Add a `review/` log for the judgements made while extracting from source documents. The extraction can be rebuilt; the judgements cannot.',
-    ],
-  },
-  {
     slug: 'resona',
-    title: 'Build your own Resona',
-    intro: 'Resona is a pipeline, not a chat: **audio in, a coded report out**. The discussion guide is the coding frame, every insight must cite a timestamp, and the model is told to **doubt itself out loud** when a claim outruns the evidence.',
+    title: 'Build your own research allrounder',
+    intro: 'It is a pipeline, not a chat: **a study set up, sessions recorded, a coded report out**. The discussion guide is the coding frame, every insight must cite a timestamp, the model is told to **doubt itself out loud** when a claim outruns the evidence, and every finished study **stays searchable for the next one.**',
     get: [
+      'A setup step that pins the objective, cohort, method and discussion guide before a single recording is loaded.',
       'Transcripts with speakers separated and each utterance tagged to a section of your discussion guide.',
       'Observations clustered into themes, insights scored by how many participants support them, verbatims pinned to timestamps.',
       'A key finding, how-might-we prompts per theme, and an “AI asks” list of claims that need your clarification.',
       'A report that exports cleanly and re-runs when a recording is added.',
+      'A store of finished studies anyone can search, so the next study starts from what is already known.',
     ],
     need: [
       'Transcription with speaker diarization for your languages (a Whisper-class model handles Hindi and Hinglish acceptably).',
@@ -66,7 +31,9 @@ When I share a brief, links or a readout, do this:
       'Your discussion guide, with sections and objectives written out.',
       'Consent from participants for recording and machine transcription.',
     ],
-    prompt: `You are a research synthesist. Inputs: (a) a discussion guide with numbered sections and objectives, (b) transcripts with speaker labels and timestamps, one per session.
+    prompt: `You are a research synthesist. Inputs: (a) a study brief \u2014 objective, cohort, method, date, researchers, (b) a discussion guide with numbered sections and objectives, (c) transcripts with speaker labels and timestamps, one per session.
+
+Before anything else: if the brief is missing the objective, the cohort or the method, ask for them and stop. A study without a stated objective cannot be coded against one.
 
 Work in this order and show your work:
 
@@ -87,6 +54,48 @@ Output as structured sections in this order: Key finding · Quality (observation
       'Swap the scoring thresholds for your sample sizes. With four participants, “3 of 4” is HIGH; with twelve it is not.',
       'Keep verbatims in the participant’s language and translate in a footnote. Translation flattens the hesitation you are looking for.',
       'Add voice features later, if at all: pauses, sighs and pitch help spot the gap between what was said and what was felt, but the timestamp rule does most of the work.',
+    ],
+  },
+  {
+    slug: 'realistic-prototype',
+    title: 'Build a prototype people forget is a prototype',
+    intro: 'Not a click-through. A **small web app with the real product\u2019s shape** \u2014 a catalogue that reads like the catalogue, a cart that adds up, a payment step that fails when you make it fail. Participants stop performing for you, because **there is nothing to perform for.**',
+    get: [
+      'A running app on a URL you can send to a moderator, a participant, or a stakeholder.',
+      'Every page a participant could wander into \u2014 feed, category, product, cart, payment, order placed, past orders \u2014 not only the ones on the happy path.',
+      'A mock catalogue with prices, ratings, review counts and delivery promises that read like the real thing.',
+      'Checkout and payment that run end to end on dummy instruments, so complex flows become testable.',
+      'A place to drop a new feature or a new content row in and watch people meet it cold.',
+    ],
+    need: [
+      'A front-end you can stand up quickly \u2014 Vite and React is plenty \u2014 and any static host.',
+      'A catalogue fixture: a few hundred items with images, prices and ratings. Invent them; do not export production data.',
+      'The product\u2019s real type scale, spacing and components, taken from the design system rather than eyeballed.',
+      'A phone to test on. Everything about this falls apart on a desktop window.',
+    ],
+    prompt: `Build me a realistic, clickable prototype of a mobile shopping app as a small Vite + React web app. Treat it as a research rig, not a demo.
+
+Rules, in order of importance:
+
+1. It must not feel like a prototype. Every screen a participant can reach must exist. No dead links, no "coming soon", no jump back to the home screen because I did not build that page. If a tap has nowhere to go, build the somewhere.
+
+2. Use routes, not screens-as-slides: / (feed), /category/:slug, /product/:id, /cart, /product/:id/payment, /order/success, /orders, /orders/:id. Back must work. Refresh must work. Deep links must work.
+
+3. Mock the catalogue, do not export it. Generate a few hundred items with plausible names, prices, discounts, ratings, review counts, delivery promises and badges. Vary them the way a real catalogue varies — a few outliers, a few with no reviews. Never use real customer, seller or business data.
+
+4. Checkout must complete. Add to cart, change quantity, pick an address, pick a payment instrument, place the order, land on an order-placed screen, find the order in past orders. Give me a switch to make payment fail, so I can test the recovery path too.
+
+5. Match the real product's type scale, spacing, radii and components. A prototype that is nearly right in layout but wrong in type reads as fake within seconds.
+
+6. Make it phone-first: 375px viewport, thumb-reachable controls, real scroll momentum, no hover-only affordances.
+
+7. Put the things I want to test behind a flag, so I can turn a new row, badge or landing surface on for one session and off for the next.
+
+Ask me what I am trying to learn before you start, then tell me which screens that makes load-bearing.`,
+    adapt: [
+      'Swap the catalogue fixture for your own category. The shape of the data matters more than the volume \u2014 get the outliers in.',
+      'If you need to test a surface that does not exist yet, build it behind a flag rather than forking the prototype. One build, many sessions.',
+      'Hand participants a device with the prototype already open. A URL bar is the fastest way to remind someone they are in a test.',
     ],
   },
 ];

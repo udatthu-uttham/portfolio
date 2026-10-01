@@ -1,0 +1,135 @@
+---
+// The realistic prototype, previewed by running the actual build (CLAUDE.md: a
+// preview renders the tool's real UI, not a restyled version of it). The phone
+// holds an iframe of /proto/feed-ux at a real 320px handset viewport, scaled to
+// whatever width the card gives it — so the app's own responsive rules behave
+// exactly as they do in a session, and the Resona card's phone, this one and
+// the Projects deck covers are all the same object at the same zoom.
+//
+// The frame does not take the pointer: a half-scale shop is worse to use than
+// the real thing, and an interactive iframe would eat the page's scroll. The
+// well is a link instead, and the prototype opens full size in its own tab.
+//
+// CATALOGUE IS MOCK (locked 2026-09-20): the products, prices and ratings in the
+// sandbox are stand-ins that read like the real thing. No Meesho business
+// figures appear here or anywhere on the page.
+interface Props {
+  href: string;
+  label: string;
+}
+const { href, label } = Astro.props;
+---
+
+<div class="pp">
+  <a class="pp__phone" href={href} target="_blank" rel="noopener" aria-label={`${label} — opens the running sandbox in a new tab`}>
+    <span class="pp__stage" data-proto-stage>
+      <iframe
+        class="pp__frame"
+        src={href}
+        title="The shopping sandbox, running"
+        loading="lazy"
+        tabindex="-1"
+        aria-hidden="true"
+        scrolling="no"
+      ></iframe>
+    </span>
+    <span class="pp__open">{label} <span aria-hidden="true">↗</span></span>
+  </a>
+</div>
+
+<script>
+  // The scale is the phone's width over the app's own 320px viewport, and --vh
+  // is the frame's height in those same units — so the app is handed a viewport
+  // that ends exactly where the frame does and its fixed bottom bar lands on
+  // the edge instead of being cut off. Exact at every card breakpoint.
+  const VW = 320;
+  document.querySelectorAll<HTMLElement>('[data-proto-stage]').forEach((stage) => {
+    const fit = () => {
+      const k = stage.clientWidth / VW;
+      if (!k) return;
+      stage.style.setProperty('--k', String(k));
+      stage.style.setProperty('--vh', `${stage.clientHeight / k}px`);
+    };
+    new ResizeObserver(fit).observe(stage);
+    fit();
+  });
+</script>
+
+<style>
+  .pp {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    width: 100%;
+    height: 100%;
+    text-align: left;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  /* Same frame as the Resona card and as the Projects deck covers, so the two
+     sections read as one shelf: 9/15, flush on the bottom edge. */
+  .pp__phone {
+    position: relative;
+    flex: 0 1 auto;
+    height: 100%;
+    aspect-ratio: 9 / 15;
+    max-width: 100%;
+    overflow: hidden;
+    border: 1px solid var(--line-1);
+    border-bottom: 0;
+    border-radius: 18px 18px 0 0;
+    background: #fff;
+    box-shadow: var(--shadow-rest);
+    text-decoration: none;
+  }
+  .pp__phone:focus-visible { outline: 2px solid var(--amber-text); outline-offset: 2px; }
+
+  /* The app gets a real 320px phone viewport — the same one the Resona screen
+     is laid out in — and is scaled down as one piece, so its own breakpoints
+     fire as they do on a phone. --k and --vh are written by the observer above;
+     the fallbacks hold until it runs. */
+  .pp__stage {
+    --k: 0.8;
+    position: absolute;
+    inset: 0;
+    display: block;
+    overflow: hidden;
+  }
+  .pp__frame {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 320px;
+    height: var(--vh, 533px);
+    border: 0;
+    transform-origin: top left;
+    scale: var(--k);
+    pointer-events: none;
+  }
+
+  /* Above the app's own bottom nav, not on top of it. */
+  .pp__open {
+    position: absolute;
+    left: 50%;
+    bottom: 14%;
+    translate: -50% 0;
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-pill);
+    background: var(--ink-900);
+    color: var(--paper-0);
+    font-family: var(--font-paper);
+    font-size: var(--text-eyebrow);
+    font-weight: 500;
+    letter-spacing: 0;
+    white-space: nowrap;
+    box-shadow: var(--shadow-stuck);
+  }
+  /* No lift, no tilt (CLAUDE.md): hover is colour and the arrow, nothing else. */
+  .pp__open span { display: inline-block; transition: transform var(--dur-2) var(--ease-standard); }
+  @media (hover: hover) and (pointer: fine) {
+    .pp__phone:hover .pp__open { background: var(--amber-text); }
+    .pp__phone:hover .pp__open span { transform: translateX(3px); }
+  }
+
+</style>
