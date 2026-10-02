@@ -1,6 +1,12 @@
 ---
 // Full-bleed glass nav — one of the two structural bookends (brief §4).
 // Copy + structure from Figma frame 2003:156.
+import { Image } from 'astro:assets';
+// The one avatar file — the favicons are generated from it too (CLAUDE.md,
+// Favicon) — served here as a webp at its own 170×242 instead of the 40KB
+// PNG, which was ~5x the size the header shows it at (perf pass 2026-10-02).
+import avatar from '../../public/assets/avatar.png';
+
 interface Props {
   active?: 'about' | 'projects' | 'contact' | 'ai';
 }
@@ -11,13 +17,12 @@ const { active = 'about' } = Astro.props;
 <header class="site-header glass glass--nav" data-hero-nav>
   <div class="site-header__inner">
     <a class="site-header__brand" href="/" aria-label="Uttham Udatthu — home">
-      <img
+      <Image
         class="site-header__avatar"
         data-header-avatar
-        src="/assets/avatar.png"
+        src={avatar}
         alt=""
-        width="64"
-        height="90"
+        loading="eager"
       />
       <span class="site-header__wordmark on-glass">
         UTTHAM <span class="site-header__wordmark-last">UDATTHU</span>

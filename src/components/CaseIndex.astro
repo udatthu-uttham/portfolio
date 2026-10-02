@@ -15,7 +15,7 @@ const { items, label } = Astro.props;
     <ol class="case-index__list">
       {items.map((s) => (
         <li class="case-index__row">
-          <a class="case-index__link" href={`/work/${s.slug}`}>
+          <a class="case-index__link" href={`/work/${s.slug}`} data-astro-prefetch>
             <span class="case-index__year">{s.year}</span>
             <span class="case-index__kicker">{s.kicker}</span>
             <span class="case-index__title">{s.title}</span>

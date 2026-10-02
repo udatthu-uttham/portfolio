@@ -6,6 +6,9 @@ import SectionRule from '../components/SectionRule.astro';
 import SignalLoop from '../components/SignalLoop.astro';
 import InstaxFrame from '../components/InstaxFrame.astro';
 import HiSticker from '../components/HiSticker.astro';
+// The hero's GSAP chunk, into Base's head slot: this is the only page with a
+// hero or with magnetic tiles, so it is the only page that loads GSAP.
+import HeroMotion from '../components/HeroMotion.astro';
 import { studies, contact } from '../data/studies';
 import { rich } from '../lib/rich';
 import CaseIndex from '../components/CaseIndex.astro';
@@ -48,6 +51,7 @@ const principles = [
 ---
 
 <Base title="Uttham Udatthu — Design Lead">
+  <HeroMotion slot="head" />
   <a class="skip-link" href="#main">Skip to content</a>
   <Header />
 
@@ -71,6 +75,7 @@ const principles = [
               widths={[160, 320, 480]}
               sizes="164px"
               loading="eager"
+              fetchpriority="high"
             />
           </InstaxFrame>
           <div class="hero__hello-sticker" aria-hidden="true">
@@ -137,7 +142,8 @@ const principles = [
                 <a
                   class="tile"
                   href={`/work/${study.slug}`}
-                  data-magnetic>
+                  data-magnetic
+                  data-astro-prefetch>
                   <img class="tape" src="/assets/stickers/washi.svg" alt="" aria-hidden="true" />
                   <h3>{study.title}</h3>
                   <p class="tile__desc" set:html={rich(study.summary)} />
@@ -182,7 +188,7 @@ const principles = [
                 <article class="tile tile--ai" data-magnetic>
                   <img class="tape" src="/assets/stickers/washi.svg" alt="" aria-hidden="true" />
                   <div class="tool__copy">
-                    <h3><a class="tool__link" href={`/ai/${tool.slug}`}>{tool.name}</a></h3>
+                    <h3><a class="tool__link" href={`/ai/${tool.slug}`} data-astro-prefetch>{tool.name}</a></h3>
                     <p class="tile__desc" set:html={rich(tool.what)} />
                   </div>
 

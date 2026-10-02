@@ -2,6 +2,21 @@
 import '../styles/global.css';
 import PointerRide from '../components/PointerRide.astro';
 
+// Load order (perf pass 2026-10-02). Everything the browser needs for the first
+// paint is declared in the head, in the first ~2KB of every page:
+// - The three General Sans faces are all on the first screen of every page —
+//   600 for the wordmark, headings and the hero's bold beats, 400 for the hero
+//   lead and body copy (the largest text on the page), 500 for the nav — so all
+//   three are preloaded and the first paint is in the right face rather than a
+//   swapped fallback. Caveat is a caption, not the lead, and is left to the CSS.
+// - The site motion is a module (deferred), so declaring it in the head costs
+//   no parsing and lets the fetch start with the first bytes of the page rather
+//   than after the last. A page can add its own head entries through the head
+//   slot — the homepage adds the hero's GSAP chunk (HeroMotion).
+// - The <noscript> for the scroll reveals lives in the body on purpose: a
+//   <noscript> inside <head> makes the Astro compiler close the head early,
+//   which used to push every stylesheet link to after </body>.
+
 interface Props {
   title: string;
   description?: string;
@@ -26,16 +41,16 @@ const {
     <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
     <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <!-- scroll-reveal content starts at opacity 0 for the IntersectionObserver;
-         without JS nothing would ever un-hide it -->
-    <noscript>
-      <style>
-        .rv { opacity: 1 !important; transform: none !important; }
-      </style>
-    </noscript>
     <link
       rel="preload"
       href="/fonts/general-sans-600.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/general-sans-400.woff2"
       as="font"
       type="font/woff2"
       crossorigin
@@ -47,10 +62,18 @@ const {
       type="font/woff2"
       crossorigin
     />
+    <script src="../scripts/motion.js"></script>
+    <slot name="head" />
   </head>
   <body>
+    <!-- scroll-reveal content starts at opacity 0 for the IntersectionObserver;
+         without JS nothing would ever un-hide it -->
+    <noscript>
+      <style>
+        .rv { opacity: 1 !important; transform: none !important; }
+      </style>
+    </noscript>
     <slot />
     <PointerRide />
-    <script src="../scripts/motion.js"></script>
   </body>
 </html>
