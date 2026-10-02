@@ -366,8 +366,9 @@ still drive the phone; a page with rows that all reach the middle never takes
 that path.
 
 **The full case study opens behind a light gate** (Uttham chose "Light
-gate only"). **The password card comes first and the "In the full case study"
-list sits under it; a right password reloads the whole page, which opens on a
+gate only"). **The password card holds the "In the full case study" list** (2026-10-02:
+"I want the full case study information in the white card"): its line, the
+list, then the button; a right password reloads the whole page, which opens on a
 dashed separator labelled "The full case study"**, with the card and the list
 hidden (2026-10-02: "once I enter the password the whole page should refresh,
 with seperator to show the added content"). The gate is a speed bump, not protection — the text ships in the page and this

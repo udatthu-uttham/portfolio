@@ -144,12 +144,15 @@ const titleFor = (key: string) => {
                 </aside>
               )
             ) : block.kind === 'inside' ? (
+              /* in a section with the gate, the list goes inside the gate card */
+              data.gate && section.blocks.some((b) => b.kind === 'gate') ? null : (
               <div class="ct-inside-block" data-inside>
                 <p class="ct-body ct-inside-lead">{block.lead}</p>
                 <ul class="ct-inside">
                   {block.items.map((item) => <li>{item}</li>)}
                 </ul>
               </div>
+              )
             ) : block.kind === 'rows' ? (
               <>
                 {block.heading && <h3 id={idFor(block.heading)}>{block.heading}</h3>}
@@ -175,6 +178,17 @@ const titleFor = (key: string) => {
               data.gate && (
                 <div class="ct-gate" data-gate data-hash={CASE_PASSWORD_SHA256} data-dev={dev ? '1' : undefined}>
                   <p class="ct-gate__text">{data.gate.text}</p>
+                  {/* what the full study holds, on the card that opens it
+                      (Uttham, 2026-10-02: "I want the full case study
+                      information in the white card") */}
+                  {section.blocks.filter((b) => b.kind === 'inside').map((b) => b.kind === 'inside' && (
+                    <div class="ct-gate__inside">
+                      <p class="ct-gate__lead">{b.lead}</p>
+                      <ul class="ct-inside">
+                        {b.items.map((item) => <li>{item}</li>)}
+                      </ul>
+                    </div>
+                  ))}
                   {hasFull && (
                     <>
                       <button class="cta cta--primary" type="button" data-gate-open aria-expanded="false" aria-controls="full">{data.gate.cta}</button>
@@ -959,6 +973,9 @@ const titleFor = (key: string) => {
     box-shadow: var(--shadow-rest);
   }
   .ct-gate__text { margin: 0; color: var(--ink-600); font-size: var(--text-body); line-height: var(--lh-body); }
+  /* the list of what is inside: the lead in ink, the items a within-card step under it */
+  .ct-gate__lead { margin: 0; color: var(--ink-900); font-size: var(--text-body); font-weight: 500; line-height: var(--lh-body); }
+  .ct-gate__inside .ct-inside { margin-top: var(--space-2); }
   .ct-gate__form { display: grid; gap: var(--space-2); width: 100%; }
   /* the global sticker sets display, which beats the hidden attribute */
   .ct-gate [hidden] { display: none; }
