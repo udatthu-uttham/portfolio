@@ -1191,6 +1191,17 @@ const titleFor = (key: string) => {
          in its columns, so the spare width falls between text and card instead
          of inside it. --ct-pane-h is the tallest the card may be. */
       --ct-pane-h: min(calc(100svh - var(--header-height) - 2 * var(--content-gap)), 720px);
+      /* THE CARD SITS CENTRED in the screen under the header (Uttham,
+         2026-10-02: "the phone preview on l2 pages is not center aligned, there
+         is less spacing on top than bottom when the header disappears"). The
+         sticky box is the whole visible height below the header — dvh, so it
+         follows a tablet browser's address bar as it slides away — and the card
+         is centred in it. The phone's own size stays on svh, so it never jumps
+         while the bar moves; only the spare height around it is shared out. */
+      height: calc(100svh - var(--header-height) - 2 * var(--content-gap));
+      height: calc(100dvh - var(--header-height) - 2 * var(--content-gap));
+      display: grid;
+      align-content: center;
       --ct-title-h: 0px;
       --ct-foot-h: 0px;
       --ct-phone-w: min(

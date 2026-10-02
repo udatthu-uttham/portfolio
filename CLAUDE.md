@@ -313,7 +313,7 @@ title), Problem, Strategy and Outcome — no sub-group ticks, no full-study tick
 the mobile preview, we should optimise this space"): from 768px the phone is as
 tall as the screen allows (`--ct-pane-h`, ≤720px) and the card is the phone plus
 one `--card-padding` all round, centred in its columns, so spare width falls
-outside the card. **The card carries a title above the phone** naming what it
+outside the card. **The card is centred in the visible height under the header** (the sticky box is `100dvh` less the header and two gaps, so a tablet browser's sliding address bar never piles the spare height under the card; 2026-10-02: "less spacing on top than bottom"). **The card carries a title above the phone** naming what it
 shows (`screens.titles`, one short line per state; a state that borrows an
 earlier screen borrows its title); the mini player on phones has none.
 
