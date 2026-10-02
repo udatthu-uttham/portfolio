@@ -320,11 +320,14 @@ then the helps as ruled rows), **How I made it** (only a tool that carries `made
 — Resona: his lead on the skill behind the preparation, unnamed and in the first
 person as he asked, then the synthesis pipeline step by step, each step driving
 the phone; mechanism only, never file names, model names, ID formats or bugs),
-What you get, What you need, The prompt — the
-paper card with the page's one primary sticker, "Copy the prompt", which
-copies the `<pre>` word for word — and nothing after it: **What to change for
-your team is gone** (2026-10-02: "remove want to change for your team section,
-and the prompt I believe is whitelabelled"). **No copy
+What you get, The prompt — the
+paper card with the page's one primary sticker, "Copy the prompt", and **only a
+preview of the prompt** (2026-10-02: "copy the prompt can just have preview and
+a copy button"): six lines in the recessed well, fading out, while the button
+copies the whole `<pre>` word for word — and nothing after it. **What you need
+and What to change for your team are gone** (2026-10-02: "can we ignore what you
+need"; "remove want to change for your team section, and the prompt I believe is
+whitelabelled"). **No copy
 lives in `src/data/ai-pages.ts`**: it arranges `tools.ts` and `guides.ts` and
 says which step each row shows. **Resona follows the reading** (`follow`): every
 row and step names one of its own steps — prepare, setup, record, synth, insights — and

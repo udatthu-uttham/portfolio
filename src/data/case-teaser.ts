@@ -16,7 +16,7 @@ export type CaseBlock =
   | { kind: 'quote'; text: string; source: string; consent?: boolean } // a sticky note; consent: false keeps it off the page
   | { kind: 'inside'; lead: string; items: string[] } // "In the full case study:" and its list
   | { kind: 'rows'; heading?: string; rows: CaseRow[] } // ruled rows of prose, each its own trigger (the AI Space pages)
-  | { kind: 'prompt'; text: string; copy: string } // the bolted glass prompt panel: `text` verbatim, `copy` the button's label
+  | { kind: 'prompt'; text: string; copy: string } // the prompt card: a preview of `text` and a button (`copy` its label) that copies all of it
   | { kind: 'gate' }; // the light-gate card (needs `gate` on the page)
 
 export type CaseSection = { state?: string; heading: string; blocks: CaseBlock[] };

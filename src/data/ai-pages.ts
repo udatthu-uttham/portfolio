@@ -7,7 +7,7 @@
 // tool, the sticky phone runs it.
 //
 // NO COPY LIVES HERE. Every word comes from tools.ts (name, kicker, year, what,
-// helps, idea, made, visit) and guides.ts (title, intro, get, need, prompt) — Uttham's
+// helps, idea, made, visit) and guides.ts (title, intro, get, prompt) — Uttham's
 // own lines, word for word (CLAUDE.md). This file only arranges them and says
 // which step of the running tool each row shows.
 //
@@ -25,7 +25,6 @@ type StateMap = {
   helps?: Step[];
   madeSteps?: Step[];
   get?: Step[];
-  need?: Step[];
   prompt?: Step;
 };
 
@@ -41,8 +40,6 @@ const stateMaps: Record<string, StateMap> = {
     madeSteps: ['setup', 'record', 'synth', 'synth', 'insights', 'insights', 'insights'],
     // the setup step · coded transcripts · themes and scores · key finding and AI asks · the report · the store
     get: ['setup', 'synth', 'insights', 'insights', 'insights', 'prepare'],
-    // transcription · the synthesis model · the discussion guide · consent to record
-    need: ['record', 'synth', 'setup', 'record'],
     // the prompt is the synthesis pass; the phone shows what it produces
     prompt: 'insights',
   },
@@ -99,7 +96,8 @@ export const aiPage = (slug: string): CaseTeaserData => {
           }]
         : []),
       { heading: 'What you get', blocks: [{ kind: 'rows', rows: rows(guide.get, map.get) }] },
-      { heading: 'What you need', blocks: [{ kind: 'rows', rows: rows(guide.need, map.need) }] },
+      // "What you need" came off on 2026-10-02 (Uttham: "can we ignore what you
+      // need"); the page goes from what you get straight to the prompt.
       // The page ends on the prompt. "What to change for your team" came off on
       // 2026-10-02 (Uttham: "remove want to change for your team section, and
       // the prompt I believe is whitelabelled") — the prompt already asks what

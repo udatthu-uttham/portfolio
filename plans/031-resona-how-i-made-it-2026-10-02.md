@@ -53,3 +53,14 @@ Fixed:
 
 Refuted as taste or already handled: guide-optional wording, the handoff between skill and
 pipeline, the Listen screen, literal vs escaped characters, the public-repo comment.
+
+## Later the same day: no What you need; the prompt is a preview
+
+Uttham: "can we ignore what you need, &copy the prompt can just have preview and a copy button?"
+
+- **What you need** is gone from both AI pages (and `guide.need` from `guides.ts`); each page
+  goes from What you get straight to the prompt.
+- **The prompt card is a preview and a button.** The recessed well shows six lines and the text
+  fades into it; the well stays solid. The whole prompt is still in the `<pre>`, so the button
+  copies all of it (checked: 1,664 of 1,664 characters, ending on the last line) and a screen
+  reader reads all of it. 1440×900 and 375px: no horizontal overflow.

@@ -11,7 +11,6 @@ export type Guide = {
   title: string;
   intro: string; // one paragraph, highlights in **bold**
   get: string[]; // what you get
-  need: string[]; // what you need
   prompt: string; // the prompt itself, copied verbatim
 };
 
@@ -27,12 +26,6 @@ export const guides: Guide[] = [
       'A key finding, how-might-we prompts per theme, and **an “AI asks” list of claims that need your clarification**.',
       'A report that exports cleanly and re-runs when a recording is added.',
       'A store of finished studies anyone can search, so **the next study starts from what is already known**.',
-    ],
-    need: [
-      '**Transcription with speaker diarization for your languages** (a Whisper-class model handles Hindi and Hinglish acceptably).',
-      '**A long-context model for the synthesis pass**, and a place to run it: a script, a Claude Project, or a small web app.',
-      'Your discussion guide, with sections and objectives written out.',
-      'Consent from participants for recording and machine transcription.',
     ],
     prompt: `You are a research synthesist. Inputs: (a) a study brief \u2014 objective, cohort, method, date, researchers, (b) a discussion guide with numbered sections and objectives, (c) transcripts with speaker labels and timestamps, one per session.
 
@@ -64,12 +57,6 @@ Output as structured sections in this order: Key finding · Quality (observation
       'A mock catalogue with prices, ratings, review counts and delivery promises that **read like the real thing**.',
       'Checkout and payment that **run end to end on dummy instruments**, so complex flows become testable.',
       'A place to drop a new feature or a new content row in and **watch people meet it cold**.',
-    ],
-    need: [
-      '**A front-end you can stand up quickly** \u2014 Vite and React is plenty \u2014 and any static host.',
-      'A catalogue fixture: a few hundred items with images, prices and ratings. **Invent them; do not export production data.**',
-      '**The product\u2019s real type scale, spacing and components**, taken from the design system rather than eyeballed.',
-      'A phone to test on. Everything about this falls apart on a desktop window.',
     ],
     prompt: `Build me a realistic, clickable prototype of a mobile shopping app as a small Vite + React web app. Treat it as a research rig, not a demo.
 
