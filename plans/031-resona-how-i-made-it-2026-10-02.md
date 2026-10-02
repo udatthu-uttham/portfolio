@@ -64,3 +64,36 @@ Uttham: "can we ignore what you need, &copy the prompt can just have preview and
   fades into it; the well stays solid. The whole prompt is still in the `<pre>`, so the button
   copies all of it (checked: 1,664 of 1,664 characters, ending on the last line) and a screen
   reader reads all of it. 1440×900 and 375px: no horizontal overflow.
+
+## Later still: the prompts follow the page, and fold open
+
+Uttham: "the prompt should be updated with the latest content, but places where we used meesho
+context or something, the prompt should be generalised for people and ask their content so they
+can achieve it. and let their be a way to expand the prmopt? or keep it open the compressed one I
+am not liking"
+
+- **Both prompts are rewritten** (workflow wf_b86488b3-4eb). Each prompt had a drafter, a
+  white-label reviewer, a fidelity and prompt-craft reviewer, and a reviser; 23 and 20 findings
+  were applied.
+  - **Resona** runs in two modes, Prepare and Synthesise.
+    - Prepare follows the guide-writing logic: no questions until the goal, screens and cohorts
+      are confirmed; the method follows from the goal; tasks before probes; an Observe cue on every
+      question; a bias check.
+    - Synthesise runs the page's seven steps, with the safeguards: exact quotes, labelled
+      inferences, uncovered themes never filled, counted confidence, verify, and AI asks.
+    - The Meesho context becomes questions for the reader: their product and flows, participants
+      and their language and cultural cues, past research, and the team's methods.
+    - It adds a consent check before any session material is used.
+  - **The prototype** asks six questions first: what to learn, the product and its flows, data
+    sources and approval, the product's rules, design, and what to test.
+    - Real data goes through the reader's own services, or through a synthetic layer shaped like
+      their tables. Every value comes from a table, and the logic is real.
+    - One privacy rule overrides the rest: a participant sees only their own data, read-only, with
+      consent; synthetic data is the default; reads have no side effects; keys stay on a small
+      server.
+  - Neither prompt names Meesho, its users or internal tools. Copy takes all of them: 10,494 and
+    7,966 characters.
+- **The prompt folds open.** It shows ten lines with "Show the full prompt ↓" under the well, as
+  a text link. Expanded, the toggle reads "Show less ↑". Without the script the prompt is simply
+  open, and a prompt only a few lines longer than the fold is never folded. Checked at 1440×900
+  and at 375px: no horizontal overflow.

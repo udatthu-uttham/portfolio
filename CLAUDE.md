@@ -321,10 +321,16 @@ then the helps as ruled rows), **How I made it** (only a tool that carries `made
 person as he asked, then the synthesis pipeline step by step, each step driving
 the phone; mechanism only, never file names, model names, ID formats or bugs),
 What you get, The prompt — the
-paper card with the page's one primary sticker, "Copy the prompt", and **only a
-preview of the prompt** (2026-10-02: "copy the prompt can just have preview and
-a copy button"): six lines in the recessed well, fading out, while the button
-copies the whole `<pre>` word for word — and nothing after it. **What you need
+paper card with the page's one primary sticker, "Copy the prompt", and **the
+prompt folded to its first ten lines with "Show the full prompt" under it**
+(2026-10-02: "let their be a way to expand the prmopt … the compressed one I am
+not liking", replacing that day's six-line preview); the button always copies the
+whole `<pre>` word for word — and nothing after it. **The prompts are
+white-label and follow the page** (2026-10-02): each does what its page now says
+the tool does, and wherever the real tool leans on Meesho context it asks the
+reader for their own (product and flows, users and their language, past research,
+methods, data sources) instead; no prompt names Meesho, its users or internal
+tools. **What you need
 and What to change for your team are gone** (2026-10-02: "can we ignore what you
 need"; "remove want to change for your team section, and the prompt I believe is
 whitelabelled"). **No copy

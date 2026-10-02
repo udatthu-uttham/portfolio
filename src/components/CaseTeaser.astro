@@ -145,7 +145,10 @@ if (data.gate && data.experiments?.length) {
                   <button class="cta cta--primary" type="button" data-copy-prompt data-copied="Copied">{block.copy}</button>
                   <span class="sr-only" role="status" data-copy-status></span>
                 </div>
-                <pre class="ct-prompt__text" data-prompt-text>{block.text}</pre>
+                <pre class="ct-prompt__text" id="ct-prompt-text" data-prompt-text>{block.text}</pre>
+                <button class="ct-prompt__more text-link" type="button" data-prompt-more aria-controls="ct-prompt-text" aria-expanded="true" hidden>
+                  <span data-more-label>Show less</span> <span aria-hidden="true" data-more-arr>↑</span>
+                </button>
               </div>
             ) : (
               data.gate && (
@@ -512,6 +515,26 @@ if (data.gate && data.experiments?.length) {
     const text = panel.querySelector<HTMLElement>('[data-prompt-text]');
     const status = panel.querySelector<HTMLElement>('[data-copy-status]');
     if (!btn || !text) return;
+
+    // Expand / collapse. A prompt only a few lines past the collapsed height
+    // is simply shown open: folding away three lines is not worth a control.
+    const more = panel.querySelector<HTMLButtonElement>('[data-prompt-more]');
+    const moreLabel = more?.querySelector<HTMLElement>('[data-more-label]');
+    const moreArr = more?.querySelector<HTMLElement>('[data-more-arr]');
+    if (more && moreLabel && moreArr) {
+      const set = (open: boolean) => {
+        panel.toggleAttribute('data-collapsed', !open);
+        more.setAttribute('aria-expanded', String(open));
+        moreLabel.textContent = open ? 'Show less' : 'Show the full prompt';
+        moreArr.textContent = open ? '↑' : '↓';
+      };
+      const full = text.scrollHeight;
+      set(false);
+      if (full - text.clientHeight < 4 * parseFloat(getComputedStyle(text).lineHeight)) set(true);
+      else more.hidden = false;
+      more.addEventListener('click', () => set(panel.hasAttribute('data-collapsed')));
+    }
+
     const label = btn.textContent ?? '';
     const done = btn.dataset.copied ?? 'Copied';
     let timer = 0;
@@ -773,10 +796,12 @@ if (data.gate && data.experiments?.length) {
   /* ---- the prompt: a paper card with the page's one primary sticker ---- */
   /* a paper card, not glass — glass is for something kept between (Uttham,
      2026-10-01); the prompt sits in the sheet's recessed well (--paper-2).
-     It is a PREVIEW and a copy button, nothing more (Uttham, 2026-10-02: "copy
-     the prompt can just have preview and a copy button"): the well shows the
-     opening lines and fades out; the whole prompt is still in the <pre>, so
-     the button copies all of it and a screen reader reads all of it. */
+     The well opens on the prompt's first ten lines and fades out, with "Show
+     the full prompt" under it (Uttham, 2026-10-02: "let their be a way to
+     expand the prmopt … the compressed one I am not liking" — this replaces the
+     six-line preview of the same day). The whole prompt is always in the <pre>,
+     so the button copies all of it and a screen reader reads all of it. The
+     script collapses it, so without the script it is simply open. */
   .ct-prompt {
     position: relative;
     margin-top: var(--group-gap);
@@ -801,14 +826,16 @@ if (data.gate && data.experiments?.length) {
     line-height: var(--lh-body);
     white-space: pre-wrap;
     overflow-wrap: anywhere;
-    /* six lines of the prompt inside the well's padding, then the text fades
-       into the well over the last two — the well itself stays solid */
     --pv-line: calc(var(--text-small) * var(--lh-body));
     position: relative;
-    max-height: calc(2 * var(--card-padding) + 6 * var(--pv-line));
+  }
+  /* collapsed: ten lines inside the well's padding, then the text fades into
+     the well over the last two — the well itself stays solid */
+  .ct-prompt[data-collapsed] .ct-prompt__text {
+    max-height: calc(2 * var(--card-padding) + 10 * var(--pv-line));
     overflow: hidden;
   }
-  .ct-prompt__text::after {
+  .ct-prompt[data-collapsed] .ct-prompt__text::after {
     content: '';
     position: absolute;
     inset: auto 0 0;
@@ -816,6 +843,16 @@ if (data.gate && data.experiments?.length) {
     background: linear-gradient(to bottom, transparent, var(--paper-2) calc(100% - var(--card-padding)));
     pointer-events: none;
   }
+  /* the toggle is a text link, like "Read the case", under the well */
+  .ct-prompt__more {
+    justify-self: start;
+    padding: 0;
+    background: none;
+    border: 0;
+    cursor: pointer;
+  }
+  .ct-prompt__more[hidden] { display: none; }
+  .ct-prompt__more:focus-visible { outline: 2px solid var(--amber-text); outline-offset: 4px; }
 
   .ct-inside-lead { margin-top: var(--ct-sub); }
   .ct-inside {
