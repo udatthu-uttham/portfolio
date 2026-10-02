@@ -1251,18 +1251,22 @@ const principles = [
   }
 
   @media (max-width: 960px) {
-    /* The panel stacks: notes first, then the photo centred beneath them.
-       At 960px, not 900: below this the three notes and even a 150px photo
-       no longer fit side by side (the notes need 560 of a ~780px panel). */
-    .contact-panel { grid-template-columns: 1fr; }
-    .contact-panel__photo { --photo-w: 240px; --photo-inset: 0px; justify-self: center; }
-  }
-  @media (max-width: 820px) {
-    /* Below ~820px three-across leaves a note under 172px inside, and the
-       address breaks mid-word; the notes drop to one column, note-sized, as
-       the stack was before. */
+    /* TABLETS (Uttham, 2026-10-02: "see the contact me cards and image, they are
+       not aligned"). Below 960px the three notes no longer fit in a row beside
+       the photo (they need 560 of a ~780px panel), so they stack in one column,
+       note-sized, and the photo stands beside them on the right — the two
+       blocks centred against each other, as on a laptop, instead of a column
+       of notes over a photo centred under nothing. */
+    .contact-panel { grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
     .note-row { grid-template-columns: 1fr; }
     .note-row li { max-width: 260px; }
+    .contact-panel__photo { --photo-w: clamp(180px, 30vw, 260px); }
+  }
+  @media (max-width: 600px) {
+    /* PHONES: one column. The photo takes the notes' own left edge and width,
+       so the stack reads as one aligned column. */
+    .contact-panel { grid-template-columns: 1fr; align-items: start; }
+    .contact-panel__photo { --photo-w: min(100%, 260px); --photo-inset: 0px; justify-self: start; }
   }
   @media (max-width: 900px) {
     /* the three principles stay side by side down to phone width; the body drops to small text */
