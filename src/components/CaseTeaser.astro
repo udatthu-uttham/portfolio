@@ -27,7 +27,10 @@ const { data, frame } = Astro.props;
 const live = Astro.slots.has('preview');
 const livePhone = live && frame === 'phone';
 
-const files = import.meta.glob<ImageMetadata>('../assets/{plp,mall}/*.{png,jpg,jpeg,webp}', { eager: true, import: 'default' });
+// the case studies' phone screens: plp/ and mall-case/ hold only what Uttham
+// supplies for them (2026-10-02: "remove them and ask me I will give all of
+// them"); mall/ is the Mall deck's own exports, still used by the homepage tile
+const files = import.meta.glob<ImageMetadata>('../assets/{plp,mall,mall-case}/*.{png,jpg,jpeg,webp}', { eager: true, import: 'default' });
 const library: Record<string, ImageMetadata> = Object.fromEntries(
   Object.entries(files).map(([path, img]) => {
     const [dir, name] = path.split('/').slice(-2);
@@ -236,7 +239,9 @@ const titleFor = (key: string) => {
                   loading={i < 2 ? 'eager' : 'lazy'}
                 />
               ))}
-              {dev && <p class="ct-phone__dev" data-dev-label></p>}
+              {/* while a screen is still to come: its state's name on the dev
+                  server, a quiet line in the build */}
+              <p class="ct-phone__dev" data-dev-label data-dev={dev ? '1' : undefined}></p>
               {/* phones only: the mini phone opens the screen full size */}
               <button class="ct-pip__enlarge" type="button" aria-label="Enlarge the preview" data-pip-enlarge></button>
             </div>
@@ -326,7 +331,10 @@ const titleFor = (key: string) => {
       document.dispatchEvent(new CustomEvent('case:state', { detail: { state } }));
       const own = shots.get(state);
       const next = own ?? fallback.get(trigger) ?? null;
-      if (devLabel) devLabel.textContent = own ? '' : `No screen yet: ${state}`;
+      if (devLabel) {
+        if (devLabel.dataset.dev) devLabel.textContent = own ? '' : `No screen yet: ${state}`;
+        else devLabel.textContent = next ? '' : 'Screen coming soon';
+      }
       // the card's title names what the phone shows: the screen's own title,
       // or — before any screen exists — the state's
       if (paneTitle) paneTitle.textContent = next?.dataset.title ?? stateTitles[state] ?? '';
@@ -1020,7 +1028,8 @@ const titleFor = (key: string) => {
     scale: 1;
     transition: opacity var(--dur-4) var(--ease-enter), scale var(--dur-4) var(--ease-enter);
   }
-  /* dev server only: which screen the phone is waiting for */
+  /* which screen the phone is waiting for: the state on the dev server, "Screen
+     coming soon" in the build while the phone has nothing to show */
   .ct-phone__dev {
     position: absolute;
     inset: auto var(--space-3) var(--space-3);

@@ -272,12 +272,20 @@ following the reading, opens full size on a tap, hides on × ("Show preview"
 brings it back) and steps away at the end of the study. Content lives in `src/data/plp-case.ts`;
 the page is `src/components/CaseTeaser.astro`, opted in by `teaser` on the study.
 
-**Meesho Mall is the same teaser** (Uttham, 2026-10-01: "implement like we did
-for the first 1"), from `src/data/mall-case.ts`; its phone shows the Mall deck's
-own exports in `src/assets/mall/`, mapped per state (`screens.map`). What his
-layout marks as a placeholder — the v3 year, the Team row, the full study — stays
-off until he supplies it, and the gate card has no button while there is no full
-study behind it.
+**Meesho Mall is the same teaser**, from `src/data/mall-case.ts`, reworked on
+2026-10-02 from his notes: Role Senior Product Designer, 2022–2023; where it
+started (competitive, better-quality alternatives for shoppers who seek quality,
+and a quiet hint that the first launch found the go-to-market); v2 as the bold
+version that followed; the research before the v3 launch, with its sticky note;
+v3; what happened. **Its full case study is behind the same gate**, built from
+his own deck chapters (git `09893d8^`): no colleague names, no team-lead claims,
+no numbers. **Uttham supplies every case-page screen** (2026-10-02: "the existing
+screens you have put are all bad for projects remove them and ask me I will give
+all of them"): they go in `src/assets/plp/` and `src/assets/mall-case/`, named by
+state, listed with their card titles in `screens.titles`; until one exists the
+phone borrows the previous screen, and with none at all the build shows "Screen
+coming soon". `src/assets/mall/` is the Mall deck's own exports, kept only for the
+homepage tile.
 
 **The teaser pages run on the homepage spacing ladder, stepped up for reading**
 (Uttham: "make sure there is lot of spacing … it should match that system"):

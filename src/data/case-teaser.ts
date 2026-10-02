@@ -41,7 +41,7 @@ export type CaseTeaserData = {
   gate?: { text: string; cta: string };
   experiments?: Experiment[]; // the full study behind the gate; none → the card has no button
   screens?: {
-    dir: 'plp' | 'mall'; // a folder under src/assets/
+    dir: 'plp' | 'mall-case'; // a folder under src/assets/ holding this page's screens
     map?: Record<string, string>; // state → file name, when it is not the state's own name
     alts: Record<string, string>; // state → what its screen shows
     titles?: Record<string, string>; // state → the short title on the card, above the phone
