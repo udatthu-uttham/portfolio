@@ -38,11 +38,12 @@ Not covered by this rule, and fine to keep: dates, version numbers, and the
 method detail of Uttham's own research (number of rounds, sample sizes,
 locations).
 
-**A public figure Meesho itself published is fine — linked to where Meesho says
-it** (Uttham's case-study brief, 2026-10-01: "Public figures are fine when
-sourced… Link it."). Today that is one number: **250 million shoppers**, from
-Meesho's Q3 FY26 Shareholders' Letter (251 million annual transacting users),
-linked on its first mention to the BSE filing. Outcome metrics stay off the site
+**A public figure Meesho itself published is fine** (Uttham's case-study brief,
+2026-10-01: "Public figures are fine when sourced"). Today that is one number:
+**250 million shoppers**, from Meesho's Q3 FY26 Shareholders' Letter (251
+million annual transacting users). **It is not linked** (2026-10-02: "the 250mn
+users in first project has a link please remove that"); the source stays in the
+data file's comment. Outcome metrics stay off the site
 even when public — no lifts, rates or conversion.
 
 ## Motion: magnetic sheets only where a hand would peel them

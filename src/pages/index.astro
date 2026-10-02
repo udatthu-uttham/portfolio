@@ -41,9 +41,13 @@ const principles = [
   },
   {
     // Uttham, 2026-10-01: "rather than saying speed … optimising the process
-    // and leveraging AI tooling to accelerate & improve efficiency".
-    title: 'Boosting design workflows for improving efficiency.',
-    tag: 'Automate repetitive tasks, boosting workflows with AI.',
+    // and leveraging AI tooling to accelerate & improve efficiency"; compacted
+    // to the other two's length on 2026-10-02 ("the third how I lead is
+    // verbose, please compact that whole block"). It was "Boosting design
+    // workflows for improving efficiency." / "Automate repetitive tasks,
+    // boosting workflows with AI."
+    title: 'Design workflows, boosted by AI.',
+    tag: 'Automate the repetitive. Keep the craft.',
   },
 ];
 ---
@@ -815,9 +819,12 @@ const principles = [
      running tool, so the row is a shelf of two working things rather than a
      grid of summaries. Everything below the well is kept to one line a piece so
      an AI sheet stands the same height as a case sheet beside it. */
-  /* 540px is where a tool sheet can hold its copy beside its phone (below), so
-     the row drops to one sheet per line before the sheets get too narrow. */
-  .tiles--ai { grid-template-columns: repeat(auto-fit, minmax(min(100%, 540px), 1fr)); }
+  /* The row is the Projects row exactly — two up from tablet, one on phones —
+     so the two sections never disagree (Uttham, 2026-10-02: "on tablet, the ai
+     cards have different layout and project have different, please keep them
+     consistent"). A sheet sets its copy beside its phone only once the sheet
+     itself is 540px wide (the container query below), which happens on laptops;
+     on a tablet both sections stack: title, line, picture, action. */
   .tile--ai { gap: var(--space-4); }
 
   /* An AI card opens its teaser page, as a case card opens its case — but the

@@ -5,9 +5,9 @@
 // its screen is src/assets/plp/<state>.(png|jpg|webp), dropped in by Uttham.
 //
 // CONFIDENTIALITY: direction and status only — no lifts, rates or internal
-// counts. The one figure on the page, 250 million, is public and sourced
-// (Meesho's Q3 FY26 Shareholders' Letter, 251M annual transacting users) and
-// is linked where it first appears. Items the brief marks "open" are left out
+// counts. The one figure on the page, 250 million, is Meesho's own public
+// number (Q3 FY26 Shareholders' Letter, 251M annual transacting users); it is
+// not linked (2026-10-02). Items the brief marks "open" are left out
 // rather than shown as placeholders.
 //
 // 2026-10-02 (Uttham): a catchier title; Role "strategy and design lead for pod
@@ -23,13 +23,11 @@ import type { CaseTeaserData } from './case-teaser';
 export const plpCase: CaseTeaserData = {
   // before: "Helping shoppers understand products better at first glance"
   title: 'From a glance to a decision',
-  // {source} becomes the sourced link; the sentence is under 15 words, so no bold.
-  dek: 'Rethinking Meesho’s product card for {source} people who browse by picture.',
-  source: {
-    label: '250 million',
-    href: 'https://www.bseindia.com/xml-data/corpfiling/AttachHis/b7bfb190-04cb-45a5-8cfd-4f70013eff2e.pdf#page=9',
-    title: 'Meesho Shareholders’ Letter, Q3 FY26 (30 January 2026): 251 million annual transacting users',
-  },
+  // Unlinked (Uttham, 2026-10-02: "the 250mn users in first project has a link
+  // please remove that"). The figure is Meesho's own public number (Q3 FY26
+  // Shareholders' Letter, 251 million annual transacting users). The sentence
+  // is under 15 words, so no bold.
+  dek: 'Rethinking Meesho’s product card for 250 million people who browse by picture.',
   facts: [
     { label: 'Role', value: 'Strategy and design lead for a pod of five' },
     { label: 'Timeline', value: 'Six months' },
