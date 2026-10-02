@@ -9,13 +9,13 @@
 //
 // LAYOUT (Uttham, 2026-09-21; 2026-10-01; 2026-10-02): two cards, built out of
 // the Projects tile — tape, title, lead line, the phone in its glass well, and
-// "View more", which opens the teaser as "Read the case" opens a case (2026-10-02:
+// "View more", which opens the tool's page as "Read the case" opens a case (2026-10-02:
 // "the ai cards should not have copy the plan as CTA, view more should be the
-// CTA for it"; the prompt is copied on the teaser page). `helps` is NOT on the card: it moved to the tool's teaser page,
+// CTA for it"; the prompt is copied on the tool's page). `helps` is NOT on the card: it moved to the tool's page,
 // /ai/<slug>, which the whole card opens, along with the long version of "how
 // to build it". The phone on the card is a running preview with no link of its
-// own; on the teaser page the same tool runs in the sticky phone
-// (src/data/ai-teasers.ts arranges the page).
+// own; on its page the same tool runs in the sticky phone
+// (src/data/ai-pages.ts arranges the page).
 //
 // THE COPY IS UTTHAM'S (2026-09-21): `what` and `helps` are his own words, and
 // only grammar and the bold rule have been touched. Do NOT shorten them to fit
@@ -27,11 +27,18 @@ export type Tool = {
   name: string;
   year: string;
   what: string; // the card's lead line. Highlights in **bold**.
-  idea?: string; // the teaser's opening section, "The idea", in Uttham's words. Highlights in **bold**, one ^^beat^^.
+  idea?: string; // the page's opening section, "The idea", in Uttham's words. Highlights in **bold**, one ^^beat^^.
+  made?: {
+    // the page's "How I made it", after "How it helps". Highlights in **bold**.
+    lead: string; // how the tool was built, in Uttham's words
+    pipeline: string; // one line over the steps
+    heading: string; // the steps' sub-heading (it gets its own tick on the rail)
+    steps: { label: string; text: string }[];
+  };
   helps: string[]; // how it helps, one point each, shown on /ai/<slug>. Highlights in **bold**.
   action: string; // the card's action, which reads like a case tile's "Read the case"
   used?: { label: string; href: string }; // where it shows up in the case studies
-  visit?: { label: string; href: string }; // a live thing you can open yourself: the teaser's "Open the prototype ↗", and the preview's src
+  visit?: { label: string; href: string }; // a live thing you can open yourself: the page's "Open the prototype ↗", and the preview's src
 };
 
 export const tools: Tool[] = [
@@ -46,6 +53,32 @@ export const tools: Tool[] = [
       '**They can learn, follow and improve,** as the tool actively listens to their research and upskills them.',
       '**Centralised research storage** that is accessible to everyone.',
     ],
+    // HOW I MADE IT (Uttham, 2026-10-02). The lead is his, verbatim but for
+    // grammar: "this is powered by /anthropic-skills:research-scripter for
+    // generating and decoding the research objectives, we have added meesho
+    // context from hero flows to about our users, past popular research
+    // studies, trained internally on research methodologies, on how to conduct
+    // research for meesho audience". He then settled it: the app triggers the
+    // skill itself; the skill goes unnamed ("no need to give the names, just
+    // this page is all about explaining my work"); "we" is him alone; his
+    // phrases stay as written. The steps are the app's synthesis pipeline as he
+    // had it read out of its code the same day — mechanism only: no file
+    // names, model names, participant-ID format or known bugs, because this
+    // repo is public.
+    made: {
+      lead: 'This is **powered by an AI skill I wrote** for generating and decoding the research objectives. I have added **Meesho context, from hero flows to who our users are,** and past popular research studies, and it is trained internally on research methodologies: **how to conduct research for the Meesho audience.**',
+      pipeline: 'The synthesis is **a pipeline of separate model calls, each building on the ones before it** — never one big prompt. The discussion guide steers all of it.',
+      heading: 'The synthesis, step by step',
+      steps: [
+        { label: 'Plan', text: 'The discussion guide becomes **a synthesis plan:** its themes, research questions and activities — a variant comparison, a card sort — are carried into every step after it.' },
+        { label: 'Listen', text: 'Each recording comes back **transcribed and translated, speakers separated, with emotion and vocal cues** — calibrated for India, so a flat “haan haan” is not read as agreement.' },
+        { label: 'Nuggets', text: 'The transcripts become atomic observations, **each with one exact quote,** the participant, their emotion and a topic.' },
+        { label: 'Cluster', text: 'Observations are grouped under the guide’s themes; **without a guide, the model clusters them bottom-up.**' },
+        { label: 'Synthesise', text: 'It works through **each research question, then the leftovers,** into insights, opportunities, pain points and any sections the plan asked for. A theme with no evidence is reported as uncovered, never invented, and a quote whose voice disagrees with its words becomes **a say–feel gap, the deepest kind of insight.**' },
+        { label: 'How might we', text: 'How-might-we questions and ranked opportunity areas, **built only from findings more than one participant backs,** and a summary for stakeholders.' },
+        { label: 'Verify', text: 'Every finding is **checked against the observations and the transcript.** Anything with a critical issue is flagged for review with a question for the researcher, who can answer it and have the audio heard again; **the finding is then updated.**' },
+      ],
+    },
     action: 'View more',
   },
   {

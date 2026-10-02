@@ -304,23 +304,30 @@ AI prompt panel stand on the paper card (`--paper-1`, `--line-1`, `--radius-sm`,
 (`--paper-2`); glass is for a pane with something tucked behind it, as the hero
 portrait is behind its slab.
 
-**The AI Space tool pages are teasers too** (Uttham, 2026-10-01: "do similar
-teaser for ai space things … the right side is running preview as we did for
-the project case studies, similar for the first ai tool as well"). `/ai/<slug>`
-is the same `CaseTeaser`, in live mode with `frame="phone"`: **the left column is
+**The AI Space tool pages are one-pagers, not teasers** (Uttham, 2026-10-02:
+"for AI space cards, there is no need to have teaser, just a one pager only" —
+he then chose to keep the layout and drop the word). Everything is on the page,
+nothing is gated, and the page is about **explaining his work** ("just this page
+is all about explaining my work"). They borrow the case studies' layout
+(2026-10-01: "the right side is running preview as we did for the project case
+studies"): `/ai/<slug>` renders `CaseTeaser` in live mode with `frame="phone"`: **the left column is
 the white-label guide and the sticky phone runs the tool itself**, in the
 teaser's own 9/19.5 phone (the tool fills it). Left, in order: the guide's title
 and intro as the hero, facts (Tool, Kind, Year), The idea (only a tool that
 carries `idea` in `tools.ts` — the prototype, in Uttham's 2026-10-02 words, with
 its one `^^` beat), How it helps (the card's line,
-then the helps as ruled rows), What you get, What you need, The prompt — the
+then the helps as ruled rows), **How I made it** (only a tool that carries `made`
+— Resona: his lead on the skill behind the preparation, unnamed and in the first
+person as he asked, then the synthesis pipeline step by step, each step driving
+the phone; mechanism only, never file names, model names, ID formats or bugs),
+What you get, What you need, The prompt — the
 paper card with the page's one primary sticker, "Copy the prompt", which
 copies the `<pre>` word for word — and nothing after it: **What to change for
 your team is gone** (2026-10-02: "remove want to change for your team section,
 and the prompt I believe is whitelabelled"). **No copy
-lives in `src/data/ai-teasers.ts`**: it arranges `tools.ts` and `guides.ts` and
+lives in `src/data/ai-pages.ts`**: it arranges `tools.ts` and `guides.ts` and
 says which step each row shows. **Resona follows the reading** (`follow`): every
-row names one of its own steps — prepare, setup, record, synth, insights — and
+row and step names one of its own steps — prepare, setup, record, synth, insights — and
 the phone shows that step; the homepage card keeps its loop. **The prototype
 just runs, and can be used in the phone** (`interactive`); driving its routes
 from the reading would pull it out of the reader's hands, so its rows carry no

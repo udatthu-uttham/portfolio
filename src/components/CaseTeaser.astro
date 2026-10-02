@@ -112,7 +112,7 @@ if (data.gate && data.experiments?.length) {
                 {block.heading && <h3 id={idFor(block.heading)}>{block.heading}</h3>}
                 <ul class="ct-steps">
                   {block.steps.map((s) => (
-                    <li class="ct-step" data-state={s.state}><b>{s.label}</b>{s.text}</li>
+                    <li class="ct-step" data-state={s.state}><b>{s.label}</b><span set:html={rich(s.text)} /></li>
                   ))}
                 </ul>
               </>
@@ -739,8 +739,8 @@ if (data.gate && data.experiments?.length) {
     transition: background-color var(--dur-2) var(--ease-standard);
   }
   .ct-step.is-current::before { background: var(--amber-700); }
-  /* a row of prose rather than a label and its line: the highlight is the bold */
-  .ct-row :global(.em) { color: var(--ink-900); font-weight: 600; }
+  /* the highlight in a row, or in a step's line under its label, is the bold */
+  .ct-step :global(.em) { color: var(--ink-900); font-weight: 600; }
   /* rows or the prompt straight under a section's h2 take the heading's own
      gap, as a first paragraph does; after text they are a sub-group */
   .ct-section > h2 + .ct-rows,

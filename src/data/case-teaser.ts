@@ -7,7 +7,7 @@
 // screen `screens.map[state] ?? state` from `src/assets/<screens.dir>/`; with a
 // `preview` slot (a live tool) it is announced as a `case:state` event instead.
 
-export type CaseStep = { state?: string; label: string; text: string };
+export type CaseStep = { state?: string; label: string; text: string }; // a labelled ruled row; highlights in **bold**
 export type CaseRow = { state?: string; text: string }; // one ruled row of prose; highlights in **bold**
 
 export type CaseBlock =

@@ -3,7 +3,7 @@
 // be running the same afternoon. Nothing in here names Meesho data, people,
 // files or figures — that is the point of white-label.
 //
-// Rendered on /ai/<slug> as a teaser (src/data/ai-teasers.ts arranges it). The
+// Rendered on /ai/<slug>, a one-pager (src/data/ai-pages.ts arranges it). The
 // lines carry their highlights in **bold** (CLAUDE.md); the prompt never does —
 // it is copied as plain text, word for word.
 export type Guide = {

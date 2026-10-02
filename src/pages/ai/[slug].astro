@@ -1,12 +1,13 @@
 ---
-// One AI Space tool, as a teaser (Uttham, 2026-10-01: "similar teaser for ai
-// space things … clicking on the card will move to ai space teaser page, where
+// One AI Space tool, as a one-pager (Uttham, 2026-10-02: "no need to have
+// teaser, just a one pager only"), in the case studies' layout (2026-10-01:
+// "clicking on the card will move to ai space teaser page, where
 // the right side is running preview as we did for the project case studies").
 // The left column is the white-label guide — how it helps, what you get, what
 // you need, the prompt (copyable), what to change — and the sticky phone on the
 // right runs the tool itself. The layout is the case studies' CaseTeaser in
 // live mode; the arrangement and the state of each row are in
-// src/data/ai-teasers.ts, the words in tools.ts and guides.ts.
+// src/data/ai-pages.ts, the words in tools.ts and guides.ts.
 import Base from '../../layouts/Base.astro';
 import Header from '../../components/Header.astro';
 import GridOverlay from '../../components/GridOverlay.astro';
@@ -15,21 +16,21 @@ import ResonaPreview from '../../components/ResonaPreview.astro';
 import ProtoPreview from '../../components/ProtoPreview.astro';
 import { guides } from '../../data/guides';
 import { tools } from '../../data/tools';
-import { aiTeaser } from '../../data/ai-teasers';
+import { aiPage } from '../../data/ai-pages';
 
 export function getStaticPaths() {
   return guides.map((guide) => ({ params: { slug: guide.slug }, props: { guide } }));
 }
 const { guide } = Astro.props;
 const tool = tools.find((t) => t.slug === guide.slug);
-const teaser = aiTeaser(guide.slug);
+const page = aiPage(guide.slug);
 ---
 <Base title={`${guide.title} — Uttham Udatthu`} description={guide.intro.replace(/\*\*/g, '')}>
   <a class="skip-link" href="#main">Skip to content</a>
   <Header active="ai" />
   <main id="main" class="ai-page" tabindex="-1">
     <GridOverlay />
-    <CaseTeaser data={teaser} frame="phone">
+    <CaseTeaser data={page} frame="phone">
       <Fragment slot="preview">
         {guide.slug === 'resona' && <ResonaPreview fill follow />}
         {guide.slug === 'realistic-prototype' && tool?.visit && <ProtoPreview src={tool.visit.href} fill interactive />}
@@ -40,7 +41,7 @@ const teaser = aiTeaser(guide.slug);
 
 <style>
   /* the case page's own frame (work/[slug].astro): the header, then half a
-     section gap; the teaser's own bottom pad ends the page */
+     section gap; the layout's own bottom pad ends the page */
   .ai-page {
     position: relative;
     min-height: 100svh;
