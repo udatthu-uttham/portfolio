@@ -1,0 +1,11 @@
+---
+// The hero's GSAP choreography and the magnetic sheets (motion-hero.js), as a
+// component so the homepage can hand the chunk to Base's head slot and it is
+// discovered with the first bytes of the page, beside the site motion. It is a
+// component rather than a <script> written straight into the slot because the
+// compiler numbers a page's own scripts in a different order than it renders
+// them, and the slot came out holding the wrong one (perf pass 2026-10-02).
+// The homepage is the only page with a hero or with data-magnetic tiles, so
+// this is the only page that renders it; GSAP never ships anywhere else.
+---
+<script src="../scripts/motion-hero.js"></script>

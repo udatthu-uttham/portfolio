@@ -37,9 +37,8 @@ const { src, fill = false, interactive = false } = Astro.props;
       ) : (
         <iframe
           class="pp__frame"
-          src={src}
+          data-src={src}
           title="The shopping sandbox, running"
-          loading="lazy"
           tabindex="-1"
           aria-hidden="true"
           scrolling="no"
@@ -88,6 +87,33 @@ const { src, fill = false, interactive = false } = Astro.props;
     frame.addEventListener('load', eager);
     eager();
   });
+
+  // The card's phone holds its address in data-src and is only handed it once
+  // the card is within a screen of the viewport: the sandbox is a ~1MB build,
+  // and a native loading="lazy" iframe still fetched it on page load, because
+  // AI Space sits inside the browser's own look-ahead distance. One screen is
+  // enough for the app to boot before a reader scrolling at reading pace
+  // reaches it; the teaser page's live phone keeps its src and loads at once
+  // (perf pass 2026-10-02).
+  const pending = document.querySelectorAll<HTMLIFrameElement>('iframe[data-src]');
+  const hand = (frame: HTMLIFrameElement) => {
+    if (!frame.src && frame.dataset.src) frame.src = frame.dataset.src;
+  };
+  if ('IntersectionObserver' in window) {
+    const near = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.querySelectorAll<HTMLIFrameElement>('iframe[data-src]').forEach(hand);
+          near.unobserve(entry.target);
+        });
+      },
+      { rootMargin: '100% 0px' }
+    );
+    pending.forEach((frame) => near.observe(frame.closest('[data-proto-stage]') ?? frame));
+  } else {
+    pending.forEach(hand);
+  }
 </script>
 
 <style>

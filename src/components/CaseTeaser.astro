@@ -29,8 +29,9 @@ const livePhone = live && frame === 'phone';
 
 // the case studies' phone screens: plp/ and mall-case/ hold only what Uttham
 // supplies for them (2026-10-02: "remove them and ask me I will give all of
-// them"); mall/ is the Mall deck's own exports, still used by the homepage tile
-const files = import.meta.glob<ImageMetadata>('../assets/{plp,mall,mall-case}/*.{png,jpg,jpeg,webp}', { eager: true, import: 'default' });
+// them"). mall/ (the Mall deck's own exports, for the homepage tile) is not
+// globbed here: an eager glob emits every file it matches into the build.
+const files = import.meta.glob<ImageMetadata>('../assets/{plp,mall-case}/*.{png,jpg,jpeg,webp}', { eager: true, import: 'default' });
 const library: Record<string, ImageMetadata> = Object.fromEntries(
   Object.entries(files).map(([path, img]) => {
     const [dir, name] = path.split('/').slice(-2);
