@@ -49,7 +49,10 @@ Output as structured sections in this order: Key finding · Quality (observation
   },
   {
     slug: 'realistic-prototype',
-    title: 'Build a prototype people forget is a prototype',
+    // Uttham, 2026-10-02: "title should be rephrased to something like how to
+    // get deeper insights by mimicing the real app experience faster". It was
+    // "Build a prototype people forget is a prototype".
+    title: 'How to get deeper insights by mimicking the real app experience, faster',
     intro: 'Not a click-through. A **small web app with the real product\u2019s shape** \u2014 a catalogue that reads like the catalogue, a cart that adds up, a payment step that fails when you make it fail. Participants stop performing for you, because **there is nothing to perform for.**',
     get: [
       '**A running app on a URL** you can send to a moderator, a participant, or a stakeholder.',
