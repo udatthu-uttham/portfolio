@@ -379,8 +379,73 @@ const titleFor = (key: string) => {
         const d = Math.abs((r.top + r.bottom) / 2 - mid);
         if (d < bestD) { bestD = d; best = el; }
       }
-      if (best) show(best);
+      if (best) choose(best);
     };
+
+    // ---- each block plays as a slideshow -------------------------------------
+    // (Uttham, 2026-10-02: "the section be understood where decisions happen,
+    // there will be one gif, with 4 images, the preview runs these 4 slideshows,
+    // accordingly the highlight changes in the left, implement this
+    // functionality in all the blocks"). Once the reading reaches a block of
+    // rows or steps that shows two or more different screens, the phone runs
+    // through them in order, a beat each, and the row it is showing takes the
+    // highlight; scrolling within the block leaves it playing, scrolling to
+    // another block or section hands over. Hovering or focusing a row holds
+    // the slideshow on that row. Reduced motion, or a hidden tab: no
+    // autoplay — the reading picks the row, as before.
+    const BEAT = 2600;
+    const still = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const groupOf = (el: HTMLElement) => {
+      const list = el.parentElement;
+      if (!list?.classList.contains('ct-steps')) return null;
+      const items = [...list.children].filter((c): c is HTMLElement => c instanceof HTMLElement && Boolean(c.dataset.state));
+      return new Set(items.map((i) => i.dataset.state)).size > 1 ? { list, items } : null;
+    };
+    let playing: { list: Element; items: HTMLElement[] } | null = null;
+    let at = 0;
+    let held = false;
+    let beat = 0;
+    const stopBeat = () => { window.clearTimeout(beat); beat = 0; };
+    const nextBeat = () => {
+      stopBeat();
+      if (!playing || held || still.matches || document.hidden) return;
+      beat = window.setTimeout(() => {
+        if (!playing) return;
+        at = (at + 1) % playing.items.length;
+        show(playing.items[at]);
+        nextBeat();
+      }, BEAT);
+    };
+    const choose = (trigger: HTMLElement) => {
+      const group = groupOf(trigger);
+      if (playing && group && group.list === playing.list) return; // the block plays on
+      playing = group;
+      held = false;
+      at = group ? group.items.indexOf(trigger) : 0;
+      show(trigger);
+      nextBeat();
+    };
+    document.querySelectorAll<HTMLElement>('.ct-steps').forEach((list) => {
+      const hold = (event: Event) => {
+        const item = (event.target as HTMLElement).closest<HTMLElement>('.ct-step[data-state]');
+        if (!item || !playing || playing.list !== list) return;
+        held = true;
+        stopBeat();
+        at = playing.items.indexOf(item);
+        show(item);
+      };
+      const release = () => {
+        if (!playing || playing.list !== list) return;
+        held = false;
+        nextBeat();
+      };
+      list.addEventListener('pointerover', hold);
+      list.addEventListener('focusin', hold);
+      list.addEventListener('pointerleave', release);
+      list.addEventListener('focusout', release);
+    });
+    document.addEventListener('visibilitychange', nextBeat);
+    still.addEventListener('change', nextBeat);
 
     // The reading band's centre, in viewport px: the middle of the screen at
     // every width now that phones float the preview instead of stacking it.
@@ -436,7 +501,7 @@ const titleFor = (key: string) => {
       frame = requestAnimationFrame(() => { frame = 0; pick(); });
     }, { passive: true });
 
-    if (triggers[0]) show(triggers[0]);
+    if (triggers[0]) choose(triggers[0]);
     observe();
     wide.addEventListener('change', observe);
     let resizeTimer = 0;
@@ -708,9 +773,16 @@ const titleFor = (key: string) => {
     margin: 0 auto;
     /* a whole section gap before "More cases", as between every section */
     padding-bottom: var(--section-y);
-    /* the sub-group step: --group-gap, floored at --space-6 so a group heading
-       keeps 2:1 over its 16px to its rows even where --group-gap is 24 */
-    --ct-sub: max(var(--group-gap), var(--space-6));
+    /* ONE RUNG MORE AIR, every step of the ladder (Uttham, 2026-10-02: "the
+       texts are closely placed making it too textual please use ample spacings
+       and consistent spacings"). The order of the steps is unchanged, so the
+       grouping still reads; only the reading pages breathe more.
+       the sub-group step: 48–64, two rungs over the heading's 32 */
+    --ct-sub: max(var(--space-7), calc(var(--group-gap) * 4 / 3));
+    /* heading → its text, one rung over --head-gap */
+    --ct-head: var(--space-6);
+    /* paragraph → paragraph, sub-group heading → its rows */
+    --ct-para: var(--space-5);
   }
 
   /* ---- hero: the case page's own entrance, the reference's content ---- */
@@ -786,12 +858,12 @@ const titleFor = (key: string) => {
      own text than the section before it (law of proximity):
        between sections, hero → story, story → More cases   --section-y (96–160)
        text → a sub-group (rows, note, list, gate), and
-       above a sub-group's heading              --ct-sub: --group-gap, ≥32 (32–48)
-       heading → its text                                    --head-gap (24)
-       sub-group heading → its rows; paragraph → paragraph   --space-4 (16)
-       row label → its line; inside a card                   --space-2 / --space-4
+       above a sub-group's heading              --ct-sub (48–64)
+       heading → its text                       --ct-head (32)
+       sub-group heading → its rows; paragraph → paragraph   --ct-para (24)
+       row label → its line; inside a card                   --space-3 / --space-4
      Insets, apart from the stack: below the header --section-pad, row padding
-     --space-5, the gate card --card-padding. */
+     --space-6, the gate card --card-padding. One rung up on 2026-10-02. */
   .ct-layout { margin-top: var(--section-y); }
   .ct-story { display: grid; gap: var(--section-y); min-width: 0; }
   .ct-section, .ct-full { min-width: 0; }
@@ -812,7 +884,7 @@ const titleFor = (key: string) => {
   }
   .ct-body {
     max-width: 62ch;
-    margin: var(--space-4) 0 0;
+    margin: var(--ct-para) 0 0;
     color: var(--ink-600);
     font-size: var(--text-body);
     line-height: var(--lh-body);
@@ -824,22 +896,22 @@ const titleFor = (key: string) => {
   /* Ruled rows, the case index's dashed recipe: the label on its own line, the
      line under it. The row being read takes an amber tick in the gutter —
      colour only, nothing moves. */
-  h2 + .ct-body { margin-top: var(--head-gap); }
+  h2 + .ct-body { margin-top: var(--ct-head); }
   .ct-steps { margin: var(--ct-sub) 0 0; padding: 0; list-style: none; }
-  h3 + .ct-steps { margin-top: var(--space-4); }
+  h3 + .ct-steps { margin-top: var(--ct-para); }
   /* a sub-group's lead line belongs to its rows: heading → lead → rows all
      at the within-group step, so the group reads as one block */
-  .ct-sublead + .ct-steps { margin-top: var(--space-4); }
+  .ct-sublead + .ct-steps { margin-top: var(--ct-para); }
   .ct-step {
     position: relative;
-    padding: var(--space-5) 0;
+    padding: var(--space-6) 0;
     border-top: 1px dashed var(--line-mark);
     color: var(--ink-600);
     font-size: var(--text-body);
     line-height: var(--lh-body);
   }
   .ct-step:last-child { border-bottom: 1px dashed var(--line-mark); }
-  .ct-step b { display: block; margin-bottom: var(--space-2); color: var(--ink-900); font-weight: 600; }
+  .ct-step b { display: block; margin-bottom: var(--space-3); color: var(--ink-900); font-weight: 600; }
   .ct-step::before {
     content: '';
     position: absolute;
@@ -856,7 +928,7 @@ const titleFor = (key: string) => {
   /* rows or the prompt straight under a section's h2 take the heading's own
      gap, as a first paragraph does; after text they are a sub-group */
   .ct-section > h2 + .ct-rows,
-  .ct-section > h2 + .ct-prompt { margin-top: var(--head-gap); }
+  .ct-section > h2 + .ct-prompt { margin-top: var(--ct-head); }
 
   /* the verbatim, once consent is confirmed: the case page's sticky note */
   .ct-note {
@@ -1033,7 +1105,7 @@ const titleFor = (key: string) => {
     text-transform: uppercase;
     white-space: nowrap;
   }
-  .ct-exp { display: grid; gap: var(--space-6); }
+  .ct-exp { display: grid; gap: var(--space-7); }
   .ct-exp__head { display: grid; justify-items: start; gap: var(--space-3); }
   .ct-exp__head h3 { margin: 0; font-size: var(--text-h3); }
   /* status as the case index's pill — the one place a pill belongs */
@@ -1048,7 +1120,7 @@ const titleFor = (key: string) => {
     letter-spacing: var(--track-label);
     text-transform: uppercase;
   }
-  .ct-exp__part { display: grid; gap: var(--space-2); }
+  .ct-exp__part { display: grid; gap: var(--space-3); }
   .ct-exp__part .ct-body { margin: 0; }
   .ct-exp__label {
     margin: 0;

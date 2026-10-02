@@ -6,7 +6,7 @@ Canonical export: `docs/design-tokens.json`. Implementation: `src/styles/global.
 
 Naming is locked as of 2026-10-01 (`docs/design-audit.md` §10, decision 1): **the existing prefixes stay**; category grouping happens through a prefix mapping table, never a rename.
 
-**Controls — one button family, three weights (locked 2026-09-07).** Every button is a die-cut *sticker*: sharp corners (`--radius-control`, 0), the sticker label voice (`--font-paper` 600 · `--text-small` · uppercase · `--track-label`), padding `--space-3 --space-5`, min-height `--space-7`, a −2° lean (`--cta-tilt`; a second sticker beside the first leans +1.5°), `--shadow-stuck` at rest. Hover (fine pointers only): straightens, lifts `--lift-y`, `--shadow-lift`. Press: flat, `--shadow-press`, `--dur-1`; release 100ms. Weight is the stock alone:
+**Controls — one button family, three weights (locked 2026-09-07).** Every button is a die-cut *sticker*: slightly rounded corners (`--radius-control`, 6px since 2026-10-02 — "this is the only sharp element on this website"; 0 before), the sticker label voice (`--font-paper` 600 · `--text-small` · uppercase · `--track-label`), padding `--space-3 --space-5`, min-height `--space-7`, a −2° lean (`--cta-tilt`; a second sticker beside the first leans +1.5°), `--shadow-stuck` at rest. Hover (fine pointers only): straightens, lifts `--lift-y`, `--shadow-lift`. Press: flat, `--shadow-press`, `--dur-1`; release 100ms. Weight is the stock alone:
 
 | Class | Stock | Use |
 |---|---|---|
@@ -144,12 +144,12 @@ The stack, largest first:
 | Gap | Token | 375 / 1280 / 1440 |
 | --- | --- | --- |
 | Hero → story, section → section, story → More cases, full-study block → block | `--section-y` | 96 / 141 / 158 |
-| Text → a sub-group (rows, note, list, gate card), and above a sub-group heading | `--ct-sub` = `max(--group-gap, --space-6)` | 32 / 45 / 48 |
-| Heading → its text | `--head-gap` | 24 |
-| Sub-group heading → its rows; paragraph → paragraph; inside the gate card | `--space-4` | 16 |
-| Row label → its line | `--space-2` | 8 |
+| Text → a sub-group (rows, note, list, gate card), and above a sub-group heading | `--ct-sub` = `max(--space-7, --group-gap × 4/3)` | 48 / 60 / 64 |
+| Heading → its text | `--ct-head` = `--space-6` | 32 |
+| Sub-group heading → its rows; paragraph → paragraph | `--ct-para` = `--space-5` | 24 |
+| Row label → its line; inside the gate card | `--space-3` / `--space-4` | 12 / 16 |
 
-Each is a clear step under the one above at every width (the `--space-6` floor keeps a sub-group heading 2:1 over its rows on phones, where `--group-gap` alone is 24). Insets, outside the stack: below the header `--section-pad` (48 / 70 / 79), row padding `--space-5` (24), the gate card `--card-padding` (16 / 28 / 32) — never narrower than the card's own inner gap. These pages used `--section-y-sm` between sections until this pass; it stays the rung for the old chapter template only.
+**One rung more air since 2026-10-02** (Uttham: "the texts are closely placed making it too textual please use ample spacings and consistent spacings"): every step moved up one, so their order, and the grouping it draws, is unchanged. Each is a clear step under the one above at every width. Insets, outside the stack: below the header `--section-pad` (48 / 70 / 79), row padding `--space-6` (32), a full-study block's parts `--space-7` apart, the gate card `--card-padding` (16 / 28 / 32) — never narrower than the card's own inner gap. These pages used `--section-y-sm` between sections until this pass; it stays the rung for the old chapter template only.
 
 The hero statement fills the glass panel's padded content width. Its portrait tucks 32px behind the glass and sits 64px from the panel's left edge, clear of the corner bolts. Panel top and bottom padding follows the hardware rules below. The scene and its handwritten explanation form one figure: caption first, artwork 12px below it, with a shared left edge. Its width follows whole foundation columns, as described below. Contact notes share the same size, and the photo group reserves 32px above its frame for the attached badge.
 

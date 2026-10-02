@@ -290,10 +290,16 @@ homepage tile.
 
 **The teaser pages run on the homepage spacing ladder, stepped up for reading**
 (Uttham: "make sure there is lot of spacing … it should match that system"):
-`--section-y` between sections (the bus-discovery reference's 160px), `--head-gap`
-from a heading to its text, `--ct-sub` (`--group-gap`, never under 32px) to a
-sub-group and above its heading, `--space-4` between paragraphs, rows at
-`--space-5`. The table is in `docs/design-tokens.md`; never drop these pages back
+`--section-y` between sections (the bus-discovery reference's 160px), `--ct-head`
+(32) from a heading to its text, `--ct-sub` (48–64) to a sub-group and above its
+heading, `--ct-para` (24) between paragraphs, rows padded `--space-6` — one rung
+up on 2026-10-02 ("the texts are closely placed making it too textual"). **Each
+block of rows or steps plays as a slideshow** (2026-10-02: "the preview runs
+these 4 slideshows, accordingly the highlight changes in the left … in all the
+blocks"): once the reading reaches a block showing two or more different
+screens, the phone runs through them a beat (2.6s) each and the row it shows
+takes the highlight; hovering a row holds it; reduced motion keeps the
+scroll-driven pick. The table is in `docs/design-tokens.md`; never drop these pages back
 to `--section-y-sm`. **Every teaser page navigates by a rail of scroll points,
 each title a tooltip** (Uttham, 2026-10-02: "the sticky notes as scroll points in
 l2 is weird lets do the one you initially made but the active or hover state show

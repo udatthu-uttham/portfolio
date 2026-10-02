@@ -158,7 +158,7 @@
   --radius-card: 16px;
   --radius-sm: 8px;
   --radius-inset: 2px; /* nested inset exception in the supplied radius role */
-  --radius-control: 0px; /* CTA material recipe */
+  --radius-control: 6px; /* CTA material recipe: slightly rounded (2026-10-02: "the only sharp element on this website") */
 
   /* elevation — four warm-ink shadows for paper objects; glass, CTA and bolt
      keep their own material recipes (documented in design-tokens.md) */
