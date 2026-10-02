@@ -267,15 +267,17 @@ study behind it.
 from a heading to its text, `--ct-sub` (`--group-gap`, never under 32px) to a
 sub-group and above its heading, `--space-4` between paragraphs, rows at
 `--space-5`. The table is in `docs/design-tokens.md`; never drop these pages back
-to `--section-y-sm`. **Every teaser page navigates by bookmarks, like a book's index tabs**
-(Uttham, 2026-10-01: "instead of dots can we use bookmarks that we do on books,
-with small titles, so people can navigate the subsections inside the page"):
-paper tabs with small titles stuck on the phone card's right edge, sticking out
-past it, spread down the edge — one per section and per sub-group heading (a
-sub-group's tab shorter, tucked under its section's), the full study and its
-blocks joining once it is open. The one being read is on the amber note stock;
-a click jumps. On the tablet grid they shrink to stubs whose titles open on
-hover or focus; not on phones, where the mini player owns the right edge.
+to `--section-y-sm`. **Every teaser page navigates by a rail of scroll points,
+each title a tooltip** (Uttham, 2026-10-02: "the sticky notes as scroll points in
+l2 is weird lets do the one you initially made but the active or hover state show
+these as tooltips" — this retires the 2026-10-01 book-style bookmarks). A tick
+per section and per sub-group heading, fixed and vertically centred in the right
+gutter (a sub-group's tick shorter, the one being read longer and in
+`--ink-900`), the full study and its blocks joining once it is open; a click
+jumps. **Only one title shows at a time, as a small paper tooltip left of its
+tick**: the current tick's, or the hovered or keyboard-focused one's instead.
+It fades, never slides. The phone card keeps its plain `--card-padding`; the rail
+is ≥768px only, since on phones the mini player owns the right edge.
 
 **Glass only where something sits between** (Uttham, 2026-10-01: "for the phone
 preview no need to use the glass, use the card component, glass is only used
