@@ -23,7 +23,7 @@ import { guides } from './guides';
 type Step = 'prepare' | 'setup' | 'record' | 'synth' | 'insights';
 type StateMap = {
   helps?: Step[];
-  madeSteps?: Step[];
+  made?: Step[][]; // per How I made it group, per row or step
   get?: Step[];
   prompt?: Step;
 };
@@ -32,12 +32,21 @@ const stateMaps: Record<string, StateMap> = {
   resona: {
     // methods and questions suggested · it listens · one store for everyone
     helps: ['setup', 'record', 'prepare'],
-    // plan · listen · nuggets · cluster · synthesise · how might we · verify.
-    // The section itself carries no state: a section that holds triggers of
-    // its own would compete with them (the picker takes the trigger whose
-    // centre is nearest the band, and a tall section's centre sits mid-steps),
-    // so its lead keeps the home screen from the last "How it helps" row.
-    madeSteps: ['setup', 'record', 'synth', 'synth', 'insights', 'insights', 'insights'],
+    // How I made it, group by group. Neither the section nor a group carries a
+    // state of its own: a box that holds triggers would compete with them (the
+    // picker takes the trigger whose centre is nearest the band, and a tall
+    // box's centre sits mid-rows), so only rows and steps drive the phone.
+    made: [
+      // planning: types and method · the gate and formats · cohorts on the New Notes form;
+      // examples · past studies · tailoring · language · tasks · techniques · bias on the home
+      ['setup', 'setup', 'setup', 'prepare', 'prepare', 'prepare', 'prepare', 'prepare', 'prepare', 'prepare'],
+      // execution: goals pinned · the guide at hand · listening · notes · mapped · uncovered
+      ['setup', 'record', 'record', 'record', 'synth', 'insights'],
+      // synthesis: plan · listen · nuggets · cluster · synthesise · how might we · verify
+      ['setup', 'record', 'synth', 'synth', 'insights', 'insights', 'insights'],
+      // library: by meaning · one record · evidence · the search · reuse · ask a study
+      ['prepare', 'insights', 'insights', 'prepare', 'prepare', 'insights'],
+    ],
     // the setup step · coded transcripts · themes and scores · key finding and AI asks · the report · the store
     get: ['setup', 'synth', 'insights', 'insights', 'insights', 'prepare'],
     // the prompt is the synthesis pass; the phone shows what it produces
@@ -60,8 +69,11 @@ export const aiPage = (slug: string): CaseTeaserData => {
     back: { href: '/#ai', label: '← AI Space' },
     facts: [
       { label: 'Tool', value: tool.name },
-      // the guide page's eyebrow, as it read before the teaser
-      { label: 'Kind', value: `${tool.kicker} · White-label guide` },
+      // "Value added" replaces "Kind" where Uttham has given one (2026-10-02:
+      // "remove the kind - and say value added")
+      tool.value
+        ? { label: 'Value added', value: tool.value }
+        : { label: 'Kind', value: `${tool.kicker} · White-label guide` },
       { label: 'Year', value: tool.year },
     ],
     visit: tool.visit,
@@ -78,31 +90,34 @@ export const aiPage = (slug: string): CaseTeaserData => {
         ],
       },
       // How the tool was built, right after what it does for you (Uttham,
-      // 2026-10-02), and before the white-label recipe. Second, not first like
-      // the prototype's idea: it explains how the tool works rather than what
-      // it is. Only tools that carry `made` get it.
+      // 2026-10-02), in one sub-group per stage. Only tools that carry `made`
+      // get it.
       ...(tool.made
         ? [{
             heading: 'How I made it',
             blocks: [
-              { kind: 'p' as const, text: tool.made.lead },
-              { kind: 'p' as const, text: tool.made.pipeline },
-              {
-                kind: 'steps' as const,
-                heading: tool.made.heading,
-                steps: tool.made.steps.map((st, i) => ({ ...st, state: map.madeSteps?.[i] })),
-              },
+              ...(tool.made.lead ? [{ kind: 'p' as const, text: tool.made.lead }] : []),
+              ...tool.made.groups.map((g, gi) =>
+                g.steps
+                  ? { kind: 'steps' as const, heading: g.heading, lead: g.lead, steps: g.steps.map((st, i) => ({ ...st, state: map.made?.[gi]?.[i] })) }
+                  : { kind: 'rows' as const, heading: g.heading, lead: g.lead, rows: rows(g.rows ?? [], map.made?.[gi]) },
+              ),
             ],
           }]
         : []),
-      { heading: 'What you get', blocks: [{ kind: 'rows', rows: rows(guide.get, map.get) }] },
-      // "What you need" came off on 2026-10-02 (Uttham: "can we ignore what you
-      // need"); the page goes from what you get straight to the prompt.
-      // The page ends on the prompt. "What to change for your team" came off on
-      // 2026-10-02 (Uttham: "remove want to change for your team section, and
-      // the prompt I believe is whitelabelled") — the prompt already asks what
-      // you are trying to learn and leaves the catalogue to you.
+      // Where the work goes next (Uttham, 2026-10-02: "Add next steps"). Only
+      // tools that carry `next` get it.
+      ...(tool.next
+        ? [{ heading: 'Next steps', blocks: [{ kind: 'p' as const, text: tool.next.lead }, { kind: 'rows' as const, rows: rows(tool.next.rows) }] }]
+        : []),
+      // The recipe comes after the story: the prompt, then what it gets you
+      // (Uttham, 2026-10-02: "what you get should be after the prompt section
+      // for both the ai projects"). "What you need" (2026-10-02: "can we ignore
+      // what you need") and "What to change for your team" ("the prompt I
+      // believe is whitelabelled") are gone; the prompt asks for the reader's
+      // own context instead.
       { state: map.prompt, heading: 'The prompt', blocks: [{ kind: 'prompt', text: guide.prompt, copy: 'Copy the prompt' }] },
+      { heading: 'What you get', blocks: [{ kind: 'rows', rows: rows(guide.get, map.get) }] },
     ],
   };
 };

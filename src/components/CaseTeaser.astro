@@ -70,28 +70,43 @@ const idFor = (text: string) => `s-${text.toLowerCase().replace(/[^a-z0-9]+/g, '
 
 // The scroll points, in reading order: each section, each sub-group heading
 // inside it, and — once the full study is open — the study and its blocks.
+// A page with `rail` keeps only the top of the page and the sections it names
+// (the full study opens inside Outcome, so Outcome stays lit while it is read).
 type Mark = { id: string; title: string; sub?: boolean; full?: boolean };
-const marks: Mark[] = data.sections.flatMap((section) => [
-  { id: idFor(section.heading), title: section.heading },
-  ...section.blocks.flatMap((b) =>
-    (b.kind === 'steps' || b.kind === 'rows') && b.heading ? [{ id: idFor(b.heading), title: b.heading, sub: true }] : []
-  ),
-]);
-if (data.gate && data.experiments?.length) {
+const rail = data.rail;
+const marks: Mark[] = rail
+  ? [
+      ...(rail.top ? [{ id: 'ct-top', title: data.title }] : []),
+      ...data.sections.filter((s) => rail.sections.includes(s.heading)).map((s) => ({ id: idFor(s.heading), title: s.heading })),
+    ]
+  : data.sections.flatMap((section) => [
+      { id: idFor(section.heading), title: section.heading },
+      ...section.blocks.flatMap((b) =>
+        (b.kind === 'steps' || b.kind === 'rows') && b.heading ? [{ id: idFor(b.heading), title: b.heading, sub: true }] : []
+      ),
+    ]);
+if (data.gate && data.experiments?.length && !rail) {
   marks.push({ id: 'full-title', title: 'The full case study', full: true });
   data.experiments.forEach((e) => marks.push({ id: idFor(e.title), title: e.title, sub: true, full: true }));
 }
+// the title on the card over the phone: per screen, from the first state that
+// shows it, so a state that borrows an earlier screen borrows its title too
+const titles = data.screens?.titles;
+const titleFor = (key: string) => {
+  const state = Object.keys(stateToShot).find((s) => stateToShot[s] === key);
+  return state ? titles?.[state] : undefined;
+};
 ---
 
 <div class="ct">
-  <header class="ct-hero">
+  <header class="ct-hero" id={rail?.top ? 'ct-top' : undefined}>
     <a class="back-link text-link" href={back.href}>{back.label}</a>
     <h1>{data.title}</h1>
     <p class="ct-dek" set:html={dek} />
     {data.facts.length > 0 && (
       <dl class="ct-facts">
         {data.facts.map((f) => (
-          <div class="ct-facts__row"><dt>{f.label}</dt><dd>{f.value}</dd></div>
+          <div class="ct-facts__row"><dt>{f.label}</dt><dd set:html={rich(f.value)} /></div>
         ))}
       </dl>
     )}{data.visit && (
@@ -110,6 +125,7 @@ if (data.gate && data.experiments?.length) {
             ) : block.kind === 'steps' ? (
               <>
                 {block.heading && <h3 id={idFor(block.heading)}>{block.heading}</h3>}
+                {block.lead && <p class="ct-body ct-sublead" set:html={rich(block.lead)} />}
                 <ul class="ct-steps">
                   {block.steps.map((s) => (
                     <li class="ct-step" data-state={s.state}><b>{s.label}</b><span set:html={rich(s.text)} /></li>
@@ -133,6 +149,7 @@ if (data.gate && data.experiments?.length) {
             ) : block.kind === 'rows' ? (
               <>
                 {block.heading && <h3 id={idFor(block.heading)}>{block.heading}</h3>}
+                {block.lead && <p class="ct-body ct-sublead" set:html={rich(block.lead)} />}
                 <ul class="ct-steps ct-rows">
                   {block.rows.map((r) => (
                     <li class="ct-step ct-row" data-state={r.state} set:html={rich(r.text)} />
@@ -192,8 +209,9 @@ if (data.gate && data.experiments?.length) {
       )}
     </div>
 
-    <aside class:list={['ct-panel', { 'ct-panel--live': live }]} aria-label={data.panelLabel ?? 'Preview'} data-case-panel data-map={JSON.stringify(stateToShot)}>
+    <aside class:list={['ct-panel', { 'ct-panel--live': live, 'ct-panel--titled': titles && !live }]} aria-label={data.panelLabel ?? 'Preview'} data-case-panel data-map={JSON.stringify(stateToShot)} data-titles={titles && !live ? JSON.stringify(titles) : undefined}>
       <div class="ct-pane">
+        {titles && !live && <p class="ct-pane__title" data-pane-title aria-live="polite"></p>}
         <div class="ct-stage">
           {livePhone ? (
             <div class="ct-phone ct-phone--live">
@@ -210,6 +228,7 @@ if (data.gate && data.experiments?.length) {
                 <Image
                   class="ct-screen"
                   data-screen={key}
+                  data-title={titleFor(key)}
                   src={library[key]}
                   alt={altFor(key)}
                   widths={[360, 720]}
@@ -275,6 +294,8 @@ if (data.gate && data.experiments?.length) {
     const stateMap: Record<string, string> = JSON.parse(panel.dataset.map || '{}');
     const shots = { get: (state: string) => byKey.get(stateMap[state]) };
     const devLabel = panel.querySelector<HTMLElement>('[data-dev-label]');
+    const paneTitle = panel.querySelector<HTMLElement>('[data-pane-title]');
+    const stateTitles: Record<string, string> = JSON.parse(panel.dataset.titles ?? '{}');
     const triggers = [...root.querySelectorAll<HTMLElement>('[data-state]')];
     // A state with no screen yet shows the nearest earlier state's screen, in
     // reading order — the same whether the reader scrolled down to it, jumped
@@ -300,6 +321,9 @@ if (data.gate && data.experiments?.length) {
       const own = shots.get(state);
       const next = own ?? fallback.get(trigger) ?? null;
       if (devLabel) devLabel.textContent = own ? '' : `No screen yet: ${state}`;
+      // the card's title names what the phone shows: the screen's own title,
+      // or — before any screen exists — the state's
+      if (paneTitle) paneTitle.textContent = next?.dataset.title ?? stateTitles[state] ?? '';
       if (next === shown) return;
       shown?.classList.remove('is-on');
       next?.classList.add('is-on');
@@ -687,6 +711,7 @@ if (data.gate && data.experiments?.length) {
     text-transform: uppercase;
   }
   .ct-facts dd { margin: 0; color: var(--ink-900); font-size: var(--text-body); line-height: var(--lh-body); }
+  .ct-facts dd :global(.em) { font-weight: 600; } /* a long fact (Value added) carries its highlight too */
   /* a live thing the reader can open themselves, under the facts */
   .ct-visit { margin-top: var(--group-gap); }
 
@@ -741,6 +766,9 @@ if (data.gate && data.experiments?.length) {
   h2 + .ct-body { margin-top: var(--head-gap); }
   .ct-steps { margin: var(--ct-sub) 0 0; padding: 0; list-style: none; }
   h3 + .ct-steps { margin-top: var(--space-4); }
+  /* a sub-group's lead line belongs to its rows: heading → lead → rows all
+     at the within-group step, so the group reads as one block */
+  .ct-sublead + .ct-steps { margin-top: var(--space-4); }
   .ct-step {
     position: relative;
     padding: var(--space-5) 0;
@@ -955,7 +983,8 @@ if (data.gate && data.experiments?.length) {
     box-shadow: var(--shadow-rest);
   }
   /* sized off the stage's height AND width, so the phone always stands whole
-     inside the pane, never cut and never stretched */
+     inside the pane, never cut and never stretched (from 768px the card hugs
+     the phone instead; see the panel's --ct-phone-w) */
   .ct-stage { height: 100%; container-type: size; display: grid; place-items: center; }
   .ct-phone {
     position: relative;
@@ -999,6 +1028,8 @@ if (data.gate && data.experiments?.length) {
   /* ---- scroll points: a rail of ticks in the right gutter, titles as
      tooltips ---- */
   .ct-section, .ct-exp, .ct-section h3[id] { scroll-margin-top: calc(var(--header-height) + var(--content-gap)); }
+  /* the rail's top point lands on the page's own top */
+  .ct-hero[id] { scroll-margin-top: calc(var(--header-height) + var(--section-pad)); }
   .ct-points { display: none; }
   @media (min-width: 768px) {
     .ct-points {
@@ -1102,6 +1133,19 @@ if (data.gate && data.experiments?.length) {
     .ct-points { --pt-pad: var(--space-2); }
   }
 
+  /* the card's title: what the phone is showing, one line above it */
+  .ct-pane__title {
+    max-width: var(--ct-phone-w, none);
+    margin: 0 0 var(--space-3);
+    color: var(--ink-900);
+    font-size: var(--text-small);
+    font-weight: 600;
+    line-height: var(--lh-heading);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
   /* the mini-player controls exist only on phones */
   .ct-pip__enlarge, .ct-pip__close, .ct-pip__restore, .ct-pip__scrim { display: none; }
 
@@ -1122,8 +1166,25 @@ if (data.gate && data.experiments?.length) {
       grid-row: 1;
       position: sticky;
       top: calc(var(--header-height) + var(--content-gap));
-      height: min(calc(100svh - var(--header-height) - 2 * var(--content-gap)), 720px);
+      /* THE CARD HUGS THE PHONE (Uttham, 2026-10-02: "the prototype pane on
+         right has too much padding on left right of the mobile preview, we
+         should optimise this space"). The phone is as tall as the screen
+         allows; the card is the phone plus one card inset all round, centred
+         in its columns, so the spare width falls between text and card instead
+         of inside it. --ct-pane-h is the tallest the card may be. */
+      --ct-pane-h: min(calc(100svh - var(--header-height) - 2 * var(--content-gap)), 720px);
+      --ct-title-h: 0px;
+      --ct-phone-w: min(
+        calc(100cqw - 2 * var(--card-padding)),
+        calc((var(--ct-pane-h) - 2 * var(--card-padding) - var(--ct-title-h)) * 9 / 19.5)
+      );
+      container-type: inline-size;
     }
+    /* the title over the phone: one line of small text and a within-card step */
+    .ct-panel--titled { --ct-title-h: calc(var(--text-small) * var(--lh-heading) + var(--space-3)); }
+    .ct-pane { width: fit-content; height: auto; margin-inline: auto; }
+    .ct-stage { height: auto; container-type: normal; display: block; }
+    .ct-phone { width: var(--ct-phone-w); }
   }
   @media (min-width: 768px) and (max-width: 900px) {
     .ct-story { grid-column: 1 / 6; }
@@ -1160,6 +1221,7 @@ if (data.gate && data.experiments?.length) {
       backdrop-filter: none;
     }
     .ct-pane .bolt { display: none; }
+    .ct-pane__title { display: none; } /* the mini player is only the phone */
     .ct-stage { position: relative; height: auto; container-type: normal; display: block; }
     .ct-phone { width: 100%; border-radius: var(--radius-sm); box-shadow: var(--shadow-lift); }
     .ct-phone__dev { display: none; }

@@ -257,7 +257,8 @@ regenerate all three from it — never draw a separate mark.
 **The product-cards case study (`/work/a-line-of-card-height`) is Uttham's teaser
 layout, built as he drew it** (2026-10-01, "PLP card case study — teaser
 layout.html": "I want that as it is"). Text only on the left — Context, Problem,
-the scan order, Strategy, Outcome — and **a sticky phone on the right that swaps
+Strategy, Outcome (the scan-order section came off on 2026-10-02: "what shoppers
+look at - we can omit this section") — and **a sticky phone on the right that swaps
 to the screen for whatever is being read** (the bus-discovery reference). Every
 element with a `data-state` picks a screen; **the screens are Uttham's Figma
 exports, never coded mock-ups** ("I will give the figma screens, use them, no
@@ -293,8 +294,19 @@ gutter (a sub-group's tick shorter, the one being read longer and in
 `--ink-900`), the full study and its blocks joining once it is open; a click
 jumps. **Only one title shows at a time, as a small paper tooltip left of its
 tick**: the current tick's, or the hovered or keyboard-focused one's instead.
-It fades, never slides. The phone card keeps its plain `--card-padding`; the rail
-is ≥768px only, since on phones the mini player owns the right edge.
+It fades, never slides. The rail is ≥768px only, since on phones the mini player
+owns the right edge. **A page can limit its rail** (`rail` on the page's data;
+2026-10-02: "the scroll stepper should also have limited things, outcome,
+strategy, problem, title"): the product cards keep only the top of the page (its
+title), Problem, Strategy and Outcome — no sub-group ticks, no full-study ticks.
+
+**The phone card hugs the phone** (2026-10-02: "too much padding on left right of
+the mobile preview, we should optimise this space"): from 768px the phone is as
+tall as the screen allows (`--ct-pane-h`, ≤720px) and the card is the phone plus
+one `--card-padding` all round, centred in its columns, so spare width falls
+outside the card. **The card carries a title above the phone** naming what it
+shows (`screens.titles`, one short line per state; a state that borrows an
+earlier screen borrows its title); the mini player on phones has none.
 
 **Glass only where something sits between** (Uttham, 2026-10-01: "for the phone
 preview no need to use the glass, use the card component, glass is only used
@@ -312,28 +324,24 @@ is all about explaining my work"). They borrow the case studies' layout
 (2026-10-01: "the right side is running preview as we did for the project case
 studies"): `/ai/<slug>` renders `CaseTeaser` in live mode with `frame="phone"`: **the left column is
 the white-label guide and the sticky phone runs the tool itself**, in the
-teaser's own 9/19.5 phone (the tool fills it). Left, in order: the guide's title
-and intro as the hero, facts (Tool, Kind, Year), The idea (only a tool that
-carries `idea` in `tools.ts` — the prototype, in Uttham's 2026-10-02 words, with
-its one `^^` beat), How it helps (the card's line,
-then the helps as ruled rows), **How I made it** (only a tool that carries `made`
-— Resona: his lead on the skill behind the preparation, unnamed and in the first
-person as he asked, then the synthesis pipeline step by step, each step driving
-the phone; mechanism only, never file names, model names, ID formats or bugs),
-What you get, The prompt — the
-paper card with the page's one primary sticker, "Copy the prompt", and **the
-prompt folded to its first ten lines with "Show the full prompt" under it**
-(2026-10-02: "let their be a way to expand the prmopt … the compressed one I am
-not liking", replacing that day's six-line preview); the button always copies the
-whole `<pre>` word for word — and nothing after it. **The prompts are
-white-label and follow the page** (2026-10-02): each does what its page now says
-the tool does, and wherever the real tool leans on Meesho context it asks the
-reader for their own (product and flows, users and their language, past research,
-methods, data sources) instead; no prompt names Meesho, its users or internal
-tools. **What you need
-and What to change for your team are gone** (2026-10-02: "can we ignore what you
-need"; "remove want to change for your team section, and the prompt I believe is
-whitelabelled"). **No copy
+teaser's own 9/19.5 phone (the tool fills it). Left, in order (2026-10-02): the page's headline and summary as the hero
+(explaining the tool, not selling it); facts — Tool, **Value added** (his line
+on who uses it, where he has given one; it replaces Kind) and Year; The idea
+(the prototype: how the spark came, then the real-data claim with its one `^^`
+beat); How it helps; **How I made it** (Resona, in four sub-groups — research
+planning, execution, synthesis, library — each with his lead and rows that drive
+the phone; never called a skill, no tool or model names, mechanism only); **Next
+steps** (the prototype: the pilot, and the advanced version with the tech team);
+then the recipe — **The prompt, then What you get** (2026-10-02: "what you get
+should be after the prompt section for both the ai projects"). The prompt card
+carries the page's one primary sticker, "Copy the prompt", and **the prompt
+folded to its first ten lines with "Show the full prompt" under it**; the button
+always copies the whole `<pre>` word for word. **The prompts are white-label and
+follow the page**: each does what its page says the tool does (Resona's has four
+modes: Prepare, Run, Synthesise, Library), and wherever the real tool leans on
+Meesho context it asks the reader for their own instead; no prompt names Meesho,
+its users or internal tools. **What you need and What to change for your team
+are gone** (2026-10-02). **No copy
 lives in `src/data/ai-pages.ts`**: it arranges `tools.ts` and `guides.ts` and
 says which step each row shows. **Resona follows the reading** (`follow`): every
 row and step names one of its own steps — prepare, setup, record, synth, insights — and
@@ -353,8 +361,9 @@ gate only"): a speed bump, not protection — the text ships in the page and thi
 repo is public. Only the password's SHA-256 is stored, set with
 `npm run case-password`; with none set, the dev server opens it with any entry
 and a production build for no one. **A research verbatim his layout marks
-consent-open stays off the page** (`consent: false` on the quote — the
-product-cards fabric quote) until he confirms it; the Mall quotes are not so
+consent-open stays off the page** (`consent: false` on the quote; the
+product-cards fabric quote left with the scan-order section on 2026-10-02) until
+he confirms it; the Mall quotes are not so
 marked and were already public. Anything a brief marks "open" is left out,
 never shown as a placeholder.
 

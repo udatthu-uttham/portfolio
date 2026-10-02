@@ -7,14 +7,22 @@
 // CONFIDENTIALITY: direction and status only — no lifts, rates or internal
 // counts. The one figure on the page, 250 million, is public and sourced
 // (Meesho's Q3 FY26 Shareholders' Letter, 251M annual transacting users) and
-// is linked where it first appears. Research verbatims stay off the page until
-// consent is confirmed (`consent` on the quote). Items the brief marks "open" are
-// left out rather than shown as placeholders.
+// is linked where it first appears. Items the brief marks "open" are left out
+// rather than shown as placeholders.
+//
+// 2026-10-02 (Uttham): a catchier title; Role "strategy and design lead for pod
+// of 5", Timeline "6months", no Research row; his Context; the Problem's second
+// paragraph as a mission statement; "what shoppers look at - we can omit this
+// section" (it took the consent-open fabric quote with it); Strategy rewritten
+// from his notes, with cash out of the teaser ("ignore the cash price thing
+// here"); a title on the card for each screen; the rail limited to the top,
+// Problem, Strategy and Outcome.
 
 import type { CaseTeaserData } from './case-teaser';
 
 export const plpCase: CaseTeaserData = {
-  title: 'Helping shoppers understand products better at first glance',
+  // before: "Helping shoppers understand products better at first glance"
+  title: 'From a glance to a decision',
   // {source} becomes the sourced link; the sentence is under 15 words, so no bold.
   dek: 'Rethinking Meesho’s product card for {source} people who browse by picture.',
   source: {
@@ -23,18 +31,18 @@ export const plpCase: CaseTeaserData = {
     title: 'Meesho Shareholders’ Letter, Q3 FY26 (30 January 2026): 251 million annual transacting users',
   },
   facts: [
-    { label: 'Role', value: 'Strategy & Design lead, pod of 3' },
-    { label: 'Research', value: 'Delhi, Bengaluru, Jaipur' },
-    { label: 'Timeline', value: 'One year' },
+    { label: 'Role', value: 'Strategy and design lead for a pod of five' },
+    { label: 'Timeline', value: 'Six months' },
   ],
   panelLabel: 'Card preview',
+  rail: { top: true, sections: ['Problem', 'Strategy', 'Outcome'] },
 
   sections: [
     {
       state: 'before',
       heading: 'Context',
       blocks: [
-        { kind: 'p', text: 'Most Meesho shoppers are **new to e-commerce** and live in tier 3 and tier 4 towns. They browse whenever they have a few free minutes, and **they scan by picture**: the image first, everything else later.' },
+        { kind: 'p', text: 'Most of our shoppers live in **tier 3 and tier 4 towns**, and some are new to e-commerce and shop only on Meesho. All 250 million of them just open Meesho whenever they have time and start browsing. They scan by picture only, and they operate in **a mode of rejection**. They are image-first: **they stop when the image is nice**, and everything else comes later.' },
       ],
     },
     {
@@ -42,25 +50,7 @@ export const plpCase: CaseTeaserData = {
       heading: 'Problem',
       blocks: [
         { kind: 'p', text: 'Over time, **more than ten teams** had added their own features to the card. Each addition made it taller, so **shoppers saw fewer products on every screen**, and the pictures they rely on got harder to compare.' },
-        { kind: 'p', text: 'Help 250 million shoppers **find the right product faster**, across different categories and different reasons for browsing.' },
-      ],
-    },
-    {
-      heading: 'What shoppers look at, in order',
-      blocks: [
-        { kind: 'p', text: 'Across sessions in Delhi, Bengaluru and Jaipur, the same order held. **Shoppers triage the card; they do not read it.**' },
-        {
-          kind: 'steps',
-          steps: [
-            { state: 'scan-picture', label: '1. The picture', text: 'People tap the picture, not the text.' },
-            { state: 'scan-price', label: '2. The price', text: 'The only text read while scanning.' },
-            { state: 'scan-title', label: '3. The title area', text: 'Glanced at, rarely read.' },
-            { state: 'scan-rating', label: '4. The rating', text: 'Used as a threshold, not a value.' },
-            { state: 'scan-tags', label: '5. The tags', text: 'Noticed only when colour pulls the eye.' },
-          ],
-        },
-        // Off the page until the participant's consent is confirmed (brief §1, open item 3).
-        { kind: 'quote', consent: false, text: '“Fabric pahle andar jaake dekhti thi, ab idhar se hi pata lag raha hai.”', source: 'I used to open the product to check the fabric. Now I can tell from here.' },
+        { kind: 'p', text: 'The pod’s mission: ^^help 250 million shoppers find the right product faster^^, whatever the category and whatever brings them to browse.' },
       ],
     },
     {
@@ -71,8 +61,8 @@ export const plpCase: CaseTeaserData = {
           kind: 'steps',
           heading: '1. Remove what slows them down',
           steps: [
-            { state: 'cleanup', label: 'Cleanup', text: 'Took off elements shoppers didn’t use. Every element now lives in a named zone with a cap.' },
-            { state: 'titles', label: 'Clearer titles', text: 'Seller titles replaced by the few facts that matter: fabric, pack size.' },
+            { state: 'cleanup', label: 'Card framework', text: 'We started by understanding every case the card has to carry, then built a framework from them: **the right information architecture for browsing cards, and one that scales.**' },
+            { state: 'titles', label: 'Clearer titles', text: 'Titles weren’t adding value: most of them had shop names in them. We replaced them with **the important facts shoppers need before making a decision.**' },
             { state: 'stagger', label: 'Staggered feed', text: 'Cards at their natural height, so more fit on a screen.' },
             { state: 'list', label: 'List or grid by category', text: 'Rows where details decide, grid where looks decide.' },
           ],
@@ -81,10 +71,9 @@ export const plpCase: CaseTeaserData = {
           kind: 'steps',
           heading: '2. Add what helps them decide',
           steps: [
-            { state: 'scroll', label: 'Swipeable images', text: 'See more of the product without opening it.' },
+            { state: 'scroll', label: 'Swipeable images', text: 'We added more swipeable images because **shoppers form better conviction from them** before opening the product. They show more of the product and the variations it comes in.' },
             { state: 'bigimg', label: 'Bigger images for fashion', text: 'Where the look is the decision.' },
-            { state: 'cash', label: 'Cash price', text: 'The price they’ll actually pay on delivery.' },
-            { state: 'date', label: 'Delivery date', text: 'A clear day count instead of a promise.' },
+            { state: 'date', label: 'Delivery date', text: 'A clear day count instead of a promise, added **only on products where delivery is fast**, not on all of them.' },
           ],
         },
       ],
@@ -99,7 +88,6 @@ export const plpCase: CaseTeaserData = {
           lead: 'In the full case study:',
           items: [
             'Each of the eight changes: why, how, what worked',
-            'The research: method, sample, scan-order evidence',
             'Before and after screens for every change',
           ],
         },
@@ -183,22 +171,33 @@ export const plpCase: CaseTeaserData = {
   screens: {
     dir: 'plp',
     alts: {
-    before: 'The old product card',
-    'before-annotated': 'The old card, each element labelled with the team that added it',
-    'scan-picture': 'The old card with only the picture lit',
-    'scan-price': 'The old card with only the price lit',
-    'scan-title': 'The old card with only the title area lit',
-    'scan-rating': 'The old card with only the rating lit',
-    'scan-tags': 'The old card with only the tags lit',
-    cleanup: 'The old card next to the cleaned-up card',
-    titles: 'The new card with fact chips where the title used to be',
-    stagger: 'A product feed with staggered columns: each card at its natural height',
-    list: 'List rows for a considered category',
-    scroll: 'A card with swipeable images',
-    bigimg: 'A fashion card with a taller 4:5 image',
-    cash: 'The new card with the cash-price row lit',
-    date: 'The new card with the delivery date lit',
-    after: 'The new product card',
+      before: 'The old product card',
+      'before-annotated': 'The old card, each element labelled with the team that added it',
+      cleanup: 'The card framework: every case the card carries, in one structure',
+      titles: 'The new card with fact chips where the title used to be',
+      stagger: 'A product feed with staggered columns: each card at its natural height',
+      list: 'List rows for a considered category',
+      scroll: 'A card with swipeable images showing more of the product and its variations',
+      bigimg: 'A fashion card with a taller 4:5 image',
+      date: 'A fast-delivery product card with its delivery date',
+      after: 'The new product card',
+      cash: 'The new card with the cash-price row lit',
+    },
+    // the title on the card, above the phone (Uttham, 2026-10-02: "add title of
+    // what images are shown on the prototype, this title should be on card and
+    // above the preview")
+    titles: {
+      before: 'The old card',
+      'before-annotated': 'Which team added what',
+      cleanup: 'The card framework',
+      titles: 'Facts in place of the title',
+      stagger: 'A staggered feed',
+      list: 'List view by category',
+      scroll: 'More views and variations',
+      bigimg: 'Bigger images for fashion',
+      date: 'Dates on fast deliveries',
+      after: 'The new card',
+      cash: 'The cash-price row',
     },
   },
 };

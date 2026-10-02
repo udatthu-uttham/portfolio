@@ -5,11 +5,24 @@ Drop a Figma export in this folder named after its state and the page picks it
 up on the next build — `before.png`, `scan-price.png`, and so on (.png, .jpg or
 .webp). A state with no file keeps the previous screen on the phone.
 
-Teaser: `before` · `before-annotated` · `scan-picture` · `scan-price` ·
-`scan-title` · `scan-rating` · `scan-tags` · `cleanup` · `titles` · `stagger` ·
-`list` · `scroll` · `bigimg` · `cash` · `date` · `after`
+Teaser (2026-10-02), in reading order, with the title the card shows above
+the phone:
 
-Full case study blocks reuse the same names (cleanup … date).
+| File | Shown at | Card title | What the screen is |
+|---|---|---|---|
+| `before` | Context | The old card | the old product card in the feed |
+| `before-annotated` | Problem | Which team added what | the old card, each element labelled with the team that added it |
+| `cleanup` | Card framework | The card framework | the framework: every case the card carries, in one structure |
+| `titles` | Clearer titles | Facts in place of the title | the new card with fact chips where the shop-name title was |
+| `stagger` | Staggered feed | A staggered feed | on hand (`stagger.jpg`) |
+| `list` | List or grid by category | List view by category | list rows for a considered category |
+| `scroll` | Swipeable images | More views and variations | a card whose swipeable images show more of the product and its variations |
+| `bigimg` | Bigger images for fashion | Bigger images for fashion | a fashion card with the taller 4:5 image |
+| `date` | Delivery date | Dates on fast deliveries | a fast-delivery card with its day count |
+| `after` | Outcome | The new card | the new product card |
+
+Full case study only: `cash` (The cash-price row). The other blocks reuse the
+names above. The scan-order screens (`scan-*`) left with that section.
 
 Export phone screens portrait (about 9 : 19.5), at 2× or more (≥ 720px wide),
 with dummy data only — no Figma links or file keys on the page.

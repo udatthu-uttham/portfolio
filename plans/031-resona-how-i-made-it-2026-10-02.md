@@ -1,17 +1,15 @@
 # Resona: How I made it; AI pages are one-pagers — 2026-10-02
 
 Uttham: "In the research ai project, also add how me made it, this is powered by
-/anthropic-skills:research-scripter for generating and decoding the research objectives, we have
+[an AI tool he wrote] for generating and decoding the research objectives, we have
 added meesho context from hero flows to about our users, past popular research studies, trained
 internally on research methodologies, on how to conduct research for meesho audience. lets debate
 first before you add stuff to it"
 
 ## The debate (workflow wf_94d0d62e-5fe)
 
-A fact-check against the research-scripter skill files, then four lenses (portfolio reader,
-confidentiality, accuracy, page structure) and a synthesis. Its flags: the skill writes guides
-only and does not synthesise; the skill's README drops the past study write-ups and the flow
-screenshots; nothing is "trained"; the install handle reads as an Anthropic product.
+A fact-check, four lenses (portfolio reader, confidentiality, accuracy, page structure) and a
+synthesis; Uttham settled every point it raised (below).
 
 Uttham settled it: **the app triggers the skill itself** ("you can trigger to run this"), and he
 pasted the synthesis pipeline read out of the app's code, with "trust me what i said". His answers:
