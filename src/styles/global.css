@@ -545,7 +545,7 @@ a {
 }
 .cta--secondary:active { background: rgba(255, 255, 255, 0.6); }
 
-/* Tertiary: a paper text link with an amber rule under it. "Read the case",
+/* Tertiary: a paper text link with an amber rule under it. "Read the case study",
    "All projects". Not a sticker, so the ladder stops at three. */
 .text-link {
   position: relative;

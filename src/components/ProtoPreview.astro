@@ -1,7 +1,7 @@
 ---
 // The realistic prototype, previewed by running the actual build (CLAUDE.md: a
 // preview renders the tool's real UI, not a restyled version of it). The phone
-// holds an iframe of /proto/feed-ux at a real 320px handset viewport, scaled to
+// holds an iframe of /proto/feed-ux at a real 360px handset viewport, scaled to
 // whatever width it is given — so the app's own responsive rules behave
 // exactly as they do in a session, and the Resona card's phone, this one and
 // the Projects deck covers are all the same object at the same zoom.
@@ -50,11 +50,14 @@ const { src, fill = false, interactive = false } = Astro.props;
 </div>
 
 <script>
-  // The scale is the phone's width over the app's own 320px viewport, and --vh
+  // The scale is the phone's width over the app's own 360px viewport, and --vh
   // is the frame's height in those same units — so the app is handed a viewport
   // that ends exactly where the frame does and its fixed bottom bar lands on
   // the edge instead of being cut off. Exact at every card breakpoint.
-  const VW = 320;
+  // 360, not 320 (2026-10-02): the app is built for phones of 360px and up (it
+  // has its own under-360 rule), and at 320 its bottom bar ran "Live Video" into
+  // "My Orders".
+  const VW = 360;
   document.querySelectorAll<HTMLElement>('[data-proto-stage]').forEach((stage) => {
     const fit = () => {
       const k = stage.clientWidth / VW;
@@ -64,6 +67,26 @@ const { src, fill = false, interactive = false } = Astro.props;
     };
     new ResizeObserver(fit).observe(stage);
     fit();
+  });
+
+  // The app's own small icons load at once. Every image in the build is lazy,
+  // which keeps the hundreds of hotlinked product photos from swamping the
+  // image CDN — but a lazy icon in the fixed bottom bar could be left unloaded
+  // (2026-10-02: a blank space over "My Orders"). Local files only; the product
+  // photos stay lazy.
+  document.querySelectorAll<HTMLIFrameElement>('.pp__frame').forEach((frame) => {
+    const eager = () => {
+      const doc = frame.contentDocument;
+      if (!doc?.body) return;
+      const wake = (root: ParentNode) =>
+        root.querySelectorAll<HTMLImageElement>('img[loading="lazy"]').forEach((img) => {
+          if ((img.getAttribute('src') ?? '').startsWith('/proto/')) img.loading = 'eager';
+        });
+      wake(doc);
+      new MutationObserver(() => wake(doc)).observe(doc.body, { childList: true, subtree: true });
+    };
+    frame.addEventListener('load', eager);
+    eager();
   });
 </script>
 
@@ -106,8 +129,8 @@ const { src, fill = false, interactive = false } = Astro.props;
     box-shadow: none;
   }
 
-  /* The app gets a real 320px phone viewport — the same one the Resona screen
-     is laid out in — and is scaled down as one piece, so its own breakpoints
+  /* The app gets a real 360px phone viewport and is scaled down as one piece,
+     so its own breakpoints
      fire as they do on a phone. --k and --vh are written by the observer above;
      the fallbacks hold until it runs. */
   .pp__stage {
@@ -121,8 +144,8 @@ const { src, fill = false, interactive = false } = Astro.props;
     position: absolute;
     top: 0;
     left: 0;
-    width: 320px;
-    height: var(--vh, 533px);
+    width: 360px;
+    height: var(--vh, 600px);
     border: 0;
     transform-origin: top left;
     scale: var(--k);

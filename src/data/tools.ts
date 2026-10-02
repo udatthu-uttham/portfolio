@@ -9,7 +9,7 @@
 //
 // LAYOUT (Uttham, 2026-09-21; 2026-10-01; 2026-10-02): two cards, built out of
 // the Projects tile — tape, title, lead line, the phone in its glass well, and
-// "View more", which opens the tool's page as "Read the case" opens a case (2026-10-02:
+// "View more", which opens the tool's page as "Read the case study" opens a case (2026-10-02:
 // "the ai cards should not have copy the plan as CTA, view more should be the
 // CTA for it"; the prompt is copied on the tool's page). `helps` is NOT on the card: it moved to the tool's page,
 // /ai/<slug>, which the whole card opens, along with the long version of "how
@@ -38,7 +38,7 @@ export type Tool = {
   };
   next?: { lead: string; rows: string[] }; // the page's "Next steps", after How I made it. Highlights in **bold**.
   helps: string[]; // how it helps, one point each, shown on /ai/<slug>. Highlights in **bold**.
-  action: string; // the card's action, which reads like a case tile's "Read the case"
+  action: string; // the card's action, which reads like a case tile's "Read the case study"
   used?: { label: string; href: string }; // where it shows up in the case studies
   visit?: { label: string; href: string }; // a live thing you can open yourself: the page's "Open the prototype ↗", and the preview's src
 };

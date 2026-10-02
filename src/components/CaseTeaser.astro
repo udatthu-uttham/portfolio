@@ -209,7 +209,7 @@ const titleFor = (key: string) => {
       )}
     </div>
 
-    <aside class:list={['ct-panel', { 'ct-panel--live': live, 'ct-panel--titled': titles && !live }]} aria-label={data.panelLabel ?? 'Preview'} data-case-panel data-map={JSON.stringify(stateToShot)} data-titles={titles && !live ? JSON.stringify(titles) : undefined}>
+    <aside class:list={['ct-panel', { 'ct-panel--live': live, 'ct-panel--titled': titles && !live, 'ct-panel--visit': data.visit }]} aria-label={data.panelLabel ?? 'Preview'} data-case-panel data-map={JSON.stringify(stateToShot)} data-titles={titles && !live ? JSON.stringify(titles) : undefined}>
       <div class="ct-pane">
         {titles && !live && <p class="ct-pane__title" data-pane-title aria-live="polite"></p>}
         <div class="ct-stage">
@@ -243,6 +243,12 @@ const titleFor = (key: string) => {
           )}
           <button class="ct-pip__close" type="button" aria-label="Hide the preview" data-pip-close><span aria-hidden="true">×</span></button>
         </div>
+        {/* next to the thing it opens (Uttham, 2026-10-02: "this should be in
+            the proximity of the prototype. maybe bottom of the preview"); on
+            phones it stays under the facts, where the mini player cannot hide it */}
+        {data.visit && (
+          <a class="text-link ct-visit ct-pane__visit" href={data.visit.href} target="_blank" rel="noopener">{data.visit.label} <span aria-hidden="true">↗</span></a>
+        )}
       </div>
     </aside>
   </div>
@@ -712,8 +718,10 @@ const titleFor = (key: string) => {
   }
   .ct-facts dd { margin: 0; color: var(--ink-900); font-size: var(--text-body); line-height: var(--lh-body); }
   .ct-facts dd :global(.em) { font-weight: 600; } /* a long fact (Value added) carries its highlight too */
-  /* a live thing the reader can open themselves, under the facts */
+  /* a live thing the reader can open themselves: under the facts on phones,
+     on the card under the phone from 768px */
   .ct-visit { margin-top: var(--group-gap); }
+  .ct-pane__visit { display: none; }
 
   /* ---- the reading column and the phone beside it ---- */
   /* THE SPACING LADDER, the homepage's own (CLAUDE.md), stepped up for reading
@@ -871,7 +879,7 @@ const titleFor = (key: string) => {
     background: linear-gradient(to bottom, transparent, var(--paper-2) calc(100% - var(--card-padding)));
     pointer-events: none;
   }
-  /* the toggle is a text link, like "Read the case", under the well */
+  /* the toggle is a text link, like "Read the case study", under the well */
   .ct-prompt__more {
     justify-self: start;
     padding: 0;
@@ -1174,14 +1182,20 @@ const titleFor = (key: string) => {
          of inside it. --ct-pane-h is the tallest the card may be. */
       --ct-pane-h: min(calc(100svh - var(--header-height) - 2 * var(--content-gap)), 720px);
       --ct-title-h: 0px;
+      --ct-foot-h: 0px;
       --ct-phone-w: min(
         calc(100cqw - 2 * var(--card-padding)),
-        calc((var(--ct-pane-h) - 2 * var(--card-padding) - var(--ct-title-h)) * 9 / 19.5)
+        calc((var(--ct-pane-h) - 2 * var(--card-padding) - var(--ct-title-h) - var(--ct-foot-h)) * 9 / 19.5)
       );
       container-type: inline-size;
     }
     /* the title over the phone: one line of small text and a within-card step */
     .ct-panel--titled { --ct-title-h: calc(var(--text-small) * var(--lh-heading) + var(--space-3)); }
+    /* the open link under the phone takes its line the same way: a within-card
+       step above it and the text link's own height (its underline included) */
+    .ct-panel--visit { --ct-foot-h: calc(var(--space-4) + var(--text-body) * var(--lh-heading) + var(--space-2)); }
+    .ct-hero .ct-visit { display: none; }
+    .ct-pane__visit { display: inline-flex; margin-top: var(--space-4); }
     .ct-pane { width: fit-content; height: auto; margin-inline: auto; }
     .ct-stage { height: auto; container-type: normal; display: block; }
     .ct-phone { width: var(--ct-phone-w); }
