@@ -13,7 +13,6 @@ export type Guide = {
   get: string[]; // what you get
   need: string[]; // what you need
   prompt: string; // the prompt itself, copied verbatim
-  adapt: string[]; // what to change for your team
 };
 
 export const guides: Guide[] = [
@@ -54,11 +53,6 @@ Work in this order and show your work:
 6. How might we. Two prompts per theme, phrased as design questions, never as solutions.
 
 Output as structured sections in this order: Key finding · Quality (observations, clusters, insights, HMWs counted) · Themes with insights · AI asks · How might we.`,
-    adapt: [
-      '**Swap the scoring thresholds for your sample sizes.** With four participants, “3 of 4” is HIGH; with twelve it is not.',
-      '**Keep verbatims in the participant’s language** and translate in a footnote. Translation flattens the hesitation you are looking for.',
-      '**Add voice features later, if at all**: pauses, sighs and pitch help spot the gap between what was said and what was felt, but **the timestamp rule does most of the work**.',
-    ],
   },
   {
     slug: 'realistic-prototype',
@@ -96,10 +90,5 @@ Rules, in order of importance:
 7. Put the things I want to test behind a flag, so I can turn a new row, badge or landing surface on for one session and off for the next.
 
 Ask me what I am trying to learn before you start, then tell me which screens that makes load-bearing.`,
-    adapt: [
-      'Swap the catalogue fixture for your own category. **The shape of the data matters more than the volume** \u2014 get the outliers in.',
-      'If you need to test a surface that does not exist yet, **build it behind a flag** rather than forking the prototype. One build, many sessions.',
-      '**Hand participants a device with the prototype already open.** A URL bar is the fastest way to remind someone they are in a test.',
-    ],
   },
 ];

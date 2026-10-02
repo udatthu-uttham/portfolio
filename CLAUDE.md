@@ -128,6 +128,8 @@ section pads `--section-pad` — half a `--section-y` — top and bottom**, so t
 neighbours' pads meet at the boundary and content-to-content is never less than
 one `--section-y`; no section owns the whole gap, so none can double it. Every
 `section[id]` lands a nav jump with `scroll-margin-top: var(--header-height)`.
+**The one exception is the last screen**: Contact has no bottom pad and shares
+its screen with the footer (see "Contact fits one screen").
 Centring is block-level `align-content: center`, so the children keep normal
 flow and their collapsing margins; a browser without it top-aligns, which is the
 old layout.
@@ -170,6 +172,17 @@ is what "end to end" asks for.
 
 ## Contact fits one screen
 
+**Contact and the footer share the last screen** (Uttham, 2026-10-02: "reduce
+the space between footer and last section, so whole contact with footer can come
+in one viewport"). `#contact` gives up its bottom pad and takes
+`min-height: calc(100svh − header − --footer-block)`; the footer's own top pad,
+one `--section-y-sm`, is the only gap between the panel and the footer rule, and
+its bottom pad is one `--card-padding` (the 96px it kept for a page navigator
+that no longer exists is gone). A jump to `#contact` lands the *content* one
+`--space-6` under the header, so the top pad slides under it and the footer
+stays on screen. Measured 1024×768 to 1920×1080: content + footer fit at every
+size, with 6px of air at 1366×768, where the photo is at its 150px floor.
+
 **The whole contact section fits one viewport** (Uttham, 2026-10-01: "the whole
 contact section should be in one viewport, let's remove the paragraph section for
 the How I lead section"). The three principles are **a title and a tagline each,
@@ -181,7 +194,7 @@ clickability"). The three notes sit in **one row at their own size** — two lin
 each, label and arrow then address, all three the widest one's width — and are
 **never stretched across the leftover glass**, and never narrower than their
 content (nothing wraps). They keep their tilt, hover lift and arrow. The photo is
-**as big as the screen's height allows** (`--photo-w`: budget − 295px, ÷ 1.23,
+**as big as the screen's height allows** (`--photo-w`: what the screen leaves under the header after `--space-6` of air, the footer and 412px of everything else, since 2026-10-02; it was budget − 295px, ÷ 1.23,
 150–340px), sized off the content budget, not its column, and sits one
 `--space-4` in from the panel's right edge so its tilted corner clears the bolts
 by the 16px they are owed. **No badges on the photo for now** (2026-10-01, "for
@@ -191,7 +204,9 @@ away from coming back.
 ## AI Space and Projects are the same object
 
 **An AI Space card is a Projects tile** (Uttham, 2026-09-21): same tape, paper,
-title, lead line, glass well and an action that reads like "Read the case".
+title, lead line, glass well and an action that reads like "Read the case" —
+**"View more →"** (2026-10-02: "the ai cards should not have copy the plan as
+CTA, view more should be the CTA for it").
 **Every card carries its own picture, on its own taped sheet** (Uttham,
 2026-10-01: "why we are having image of one card, we should have for both") —
 never one shared stage that several cards switch between; that was tried the
@@ -201,18 +216,20 @@ the case pages, the guide pages and the case index. The old "two cards, never
 three" cap is lifted (2026-10-01: "lets change that rule to 3"); each section
 has two sheets today.
 
-**A tool card is its name, its one line, the phone and the copy action —
+**A tool card is its name, its one line, the phone and "View more" —
 nothing else** (Uttham, 2026-10-01: "remove the explanation on the main AI space
 cards to optimise content, these descriptions can be in l2 page"). The "how it
 helps" lines live on the tool's teaser page, `/ai/<slug>`, word for word under
 "How it helps", and **the whole card opens that page** the way a case card opens
-its case: the title's link stretches over the sheet and only the copy action
-sits above it. **The phones are running previews with no link or pill of their
+its case: the title's link stretches over the sheet (an iframe may not sit
+inside a link, so the sheet cannot be one) and "View more" is its visible,
+aria-hidden action, as "Read the case" is a case tile's; the arrow nudges on the
+sheet's hover. **The phones are running previews with no link or pill of their
 own** (Uttham, 2026-10-01: "in the ai prototype card, no need to add view
 prototype link, clicking on the card will move to ai space teaser page") — a
 click anywhere on the card, the phone included, opens the teaser; the full-size
-prototype is opened from the teaser page instead. No visible "read more" was
-added — the action row stays "just Copy the plan, nothing else here".
+prototype is opened from the teaser page instead. The copy buttons are gone from
+the cards; the prompt is copied on the teaser page.
 
 How the two differ: **a case sheet stacks** — title, lead, the well, the action —
 and on a laptop its well takes the height the copy leaves, so the cover sits as a
@@ -293,10 +310,14 @@ the project case studies, similar for the first ai tool as well"). `/ai/<slug>`
 is the same `CaseTeaser`, in live mode with `frame="phone"`: **the left column is
 the white-label guide and the sticky phone runs the tool itself**, in the
 teaser's own 9/19.5 phone (the tool fills it). Left, in order: the guide's title
-and intro as the hero, facts (Tool, Kind, Year), How it helps (the card's line,
+and intro as the hero, facts (Tool, Kind, Year), The idea (only a tool that
+carries `idea` in `tools.ts` — the prototype, in Uttham's 2026-10-02 words, with
+its one `^^` beat), How it helps (the card's line,
 then the helps as ruled rows), What you get, What you need, The prompt — the
-bolted glass panel with the page's one primary sticker, "Copy the prompt", which
-copies the `<pre>` word for word — and What to change for your team. **No copy
+paper card with the page's one primary sticker, "Copy the prompt", which
+copies the `<pre>` word for word — and nothing after it: **What to change for
+your team is gone** (2026-10-02: "remove want to change for your team section,
+and the prompt I believe is whitelabelled"). **No copy
 lives in `src/data/ai-teasers.ts`**: it arranges `tools.ts` and `guides.ts` and
 says which step each row shows. **Resona follows the reading** (`follow`): every
 row names one of its own steps — prepare, setup, record, synth, insights — and

@@ -4,7 +4,7 @@
 // live mode: the left column is the guide, the sticky phone runs the tool.
 //
 // NO COPY LIVES HERE. Every word comes from tools.ts (name, kicker, year, what,
-// helps, visit) and guides.ts (title, intro, get, need, prompt, adapt) — Uttham's
+// helps, idea, visit) and guides.ts (title, intro, get, need, prompt) — Uttham's
 // own lines, word for word (CLAUDE.md). This file only arranges them and says
 // which step of the running tool each row shows.
 //
@@ -23,7 +23,6 @@ type StateMap = {
   get?: Step[];
   need?: Step[];
   prompt?: Step;
-  adapt?: Step[];
 };
 
 const stateMaps: Record<string, StateMap> = {
@@ -36,8 +35,6 @@ const stateMaps: Record<string, StateMap> = {
     need: ['record', 'synth', 'setup', 'record'],
     // the prompt is the synthesis pass; the phone shows what it produces
     prompt: 'insights',
-    // scoring thresholds · verbatims in their own language (the home's records) · voice features
-    adapt: ['insights', 'prepare', 'record'],
   },
 };
 
@@ -63,6 +60,9 @@ export const aiTeaser = (slug: string): CaseTeaserData => {
     visit: tool.visit,
     panelLabel: `${tool.name}, running`,
     sections: [
+      // The tool's own idea, ahead of everything (Uttham, 2026-10-02: "emphasis
+      // the idea of this prototype"). Only tools that carry one get it.
+      ...(tool.idea ? [{ heading: 'The idea', blocks: [{ kind: 'p' as const, text: tool.idea }] }] : []),
       {
         heading: 'How it helps',
         blocks: [
@@ -72,8 +72,11 @@ export const aiTeaser = (slug: string): CaseTeaserData => {
       },
       { heading: 'What you get', blocks: [{ kind: 'rows', rows: rows(guide.get, map.get) }] },
       { heading: 'What you need', blocks: [{ kind: 'rows', rows: rows(guide.need, map.need) }] },
+      // The page ends on the prompt. "What to change for your team" came off on
+      // 2026-10-02 (Uttham: "remove want to change for your team section, and
+      // the prompt I believe is whitelabelled") — the prompt already asks what
+      // you are trying to learn and leaves the catalogue to you.
       { state: map.prompt, heading: 'The prompt', blocks: [{ kind: 'prompt', text: guide.prompt, copy: 'Copy the prompt' }] },
-      { heading: 'What to change for your team', blocks: [{ kind: 'rows', rows: rows(guide.adapt, map.adapt) }] },
     ],
   };
 };

@@ -7,9 +7,11 @@
 // participant audio or verbatims, no Meesho figures. The previews show the
 // mechanism; the contents are always invented.
 //
-// LAYOUT (Uttham, 2026-09-21; 2026-10-01): two cards, built out of the Projects
-// tile — tape, title, lead line, the phone in its glass well, and the replicate
-// action. `helps` is NOT on the card: it moved to the tool's teaser page,
+// LAYOUT (Uttham, 2026-09-21; 2026-10-01; 2026-10-02): two cards, built out of
+// the Projects tile — tape, title, lead line, the phone in its glass well, and
+// "View more", which opens the teaser as "Read the case" opens a case (2026-10-02:
+// "the ai cards should not have copy the plan as CTA, view more should be the
+// CTA for it"; the prompt is copied on the teaser page). `helps` is NOT on the card: it moved to the tool's teaser page,
 // /ai/<slug>, which the whole card opens, along with the long version of "how
 // to build it". The phone on the card is a running preview with no link of its
 // own; on the teaser page the same tool runs in the sticky phone
@@ -25,8 +27,9 @@ export type Tool = {
   name: string;
   year: string;
   what: string; // the card's lead line. Highlights in **bold**.
+  idea?: string; // the teaser's opening section, "The idea", in Uttham's words. Highlights in **bold**, one ^^beat^^.
   helps: string[]; // how it helps, one point each, shown on /ai/<slug>. Highlights in **bold**.
-  action: string; // the label on the replicate link
+  action: string; // the card's action, which reads like a case tile's "Read the case"
   used?: { label: string; href: string }; // where it shows up in the case studies
   visit?: { label: string; href: string }; // a live thing you can open yourself: the teaser's "Open the prototype ↗", and the preview's src
 };
@@ -43,7 +46,7 @@ export const tools: Tool[] = [
       '**They can learn, follow and improve,** as the tool actively listens to their research and upskills them.',
       '**Centralised research storage** that is accessible to everyone.',
     ],
-    action: 'Copy the prompt',
+    action: 'View more',
   },
   {
     slug: 'realistic-prototype',
@@ -51,12 +54,17 @@ export const tools: Tool[] = [
     name: 'Realistic prototype',
     year: '2026',
     what: 'A web app that **looks like Meesho, with realistic user data,** built for better research.',
+    // Uttham, 2026-10-02, verbatim but for grammar: "emphasis the idea of this
+    // prototype which has linkage to meesho services that fetches realtime
+    // production data for actual users, all the values are connected to backend
+    // table and proper logics are set in place to make this a realistic prototype"
+    idea: 'This prototype is ^^linked to Meesho services that fetch real-time production data for actual users.^^ All the values are connected to backend tables, and **proper logic is set in place to make it a realistic prototype.**',
     helps: [
       '**Strong engagement from users,** as this web app has user data and Meesho design that emulate real app movements — giving great insights.',
       '**Complex flows like checkout and payments become testable** — users can emulate checkout, run journeys and track their orders.',
       '**Understand how people react to new features and content** — for example, Best of Jaipur product cards in the feed.',
     ],
-    action: 'Copy the plan',
+    action: 'View more',
     visit: { label: 'Open the prototype', href: '/proto/feed-ux/index.html' },
   },
 ];

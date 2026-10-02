@@ -11,7 +11,6 @@ import { rich } from '../lib/rich';
 import CaseIndex from '../components/CaseIndex.astro';
 import ResonaPreview from '../components/ResonaPreview.astro';
 import ProtoPreview from '../components/ProtoPreview.astro';
-import { guides } from '../data/guides';
 const featuredStudies = studies.filter((s) => s.featured);
 const indexedStudies = studies.filter((s) => !s.featured);
 import { tools } from '../data/tools';
@@ -26,7 +25,6 @@ const covers: Record<string, ImageMetadata> = Object.fromEntries(
 
 // The replicate button hands over the guide's prompt verbatim, so the card and
 // the guide page can never drift apart.
-const promptFor = (slug: string) => guides.find((g) => g.slug === slug)?.prompt ?? '';
 
 // Authored copy; unfinished metrics stay out of the rendered page.
 const principles = [
@@ -191,13 +189,7 @@ const principles = [
                     {tool.slug === 'realistic-prototype' && tool.visit && <ProtoPreview src={tool.visit.href} />}
                   </div>
 
-                  <div class="tool__foot">
-                    <button class="tool__go text-link" type="button" data-copy-prompt data-copied="Copied">
-                      <span data-copy-label>{tool.action}</span>
-                      <span class="tile__arr" aria-hidden="true">→</span>
-                    </button>
-                    <textarea class="tool__promptsrc" hidden readonly aria-hidden="true">{promptFor(tool.slug)}</textarea>
-                  </div>
+                  <span class="tile__go tool__go text-link" aria-hidden="true">{tool.action} <span class="tile__arr">→</span></span>
                 </article>
               </div>
             ))
@@ -299,32 +291,6 @@ const principles = [
   </main>
 </Base>
 
-<script>
-  // "Replicate" hands over the guide's prompt. The textarea beside each button
-  // is the source of truth, so the card and /ai/<slug> can never disagree.
-  document.querySelectorAll<HTMLButtonElement>('[data-copy-prompt]').forEach((btn) => {
-    btn.addEventListener('click', async () => {
-      const src = btn.parentElement?.querySelector<HTMLTextAreaElement>('.tool__promptsrc');
-      if (!src) return;
-      try {
-        await navigator.clipboard.writeText(src.value);
-      } catch {
-        // Clipboard blocked (insecure origin, denied permission): fall back to
-        // the old selection copy rather than leaving the button doing nothing.
-        src.hidden = false;
-        src.select();
-        document.execCommand('copy');
-        src.hidden = true;
-      }
-      const el = btn.querySelector<HTMLElement>('[data-copy-label]');
-      if (!el) return;
-      const label = el.textContent;
-      el.textContent = btn.dataset.copied ?? 'Copied';
-      window.setTimeout(() => { el.textContent = label; }, 1800);
-    });
-  });
-</script>
-
 <style>
   /* ============================ shared layout ========================= */
   main {
@@ -366,6 +332,29 @@ const principles = [
     padding-block: var(--section-pad);
     align-content: center;
     font-size: var(--text-body);
+  }
+
+  /* THE LAST SCREEN IS CONTACT AND THE FOOTER (Uttham, 2026-10-02: "reduce the
+     space between footer and last section, so whole contact with footer can
+     come in one viewport"). Contact gives up its bottom pad and the screen the
+     footer needs, so a jump to #contact — or the end of the page — shows both.
+     The footer's top pad is then the only gap between them: one --section-y-sm,
+     the supporting-detail rung, instead of a half section gap plus that.
+     --footer-block is the footer's whole height in tokens: its top pad, the
+     ruler's row gap, its one line (the sticker: body × heading leading plus its
+     4px pads) and its bottom pad. */
+  main {
+    --footer-block: calc(var(--section-y-sm) + var(--space-3) + var(--text-body) * var(--lh-heading) + var(--space-2) + var(--card-padding));
+  }
+  #contact {
+    min-height: calc(100svh - var(--header-height) - var(--footer-block));
+    padding-bottom: 0;
+    /* A jump lands the CONTENT one --space-6 under the header, not the top
+       pad: the pad is the boundary with AI Space, and showing it would push
+       the footer off the bottom. Where Contact is only its min-height (tall
+       screens) the page cannot scroll that far, and the jump lands exactly as
+       every other section's does. */
+    scroll-margin-top: calc(var(--header-height) + var(--space-6) - var(--section-pad));
   }
 
   /* One landing rule for every nav jump, Contact included. */
@@ -825,12 +814,14 @@ const principles = [
   .tiles--ai { grid-template-columns: repeat(auto-fit, minmax(min(100%, 540px), 1fr)); }
   .tile--ai { gap: var(--space-4); }
 
-  /* An AI card opens its teaser page, as a case card opens its case — but it
-     holds the copy button, so it cannot BE a link. The title's link stretches
-     over the whole sheet instead, and the copy action sits above it. The phones
-     are running previews with no link of their own (Uttham, 2026-10-01: "no
-     need to add view prototype link, clicking on the card will move to ai
-     space teaser page"), so the well needs no way through. */
+  /* An AI card opens its teaser page, as a case card opens its case — but the
+     phone inside it is an iframe, which may not sit inside a link, so the sheet
+     cannot BE one. The title's link stretches over the whole sheet instead, and
+     "View more" is its visible action, as "Read the case" is a case tile's
+     (Uttham, 2026-10-02: "view more should be the CTA for it"). It is
+     aria-hidden because the title link already names the destination. The
+     phones are running previews with no link of their own (2026-10-01), so
+     every bit of paper and glass opens the teaser. */
   .tool__link { color: inherit; text-decoration: none; }
   .tool__link::after {
     content: '';
@@ -843,15 +834,6 @@ const principles = [
   }
   .tool__link:focus-visible { outline: none; }
   .tool__link:focus-visible::after { outline: 2px solid var(--amber-text); outline-offset: var(--space-1); }
-  /* Only the copy button rises above the stretched link, never its row, so
-     every bit of paper and glass — the phone included — opens the teaser.
-     The button is already positioned (.text-link). */
-  .tile--ai .tool__go { z-index: 2; }
-  /* The sheet takes the case tile's hover border, but its arrow belongs to the
-     copy action, so only hovering that action nudges it. */
-  @media (hover: hover) and (pointer: fine) {
-    .tile--ai:hover .tile__arr { transform: none; }
-  }
 
   /* The Projects well exactly — 4/3, phone standing flush on the bottom edge,
      glass showing on the other three sides. `container` lets each preview ask
@@ -876,21 +858,10 @@ const principles = [
     .tile__media--tool { aspect-ratio: 2 / 3; padding: var(--space-4) var(--space-4) 0; }
   }
 
-  /* The action reads exactly like a case tile's "Read the case" — same amber
-     rule, same arrow nudge — so the two sections end the same way. */
-  .tool__foot { display: flex; margin-top: auto; }
-  .tool__go {
-    margin: 0;
-    padding: 0;
-    background: none;
-    border: 0;
-    cursor: pointer;
-  }
-  .tool__go:focus-visible { outline: 2px solid var(--amber-text); outline-offset: 4px; }
-  @media (hover: hover) and (pointer: fine) {
-    .tool__go:hover .tile__arr { transform: translateX(4px); }
-  }
-  .tool__promptsrc { position: absolute; left: -9999px; width: 1px; height: 1px; }
+  /* The action is a case tile's "Read the case" exactly — same amber rule, and
+     the arrow nudges when the sheet is hovered — so the two sections end the
+     same way. It only sizes to its words, never the row. */
+  .tool__go { align-self: flex-start; }
 
   /* ================== one screen per section, a picture per sheet ========= */
   /* Each section keeps two taped sheets, and each sheet keeps its own picture
@@ -938,7 +909,7 @@ const principles = [
       min-height: calc(var(--sheet-in) + var(--sheet-top) + var(--card-padding) + 2px);
     }
     .tile--ai .tool__copy { grid-area: copy; }
-    .tile--ai .tool__foot { grid-area: foot; margin-top: 0; }
+    .tile--ai .tool__go { grid-area: foot; align-self: start; justify-self: start; margin-top: 0; }
     /* The well runs the sheet's full height and the phone stands flush on its
        bottom edge, as tall as the well allows — a handset's proportions, not
        a cropped screen. */
@@ -1041,15 +1012,16 @@ const principles = [
   .contact-panel__photo {
     position: relative;
     /* As big as the screen's HEIGHT allows (Uttham, 2026-10-01: "make this image
-       section bigger"). The photo sets the panel's height, so its width is the
-       screen's content budget (100svh − header − one section gap) minus what
-       else Contact stacks above and around it (ruler, How I lead sheet, panel
-       hardware: ~295px, measured with the third principle's title on three
-       lines, 2026-10-01), divided by the whole print's height per
-       width, caption and border included (~1.23). It was 400px and 1.07 until
-       2026-10-01, which left ~90px of the screen unused and the photo no bigger
-       than a note — "it looks like a block of 4 cards", Uttham. It stays ≥150px
-       on short screens and ≤340px on tall ones.
+       section bigger") — once the footer has its share (2026-10-02: "whole
+       contact with footer can come in one viewport"). The photo sets the
+       panel's height, so its width is what the screen leaves under the header
+       after one --space-6 of air, the footer (--footer-block) and everything
+       else Contact stacks: 412px = the ruler, the How I lead sheet and the
+       panel's own padding (≤342px) plus the print's caption and border, which
+       make it ~69px taller than it is wide. Measured at 1024×768 through
+       1920×1080 on 2026-10-02; the old formula (295px, ÷1.23) under-reserved
+       by up to 40px. It stays ≥150px on short screens — where Contact and the
+       footer still fit, with less air — and ≤340px on tall ones.
        The two moto badges came off the photo on 2026-10-01 ("for now remove
        the stickers") along with the space reserved for them; MotoSticker.astro
        is kept so they are one import away from coming back. */
@@ -1064,7 +1036,7 @@ const principles = [
        bolt is owed. One within-card step in from the right edge clears it at
        every size, and the cap below gives the notes that step back. */
     --photo-inset: var(--space-4);
-    --photo-w: clamp(150px, min(calc((100svh - var(--header-height) - var(--section-y) - 295px) / 1.23), calc(100cqw - var(--notes-min) - var(--group-gap) - var(--photo-inset))), 340px);
+    --photo-w: clamp(150px, min(calc(100svh - var(--header-height) - var(--space-6) - var(--footer-block) - 412px), calc(100cqw - var(--notes-min) - var(--group-gap) - var(--photo-inset))), 340px);
   }
 
   .contact-panel__photo :global(.instax) {
@@ -1207,8 +1179,9 @@ const principles = [
     align-items: center;
     flex-wrap: wrap;
     gap: var(--space-3);
-    /* the bottom clears the floating page navigator */
-    padding-block: var(--section-y-sm) var(--space-9);
+    /* the bottom is a card inset: the floating page navigator it once cleared
+       is gone, and Contact's screen pays for every pixel here (--footer-block) */
+    padding-block: var(--section-y-sm) var(--card-padding);
     color: var(--ink-600);
     font-size: var(--text-small);
   }
