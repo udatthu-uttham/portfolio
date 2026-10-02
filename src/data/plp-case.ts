@@ -107,14 +107,16 @@ export const plpCase: CaseTeaserData = {
   experiments: [
     {
       state: 'cleanup',
-      title: 'Cleanup',
+      // renamed with the teaser (Uttham, 2026-10-02: "rephrase this with card framework")
+      title: 'Card framework',
       why: '**More than ten teams had placed features on one card** with no shared rule for what earned a place. Each line pushed another product off the screen for a shopper who was only looking at pictures.',
+      how: 'We started by understanding every case the card has to carry, then built a framework from them: **the right information architecture for browsing cards, and one that scales.**',
     },
     {
       state: 'titles',
       title: 'Clearer titles (minimum viable truths)',
       status: 'Live; next version in test',
-      why: 'Seller-written titles were long, repetitive and stuffed with search words. **Shoppers glanced and read nothing.** The facts that decide a purchase (fabric for a kurti, pack size for a snack) were not on the card, so **people opened products just to check.**',
+      why: 'Seller-written titles were long, repetitive and stuffed with search words, and **most of them carried shop names**, which added no value. Shoppers glanced and read nothing. The facts that decide a purchase (fabric for a kurti, pack size for a snack) were not on the card, so **people opened products just to check.**',
       how: 'Defined a minimum viable truth per category: **the smallest set of facts that lets a shopper decide without opening the product.** Replaced the title with those facts as chips. A second version tightened the chips, added consideration tags (price drop / quality marks; built, not launched — too few products qualified), and **forced three rounds of catalogue cleanup so the chips were true.**',
       worked: 'Chips were noticed late but **valued once seen**; shoppers stopped opening products to check fabric. **Pack size was the most useful fact in ambiguous categories.** A chip the picture contradicts is not believed, so **catalogue quality had to come first.** Showing the prepaid price up front confused cash shoppers — fed the cash-price work.',
     },
@@ -139,7 +141,7 @@ export const plpCase: CaseTeaserData = {
       title: 'Swipeable images',
       status: 'Shipped',
       why: 'Shoppers judge from pictures and the card showed one; **every second view cost a tap in and a tap back.**',
-      how: 'Up to three images swipe inside the card, one autoplay to teach the gesture. An early version that rationed scrolling to selected products was **killed on day one — breadth was the point.**',
+      how: 'Up to three images swipe inside the card, showing **more of the product and the variations it comes in**, one autoplay to teach the gesture. An early version that rationed scrolling to selected products was **killed on day one — breadth was the point.**',
       worked: 'Taps into the product fell while orders per tap rose: one finding, not two. **The decision moved onto the listing.**',
     },
     {
@@ -162,7 +164,7 @@ export const plpCase: CaseTeaserData = {
       title: 'Delivery date',
       status: 'Scaled',
       why: 'Shoppers assumed four to five days in cities and a week or more outside them; **“Free Delivery” on every card told them nothing.**',
-      how: 'A day count at the foot of the card. Three tests, including one with a “FAST” mark in front of the number.',
+      how: 'A day count at the foot of the card, **shown only on products where delivery is fast**, not on all of them. Three tests, including one with a “FAST” mark in front of the number.',
       worked: '**The date did the work; the word in front of it carried nothing.** Third test scaled.',
     },
   ],

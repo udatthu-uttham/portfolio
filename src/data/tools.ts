@@ -86,15 +86,9 @@ export const tools: Tool[] = [
         },
         {
           heading: 'Research execution',
-          lead: 'It **actively listens to the conversations** and maps them to the research goals set in planning, **to help the research moderator.**',
-          rows: [
-            '**The goals it listens for are pinned before any audio:** the objective, the cohorts, the research type and the discussion guide the study was planned with.',
-            'In the session, **the moderator has the guide at their side:** every question comes with what to watch for, each task with a set-up line, and the header with the ground rules — never name the feature, no “good” after an answer, let silences run.',
-            'It **listens for the moments the goals hinge on:** when a design is shown, when two options are compared, which one wins and why, and when a task is finished.',
-            'The moderator’s own notes join the recording as **a source of their own, for whatever the audio missed.**',
-            '**Every answer is mapped to the research question it answers** — fully, partly or in contradiction — and every activity in the guide has to show up as an observation.',
-            'It tells the moderator **what the sessions have not reached yet:** a guide topic with no evidence so far is listed as uncovered, so the next session knows what to probe.',
-          ],
+          // the description only (Uttham, 2026-10-02: "just the description in
+          // portfolio, no need to add clear details about this")
+          rows: ['It **actively listens to the conversations** and maps them to the research goals set in planning, **to help the research moderator.**'],
         },
         {
           heading: 'Research synthesis',
@@ -111,15 +105,9 @@ export const tools: Tool[] = [
         },
         {
           heading: 'Research library',
-          lead: 'All the research reports are **vectorised and embedded using n8n,** to store them and retrieve them effectively.',
-          rows: [
-            '**Past studies are found by meaning, not by matching words:** a question finds the studies that answered it, even when they put it differently.',
-            '**Every finished study is stored as one record:** its setup — objective, cohorts, method, discussion guide — with everything the synthesis found, from themes, insights and pain points to how-might-we questions, data gaps and the topics never covered.',
-            '**Findings keep their evidence:** each insight carries its verbatim quotes, participant codes and confidence, so a past finding can be traced to who said it. In the findings, participants are codes, never names.',
-            'The home screen opens on “Search for any research”: **one place to find every study the team has run,** open to everyone.',
-            'That is how **each study is run better than the last:** before planning, the team can look up what earlier studies found on the same area.',
-            'Any study can be **asked questions in plain language.** Answers come only from that study’s findings, cite the participants and quotes behind them and say plainly when the data does not cover it, and **every question asked stays with the study** for the next reader.',
-          ],
+          // the description only (Uttham, 2026-10-02: "just the description in
+          // portfolio, no need to add clear details about this")
+          rows: ['All the research reports are **vectorised and embedded using n8n,** to store them and retrieve them effectively.'],
         },
       ],
     },

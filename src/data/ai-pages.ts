@@ -40,12 +40,12 @@ const stateMaps: Record<string, StateMap> = {
       // planning: types and method · the gate and formats · cohorts on the New Notes form;
       // examples · past studies · tailoring · language · tasks · techniques · bias on the home
       ['setup', 'setup', 'setup', 'prepare', 'prepare', 'prepare', 'prepare', 'prepare', 'prepare', 'prepare'],
-      // execution: goals pinned · the guide at hand · listening · notes · mapped · uncovered
-      ['setup', 'record', 'record', 'record', 'synth', 'insights'],
+      // execution: its description, on the listening sheet
+      ['record'],
       // synthesis: plan · listen · nuggets · cluster · synthesise · how might we · verify
       ['setup', 'record', 'synth', 'synth', 'insights', 'insights', 'insights'],
-      // library: by meaning · one record · evidence · the search · reuse · ask a study
-      ['prepare', 'insights', 'insights', 'prepare', 'prepare', 'insights'],
+      // library: its description, on the home with its search and past studies
+      ['prepare'],
     ],
     // the setup step · coded transcripts · themes and scores · key finding and AI asks · the report · the store
     get: ['setup', 'synth', 'insights', 'insights', 'insights', 'prepare'],
