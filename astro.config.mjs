@@ -2,7 +2,7 @@
 import { defineConfig } from 'astro/config';
 
 export default defineConfig({
-  site: 'https://uttham.design',
+  site: 'https://uttham.fyi',
   // A static site on GitHub Pages (perf pass 2026-10-02). The first two are
   // Astro's defaults, stated so nobody has to look them up: whitespace goes,
   // and a page's small stylesheets are inlined rather than fetched.
