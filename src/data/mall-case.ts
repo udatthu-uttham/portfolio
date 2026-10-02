@@ -12,6 +12,7 @@
 // src/assets/mall-case/<state>.(png|jpg|webp); the list is `screens.titles`.
 // CONFIDENTIALITY: direction only — the business share "climbed" and "hit the
 // share the business had asked for at kickoff"; Mall's share itself stays off.
+// 2026-10-02: no v4 ("ignore the v4 stuff") and no HUL line.
 
 import type { CaseTeaserData } from './case-teaser';
 
@@ -96,10 +97,10 @@ export const mallCase: CaseTeaserData = {
       state: 'v3-brands',
       heading: 'What happened',
       blocks: [
-        { kind: 'p', text: 'Seller labels are gone from Mall; **every product with the badge is a brand.** National brands including HUL have come on. **Shoppers recognise Mall by colour** before they read a word.' },
+        { kind: 'p', text: 'Seller labels are gone from Mall; **every product with the badge is a brand.** **Shoppers recognise Mall by colour** before they read a word.' },
         { kind: 'quote', text: '“Purple colour means Mall. These products come directly from the company, we can buy them without worrying about quality.”', source: 'Household interview, Lucknow.' },
         { kind: 'p', text: 'Mall’s share of the business is confidential for a listed company; **I walk through it in interviews.**' },
-        { kind: 'p', text: 'Next, v4: brand-specific discount indicators, a roadmap for launching national brands, and **helping shoppers tell look-alike unbranded products from the real thing.**' },
+        { kind: 'gate' },
         {
           kind: 'inside',
           lead: 'In the full case study:',
@@ -108,10 +109,8 @@ export const mallCase: CaseTeaserData = {
             'The research turn: its rounds, places and methods',
             'The seller-label call, from v2 to v3',
             'The purple tick and every v3 surface: why, how, what worked',
-            'What v4 picks up, and what is still open',
           ],
         },
-        { kind: 'gate' },
       ],
     },
   ],
@@ -145,7 +144,7 @@ export const mallCase: CaseTeaserData = {
       status: 'Removed in v3',
       why: 'In v2 the business **wanted seller labels on Mall products for margin**: small local labels, not the brands shoppers knew. **Shoppers had not built trust in Mall yet**, and every label that was not a brand diluted the one thing the badge had to say.',
       how: 'I argued against them in v2, and the labels went in anyway. **The research gave the argument its evidence**: the labels were diluting what shoppers understood Mall to be. For v3, **my advocacy and research shifted us to real brands only**, with popular brand names as the explanation of Mall.',
-      worked: '**Seller labels came off entirely**, so every product with the badge is a brand, and **national brands, HUL among them, started onboarding.**',
+      worked: '**Seller labels came off entirely**, so every product with the badge is a brand, and **national brands started onboarding.**',
     },
     {
       state: 'v3-pill',
@@ -162,13 +161,6 @@ export const mallCase: CaseTeaserData = {
       why: 'v2 had explained Mall, and shoppers ignored the explaining. v3 set two objectives: **make shoppers aware Mall exists**, through brands they already know, and **make them understand it where they decide**, so they remember it next time.',
       how: 'v3 rebuilt Mall around **recognition, not explanation.** **One colour and one mark, carried through every step:** a bottom-nav entry with an education modal of popular brands and celebrity faces; a splash for the first few visits; a hint on listings for anyone who missed it; a purple enclosure on the product page, with the brand’s own content; a landing page that leads with logos for newcomers and search for regulars; and a purple animation when the order is confirmed.',
       worked: '**People now recognise Mall by colour.** Anchored by celebrities and icons, Mall became recognisable, a go-to place and, finally, trusted, and it **hit the share the business had asked for at kickoff.** The lesson I took from it: **the answer was brand-led storytelling, not more UI tweaks.**',
-    },
-    {
-      state: 'v3-pill',
-      title: 'What v4 picks up',
-      status: 'Open',
-      why: 'The mixed-feed bet is **the part I would not call solved.** v3 carried it too, and the read did not change: **in a mixed feed the brand still loses to the image.**',
-      how: 'The v4 roadmap starts there: **brand-forward product cards, where the name does the work the pill could not**; brand-specific discount indicators; a roadmap for launching national brands; and helping shoppers tell look-alike unbranded products from the real thing.',
     },
   ],
 

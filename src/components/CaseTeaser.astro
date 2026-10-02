@@ -144,12 +144,12 @@ const titleFor = (key: string) => {
                 </aside>
               )
             ) : block.kind === 'inside' ? (
-              <>
+              <div class="ct-inside-block" data-inside>
                 <p class="ct-body ct-inside-lead">{block.lead}</p>
                 <ul class="ct-inside">
                   {block.items.map((item) => <li>{item}</li>)}
                 </ul>
-              </>
+              </div>
             ) : block.kind === 'rows' ? (
               <>
                 {block.heading && <h3 id={idFor(block.heading)}>{block.heading}</h3>}
@@ -197,6 +197,10 @@ const titleFor = (key: string) => {
 
       {hasFull && (
         <section class="ct-full" id="full" aria-labelledby="full-title" hidden>
+          {/* where the added content starts (Uttham, 2026-10-02: "once I enter
+              the password the whole page should refresh, with seperator to show
+              the added content") */}
+          <div class="ct-full__rule" aria-hidden="true"><span>The full case study</span></div>
           <h2 class="sr-only" id="full-title" tabindex="-1">The full case study</h2>
           {data.experiments!.map((e) => (
             <article class="ct-exp" id={idFor(e.title)} data-state={e.state}>
@@ -615,19 +619,39 @@ const titleFor = (key: string) => {
     const hash = gate.dataset.hash ?? '';
     const dev = gate.dataset.dev === '1';
     const KEY = 'plp-case-full-open';
+    const JUMP = 'case-full-jump';
 
+    // Open: the full study takes the place of the card that promised it — the
+    // gate and the "In the full case study" list step aside.
     const reveal = (focus: boolean) => {
       full.hidden = false;
       openBtn.setAttribute('aria-expanded', 'true');
       openBtn.hidden = true;
       form.hidden = true;
       gate.classList.add('is-open');
-      try { sessionStorage.setItem(KEY, '1'); } catch { /* storage blocked: it just won't stay open on reload */ }
+      gate.hidden = true;
+      document.querySelectorAll<HTMLElement>('[data-inside]').forEach((el) => { el.hidden = true; });
       document.dispatchEvent(new Event('case:full-open'));
-      if (focus) document.getElementById('full-title')?.focus({ preventScroll: false });
+      if (focus) document.getElementById('full-title')?.focus({ preventScroll: true });
     };
 
-    try { if (sessionStorage.getItem(KEY) === '1') reveal(false); } catch { /* storage blocked */ }
+    // A right password reloads the whole page (Uttham, 2026-10-02: "once I
+    // enter the password the whole page should refresh"), which then opens on
+    // load and lands on the separator above the added content. Storage blocked:
+    // no reload, the study simply opens in place.
+    let stored = false;
+    try { stored = sessionStorage.getItem(KEY) === '1'; } catch { /* storage blocked */ }
+    if (stored) {
+      reveal(false);
+      let jump = false;
+      try { jump = sessionStorage.getItem(JUMP) === '1'; sessionStorage.removeItem(JUMP); } catch { /* storage blocked */ }
+      if (jump) {
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          full.scrollIntoView({ block: 'start' });
+          document.getElementById('full-title')?.focus({ preventScroll: true });
+        }));
+      }
+    }
 
     openBtn.addEventListener('click', () => {
       form.hidden = false;
@@ -647,7 +671,13 @@ const titleFor = (key: string) => {
       if (ok) {
         input.value = '';
         msg.textContent = '';
-        reveal(true);
+        try {
+          sessionStorage.setItem(KEY, '1');
+          sessionStorage.setItem(JUMP, '1');
+          location.reload();
+        } catch {
+          reveal(true);
+        }
       } else {
         msg.textContent = 'That password doesn’t match.';
         input.select();
@@ -961,6 +991,31 @@ const titleFor = (key: string) => {
   /* ---- the full case study: one block per experiment, on paper ---- */
   .ct-full { display: grid; gap: var(--section-y); scroll-margin-top: calc(var(--header-height) + var(--content-gap)); }
   .ct-full[hidden] { display: none; }
+  .ct-gate[hidden], .ct-inside-block[hidden] { display: none; }
+  /* the separator: the homepage ruler's dashed hairline and tracked label,
+     drawn across the reading column; the first block starts one heading gap
+     under it rather than a whole section gap */
+  .ct-full__rule {
+    position: relative;
+    height: 0;
+    margin-bottom: calc(var(--head-gap) + var(--space-7) - var(--section-y));
+    border-top: 1px dashed var(--line-mark);
+  }
+  .ct-full__rule span {
+    position: absolute;
+    top: 0;
+    left: calc(var(--space-2) * -1);
+    translate: 0 -50%;
+    padding: 0 var(--space-2);
+    background: var(--paper-0);
+    color: var(--ink-900);
+    font-size: var(--text-eyebrow);
+    font-weight: 500;
+    letter-spacing: var(--track-label);
+    line-height: 1;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
   .ct-exp { display: grid; gap: var(--space-6); }
   .ct-exp__head { display: grid; justify-items: start; gap: var(--space-3); }
   .ct-exp__head h3 { margin: 0; font-size: var(--text-h3); }

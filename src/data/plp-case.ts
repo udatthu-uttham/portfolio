@@ -81,6 +81,7 @@ export const plpCase: CaseTeaserData = {
       heading: 'Outcome',
       blocks: [
         { kind: 'p', text: '**The new card is live** for 250 million shoppers. Results are confidential for a listed company; I walk through them in interviews.' },
+        { kind: 'gate' },
         {
           kind: 'inside',
           lead: 'In the full case study:',
@@ -89,7 +90,6 @@ export const plpCase: CaseTeaserData = {
             'Before and after screens for every change',
           ],
         },
-        { kind: 'gate' },
       ],
     },
   ],
