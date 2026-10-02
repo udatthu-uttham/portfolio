@@ -1,10 +1,16 @@
 // Cloudflare Workers serves the built site as static assets (2026-10-02: hosted
 // at uttham.fyi). Workers Builds runs `npm run build`, then `npx wrangler deploy`
 // uploads dist/. The name must match the Worker created in the dashboard.
+// Both addresses are declared here, so each deploy keeps them attached: a
+// deploy sets the Worker's custom domains to exactly this list.
 {
   "name": "portfolio",
   "compatibility_date": "2026-09-01",
   "assets": {
     "directory": "./dist"
-  }
+  },
+  "routes": [
+    { "pattern": "uttham.fyi", "custom_domain": true },
+    { "pattern": "www.uttham.fyi", "custom_domain": true }
+  ]
 }
