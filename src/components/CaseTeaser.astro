@@ -96,6 +96,11 @@ if (data.gate && data.experiments?.length && !rail) {
 // the title on the card over the phone: per screen, from the first state that
 // shows it, so a state that borrows an earlier screen borrows its title too
 const titles = data.screens?.titles;
+// A screen is a phone screen (tall) or a reference board (landscape or square,
+// e.g. an annotated framework). A board is shown whole on a widened card,
+// never cropped into the phone (Uttham, 2026-10-03: "I will give reference
+// image (figure out a way on how to place this)").
+const kindFor = (key: string) => (library[key].width / library[key].height > 0.62 ? 'board' : 'phone');
 const titleFor = (key: string) => {
   const state = Object.keys(stateToShot).find((s) => stateToShot[s] === key);
   return state ? titles?.[state] : undefined;
@@ -251,6 +256,7 @@ const titleFor = (key: string) => {
                   class="ct-screen"
                   data-screen={key}
                   data-title={titleFor(key)}
+                  data-kind={kindFor(key)}
                   src={library[key]}
                   alt={altFor(key)}
                   widths={[360, 720]}
@@ -338,6 +344,9 @@ const titleFor = (key: string) => {
     });
     let shown: HTMLElement | null = null;
     let current: HTMLElement | null = null;
+    // the block being read holds a board somewhere: the card stays wide for
+    // all of it, so the slideshow never makes the card breathe in and out
+    let wideBlock = false;
 
     const show = (trigger: HTMLElement) => {
       if (trigger === current) return;
@@ -356,7 +365,11 @@ const titleFor = (key: string) => {
       }
       // the card's title names what the phone shows: the screen's own title,
       // or — before any screen exists — the state's
-      if (paneTitle) paneTitle.textContent = next?.dataset.title ?? stateTitles[state] ?? '';
+      // (a state with its own screen names it itself, even when another state
+      // shares the file)
+      if (paneTitle) paneTitle.textContent = (own ? stateTitles[state] : undefined) ?? next?.dataset.title ?? stateTitles[state] ?? '';
+      panel.classList.toggle('is-board', next?.dataset.kind === 'board');
+      panel.classList.toggle('is-wide', next?.dataset.kind === 'board' || wideBlock);
       if (next === shown) return;
       shown?.classList.remove('is-on');
       next?.classList.add('is-on');
@@ -422,6 +435,7 @@ const titleFor = (key: string) => {
       playing = group;
       held = false;
       at = group ? group.items.indexOf(trigger) : 0;
+      wideBlock = Boolean(group?.items.some((i) => (shots.get(i.dataset.state!) ?? fallback.get(i))?.dataset.kind === 'board'));
       show(trigger);
       nextBeat();
     };
@@ -1168,6 +1182,8 @@ const titleFor = (key: string) => {
     scale: 1.02;
     transition: opacity var(--dur-2) var(--ease-exit), scale var(--dur-2) var(--ease-exit);
   }
+  /* a reference board: shown whole, centred on the card's paper */
+  .ct-screen[data-kind='board'] { object-fit: contain; object-position: center; }
   .ct-screen.is-on {
     opacity: 1;
     scale: 1;
@@ -1361,9 +1377,32 @@ const titleFor = (key: string) => {
     .ct-panel--visit { --ct-foot-h: calc(var(--space-4) + var(--text-body) * var(--lh-heading) + var(--space-2)); }
     .ct-hero .ct-visit { display: none; }
     .ct-pane__visit { display: inline-flex; margin-top: var(--space-4); }
-    .ct-pane { width: fit-content; height: auto; margin-inline: auto; }
+    .ct-pane {
+      width: calc(var(--ct-phone-w) + 2 * var(--card-padding) + 2px);
+      max-width: 100%;
+      height: auto;
+      margin-inline: auto;
+      transition: width var(--dur-3) var(--ease-standard);
+    }
     .ct-stage { height: auto; container-type: normal; display: block; }
-    .ct-phone { width: var(--ct-phone-w); }
+    .ct-phone {
+      width: var(--ct-phone-w);
+      height: calc(var(--ct-phone-w) * 19.5 / 9);
+      aspect-ratio: auto;
+      transition: width var(--dur-3) var(--ease-standard), border-color var(--dur-3) var(--ease-standard), box-shadow var(--dur-3) var(--ease-standard);
+    }
+    /* BOARD MODE: the card takes its whole column and the frame drops away, so
+       a landscape board is read at the largest size the column allows; the
+       card keeps the phone's height, so nothing below it moves */
+    .ct-panel.is-wide .ct-pane { width: 100%; }
+    .ct-phone { margin-inline: auto; }
+    .ct-panel.is-board .ct-phone {
+      width: 100%;
+      border-color: transparent;
+      background: transparent;
+      box-shadow: none;
+    }
+    .ct-panel.is-board .ct-pane__title { max-width: none; }
   }
   @media (min-width: 768px) and (max-width: 900px) {
     .ct-story { grid-column: 1 / 6; }

@@ -44,7 +44,8 @@ export const plpCase: CaseTeaserData = {
       ],
     },
     {
-      state: 'before-annotated',
+      // no screen of its own: the old feed from Context stays on the phone
+      // (Uttham, 2026-10-03: "we can ignore the annotated version")
       heading: 'Problem',
       blocks: [
         { kind: 'p', text: 'Over time, **more than ten teams** had added their own features to the card. Each addition made it taller, so **shoppers saw fewer products on every screen**, and the pictures they rely on got harder to compare.' },
@@ -70,7 +71,6 @@ export const plpCase: CaseTeaserData = {
           heading: '2. Add what helps them decide',
           steps: [
             { state: 'scroll', label: 'Swipeable images', text: 'We added more swipeable images because **shoppers form better conviction from them** before opening the product. They show more of the product and the variations it comes in.' },
-            { state: 'bigimg', label: 'Bigger images for fashion', text: 'Where the look is the decision.' },
             { state: 'date', label: 'Delivery date', text: 'A clear day count instead of a promise, added **only on products where delivery is fast**, not on all of them.' },
           ],
         },
@@ -170,16 +170,19 @@ export const plpCase: CaseTeaserData = {
   // Uttham's exports in src/assets/plp/, each named after its state.
   screens: {
     dir: 'plp',
+    // the staggered feed is the new feed (2026-10-03: "stagger, you can reuse the
+    // overall new one"); cleanup, titles, list and date are his reference boards,
+    // shown whole on a widened card rather than cropped into a phone
+    map: { stagger: 'after' },
     alts: {
       before: 'The old product card',
-      'before-annotated': 'The old card, each element labelled with the team that added it',
-      cleanup: 'The card framework: every case the card carries, in one structure',
-      titles: 'The new card with fact chips where the title used to be',
+      cleanup: 'The card framework: the card split into zones for the picture, its facts, price, quality signals and the Fast programme',
+      titles: 'The same card four ways: the seller’s title, then one and two fact chips, and a Mall card with its chips',
       stagger: 'A product feed with staggered columns: each card at its natural height',
-      list: 'List rows for a considered category',
-      scroll: 'A card with swipeable images showing more of the product and its variations',
+      list: 'Earphones in the grid view next to the list view',
+      scroll: 'A feed whose cards carry swipeable images, with the dots under each picture',
       bigimg: 'A fashion card with a taller 4:5 image',
-      date: 'A fast-delivery product card with its delivery date',
+      date: 'Three cards: no delivery line, a day count, and Fast with a day count',
       after: 'The new product card',
       cash: 'The new card with the cash-price row lit',
     },
@@ -188,11 +191,10 @@ export const plpCase: CaseTeaserData = {
     // above the preview")
     titles: {
       before: 'The old card',
-      'before-annotated': 'Which team added what',
       cleanup: 'The card framework',
       titles: 'Facts in place of the title',
       stagger: 'A staggered feed',
-      list: 'List view by category',
+      list: 'Grid or list, by category',
       scroll: 'More views and variations',
       bigimg: 'Bigger images for fashion',
       date: 'Dates on fast deliveries',
