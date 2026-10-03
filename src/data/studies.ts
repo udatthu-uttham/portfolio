@@ -94,14 +94,15 @@ scope: ['Product card systems', 'Experiment design', 'PLP at scale'],
     // one-line note and 65px on two, and the pair's tips stand only 0.35 of the
     // screen apart (51px on a 1280×720 well, where the "to" is 148px tall), so
     // "Images you can swipe", which wraps, ran its words into the note above.
-    // "Images scroll" has ~15% to spare at the narrowest note column.
+    // "Scrollable" (his word, 2026-10-04: "rephrase to fit it") fits one line
+    // with room to spare at the narrowest note column.
     tile: { phones: [
       { image: 'plp/before', label: 'Before', tone: 'old', notes: [
         { text: 'Padded to the tallest card', y: 0.49 },
       ] },
       { image: 'plp/after', label: 'After', tone: 'new', notes: [
         { text: 'Facts replace the title', y: 0.31 },
-        { text: 'Images scroll', y: 0.658, x: 0.25 }, // on the yellow kurti's carousel dots, left column
+        { text: 'Scrollable', y: 0.658, x: 0.25 }, // on the yellow kurti's carousel dots, left column
       ] },
     ] },
     // The case page is Uttham's teaser layout (2026-10-01); the six-chapter
@@ -149,8 +150,10 @@ scope: ['Product card systems', 'Experiment design', 'PLP at scale'],
         { text: 'The focus was on Mall USPs', y: 0.24 },
       ] },
       { image: 'mall-case/v3-landing-new', label: 'v3', tone: 'new', notes: [
-        { text: 'The brand on every card', y: 0.4 },
-        { text: 'Brands as the hook, not USPs', y: 0.91 },
+        // on the logo wall in the header, where the screen explains Mall
+        // (2026-10-04: "point it to the section where mall is explained")
+        { text: 'Brands as the hook, not USPs', y: 0.24 },
+        { text: 'The brand on every card', y: 0.7 }, // the boAt card's name and price
       ] },
     ] },
     focus: 'Making “branded” **believable to shoppers who had never met a brand online** — then finding that the answer was **storytelling, not more UI.**',
