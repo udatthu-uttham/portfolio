@@ -39,5 +39,28 @@
       [1.533,"#7028fc","light","#8144fc","light"],
       [1.567,"#7028fc","light","#8248fc","light"]
     ]
+  },
+  "/media/plp/swipe.mp4": {
+    "frames": 270,
+    "edges": [
+      [0,"#fefefe","dark","#fefefe","dark"],
+      [2.633,"#fbfcfc","dark","#ffffff","dark"],
+      [2.667,"#ffffff","dark","#ffffff","dark"],
+      [2.733,"#e3e1d4","dark","#ffffff","dark"],
+      [2.767,"#f1f2e5","dark","#ffffff","dark"],
+      [2.8,"#f1f2e5","dark","#f1f2e5","dark"],
+      [2.833,"#ececdb","dark","#ececdb","dark"],
+      [2.967,"#e8eadb","dark","#e8eadb","dark"],
+      [3,"#e6e5d2","dark","#e6e5d2","dark"],
+      [3.033,"#e9e5d4","dark","#e9e5d4","dark"],
+      [3.067,"#e7e3d1","dark","#e7e3d1","dark"],
+      [3.9,"#e5e1cd","dark","#e5e1cd","dark"],
+      [7.767,"#e6e4d2","dark","#e6e4d2","dark"],
+      [7.867,"#eae9da","dark","#eae9da","dark"],
+      [7.933,"#ececdd","dark","#ececdd","dark"],
+      [8.067,"#f2f2e4","dark","#f2f2e4","dark"],
+      [8.1,"#f2f2e5","dark","#ffffff","dark"],
+      [8.133,"#fefefe","dark","#ffffff","dark"]
+    ]
   }
 }
