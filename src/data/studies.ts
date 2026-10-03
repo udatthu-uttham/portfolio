@@ -26,6 +26,10 @@ export type Study = {
   featured?: boolean; // on the board as a tile with media; everything else lists in the index rows below it
   deck?: { title: [string, string]; subtitle: string; byline: string; pdf: string; screen: string }; // slide 1 of the source deck: the case opens the way the deck does
   cover?: { image: string; caption: string }; // a study without a deck opens on one render, as a card on the pane
+  // The homepage tile's phones, standing in its glass well: one screen, or two
+  // side by side for a before → after. `image` is <folder>/<state> under
+  // src/assets (the case page's own screens); `tone: 'new'` marks the after.
+  tile?: { phones: { image: string; label?: string; tone?: 'new' }[] };
   chapters?: Chapter[]; // optional story below the hero; studies without it render as before
   teaser?: CaseTeaserData; // the teaser layout (case-teaser.ts): replaces hero, artboard and chapters on its case page
 };
@@ -45,6 +49,10 @@ year: '2026—',
 focus: 'Attribute chips and a second price row **spend** card height; staggering **reclaims** it. **Running them separately was the mistake** — the real question is **the exchange rate between them.**',
 scope: ['Product card systems', 'Experiment design', 'PLP at scale'],
     cover: { image: 'stagger-cover', caption: 'Left: every card padded to its row. Right: height follows content, and an extra card enters by the third row.' },
+    // the old feed and the new one, side by side (Uttham, 2026-10-03: "highlight
+    // the old and new in the first, basically from what to what, it should look
+    // like 2 phones showing both the variations")
+    tile: { phones: [{ image: 'plp/before', label: 'Before' }, { image: 'plp/after', label: 'After', tone: 'new' }] },
     // The case page is Uttham's teaser layout (2026-10-01); the six-chapter
     // "exchange rate" draft it replaces is in git history.
     teaser: plpCase,
@@ -63,6 +71,8 @@ scope: ['Product card systems', 'Experiment design', 'PLP at scale'],
       pdf: '/meesho-mall-case-study.pdf',
       screen: 'v3-landing',
     },
+    // the Mall landing page he supplied (2026-10-03), in the tile's phone
+    tile: { phones: [{ image: 'mall-case/v3-landing-new' }] },
     focus: 'Making “branded” **believable to shoppers who had never met a brand online** — then finding that the answer was **storytelling, not more UI.**',
     scope: ['Product strategy', 'Brand & identity', 'User research'],
     placeholder: 'Program visuals coming soon.',

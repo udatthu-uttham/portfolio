@@ -27,5 +27,6 @@ names above. The scan-order screens (`scan-*`) left with that section.
 Export phone screens portrait (about 9 : 19.5), at 2× or more (≥ 720px wide),
 with dummy data only — no Figma links or file keys on the page.
 
-Nothing is on hand: the earlier cut-outs came off on 2026-10-02 (Uttham: "the existing screens
-you have put are all bad for projects remove them and ask me I will give all of them").
+On hand (2026-10-03, from Uttham): `before.png` (the old feed) and `after.png` (the new feed).
+They also stand side by side, tagged Before and After, in the homepage tile (`tile` in
+`src/data/studies.ts`). The earlier cut-outs came off on 2026-10-02.

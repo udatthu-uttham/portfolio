@@ -211,7 +211,7 @@ CTA, view more should be the CTA for it").
 **Every card carries its own picture, on its own taped sheet** (Uttham,
 2026-10-01: "why we are having image of one card, we should have for both") —
 never one shared stage that several cards switch between; that was tried the
-same day and reversed. **No pill-and-year row on any homepage tile** (2026-10-01:
+same day and reversed. **A project tile's well holds the case page's own screens in phones** (`tile` in `studies.ts`, 2026-10-03): the product cards show the old and new feeds side by side, tagged Before and After (the after on amber) — "from what to what" — and Mall shows its landing page. Screens Uttham drops anywhere in the website folder are filed by state under `src/assets/plp/` or `src/assets/mall-case/` and wired in. **No pill-and-year row on any homepage tile** (2026-10-01:
 "we don't need this whole section") — the kicker and year stay in the data for
 the case pages, the guide pages and the case index. The old "two cards, never
 three" cap is lifted (2026-10-01: "lets change that rule to 3"); each section

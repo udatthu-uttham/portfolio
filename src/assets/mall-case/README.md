@@ -14,3 +14,6 @@ with dummy data only.
 
 The list of states and their card titles is in `src/data/mall-case.ts`
 (`screens.titles`).
+
+On hand (2026-10-03, from Uttham): `v3-landing-new.png` (the Mall landing page), which the
+homepage tile also shows in its phone.

@@ -25,6 +25,11 @@ const coverFiles = import.meta.glob<ImageMetadata>('../assets/{mall,cards}/*.{jp
 const covers: Record<string, ImageMetadata> = Object.fromEntries(
   Object.entries(coverFiles).map(([path, img]) => [path.split('/').pop()!.replace(/\.(jpg|png)$/, ''), img])
 );
+// The tiles' phones show the case pages' own screens, keyed <folder>/<state>.
+const tileFiles = import.meta.glob<ImageMetadata>('../assets/{plp,mall-case}/*.{png,jpg,jpeg,webp}', { eager: true, import: 'default' });
+const tileScreens: Record<string, ImageMetadata> = Object.fromEntries(
+  Object.entries(tileFiles).map(([path, img]) => [path.split('/').slice(-2).join('/').replace(/\.(png|jpe?g|webp)$/, ''), img])
+);
 
 // The replicate button hands over the guide's prompt verbatim, so the card and
 // the guide page can never drift apart.
@@ -151,6 +156,16 @@ const principles = [
                   <img class="tape" src="/assets/stickers/washi.svg" alt="" aria-hidden="true" />
                   <h3>{study.title}</h3>
                   <p class="tile__desc" set:html={rich(study.summary)} />
+                  {study.tile && study.tile.phones.every((p) => tileScreens[p.image]) ? (
+                    <div class="tile__media glass tile__media--phones">
+                      {study.tile.phones.map((p) => (
+                        <figure class="tile__phone">
+                          {p.label && <figcaption class:list={['tile__tag', { 'tile__tag--new': p.tone === 'new' }]}>{p.label}</figcaption>}
+                          <div class="tile__screen"><Image src={tileScreens[p.image]} alt="" widths={[240, 480]} sizes="240px" /></div>
+                        </figure>
+                      ))}
+                    </div>
+                  ) : (
                   <div class={`tile__media glass ${study.deck ? 'tile__media--deck' : ''}`}>
                     {study.deck && covers[study.deck.screen] ? (
                       <div class="tile__deck"><Image src={covers[study.deck.screen]} alt="" widths={[240, 480]} sizes="240px" /></div>
@@ -160,6 +175,7 @@ const principles = [
                       study.placeholder && <span class="tile__ph">{study.placeholder}</span>
                     )}
                   </div>
+                  )}
                   <span class="tile__go text-link">Read the case study <span class="tile__arr" aria-hidden="true">→</span></span>
                 </a>
               </div>
@@ -801,6 +817,55 @@ const principles = [
     box-shadow: var(--shadow-rest);
   }
   .tile__deck img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+  /* THE TILE'S PHONES: the case page's own screens, standing flush on the
+     well's bottom edge like the AI cards' phones — one, or two side by side for
+     a before → after (Uttham, 2026-10-03). Each is sized off the well's height;
+     the two share the width with a within-card gap. The tag sits on a phone's
+     top edge, half over the glass; the after's is on the amber note stock, so
+     the change reads at a glance. */
+  .tile__media--phones { align-items: end; gap: var(--space-4); padding: var(--space-6) var(--space-5) 0; }
+  .tile__phone {
+    position: relative;
+    height: 100%;
+    /* an aspect-ratio box may grow to fit its content; the screenshot inside
+       is far taller than the phone, so the box keeps its own ratio instead */
+    min-height: 0;
+    max-width: 52%;
+    aspect-ratio: 9 / 15;
+    margin: 0;
+  }
+  .tile__phone:not(:only-child) { max-width: calc(50% - var(--space-2)); }
+  .tile__screen {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border: 1px solid var(--line-1);
+    border-bottom: 0;
+    border-radius: 18px 18px 0 0;
+    background: #fff;
+    box-shadow: var(--shadow-rest);
+  }
+  .tile__screen img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+  .tile__tag {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    z-index: 1;
+    translate: -50% -50%;
+    padding: var(--space-1) var(--space-3);
+    border: 1px solid var(--line-1);
+    border-radius: var(--radius-pill);
+    background: var(--paper-1);
+    color: var(--ink-600);
+    font-size: var(--text-eyebrow);
+    font-weight: 500;
+    letter-spacing: var(--track-label);
+    line-height: var(--lh-heading);
+    text-transform: uppercase;
+    white-space: nowrap;
+    box-shadow: var(--shadow-rest);
+  }
+  .tile__tag--new { background: var(--amber-400); color: var(--ink-900); }
   /* a study without a deck shows its cover render as a card inside the glass well */
   .tile__cover { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: var(--radius-inset); box-shadow: 0 1px 2px rgba(22, 20, 14, 0.08); }
   .tile__media :global(svg),
