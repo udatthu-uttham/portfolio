@@ -1,5 +1,5 @@
 {
- "_note": "sha256(url).slice(0, 16) → picture, for every remote image URL the prototype bundle has carried. Written by scripts/proto-synthetic-images.mjs; the real addresses are deliberately not stored.",
+ "_note": "sha256(url).slice(0, 16) → picture, for every remote image URL the prototype bundle has carried. Written by scripts/proto-synthetic-images.mjs. Hashes rather than addresses, so the current files do not list them; the bundle committed before 2026-10-03 still holds them in git history.",
  "urls": {
   "001b5709a5b27d72": "catalog/kitchen-06.webp",
   "0079341656cf33a1": "catalog/menswear-01.webp",

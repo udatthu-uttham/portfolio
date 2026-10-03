@@ -127,13 +127,29 @@ Meesho's image server, plus placehold.co fallbacks and an Unsplash avatar.
 `scripts/proto-synthetic-images.mjs` now **points every one of those URLs at a
 drawn picture of the same kind** under `public/proto/feed-ux/catalog/` (shirts,
 co-ords, sarees, cookers … from `scripts/proto-catalog-art.mjs`: no photo,
-person, logo or lettering). The map in `scripts/proto-synthetic-images.json` is
-keyed by a hash of each URL, so the real addresses stay out of the repo and the
-same product always gets the same picture. **After any rebuild of the prototype
-from its source, run the script** (`--check` says whether a remote image is
-left); it renames the bundle, because `/proto/feed-ux/assets/*` is cached as
-immutable. Only the pictures changed: the product titles, prices and ids are
-still the build's own. Any file in `catalog/` can be swapped one for one for a
+person, logo or lettering), and **draws the home strip's round category tiles**
+(`categories/*.png`, which were photographs of models and products) under their
+own names. **A card shows its own kind**: a product its category files as
+something else — toys and under-bed storage under bedsheets, dresses, tops and
+trousers under co-ords, track pants and kurtas under shirts — is pictured by its
+title (`BY_TITLE`), per record, not per URL. The map in
+`scripts/proto-synthetic-images.json` is keyed by a hash of each URL, so the
+same product always gets the same picture and the current files do not list
+the addresses; **the bundle committed before 2026-10-03 still holds them in git
+history**.
+
+**The prototype's records are synthetic too** (2026-10-03 review).
+`scripts/proto-synthetic-data.mjs` **replaces the interview setup's four
+participants' orders with invented ones** of the same shape (the same product
+kinds spread differently, the same status mix, dates in the same weeks, round
+prices), **takes brand and seller names out of catalogue titles**, drops each
+record's link to the marketplace listing it was copied from (nothing rendered
+it), and fixes the My Orders routes, which carried the base path twice and left
+an order's detail page blank. Ids, prices and ratings are still the build's own.
+**After any rebuild of the prototype from its source, run both scripts, images
+then data** (`--check` on each says whether anything is left); each renames the
+bundle, because `/proto/feed-ux/assets/*` is cached as immutable, and a second
+run changes nothing. Any file in `catalog/` can be swapped one for one for a
 better picture of the same kind without touching the bundle.
 
 ## Spacing: the rhythm ladder
