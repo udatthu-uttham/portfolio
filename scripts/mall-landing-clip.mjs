@@ -10,9 +10,8 @@
 //     stop, alternate directions; each column travels exactly one loop);
 //   - the brand cards row peeks: it eases left 40 pt, holds, and a critically
 //     damped spring brings it back to exactly 0;
-//   - the page scrolls (a short drag, then iOS-style deceleration) until the
-//     Newly Launched row is on screen, that row peeks the same way, and the
-//     page scrolls back to the top.
+//   - no page scroll: below the first screen his Figma frame is an earlier
+//     iteration, so the clip stays on the screen he exported.
 //
 // WHAT IT IS MADE OF. The first screen is Uttham's own export,
 // src/assets/mall-case/v3-landing-new.png, so the clip opens and closes on it.
@@ -55,7 +54,7 @@
 // end, so the first and last frames stay the export's.
 //
 // Run:   node scripts/mall-landing-clip.mjs            (frames + still; --still-only, --at=1.2,3.5 to inspect)
-//        swift scripts/frames-to-mp4.swift .clip-work/frames public/media/mall-case/v3-landing-active.mp4
+//        swift scripts/frames-to-mp4.swift .clip-work/frames public/media/mall-case/v3-landing-active.mp4 30 650000
 // Writes .clip-work/frames/f0000.png… (720x1440), the poster
 // src/assets/mall-case/v3-landing-active.png (1080x2160, = first = last
 // frame), and .clip-work/check/ (a frame strip and the t=0 difference).
@@ -399,11 +398,14 @@ function scrollProg(t, t0, dur) {
   if (s < Td) return xr * (s / Td) ** 2;
   return xr + (1 - xr) * (1 - (1 - (s - Td) / Tm) ** k);
 }
-const P1 = 0.5, SC1 = { t0: 1.9, dur: 1.9 }, P2 = 3.9, SC2 = { t0: 5.3, dur: 1.9 };
+// No page scroll (2026-10-03): below its first screen his Figma frame is an
+// earlier iteration (white Mall pill, "High Quality"), not his final landing,
+// so the clip stays on the screen he exported — the logo wall loops and the
+// brand cards row peeks once. scrollProg and the second row's peek stay for a
+// rerun against his final frame, should he share it.
+const P1 = 1.0;
 function state(t) {
-  const sc = scrollProg(t, SC1.t0, SC1.dur) - scrollProg(t, SC2.t0, SC2.dur);
-  const sliver = smooth((t - 1.0) / 0.6) * (1 - smooth((t - 7.3) / 0.5));
-  return { t, scroll: sc * S_MAX, logo: logoProgress(t), peek1: peek(t, P1), peek2: peek(t, P2), sliver };
+  return { t, scroll: 0, logo: logoProgress(t), peek1: peek(t, P1), peek2: 0, sliver: 0 };
 }
 
 // ===================================================== 6. rendering a frame

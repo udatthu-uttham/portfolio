@@ -592,9 +592,12 @@ landing's clip (v3-landing-active) is composed, not exported** (Uttham,
 2026-10-03: "you can animate and scroll them"; "just a small peek, not full
 animation"): `scripts/mall-landing-clip.mjs` builds it from his
 `v3-landing-new.png` and his Figma layers, re-runnable once the layers listed
-in its header are exported into `.clip-work/` — the logo wall loops, **the two
-card rows only peek 40 pt and spring back, never carousel**, and it opens and
-closes on the export. The mini
+in its header are exported into `.clip-work/` — the logo wall loops, **the
+brand cards row only peeks 40 pt and springs back, never carousels**, and it
+opens and closes on the export. **It never scrolls the page**: below its first
+screen his Figma frame is an earlier iteration (white Mall pill, "High
+Quality"), not the landing he shipped, so the clip stays on the screen he
+exported. The mini
 player takes the same proportions, and its full-size dialog shows the screen
 whole: a page in a 1 : 2 window that scrolls (by wheel and trackpad too: the
 dialog is outside the smooth scroll, `data-lenis-prevent`, and the page behind
