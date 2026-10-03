@@ -121,6 +121,21 @@ are always made up. The visible "synthetic data" caption was **dropped on
 stands, the label on the card does not. Copy and framing live in
 `src/data/tools.ts`.
 
+**The realistic prototype's pictures are drawn and self-hosted** (2026-10-03).
+Its compiled bundle used to hotlink about 1,260 real product photos from
+Meesho's image server, plus placehold.co fallbacks and an Unsplash avatar.
+`scripts/proto-synthetic-images.mjs` now **points every one of those URLs at a
+drawn picture of the same kind** under `public/proto/feed-ux/catalog/` (shirts,
+co-ords, sarees, cookers … from `scripts/proto-catalog-art.mjs`: no photo,
+person, logo or lettering). The map in `scripts/proto-synthetic-images.json` is
+keyed by a hash of each URL, so the real addresses stay out of the repo and the
+same product always gets the same picture. **After any rebuild of the prototype
+from its source, run the script** (`--check` says whether a remote image is
+left); it renames the bundle, because `/proto/feed-ux/assets/*` is cached as
+immutable. Only the pictures changed: the product titles, prices and ids are
+still the build's own. Any file in `catalog/` can be swapped one for one for a
+better picture of the same kind without touching the bundle.
+
 ## Spacing: the rhythm ladder
 
 **Every vertical gap is one of four rungs, and each rung is a clear step under
@@ -354,8 +369,10 @@ newly registered domain). On-page SEO came in the same pass. What lives where:
   The CSP lists exactly what the build loads, so **a new embed, font, image host
   or analytics script needs adding to the CSP first, or it is silently
   blocked**. `'unsafe-inline'` stays because Astro inlines its small scripts
-  and the pages use style attributes. PDFs drop the CSP so the browser's viewer
-  opens them. The microphone stays allowed for this origin only, because the
+  and the pages use style attributes. **`img-src` is `'self' data:` and no
+  host** since 2026-10-03, when the prototype's catalogue went self-hosted (see
+  "AI Space previews"); Google Fonts stays for the prototype's DM Sans. PDFs
+  drop the CSP so the browser's viewer opens them. The microphone stays allowed for this origin only, because the
   prototype has voice search. **HSTS carries `preload`** (Uttham, 2026-10-03:
   he chose to preload now rather than wait a few clean weeks). The list is hard
   to leave — removal takes months — so **every subdomain of uttham.fyi must

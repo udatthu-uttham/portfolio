@@ -21,13 +21,15 @@
   # microphone stays open to this origin only, for the prototype's voice search.
   Permissions-Policy: accelerometer=(), camera=(), display-capture=(), geolocation=(), gyroscope=(), hid=(), magnetometer=(), microphone=(self), midi=(), payment=(), serial=(), usb=(), xr-spatial-tracking=(), browsing-topics=()
   # What the built site loads, and nothing else. 'unsafe-inline': Astro inlines
-  # its small page scripts and the pages carry style attributes. The image hosts
-  # are the prototype's catalogue pictures; Google Fonts is the prototype's DM
-  # Sans; cloudflareinsights is Cloudflare Web Analytics, if it is ever switched
-  # on. A new embed, font or image host needs adding here first. No
-  # upgrade-insecure-requests: nothing here is loaded over http, and HSTS
-  # already covers the pages.
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://images.meesho.com https://placehold.co https://images.unsplash.com; media-src 'self'; connect-src 'self' https://cloudflareinsights.com; frame-src 'self'; frame-ancestors 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; manifest-src 'self'; worker-src 'self'
+  # its small page scripts and the pages carry style attributes. Every image
+  # comes from this origin: the prototype's catalogue is drawn and self-hosted
+  # since 2026-10-03 (scripts/proto-synthetic-images.mjs), so Meesho's image
+  # server, placehold.co and Unsplash are off the list. Google Fonts is the
+  # prototype's DM Sans; cloudflareinsights is Cloudflare Web Analytics, if it
+  # is ever switched on. A new embed, font or image host needs adding here
+  # first. No upgrade-insecure-requests: nothing here is loaded over http, and
+  # HSTS already covers the pages.
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; media-src 'self'; connect-src 'self' https://cloudflareinsights.com; frame-src 'self'; frame-ancestors 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; manifest-src 'self'; worker-src 'self'
 
 # A PDF opens in the browser's own viewer, which a page policy can block.
 /*.pdf
