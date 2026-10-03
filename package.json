@@ -8,7 +8,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "case-password": "node scripts/set-case-password.mjs",
-    "clip-edges": "node scripts/clip-edges.mjs"
+    "clip-edges": "node scripts/clip-edges.mjs",
+    "plp-compose": "node scripts/plp-compose.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "3.7.0",
