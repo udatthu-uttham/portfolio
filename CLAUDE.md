@@ -650,7 +650,9 @@ Wi-Fi, signal and battery at the right) **above** the screenshot and a
 gesture-bar strip **below** it, both inside the bezel and never over the
 export's own top row (the exports carry no status bar of their own), and the
 power key and volume rocker both on the right edge. **The sticky card around
-it is glass, pinned by four bolts** (2026-10-03: "glass will have bolts"), and
+it is glass, pinned by four bolts** (2026-10-03: "glass will have bolts"; "make
+sure the bolts really dont come onto phone": the card's inset is the bolt's far
+edge plus a `--space-2`, so a bolt never meets the device), and
 **its title above the device is set at `--text-body-lg`, weight 600**, so it
 registers ("the title on the can be more bigger"). Every length is a share of the
 display's width, `--ct-device-screen` (`--ct-device-k-*`: bezel 0.03, status bar

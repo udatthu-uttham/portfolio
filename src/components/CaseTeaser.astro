@@ -2604,6 +2604,12 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
        sat above the last card on the left. The box's margin gives that half
        back, so the box stops that much lower and the card's foot lands on the
        column's foot, level with the last thing in the reading. */
+    /* THE BOLTS NEVER TOUCH THE PHONE (Uttham, 2026-10-03: "make sure the
+       bolts really dont come onto phone"): a bolt sits --bolt-inset in from
+       each corner and is --bolt-size across, so the glass card's inset is the
+       bolt's far edge plus a --space-2, on every side — the device, its notes
+       and the card's height budget all read this one length. */
+    .ct-panel--device { --card-padding: calc(var(--bolt-inset) + var(--bolt-size) + var(--space-2)); }
     .ct-panel--device {
       margin-bottom: calc(-1 * max(0px, (100dvh - var(--header-height) - 2 * var(--content-gap) - (var(--ct-device-screen) * var(--ct-device-k-tall) + 2 * var(--card-padding) + var(--ct-card-edge) + var(--ct-title-h) + var(--ct-foot-h))) / 2));
     }
