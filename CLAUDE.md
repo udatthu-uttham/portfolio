@@ -243,7 +243,22 @@ cards, I want the image to be more focussed, while the 3 CTAs retain their
 clickability"). The three notes sit in **one row at their own size** — two lines
 each, label and arrow then address, all three the widest one's width — and are
 **never stretched across the leftover glass**, and never narrower than their
-content (nothing wraps). They keep their tilt, hover lift and arrow. The photo is
+content (nothing wraps). They keep their tilt, hover lift and arrow.
+**Each note carries a copy control** (Uttham, 2026-10-03: "also give an copy
+option for all those cards"): a quiet copy glyph in `--ink-600` on the note's
+first line, one `--space-3` short of the arrow, that copies **the email address,
+the LinkedIn profile URL and the phone number as shown**, while the rest of the
+note still opens its link. **It is a sibling `<button>` of the link, never inside
+it**, so the `<li>` is the note: it holds the tilt and the hover lift, the paper
+and its control tilt and lift as one, and pressing the control never presses the
+note. **It adds no width and no line** — a 24px box with a 40×40 hit area that
+stays clear of the label and the arrow even on the narrowest note (162px, at a
+961px window); the note sizes were re-measured unchanged at 1440×900 to 375×812.
+On success the glyph cross-fades to a check (opacity, scale 0.25→1, blur 4px→0;
+reduced motion just swaps), the rail's small paper tooltip says "Copied" above
+it and a polite live region announces it, for 1.6s; **a copy that fails shows
+nothing**. The Clipboard API goes first, a hidden textarea second. Tab order is
+each link, then its copy control. The photo is
 **as big as the screen's height allows** (`--photo-w`: what the screen leaves under the header after `--space-6` of air, the footer and 412px of everything else, since 2026-10-02; it was budget − 295px, ÷ 1.23,
 150–340px), sized off the content budget, not its column, and sits one
 `--space-4` in from the panel's right edge so its tilted corner clears the bolts

@@ -300,40 +300,43 @@ const homeLd = {
           <h2 class="contact-panel__title on-glass">Let’s catch up</h2>
           <p class="contact-panel__sub">If our roads cross</p>
 
-          <!-- every way to reach me is a sticky note on the acrylic -->
+          <!-- every way to reach me is a sticky note on the acrylic. Each note
+               carries a copy control (Uttham, 2026-10-03: "give an copy option
+               for all those cards"): a sibling of the link, never inside it,
+               layered over the note's first line beside the arrow. The <li>
+               holds the tilt and the hover lift so the two ride together. -->
           <ul class="note-row">
-            <li>
-              <a class="note-link" style="--note-tilt: -3deg" href={`mailto:${contact.email}`}>
-                <span>email me</span>
-                <small>{contact.email}</small>
-                <span class="note-link__arrow" aria-hidden="true">→</span>
-              </a>
-            </li>
-            <li>
-              <a
-                class="note-link"
-                style="--note-tilt: 2deg"
-                href={contact.linkedin}
-                target="_blank"
-                rel="noopener">
-                <span>LinkedIn</span>
-                <small>{contact.linkedinHandle}</small>
-                <span class="note-link__arrow" aria-hidden="true">→</span>
-              </a>
-            </li>
-            <li>
-              <a
-                class="note-link"
-                style="--note-tilt: -1.5deg"
-                href={contact.whatsapp}
-                target="_blank"
-                rel="noopener">
-                <span>WhatsApp</span>
-                <small>{contact.phone}</small>
-                <span class="note-link__arrow" aria-hidden="true">→</span>
-              </a>
-            </li>
+            {
+              [
+                { tilt: '-3deg', label: 'email me', shown: contact.email, href: `mailto:${contact.email}`, external: false, copy: contact.email, what: 'email address', done: 'Email address copied' },
+                { tilt: '2deg', label: 'LinkedIn', shown: contact.linkedinHandle, href: contact.linkedin, external: true, copy: contact.linkedin, what: 'LinkedIn profile link', done: 'LinkedIn profile link copied' },
+                { tilt: '-1.5deg', label: 'WhatsApp', shown: contact.phone, href: contact.whatsapp, external: true, copy: contact.phone, what: 'WhatsApp number', done: 'WhatsApp number copied' },
+              ].map((n) => (
+                <li style={`--note-tilt: ${n.tilt}`}>
+                  <a
+                    class="note-link"
+                    href={n.href}
+                    target={n.external ? '_blank' : undefined}
+                    rel={n.external ? 'noopener' : undefined}>
+                    <span>{n.label}</span>
+                    <small>{n.shown}</small>
+                    <span class="note-link__arrow" aria-hidden="true">→</span>
+                  </a>
+                  <button type="button" class="note-copy" aria-label={`Copy ${n.what}`} data-copy={n.copy} data-copied-msg={n.done}>
+                    <svg class="note-copy__icon note-copy__icon--copy" viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                      <rect x="5.25" y="5.25" width="9.5" height="9.5" rx="1.75" />
+                      <path d="M10.75 5.25V3A1.75 1.75 0 0 0 9 1.25H3A1.75 1.75 0 0 0 1.25 3v6A1.75 1.75 0 0 0 3 10.75h2.25" />
+                    </svg>
+                    <svg class="note-copy__icon note-copy__icon--check" viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                      <path d="M3 8.5l3.25 3.25L13 4.75" />
+                    </svg>
+                    <span class="note-copy__tip" aria-hidden="true">Copied</span>
+                  </button>
+                </li>
+              ))
+            }
           </ul>
+          <p class="sr-only" aria-live="polite" data-copy-status></p>
         </div>
 
         <!-- me & the bike — every ride badge lives on this photo -->
@@ -367,6 +370,69 @@ const homeLd = {
     </footer>
   </main>
 </Base>
+
+<script>
+  // Contact notes: each note's copy control copies what the note points at —
+  // the email address, the LinkedIn profile link, the phone number as shown.
+  // The Clipboard API first; where it is missing or refused (an http preview,
+  // an older browser), a hidden textarea and execCommand. A copy that fails
+  // shows nothing, so "Copied" is never a lie.
+  const status = document.querySelector<HTMLElement>('[data-copy-status]');
+
+  const copyText = async (text: string): Promise<boolean> => {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch {
+      // selecting the textarea takes focus and the reader's selection; both
+      // go back to whatever held them at this moment (the reader may have
+      // tabbed on while the Clipboard API was refusing)
+      const focused = document.activeElement as HTMLElement | null;
+      const selection = document.getSelection();
+      const ranges = selection ? Array.from({ length: selection.rangeCount }, (_, i) => selection.getRangeAt(i)) : [];
+      const area = document.createElement('textarea');
+      area.value = text;
+      area.setAttribute('readonly', '');
+      area.setAttribute('aria-hidden', 'true');
+      area.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;opacity:0;pointer-events:none;';
+      document.body.append(area);
+      area.select();
+      let ok = false;
+      try {
+        ok = document.execCommand('copy');
+      } catch {
+        ok = false;
+      }
+      area.remove();
+      focused?.focus({ preventScroll: true });
+      if (selection) {
+        selection.removeAllRanges();
+        ranges.forEach((range) => selection.addRange(range));
+      }
+      return ok;
+    }
+  };
+
+  document.querySelectorAll<HTMLButtonElement>('.note-copy[data-copy]').forEach((btn) => {
+    let timer = 0;
+    btn.addEventListener('click', async () => {
+      const ok = await copyText(btn.dataset.copy ?? '');
+      if (!ok) return;
+      const msg = btn.dataset.copiedMsg ?? 'Copied';
+      btn.dataset.copied = '';
+      if (status) {
+        // cleared first, so a second copy of the same note is announced again
+        status.textContent = '';
+        window.setTimeout(() => (status.textContent = msg), 50);
+      }
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => {
+        delete btn.dataset.copied;
+        if (status?.textContent === msg) status.textContent = '';
+      }, 1600);
+    });
+  });
+</script>
 
 <style>
   /* ============================ shared layout ========================= */
@@ -1362,16 +1428,25 @@ const homeLd = {
     padding: 0;
   }
 
+  /* The <li> is the note: it holds the tilt and the hover lift, so the link (the
+     paper) and its copy control (layered over it) tilt and lift as one. It is
+     exactly the link's box, so the note looks and measures as it did when the
+     link carried the tilt itself. */
   .note-row li {
+    --note-tilt: -2deg;
+    position: relative;
     width: auto;
     min-width: 0;
+    rotate: var(--note-tilt);
+    transition:
+      rotate var(--dur-2) var(--ease-standard),
+      translate var(--dur-2) var(--ease-standard);
   }
 
   /* A note is two lines: the label with its arrow, then the address. The arrow
      rides the label's line rather than taking a third, so a note is an action
      you can see at a glance, not a card competing with the photo. */
   .note-link {
-    --note-tilt: -2deg;
     position: relative;
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
@@ -1388,12 +1463,8 @@ const homeLd = {
     font-size: var(--text-note);
     font-weight: 500;
     line-height: var(--lh-heading);
-    rotate: var(--note-tilt);
     box-shadow: var(--shadow-stuck);
-    transition:
-      rotate var(--dur-2) var(--ease-standard),
-      translate var(--dur-2) var(--ease-standard),
-      box-shadow var(--dur-2) var(--ease-standard);
+    transition: box-shadow var(--dur-2) var(--ease-standard);
   }
 
   .note-link:focus-visible {
@@ -1404,22 +1475,132 @@ const homeLd = {
   /* Hover: the note straightens, lifts and casts a deeper shadow — the
      original rule, restored on 2026-10-01 at Uttham's request ("the hover
      animations on these cards are also gone"). It had been retired with the
-     2026-09-20 no-hover-motion pass; this supersedes that for the notes. */
+     2026-09-20 no-hover-motion pass; this supersedes that for the notes.
+     It is the note's hover, not the link's, so moving onto the copy control
+     keeps the note lifted. */
   @media (hover: hover) and (pointer: fine) {
-    .note-link:hover {
+    .note-row li:hover {
       rotate: 0deg;
       translate: 0 var(--lift-y);
-      box-shadow: var(--shadow-lift);
     }
+    .note-row li:hover .note-link { box-shadow: var(--shadow-lift); }
   }
 
-  /* Pressed flat: tilt returns, lift gone, shadow shrinks. */
-  .note-link:active {
+  /* Pressed flat: tilt returns, lift gone, shadow shrinks — only when the link
+     is pressed; pressing the copy control leaves the note where it is. */
+  .note-row li:has(> .note-link:active) {
     rotate: var(--note-tilt);
     translate: 0 0;
+    transition-duration: var(--dur-1);
+    transition-timing-function: var(--ease-enter);
+  }
+  .note-link:active {
     box-shadow: var(--shadow-press);
     transition-duration: var(--dur-1);
     transition-timing-function: var(--ease-enter);
+  }
+
+  /* The copy control (Uttham, 2026-10-03: "give an copy option for all those
+     cards"). A quiet glyph on the note's first line, one --space-3 short of the
+     arrow, so the label, arrow and address stay where they were and no note
+     grows. Its box is one --space-5 (24px), centred on the first line (the
+     note's 1px edge, its --space-3 top pad, half the label's line); ::before
+     stretches the hit area to 40×40, which stays clear of the label and the
+     arrow even on the narrowest note (162px, a 961px window). The arrow is one
+     --text-body-lg wide, which is how far in from the right edge it sits. */
+  .note-copy {
+    position: absolute;
+    top: calc(1px + var(--space-3) + (var(--text-note) * var(--lh-heading) - var(--space-5)) / 2);
+    right: calc(1px + var(--space-4) + var(--text-body-lg) + var(--space-3));
+    display: grid;
+    place-items: center;
+    width: var(--space-5);
+    height: var(--space-5);
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-inset);
+    background: none;
+    color: var(--ink-600);
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    transition: color var(--dur-1) var(--ease-standard);
+  }
+  /* 40×40, biased up into the note's top pad so it stops at the address line */
+  .note-copy::before {
+    content: '';
+    position: absolute;
+    inset: calc(-1 * var(--space-3)) calc(-1 * var(--space-2)) calc(-1 * var(--space-1));
+  }
+  .note-copy:hover,
+  .note-copy:focus-visible,
+  .note-copy[data-copied] { color: var(--ink-900); }
+  .note-copy:focus-visible {
+    outline: 2px solid var(--amber-text);
+    outline-offset: 2px;
+  }
+
+  /* The glyph cross-fades to a check: both stay in the DOM, the check laid
+     over the copy glyph. Reduced motion keeps the fade (instant, global.css)
+     and drops the scale and blur below. */
+  .note-copy__icon {
+    display: block;
+    width: var(--space-4);
+    height: var(--space-4);
+    transition:
+      opacity var(--dur-2) var(--ease-standard),
+      scale var(--dur-2) var(--ease-standard),
+      filter var(--dur-2) var(--ease-standard);
+  }
+  .note-copy__icon--check {
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    opacity: 0;
+    scale: 0.25;
+    filter: blur(4px);
+  }
+  .note-copy[data-copied] .note-copy__icon--copy {
+    opacity: 0;
+    scale: 0.25;
+    filter: blur(4px);
+  }
+  .note-copy[data-copied] .note-copy__icon--check {
+    opacity: 1;
+    scale: 1;
+    filter: blur(0);
+  }
+
+  /* "Copied": the site's small paper tooltip (the case rail's), just above the
+     note's top edge over the control. It fades in place and never moves; the
+     words are for the eye, the live region speaks for the screen reader. */
+  .note-copy__tip {
+    position: absolute;
+    bottom: calc(100% + var(--space-1));
+    left: 50%;
+    translate: -50% 0;
+    padding: var(--space-1) var(--space-2);
+    background: var(--paper-1);
+    border: 1px solid var(--line-1);
+    border-radius: var(--radius-inset);
+    box-shadow: var(--shadow-rest);
+    color: var(--ink-900);
+    font-family: var(--font-paper);
+    font-size: var(--text-eyebrow);
+    font-weight: 500;
+    line-height: var(--lh-heading);
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity var(--dur-2) var(--ease-standard),
+      visibility var(--dur-2) var(--ease-standard);
+  }
+  .note-copy[data-copied] .note-copy__tip {
+    opacity: 1;
+    visibility: visible;
   }
 
   .note-link small {
@@ -1545,6 +1726,8 @@ const homeLd = {
 
   @media (prefers-reduced-motion: reduce) {
     .rv, .rv.is-in, .tile:active, .tile:hover .tile__arr { transform: none; }
-    .note-link:hover, .note-link:active { rotate: var(--note-tilt); translate: none; }
+    .note-row li:hover, .note-row li:has(> .note-link:active) { rotate: var(--note-tilt); translate: none; }
+    /* the copy glyph just swaps for the check: no scale, no blur */
+    .note-copy__icon, .note-copy[data-copied] .note-copy__icon { scale: 1; filter: none; }
   }
 </style>
