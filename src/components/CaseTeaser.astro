@@ -1561,8 +1561,17 @@ const boardWidths = (key: string) => [...new Set([480, 960, 1600].map((w) => Mat
     --ct-sub: max(var(--space-7), calc(var(--group-gap) * 4 / 3));
     /* heading → its text, one rung over --head-gap */
     --ct-head: var(--space-6);
-    /* paragraph → paragraph, sub-group heading → its rows */
+    /* paragraph → paragraph */
     --ct-para: var(--space-5);
+    /* A SUB-GROUP HEADING (or its lead line) → ITS ROWS: a within-group step,
+       at most a third of the --ct-sub above the heading, so a heading can only
+       belong to the block under it (Uttham, 2026-10-03: "the sectioning and
+       association is not clear, lets make them more obvious and clear") */
+    --ct-tie: var(--space-4);
+    /* the block of rows' common region: one faint band of the white sheet
+       stock on the board, the weakest container that groups them (no border,
+       no shadow — those belong to the cards) */
+    --ct-block-bg: color-mix(in oklab, var(--paper-1) 55%, transparent);
   }
 
   /* ---- hero: the case page's own entrance, the reference's content ---- */
@@ -1640,10 +1649,12 @@ const boardWidths = (key: string) => [...new Set([480, 960, 1600].map((w) => Mat
        text → a sub-group (rows, note, list, gate), and
        above a sub-group's heading              --ct-sub (48–64)
        heading → its text                       --ct-head (32)
-       sub-group heading → its rows; paragraph → paragraph   --ct-para (24)
-       row label → its line; inside a card                   --space-3 / --space-4
+       paragraph → paragraph                    --ct-para (24)
+       sub-group heading or its lead → its rows --ct-tie (16)
+       sub-group heading → its lead; row label → its line   --space-2 / --space-3
      Insets, apart from the stack: below the header --section-pad, row padding
-     --space-6, the gate card --card-padding. One rung up on 2026-10-02. */
+     --space-6, a block of rows and the gate card --card-padding. One rung up
+     on 2026-10-02; --ct-tie split off --ct-para on 2026-10-03. */
   .ct-layout { margin-top: var(--section-y); }
   .ct-story { display: grid; gap: var(--section-y); min-width: 0; }
   .ct-section, .ct-full { min-width: 0; }
@@ -1655,12 +1666,18 @@ const boardWidths = (key: string) => [...new Set([480, 960, 1600].map((w) => Mat
     line-height: var(--lh-heading);
     text-wrap: balance;
   }
+  /* THREE LEVELS, a clear step apart (2026-10-03): the section heading
+     (--text-h3, 26–34px) is at least 1.5× the sub-group heading (--text-body-lg,
+     17–20px) at every width, and the sub-group heading stands outside its rows'
+     band, over the rows' own 16–17px labels inside it. At --text-h4 the two
+     headings were 1.3× apart and read as one level. */
   h3 {
     margin: var(--ct-sub) 0 0;
-    font-size: var(--text-h4);
+    font-size: var(--text-body-lg);
     font-weight: 600;
     letter-spacing: var(--track-heading);
     line-height: var(--lh-heading);
+    text-wrap: balance;
   }
   .ct-body {
     max-width: 62ch;
@@ -1673,29 +1690,45 @@ const boardWidths = (key: string) => [...new Set([480, 960, 1600].map((w) => Mat
   .ct-body :global(.em) { color: var(--ink-900); font-weight: 600; }
   .ct-body :global(.em--lg) { font-size: 1.28em; line-height: 1.25; }
 
-  /* Ruled rows, the case index's dashed recipe: the label on its own line, the
-     line under it. The row being read takes an amber tick in the gutter —
-     colour only, nothing moves. */
+  /* A BLOCK OF ROWS IS ONE REGION (Uttham, 2026-10-03: "the divider at the
+     end of the last item?? the sectioning and association is not clear, lets
+     make them more obvious and clear"). The rows share one faint band of the
+     sheet stock (--ct-block-bg), inset --card-padding at the sides: the band's
+     edges say where the block starts and ends, so the dashed rule (the case
+     index's recipe) is drawn only BETWEEN rows — never above the first or
+     under the last, where it read as a divider closing the block against the
+     next heading. Two levels only: the section stays open paper, the block is
+     the one region inside it. Its heading sits outside, one --ct-tie over it
+     (a third or less of the --ct-sub above the heading), so it can only
+     belong to the band under it. Each row: the label on its own line, the
+     line under it. The row being read takes an amber bar on the band's left
+     edge — colour only, nothing moves. */
   h2 + .ct-body { margin-top: var(--ct-head); }
-  .ct-steps { margin: var(--ct-sub) 0 0; padding: 0; list-style: none; }
-  h3 + .ct-steps { margin-top: var(--ct-para); }
-  /* a sub-group's lead line belongs to its rows: heading → lead → rows all
-     at the within-group step, so the group reads as one block */
-  .ct-sublead + .ct-steps { margin-top: var(--ct-para); }
+  .ct-steps {
+    margin: var(--ct-sub) 0 0;
+    padding: 0 var(--card-padding);
+    list-style: none;
+    background: var(--ct-block-bg);
+    border-radius: var(--radius-sm);
+  }
+  /* the heading, its lead and its rows are one group: heading → lead a
+     --space-2, lead (or heading) → rows a --ct-tie */
+  h3 + .ct-sublead { margin-top: var(--space-2); }
+  h3 + .ct-steps,
+  .ct-sublead + .ct-steps { margin-top: var(--ct-tie); }
   .ct-step {
     position: relative;
     padding: var(--space-6) 0;
-    border-top: 1px dashed var(--line-mark);
     color: var(--ink-600);
     font-size: var(--text-body);
     line-height: var(--lh-body);
   }
-  .ct-step:last-child { border-bottom: 1px dashed var(--line-mark); }
+  .ct-step + .ct-step { border-top: 1px dashed var(--line-mark); }
   .ct-step b { display: block; margin-bottom: var(--space-3); color: var(--ink-900); font-weight: 600; }
   .ct-step::before {
     content: '';
     position: absolute;
-    left: calc(-1 * var(--space-4));
+    left: calc(-1 * var(--card-padding));
     top: var(--space-5);
     bottom: var(--space-5);
     width: 2px;
