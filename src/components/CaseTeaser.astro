@@ -349,7 +349,7 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
     </div>
 
     <aside class:list={['ct-panel', { 'ct-panel--live': live, 'ct-panel--device': !live, 'ct-panel--titled': titles && !live, 'ct-panel--visit': data.visit, 'ct-panel--notes': noted.length > 0 }]} aria-label={data.panelLabel ?? 'Preview'} data-case-panel data-map={JSON.stringify(stateFiles)} data-titles={titles && !live ? JSON.stringify(titles) : undefined}>
-      <div class="ct-pane">
+      <div class="ct-pane glass">
         {/* one line in a slot of its own height: a long title ends in an
             ellipsis and keeps its whole text as the element's title */}
         {titles && !live && <p class="ct-pane__title" data-pane-title aria-live="polite"></p>}
@@ -425,29 +425,21 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
                 </div>
               )}
               {noted.length > 0 && (
-                /* THE NOTES, outside the device on the card's paper: one set
-                   per screen, laid over the display's box so a note's `y` lands
-                   on the screen's own height, each note standing left of it with
-                   its arrow's tip on the screen's left edge. A set fades with
-                   its screen. Decoration: the screen's alt names its zones. */
+                /* THE NOTES, words outside the device, each line starting on
+                   the thing it names inside the screen: one set per screen,
+                   laid over the display's box so `y`/`ty` land on the screen's
+                   own height. A set fades with its screen. Decoration: the
+                   screen's alt names its zones. */
                 <div class="ct-annots" aria-hidden="true">
                   {noted.map((key) => (
                     <div class="ct-annots__set" data-notes-for={key}>
                       {notesFor(key).map((n) => (
-                        <span class="ct-annot" style={`--y: ${n.y}`}>
+                        <span class="ct-annot" style={`--x: ${n.x ?? 0.03}; --y: ${n.y}; --ty: ${n.ty ?? n.y};`}>
                           <span class="ct-annot__text">{n.text}</span>
-                          {/* the homepage tiles' arrow, drawn pointing left and
-                              mirrored here; drawn twice, a paper halo under the
-                              ink, so its tip still reads where it crosses the
-                              graphite bezel onto the screen */}
-                          <svg class="ct-annot__arrow" viewBox="0 0 44 22" fill="none">
-                            <g class="ct-annot__halo">
-                              <path d="M42 2.5c-5.5.5-11.6 1.5-17.6 5S10.6 15.8 3.5 20.5" />
-                              <path d="M11.4 21.3 3.5 20.5l2.3-7.6" />
-                            </g>
-                            <path d="M42 2.5c-5.5.5-11.6 1.5-17.6 5S10.6 15.8 3.5 20.5" />
-                            <path d="M11.4 21.3 3.5 20.5l2.3-7.6" />
-                          </svg>
+                          {/* the line starts on the thing it names, inside the
+                              screen (the dot), and runs out to the words */}
+                          <span class="ct-annot__line"></span>
+                          <span class="ct-annot__dot"></span>
                         </span>
                       ))}
                     </div>
@@ -659,8 +651,10 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
     const clipOf = (el: HTMLElement | null) => el?.querySelector<HTMLVideoElement>('video') ?? null;
     let seen = true;
     let pipOn = true;
+    // a pointer resting on a point's text or on the preview (freeze, below)
+    let frozen = false;
     const canCue = () => !still.matches && !document.hidden;
-    const canPlay = () => canCue() && seen && pipOn;
+    const canPlay = () => canCue() && seen && pipOn && !frozen;
     // a clip's file is fetched only once its row is near the reading, or its
     // screen is asked to play — never with reduced motion
     const load = (video: HTMLVideoElement) => {
@@ -1018,7 +1012,7 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
     };
     const plan = () => {
       stopBeat();
-      if (still.matches || document.hidden) return;
+      if (still.matches || document.hidden || frozen) return;
       const next = upcoming();
       if (!next) return;
       const now = performance.now();
@@ -1086,6 +1080,25 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
       list.addEventListener('focusin', hold);
       list.addEventListener('pointerleave', release);
       list.addEventListener('focusout', release);
+    });
+    // A pointer resting on a point's text or on the preview stops the
+    // animation (Uttham, 2026-10-03: "on hover of a point text or the preview
+    // stop the animation"): no beat moves on, even within a row's own screens,
+    // and a pan or a clip pauses where it is; all of it carries on from there
+    // when the pointer leaves. Mouse and pen only — a tap is not a rest.
+    const freeze = (on: boolean) => {
+      if (frozen === on) return;
+      frozen = on;
+      if (!on) stepAt = performance.now();
+      sync();
+      plan();
+    };
+    const resting = (event: PointerEvent) => event.pointerType === 'mouse' || event.pointerType === 'pen';
+    const rests = [...document.querySelectorAll<HTMLElement>('.ct-steps'), document.querySelector<HTMLElement>('[data-case-panel]')];
+    rests.forEach((el) => {
+      if (!el) return;
+      el.addEventListener('pointerover', (event) => { if (resting(event) && (event.target as HTMLElement).closest('[data-state], [data-case-panel]')) freeze(true); });
+      el.addEventListener('pointerleave', (event) => { if (resting(event)) freeze(false); });
     });
     document.addEventListener('visibilitychange', () => {
       if (!document.hidden) stepAt = performance.now();
@@ -1987,17 +2000,16 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
     text-transform: uppercase;
   }
 
-  /* ---- the phone, on a paper card (Uttham, 2026-10-01: "no need to use the
-     glass, use the card component, glass is only used when you want to keep
-     something between"). ---- */
+  /* ---- the phone, on a pane of glass (Uttham, 2026-10-03: "for phone
+     preview use glass background"; it stood on a paper card from 2026-10-01).
+     The .glass recipe (global.css) gives the sheen, rim and contact shadow;
+     the edge stays 1px, so the height budget's --ct-card-edge still holds. ---- */
   .ct-pane {
     position: relative;
     height: 100%;
     padding: var(--card-padding);
-    background: var(--paper-1);
-    border: 1px solid var(--line-1);
+    border: 1px solid var(--glass-edge);
     border-radius: var(--radius-sm);
-    box-shadow: var(--shadow-rest);
   }
 
   /* THE HANDSET'S PROPORTIONS (CaseDevice), as shares of its display's width,
@@ -2299,40 +2311,55 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
     transition: opacity var(--dur-2) var(--ease-exit);
   }
   .ct-annots__set.is-on { opacity: 1; transition: opacity var(--dur-4) var(--ease-enter); }
-  .ct-annot {
-    /* the arrow is 2em × 1em; its tip sits 0.16em in from its right end and
-       0.07em up from its foot (the tiles' drawing, mirrored) */
-    --tip-x: 0.16em;
-    --tip-y: 0.07em;
-    position: absolute;
-    right: calc(-1 * var(--tip-x) - 1px);
-    bottom: calc((1 - var(--y)) * 100% - var(--tip-y));
-    max-width: calc(100% + var(--tip-x));
-    display: flex;
-    align-items: flex-end;
-  }
-  /* the words stand on the arrow's tail (0.11em under its top), a hair clear
-     of it, so a note's words never touch the arrow of the note above */
+  /* Each note spans the notes' box; its words stand at `ty` against the
+     box's right side, a --ct-annot-gap clear of the device, and its line runs
+     from the words to a dot ON the thing it names, inside the screen, at
+     (`x` of the display's width, `y` of its height) — so the reader sees which
+     part is meant (Uttham, 2026-10-03: "the pointers should have the origins
+     from inside so it is easy to understand what point we are highlighting").
+     The words may sit higher or lower than their dot (`ty`), so close zones
+     still get room between their notes ("I want the spacing to be generous
+     here"); the line's length and angle come from hypot() and atan2(). The
+     line and dot carry a paper halo, so they read over a screen and the
+     graphite bezel alike. */
+  .ct-annots { --ct-annot-gap: 1.1em; --ct-annot-pad: 0.3em; }
+  .ct-annot { position: absolute; inset: 0; }
   .ct-annot__text {
-    min-width: 0;
-    margin: 0 0.15em 0.4em 0;
+    position: absolute;
+    right: var(--ct-annot-gap);
+    top: calc(var(--ty) * 100%);
+    max-width: calc(100% - var(--ct-annot-gap));
+    translate: 0 -55%;
     text-align: right;
     text-wrap: balance;
     rotate: -2deg;
   }
-  .ct-annot__arrow {
-    flex: none;
-    display: block;
-    width: 2em;
-    height: 1em;
-    scale: -1 1;
-    overflow: visible;
-    stroke: currentColor;
-    stroke-width: 1.6;
-    stroke-linecap: round;
-    stroke-linejoin: round;
+  .ct-annot__line {
+    --dx: calc(var(--ct-annot-gap) - var(--ct-annot-pad) + var(--x) * var(--ct-device-screen));
+    --dy: calc((var(--y) - var(--ty)) * var(--ct-device-screen) * 2);
+    position: absolute;
+    left: calc(100% - var(--ct-annot-gap) + var(--ct-annot-pad));
+    top: calc(var(--ty) * 100%);
+    width: hypot(var(--dx), var(--dy));
+    height: 1.5px;
+    margin-top: -0.75px;
+    border-radius: 1px;
+    background: currentColor;
+    box-shadow: 0 0 0 1.5px rgb(255 255 255 / 0.85);
+    transform-origin: 0 50%;
+    rotate: atan2(var(--dy), var(--dx));
   }
-  .ct-annot__halo { stroke: var(--paper-1); stroke-width: 4.4; }
+  .ct-annot__dot {
+    position: absolute;
+    left: calc(100% + var(--x) * var(--ct-device-screen));
+    top: calc(var(--y) * 100%);
+    width: 8px;
+    height: 8px;
+    margin: -4px 0 0 -4px;
+    border-radius: 50%;
+    background: currentColor;
+    box-shadow: 0 0 0 2px var(--paper-1), 0 1px 3px rgb(22 20 14 / 0.25);
+  }
   /* no column (it did not fit): no notes */
   @container ct-annots (width < 96px) {
     .ct-annot { display: none; }

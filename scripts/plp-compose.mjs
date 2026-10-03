@@ -249,34 +249,28 @@ const report = {};
   // keep the clean card at the board's own size too, for checking by eye
   // (not part of the page): run with --keep
   if (process.argv.includes('--keep')) await sharp(clean).toFile(`${BOARDS}/cleanup-card.png`);
-  // Large on the feed: the card at 1002px (×1.84 — the board renders it at the
-  // feed's own density, so on the page it is shown no larger than its pixels),
-  // 36px of feed either side, centred in the feed under the chrome.
-  const width = 1002;
+  // The card alone on the feed, no search bar or filter row (Uttham,
+  // 2026-10-03: "remove the search and filter bar"): 940px wide (×1.73 — the
+  // board renders it at the feed's own density, so on the page it is shown no
+  // larger than its pixels), 70px of feed either side, centred in the screen.
+  const width = 940;
   const big = await card(clean, { left: 0, top: 0, width: info.width, height: info.height }, width);
   const left = Math.round((W - width) / 2);
-  const top = Math.round(CHROME_H + (FOOT - CHROME_H - big.height) / 2);
-  await save(
-    'cleanup',
-    [
-      { input: await region(`${DIR}/after.png`, 0, 0, W, CHROME_H), left: 0, top: 0 },
-      { input: big.buf, left, top },
-      ...(await frame()),
-    ],
-    FEED
-  );
-  // each zone's middle on the board, from its dashed box
-  const zone = (y) => at(top + (y - box.top) * big.scale);
+  const top = Math.round(3 + (FOOT - 3 - big.height) / 2);
+  await save('cleanup', [{ input: big.buf, left, top }, ...(await frame())], FEED);
+  // where each note's line starts: on the element it names, or in the card's
+  // white margin just left of it (board coordinates), as shares of the screen
+  const pt = (x, y) => ({ x: ((left + (x - box.left) * big.scale) / W).toFixed(3), y: at(top + (y - box.top) * big.scale) });
   report.cleanup = {
     scale: big.scale.toFixed(3),
     cleared,
     mirrorOff,
     touching,
-    'Product comprehension (the picture, 268–812)': zone(540),
-    'Comprehension (the chips, 821–888)': zone(855),
-    'Price (price and timer, 893–1014)': zone(953),
-    'Quality (rating and Trusted, 1019–1092)': zone(1056),
-    'Fast programme (delivery, 1100–1143)': zone(1121),
+    'Product comprehension (on the left kurti)': pt(700, 540),
+    'Comprehension (left of the chips)': pt(638, 858),
+    'Price (left of the price)': pt(638, 926),
+    'Quality (left of the rating)': pt(638, 1057),
+    'Fast programme (left of the delivery line)': pt(638, 1124),
   };
 }
 

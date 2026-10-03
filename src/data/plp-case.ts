@@ -206,32 +206,34 @@ export const plpCase: CaseTeaserData = {
       after: 'The new card',
       cash: 'The cash-price row',
     },
-    // Handwritten notes beside the phone, as on the homepage tiles: each `y` is
-    // where its arrow's tip lands, as a fraction of that screen's height, read
-    // from the composed screen (scripts/plp-compose.mjs prints them). The
-    // framework's notes are the labels on his board, word for word ("Fast
-    // Program" in the site's spelling); the rest are DRAFT wording for Uttham,
-    // true to the screens, saying what the screen shows rather than repeating
-    // the row beside it. Priority order; no numbers.
+    // Handwritten notes beside the phone: each line STARTS ON the thing it
+    // names, inside the screen (Uttham, 2026-10-03: "the pointers should have
+    // the origins from inside so it is easy to understand what point we are
+    // highlighting"), at (x, y) as shares of that screen's width and height
+    // (scripts/plp-compose.mjs prints the framework's), and runs out to its
+    // words, which stand at `ty` in the notes column — spread out, so the
+    // spacing stays generous ("I want the spacing to be generous here"). The
+    // framework's words are the labels on his board ("Fast Program" in the
+    // site's spelling); the rest are DRAFT wording for Uttham. No numbers.
     notes: {
       cleanup: [
-        { text: 'Product comprehension', y: 0.426 }, // the picture
-        { text: 'Comprehension', y: 0.695 }, // the fact chips
-        { text: 'Price', y: 0.778 }, // price and the timer
-        { text: 'Quality', y: 0.866 }, // rating and the Trusted mark
-        { text: 'Fast programme', y: 0.921 }, // the delivery line
+        { text: 'Product comprehension', x: 0.19, y: 0.364, ty: 0.36 }, // on the picture
+        { text: 'Comprehension', x: 0.09, y: 0.619, ty: 0.56 }, // the fact chips
+        { text: 'Price', x: 0.09, y: 0.673, ty: 0.68 }, // price and the timer
+        { text: 'Quality', x: 0.09, y: 0.778, ty: 0.8 }, // rating and the Trusted mark
+        { text: 'Fast programme', x: 0.09, y: 0.832, ty: 0.92 }, // the delivery line
       ],
       titles: [
-        { text: 'The seller’s title', y: 0.41 }, // DRAFT: "Anarkali Kurti", first row
-        { text: 'Facts in its place', y: 0.759 }, // DRAFT: the Kurti · Cotton chips, second row
+        { text: 'The seller’s title', x: 0.03, y: 0.41 }, // DRAFT: "Anarkali Kurti", first row
+        { text: 'Facts in its place', x: 0.03, y: 0.759 }, // DRAFT: the Kurti · Cotton chips, second row
       ],
       list: [
-        { text: 'A row per product', y: 0.231 }, // DRAFT: the first row
-        { text: 'Facts beside the picture', y: 0.578 }, // DRAFT: the third row's chips
+        { text: 'A row per product', x: 0.03, y: 0.231 }, // DRAFT: the first row
+        { text: 'Facts beside the picture', x: 0.03, y: 0.578 }, // DRAFT: the third row's chips
       ],
       date: [
-        { text: 'Fast, with a day count', y: 0.782 }, // DRAFT: the kurti's delivery line
-        { text: 'None where it isn’t fast', y: 0.406 }, // DRAFT: the shirt above it, no delivery line
+        { text: 'Fast, with a day count', x: 0.03, y: 0.782 }, // DRAFT: the kurti's delivery line
+        { text: 'None where it isn’t fast', x: 0.03, y: 0.406 }, // DRAFT: the shirt above it, no delivery line
       ],
     },
   },

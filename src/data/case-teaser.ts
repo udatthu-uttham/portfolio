@@ -29,7 +29,10 @@ export type CaseSection = { state?: string; heading: string; blocks: CaseBlock[]
 // never a number; `y` is where its arrow's tip lands on the screen's left edge,
 // as a fraction of THAT screen's height (0 = top, 1 = bottom). The words stand
 // left of the arrow, on the card's paper, never over the screen.
-export type ScreenNote = { text: string; y: number };
+// A note beside the phone: its line starts ON the thing it names, inside the
+// screen, at (x, y), and runs out to its words, which stand at `ty` in the
+// notes column (shares of the screen's width and height; `ty` defaults to y).
+export type ScreenNote = { text: string; y: number; x?: number; ty?: number };
 
 export type Experiment = {
   state: string;

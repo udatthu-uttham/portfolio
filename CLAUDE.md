@@ -564,7 +564,10 @@ block of rows or steps plays as a slideshow** (2026-10-02: "the preview runs
 these 4 slideshows, accordingly the highlight changes in the left … in all the
 blocks"): once the reading reaches a block showing two or more different
 screens, the phone runs through them a beat (2.6s) each and the row it shows
-takes the highlight; hovering a row holds it; reduced motion keeps the
+takes the highlight; hovering a row holds it, and **a pointer resting on a
+point's text or on the preview stops the animation** (2026-10-03: "on hover of
+a point text or the preview stop the animation"): no beat moves on, a pan or a
+clip pauses where it is, and it all carries on when the pointer leaves; reduced motion keeps the
 scroll-driven pick, row by row inside a block too, and hover holds nothing
 there. **A row with several screens plays them in turn**
 (`screens.map` to a list — the Mall tab: its modal, then its PiP), the card's
@@ -765,22 +768,27 @@ list view without its grid control or variant labels; the winning date card
 among cards with no date. **Cards in a mobile grid**: the four title variants
 as the feed's own 2 × 2, at its column width, each at its own height, the feed
 carrying on below them. **The framework card inside the phone**, large on the
-feed under the app's search bar and filter row, its dashed zone boxes and
-labels gone (only the dash pixels are cleared; the timer pill's foot, hidden
-under one, is restored from its own top edge, mirrored). Each takes `after.png`'s
-search bar and filter row as its chrome, except the list, which has its own.
+feed with no search bar or filter row (2026-10-03: "remove the search and
+filter bar"), centred in the screen, its dashed zone boxes and labels gone (only
+the dash pixels are cleared; the timer pill's foot, hidden under one, is
+restored from its own top edge, mirrored). The title and date screens take
+`after.png`'s search bar and filter row as their chrome; the list has its own.
 Lanczos, never sharpened; the effective upscale on the page is ×1.5 for the
 title, date and list screens (the boards are 1× renders) and none for the
 framework card. **The words outside, as on the homepage**: handwritten notes
 (`screens.notes` in `src/data/plp-case.ts`, per screen file, `y` a share of
 that screen's height, priority order, no numbers), the tiles' Caveat in ink and
-the same hand-drawn arrow, on the card's paper **left of the device** — every
-one of these screens sets its content against its left edge, and that side
-faces the reading — each arrow's tip on the display's left edge at its `y`
-(measured within 0px of it, 1px inside the screen) and crossing the bezel on a
-paper halo, the words standing on the arrow's tail, so a note is about a line
-and a half tall and the framework's four rows, a little more than that apart,
-never collide. Never over the screen, never between the device and its title.
+on the card's glass **left of the device** — every one of these screens sets
+its content against its left edge, and that side faces the reading. **Each
+note's line starts inside the screen, on the thing it names** (Uttham,
+2026-10-03: "the pointers should have the origins from inside so it is easy to
+understand what point we are highlighting"): a dot at (`x`, `y`), shares of the
+display's width and height, on the element or in the card's margin just left of
+it, and a thin ink line on a paper halo from the dot out across the bezel to the
+words. **The words stand at `ty`** (default `y`), spread down the column so
+close zones still get generous room between their notes ("I want the spacing to
+be generous here"); the line takes its length and angle from `hypot()` and
+`atan2()`. Never words over the screen, never between the device and its title.
 The framework's notes are his labels word for word (Product comprehension,
 Comprehension, Price, Quality, Fast programme); the others are DRAFT wording,
 his to set. **The notes column is constant**: `--ct-notes-w`, 0.46 of the
@@ -794,13 +802,14 @@ the dialog show none. Measured 2026-10-03: card 480.7 × 720 / 395.7 × 596 at
 1440×900 / 1280×720 through every state of the teaser and the full study, the
 display 273 / 222 as before; the Mall page is unchanged.
 
-**Glass only where something sits between** (Uttham, 2026-10-01: "for the phone
-preview no need to use the glass, use the card component, glass is only used
-when you want to keep something between"). On the teaser pages the phone and the
-AI prompt panel stand on the paper card (`--paper-1`, `--line-1`, `--radius-sm`,
+**The phone preview stands on glass** (Uttham, 2026-10-03: "for phone preview
+use glass background"; "as we have phone we can ignore the background white
+card?? or put a glass card"). The sticky card is the site's `.glass` pane, its
+edge kept at 1px so the height budget holds; the mini player stays bare. The AI
+prompt panel stays on the paper card (`--paper-1`, `--line-1`, `--radius-sm`,
 `--shadow-rest`, `--card-padding`), the prompt in the sheet's recessed well
-(`--paper-2`); glass is for a pane with something tucked behind it, as the hero
-portrait is behind its slab.
+(`--paper-2`). (From 2026-10-01 the phone stood on paper: "glass is only used
+when you want to keep something between".)
 
 **The AI Space tool pages are one-pagers, not teasers** (Uttham, 2026-10-02:
 "for AI space cards, there is no need to have teaser, just a one pager only" —
