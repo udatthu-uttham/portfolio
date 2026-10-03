@@ -295,7 +295,7 @@ CTA, view more should be the CTA for it").
 **Every card carries its own picture, on its own taped sheet** (Uttham,
 2026-10-01: "why we are having image of one card, we should have for both") —
 never one shared stage that several cards switch between; that was tried the
-same day and reversed. **A project tile's well holds the case page's own screens in phones** (`tile` in `studies.ts`, 2026-10-03): the product cards show the old and new feeds side by side, whole, tagged Before and After (the after on amber) — "from what to what" — with a few handwritten notes on what changed, and Mall shows its landing page. Screens Uttham drops anywhere in the website folder are filed by state under `src/assets/plp/` or `src/assets/mall-case/` and wired in. **No pill-and-year row on any homepage tile** (2026-10-01:
+same day and reversed. **A project tile's well holds the case page's own screens in phones** (`tile` in `studies.ts`, 2026-10-03): the product cards show the old and new feeds side by side, whole, tagged Before and After (the after on amber) — "from what to what" — with a few handwritten notes on what changed, and Mall does the same with its v2 deck screen beside the v3 landing, tagged v2 and v3 (2026-10-03: "2 can do"). Screens Uttham drops anywhere in the website folder are filed by state under `src/assets/plp/` or `src/assets/mall-case/` and wired in. **No pill-and-year row on any homepage tile** (2026-10-01:
 "we don't need this whole section") — the kicker and year stay in the data for
 the case pages, the guide pages and the case index. The old "two cards, never
 three" cap is lifted (2026-10-01: "lets change that rule to 3"); each section
@@ -350,9 +350,10 @@ a screen, and **a well under 440px wide keeps only the "to"'s notes**, which is
 a tablet's two-up row, a phone and a small laptop; under 280px (a 320px phone)
 only its first, in a narrower column and hanging below its tip. **It is all
 static**: nothing in the well moves on hover; the tile keeps its tilt, border and
-arrow nudge, and the notes ride the tilt with the sheet. A case with one screen keeps one phone —
-Meesho Mall, until Uttham approves standing his v2 deck export beside the v3
-landing (the pair is written out, commented, in `studies.ts`).
+arrow nudge, and the notes ride the tilt with the sheet. A case with one screen keeps one phone;
+both cases have a pair today. **Keep a phone's notes about half a screen apart**
+(`y` 0.4 and 0.93 on the Mall "to"; 0.33 and 0.84 on the product cards'), or
+their words collide on a short tablet or laptop well.
 
 A tool sheet's well holds **one phone standing flush on the bottom edge and
 nothing else** — no step list, no page list, no caption beside it — and the phone

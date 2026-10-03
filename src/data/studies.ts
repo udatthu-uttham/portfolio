@@ -105,17 +105,25 @@ scope: ['Product card systems', 'Experiment design', 'PLP at scale'],
       pdf: '/meesho-mall-case-study.pdf',
       screen: 'v3-landing',
     },
-    // The Mall landing page he supplied (2026-10-03), in the tile's phone, whole.
-    // The v2 → v3 pair waits for Uttham's yes on standing his deck export as the
-    // "from"; until then the tile keeps one phone. Once he agrees:
-    //   tile: { phones: [
-    //     { image: 'mall/v2-plp-badge', label: 'v2', tone: 'old' },
-    //     { image: 'mall-case/v3-landing-new', label: 'v3', tone: 'new' },
-    //   ] },
-    // (v2: wordmark, "Branded products at best prices", logo tiles; v3: tick
-    // "Mall", "Original Brands, Top Quality", the logo wall — his "sell brands,
-    // not Mall".)
-    tile: { phones: [{ image: 'mall-case/v3-landing-new' }] },
+    // v2 → v3, from his deck export to the landing page he supplied (Uttham,
+    // 2026-10-03, on standing the v2 screen beside v3: "2 can do"). v2 sells
+    // Mall itself: the wordmark, "Branded products at best prices", its own
+    // promises; v3 sells the brands — the logo wall, the brand on every card,
+    // Mall shrunk to a tick (his "sell brands, not Mall"). DRAFT wording, for
+    // Uttham to rewrite. Each `y` is measured on the export: v2's
+    // "Original Brands · Direct From Company" strip at 0.31; v3's brand badge on
+    // the first card at 0.40 and the Mall tab's tick in its bottom bar at 0.93
+    // (the notes need about half a screen between them, or their words collide
+    // on a short tablet or laptop well).
+    tile: { phones: [
+      { image: 'mall/v2-plp-badge', label: 'v2', tone: 'old', notes: [
+        { text: 'Mall sells itself', y: 0.31 },
+      ] },
+      { image: 'mall-case/v3-landing-new', label: 'v3', tone: 'new', notes: [
+        { text: 'The brand on every card', y: 0.4 },
+        { text: 'Mall shrinks to a tick', y: 0.93 },
+      ] },
+    ] },
     focus: 'Making “branded” **believable to shoppers who had never met a brand online** — then finding that the answer was **storytelling, not more UI.**',
     scope: ['Product strategy', 'Brand & identity', 'User research'],
     placeholder: 'Program visuals coming soon.',
