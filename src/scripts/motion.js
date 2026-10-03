@@ -2,13 +2,16 @@
 // the header avatar's reveal — everything a page needs on top of its own CSS.
 // The hero's GSAP choreography and the magnetic sheets live in motion-hero.js,
 // loaded by the homepage alone, so the teaser pages never download GSAP
-// (perf pass 2026-10-02). Motion preferences can change while the page remains
-// open, so the loops are explicitly started/stopped instead of being decided
-// only at page load.
+// (perf pass 2026-10-02). The homepage's weak section snap rides this Lenis
+// instance from section-snap.js, and does nothing on a page without the hero.
+// Motion preferences can change while the page remains open, so the loops are
+// explicitly started/stopped instead of being decided only at page load.
 import Lenis from 'lenis';
+import { attachSectionSnap } from './section-snap.js';
 
 const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
 let lenis;
+let detachSnap;
 let rafId = 0;
 
 // Lenis's own example keeps a rAF alive for the life of the page. That wakes the
@@ -41,7 +44,12 @@ function pump(time) {
 function wake() {
   if (!lenis || motionPreference.matches) return;
   stillSince = 0;
-  if (!rafId) rafId = requestAnimationFrame(pump);
+  if (rafId) return;
+  // Lenis times each frame from the last one it saw, which for a parked loop
+  // is the moment it parked: the first frame would advance by the whole pause
+  // and land any animation at its end in one jump. Restart its clock instead.
+  lenis.time = 0;
+  rafId = requestAnimationFrame(pump);
 }
 
 function startSmoothScroll() {
@@ -66,10 +74,13 @@ function startSmoothScroll() {
     },
     { signal: wakeAbort.signal }
   );
+  detachSnap = attachSectionSnap(lenis, wake);
   wake();
 }
 
 function stopSmoothScroll() {
+  detachSnap?.();
+  detachSnap = undefined;
   if (rafId) cancelAnimationFrame(rafId);
   rafId = 0;
   stillSince = 0;

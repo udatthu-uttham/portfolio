@@ -80,6 +80,12 @@ durations (`--develop-in` / `--develop-out` / `--develop-shake`) are
 component-local on purpose, above the `--dur-*` ladder, because a develop is
 slower than any UI feedback; the values are in `docs/design-tokens.md`.
 
+**The homepage sections settle into view, weakly** (Uttham, 2026-10-03: "can we
+do a weak magnetic scroll of sorts to center these sections in viewports"): a
+wheel gesture resting within 18% of a screen of a section's nav landing (Contact:
+the page bottom) eases there, **never back past where the gesture began**; touch,
+keys, nav jumps, reduced motion and teaser pages never snap (`section-snap.js`).
+
 ## Images: never full-bleed inside a glass panel
 
 **An image or coloured cover sits as a card ON the pane, never filling it end to
