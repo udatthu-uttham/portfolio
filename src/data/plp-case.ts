@@ -186,7 +186,10 @@ export const plpCase: CaseTeaserData = {
     // as it is, similarly for framework the framework card should comeinside the
     // image, and the wordings outside"); the boards themselves stay in
     // src/assets/plp/boards/ as the script's source and are never shown raw
-    map: { stagger: 'after', cleanup: 'framework' },
+    map: { stagger: 'after', cleanup: 'framework', scroll: 'swipe' },
+    // Swipeable images as a composed clip (Uttham, 2026-10-03: "please mock by
+    // moving images … for other 1 or 2 products atleast"): scripts/plp-swipe-clip.mjs
+    videos: { swipe: '/media/plp/swipe.mp4' },
     alts: {
       before: 'The old product card',
       cleanup: 'The card framework: one product card, large on the feed, its zones running from the picture down through its fact chips, price and timer, rating and Trusted mark, to the Fast delivery line',
@@ -194,6 +197,7 @@ export const plpCase: CaseTeaserData = {
       stagger: 'A product feed with staggered columns: each card at its natural height',
       list: 'Earphones as list rows: each row a picture beside its fact chips, price, cash price and rating',
       scroll: 'A feed whose cards carry swipeable images, with the dots under each picture',
+      swipe: 'A feed whose cards carry swipeable images: three of them swipe their picture to another kurti and back, the dots under each picture following',
       bigimg: 'A fashion card with a taller 4:5 image',
       date: 'The new feed with a kurti that shows Fast and its day count at its foot, among cards with no delivery line',
       after: 'The new product card',
