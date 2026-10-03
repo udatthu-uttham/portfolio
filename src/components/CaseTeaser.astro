@@ -218,8 +218,9 @@ const boardWidths = (key: string) => [...new Set([480, 960, 1600].map((w) => Mat
 // homepage tiles have them (Uttham, 2026-10-03: "the framework card should
 // come inside the image, and the wordings outside as you did on home page"):
 // only on a phone screen, which fills the display, so a note's `y` is a share
-// of the display's height. A page with notes (ct-panel--notes) sets them in the
-// room the centred device leaves on its left, the same at every state.
+// of the display's height. They stand in the room the centred device leaves on
+// its left, reaching into the grid gutter, the same at every state; the device
+// is the same size as on a page without notes.
 const notesFor = (key: string) => (kindFor(key) === 'phone' ? data.screens?.notes?.[nameOf(key)] ?? [] : []);
 const noted = live ? [] : shots.filter((key) => notesFor(key).length);
 ---
@@ -369,7 +370,7 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
       )}
     </div>
 
-    <aside class:list={['ct-panel', { 'ct-panel--live': live, 'ct-panel--device': !live || livePhone, 'ct-panel--titled': (titles && !live) || callout, 'ct-panel--visit': data.visit, 'ct-panel--notes': noted.length > 0 }]} aria-label={data.panelLabel ?? 'Preview'} data-case-panel data-map={JSON.stringify(stateFiles)} data-titles={titles && !live ? JSON.stringify(titles) : undefined}>
+    <aside class:list={['ct-panel', { 'ct-panel--live': live, 'ct-panel--device': !live || livePhone, 'ct-panel--titled': (titles && !live) || callout, 'ct-panel--visit': data.visit }]} aria-label={data.panelLabel ?? 'Preview'} data-case-panel data-map={JSON.stringify(stateFiles)} data-titles={titles && !live ? JSON.stringify(titles) : undefined}>
       {/* THE PHONE STANDS ON THE PAGE ITSELF (Uttham, 2026-10-03: "Remove the
           glass behind the phone preview across"): no pane of glass, no bolts,
           no card behind it — the title, the handset and its notes, nothing
@@ -2571,20 +2572,25 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
      scale with the display (--ct-device-screen), so a note keeps its place
      against the screen at every size. Never over the screen, never between
      the device and the title.
-     THE PHONE STAYS CENTRED (Uttham, 2026-10-03: "so the phone preview always
-     stays and is center aligned horizontally"): the notes take the room the
-     centred device leaves on its left, inside the columns, and never push it
-     off centre. That room is one size per viewport, so no state changes it.
-     The notes show where it holds their longest word beside its line
-     (--ct-annot-need, in em of the notes' own type; the container query
-     below): a page with notes takes a device up to a tenth smaller than its
-     full size to make that room (1440×900 and wider), and below that keeps
-     the full device and drops the notes (1200px and narrower, tablets), as
-     the homepage's narrow wells drop theirs. */
+     THE PHONE STAYS CENTRED AND KEEPS ITS SIZE (Uttham, 2026-10-03: "so the
+     phone preview always stays and is center aligned horizontally"; "fixed
+     phone size I meant"): the device is exactly the size it is on a page
+     without notes, and the notes never push it off centre or shrink it. They
+     take the room the centred device leaves on its left and reach on past
+     the columns into the grid gutter, up to a --space-4 short of the reading
+     column's right edge (--ct-annot-reach): the rows' bands run that column's
+     full width, so that edge is where the reading ends, and nothing of the
+     notes ever stands over it. That room is one size per viewport, so no
+     state changes it. The notes' type is a share of the display's width, made
+     smaller where the room asks (to the longest word beside its line,
+     --ct-annot-need em of it), never under --ct-annot-floor; where even the
+     floor does not fit, the notes are off (the container query below:
+     1024×768 and tablets), as the homepage's narrow wells drop theirs. */
   .ct {
     --ct-annot-k: 0.072; /* the notes' type, as a share of the display's width */
-    --ct-annot-floor: 15px; /* …and never smaller than this */
+    --ct-annot-floor: 14px; /* …made smaller to fit, but never smaller than this */
     --ct-annot-need: 6.6; /* the notes' room, in em of that type: the longest word, its line and air */
+    --ct-annot-reach: calc(var(--grid-gap) - var(--space-4)); /* how far past the columns the room runs */
   }
   /* the display's width again, as a length: the notes' box is a container,
      and a cqw inside it would read the box, not the columns (it put every dot
@@ -2597,19 +2603,24 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
     initial-value: 0px;
   }
   .ct-pane { --ct-annot-screen: var(--ct-device-screen, 0px); }
-  /* the notes' box: the display's height, from the columns' left edge to the
-     display's left edge, over which the lines land */
+  /* the notes' box: the display's height, from --ct-annot-reach left of the
+     columns' left edge (a --space-4 clear of the reading) to the display's
+     left edge, over which the lines land. Its type is the display's share,
+     or what the box holds of the longest word if that is less, never under
+     the floor. (100cqw here reads the columns: the box is a container itself,
+     so its own lengths query the panel.) */
   .ct-annots {
+    --ct-annot-room: calc((100cqw - var(--ct-device-w)) / 2 + var(--ct-device-screen) * var(--ct-device-k-bezel) + var(--ct-annot-reach));
     position: absolute;
     top: calc(var(--ct-device-screen) * (var(--ct-device-k-bezel) + var(--ct-device-k-status)));
     right: calc(100% - var(--ct-device-screen) * var(--ct-device-k-bezel));
-    width: calc((100cqw - var(--ct-device-w)) / 2 + var(--ct-device-screen) * var(--ct-device-k-bezel));
+    width: var(--ct-annot-room);
     height: calc(var(--ct-device-screen) * 2);
     /* a container, so a box too narrow to hold the notes hides them */
     container: ct-annots / inline-size;
     color: var(--ink-900);
     font-family: var(--font-hand);
-    font-size: clamp(var(--ct-annot-floor), calc(var(--ct-device-screen) * var(--ct-annot-k)), 22px);
+    font-size: clamp(var(--ct-annot-floor), min(calc(var(--ct-device-screen) * var(--ct-annot-k)), calc(var(--ct-annot-room) / var(--ct-annot-need))), 22px);
     font-weight: 600;
     line-height: 1.15;
     pointer-events: none;
@@ -2969,19 +2980,8 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
       --ct-device-full: min(calc((100cqw - 2 * var(--space-1)) / var(--ct-device-k-wide)), var(--ct-device-tall));
       --ct-device-screen: var(--ct-device-full);
     }
-    /* A PAGE WITH NOTES makes their room left of the centred device (see THE
-       NOTES): the widest display that leaves the box --ct-annot-need em of the
-       notes' type, F. Where F is at least nine tenths of the full size N, the
-       device takes min(N, F) and the notes show; below that it keeps N and the
-       notes are off. round(down, F, 0.9 N) is 0 below that line and at least
-       0.9 N above it, so N - that x 1000 picks between the two; a browser
-       without round() keeps N, and drops the notes where they do not fit. */
-    @supports (width: round(down, 10px, 3px)) {
-      .ct-panel--notes {
-        --ct-notes-fit: min(calc(100cqw / (1 + 2 * var(--ct-annot-need) * var(--ct-annot-k))), calc(100cqw - 2 * var(--ct-annot-need) * var(--ct-annot-floor)));
-        --ct-device-screen: max(min(var(--ct-device-full), var(--ct-notes-fit)), calc(var(--ct-device-full) - round(down, var(--ct-notes-fit), 0.9 * var(--ct-device-full)) * 1000));
-      }
-    }
+    /* (A page with notes takes the same device: the notes find their room
+       beside it, in the gutter — see THE NOTES — and never shrink it.) */
     /* the title over the phone: its one-line slot and a within-card step */
     .ct-panel--titled { --ct-title-h: calc(var(--text-body-lg) * var(--lh-statement) + var(--space-4)); }
     /* the open link under the phone takes its line the same way: a within-card

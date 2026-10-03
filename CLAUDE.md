@@ -678,10 +678,10 @@ browser's tooltip), and the tick, its length and its accessible name (the whole
 heading) still say where the reader is. Measured 2026-10-03 on all four
 CaseTeaser pages (the two cases and both AI Space pages): no tooltip touches the
 card at any width from 768px up; at 1440 the longest titles keep ~117px, at 1280
-~90px (on the product cards, whose card carries the notes column, 1440×900 leaves
-57–71px — Problem, Strategy and Outcome whole, the page title off and named by
-the browser's tooltip — and 1280×720 or 1366×768 73–85px; re-measured
-2026-10-03), and **below ~1200px the centred card leaves the gutter too narrow for a
+~90px (on the product cards, whose device is Mall's size since 2026-10-04,
+Problem, Strategy and Outcome stand whole 102–107px clear of the device at
+1440×900 and 71–77px at 1280×720, and the page title is cut with its ellipsis
+8px clear), and **below ~1200px the centred card leaves the gutter too narrow for a
 word** (58px at 1024, 24px at 768), so only the ticks show there — on hover the
 browser's tooltip, on keyboard focus only the ring and the accessible name.
 Left-aligning the card in its columns at 900–1199px would hand the gutter its
@@ -816,12 +816,14 @@ still. **On a given
 viewport the device and its 1 : 2 display never change size**: the display's
 width is the columns (less a `--space-1` each side for the keys) or the block's
 tallest height over the handset's proportions, whichever binds, set once per
-viewport — and on a page with notes, up to a tenth less where that makes their
-room (below) — and no state, beat, clip, board or title enters the sum, so a
-short screen shrinks the device once, never per state. Measured 2026-10-03
-(after the glass came off) at 1440×900 / 1280×720 / 1024×768 / 768×1024: display
-269 / 219 / 248 / 224px wide on Mall and the prototype page (the product cards
-249 at 1440×900, for its notes; Resona, with no title slot, 288), the device
+viewport — **never the notes**: a page with notes takes exactly the device a page
+without them does (2026-10-04, "do whatever is correct"; this retires the
+device up to a tenth smaller that made the notes' room) — and no state, beat,
+clip, board or title enters the sum, so a short screen shrinks the device once,
+never per state. Measured 2026-10-04 at 1920×1080 / 1600×900 / 1440×900 /
+1366×768 / 1280×720 / 1024×768 / 768×1024: display 268.4 / 268.4 / 269 / 237.8 /
+219.1 / 248.3 / 224.1px wide on **both** case pages, equal to the tenth of a
+pixel (Resona, with no title slot, was 288 at 1440×900 on 2026-10-03), the device
 centred in its columns to the pixel, the same gap above the title as under the
 device while it sticks, and in the 112px mini player at 375×812; one size
 through every state and beat sampled.
@@ -978,18 +980,30 @@ be generous here"); the line takes its length and angle from `hypot()` and
 `atan2()`. Never words over the screen, never between the device and its title.
 The framework's notes are his labels word for word (Product comprehension,
 Comprehension, Price, Quality, Fast programme); the others are DRAFT wording,
-his to set. **The notes take the room the centred device leaves on its left,
-inside the columns, and never push the phone off centre** (Uttham, 2026-10-03:
-"so the phone preview always stays and is center aligned horizontally"; this
-retires the notes column that stood the card at its columns' left edge). That
-room is one size per viewport, so no state changes it; the notes show where it
-holds their longest word beside its line (`--ct-annot-need`, 6.6em of the notes'
-own type; a container query on the box at 6.5em). **A page with notes takes a
-device up to a tenth smaller than its full size to make that room**, and below
-that keeps the full device and drops the notes: on the product cards 1440×900
-(display 249 against 269; the box 118px), 1366×768 and 1280×720 (219, the full
-size) show them; 1024×768 and tablets drop them. A screen's notes fade with it;
-the mini player and the dialog show none.
+his to set. **The notes never move or shrink the phone** (Uttham, 2026-10-03:
+"so the phone preview always stays and is center aligned horizontally"; "fixed
+phone size I meant"; 2026-10-04, "do whatever is correct"): the device is
+centred in its columns at the size it has on Mall, and the notes take the room
+it leaves on its left **and reach on into the grid gutter, to one `--space-4`
+short of the reading column's right edge** (`--ct-annot-reach`, the gutter less
+`--space-4`) — the rows' bands run that column's full width, so that edge is
+where the reading ends, and no note ever stands over it. (This retires the
+2026-10-03 device up to a tenth smaller that made their room, and before it the
+notes column that stood the card at its columns' left edge.) That room is one
+size per viewport, so no state changes it. **The notes' type gives way before
+the phone does**: a share of the display's width (`--ct-annot-k`, 0.072), made
+smaller where the room holds less than the longest word beside its line
+(`--ct-annot-need`, 6.6em), never under `--ct-annot-floor` (14px); where even
+that does not fit, the notes are off (a container query on the box at 6.5em).
+Measured 2026-10-04 on the product cards: the notes show at 1920×1080, 1600×900
+and 1440×900 (17.7px type, the box 117px), 1366×768 (17.1px) and 1280×720
+(15.8px), and down to about 1200px wide on a laptop (14.4px at 1200×800);
+1024×768 (a 66px box) and tablets drop them. At every size the box stands
+exactly 16px clear of the reading's bands and the nearest letter 18–31px; every
+dot at its (`x`, `y`) to 0.01px and every line ending on its dot, so the
+framework's five dots still sit on the picture, the first chip's left end, the
+price's ₹, the rating pill's left end and the FAST mark. A screen's notes fade
+with it; the mini player and the dialog show none.
 
 **The phone preview stands on the page, with nothing behind it** (Uttham,
 2026-10-03: "Remove the glass behind the phone preview across"), on every teaser
