@@ -112,14 +112,15 @@ scope: ['Product card systems', 'Experiment design', 'PLP at scale'],
     // at best prices", its own promises — and keeps the brands to a thin strip
     // of logos; v3 sells the brands — the logo wall, the brand on every card,
     // Mall shrunk to a tick (his "sell brands, not Mall"). DRAFT wording, for
-    // Uttham to rewrite. Each `y` is measured on the export: v2's logo strip
-    // (Himalaya, WOW, mamaearth…) at 0.33; v3's brand badge on
+    // Uttham to rewrite, except v2's, which is his ("say the focus was on mall
+    // USPs"). Each `y` is measured on the export: v2's "Original Brands ·
+    // Direct From Company" row at 0.24; v3's brand badge on
     // the first card at 0.40 and the Mall tab's tick in its bottom bar at 0.93
     // (the notes need about half a screen between them, or their words collide
     // on a short tablet or laptop well).
     tile: { phones: [
       { image: 'mall-case/v2-landing', label: 'v2', tone: 'old', notes: [
-        { text: 'Brands in a thin strip', y: 0.33 },
+        { text: 'The focus was on Mall USPs', y: 0.24 },
       ] },
       { image: 'mall-case/v3-landing-new', label: 'v3', tone: 'new', notes: [
         { text: 'The brand on every card', y: 0.4 },
