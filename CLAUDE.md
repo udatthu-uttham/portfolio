@@ -336,7 +336,8 @@ newly registered domain). On-page SEO came in the same pass. What lives where:
   into it. Titles, descriptions, Open Graph, Twitter and JSON-LD are built in
   `src/lib/seo.ts` and printed by `src/layouts/Base.astro`, after the font
   preloads. **Descriptions are assembled from copy already on the site, never
-  written fresh**: the hero line on the homepage, title plus dek on a case page,
+  written fresh**: the hero line on the homepage, word for word (not recast to
+  carry his name or "Meesho"; the title does that), title plus dek on a case page,
   the guide's headline plus who uses the tool (its Value added line) on a tool
   page, or the card's line where that runs long. They are joined only while they fit
   155 characters, otherwise the shorter whole sentence is used, and the build
@@ -357,14 +358,22 @@ newly registered domain). On-page SEO came in the same pass. What lives where:
 - **The JSON-LD describes one person and his work.** Home carries a
   `ProfilePage` whose main entity is the `Person`: given and family name, the
   handles' order (`Udatthu Uttham`) as `alternateName`, `jobTitle` Design Lead,
-  `hasOccupation` (Design Lead; Product Designer; Senior Product Designer on Mall
-  2022–2023 as a dated `Role`), `worksFor` Meesho (meesho.com, its Wikipedia
+  `hasOccupation` (Design Lead; Product Designer, alternately Lead Product
+  Designer as the CV has it), `worksFor` Meesho (meesho.com, its Wikipedia
   page), `knowsAbout` only what the site shows him doing, `alumniOf` from the CV,
   LinkedIn and GitHub in `sameAs`. The `WebSite` gives `uttham.fyi` as its
   alternate name. **A case page is an `Article` about its subject and Meesho**,
-  with keywords from its topic and the study's scope; a tool page is a
-  `CreativeWork` about its subject; each has a two-step `BreadcrumbList`.
-  validator.schema.org reported no errors and no warnings on all five pages (2026-10-03).
+  with keywords from its topic and the study's scope, and **his role on that
+  work rides on the Article, never the Person**: its `creator` is a schema.org
+  `Role` around him, named from the page's Role fact, dated from its Timeline
+  when that is a span of years (Mall: Senior Product Designer, 2022–2023).
+  **The Person carries no dated titles**, because the Mall role overlaps the
+  CV's Lead Product Designer since April 2022, and two titles at one employer
+  for one period read as a contradiction (which title held in 2022–2023 is
+  Uttham's to confirm). `author` stays the plain Person, which is what Google
+  reads. A tool page is a `CreativeWork` about its subject; each has a
+  two-step `BreadcrumbList`. validator.schema.org reported no errors and no
+  warnings on all five pages (2026-10-03).
 - **What will and won't rank, honestly** (searched 2026-10-03, before the site
   was indexed): **his full name and "Udatthu" are winnable within weeks of
   indexing** — today only a ZoomInfo listing and dictionary pages answer them.
@@ -475,7 +484,11 @@ tall as the screen allows (`--ct-pane-h`, ≤720px) and the card is the phone pl
 one `--card-padding` all round, centred in its columns, so spare width falls
 outside the card. **The card is centred in the visible height under the header** (the sticky box is `100dvh` less the header and two gaps, so a tablet browser's sliding address bar never piles the spare height under the card; 2026-10-02: "less spacing on top than bottom"). **Reference boards are shown whole** (2026-10-03: "I will give reference image (figure out a way on how to place this)"): a screen wider than a phone (width/height > 0.62) drops the phone frame and the card widens to its whole column, the board contained on the paper at the phone's height; a block that holds any board keeps the card wide throughout, so the slideshow never makes it breathe. **The card carries a title above the phone** naming what it
 shows (`screens.titles`, one short line per state; a state that borrows an
-earlier screen borrows its title); the mini player on phones has none.
+earlier screen borrows its title); the mini player on phones has none. **A
+screen's alt and title are its file's own entry first**, then the first state
+showing it that has one, so a row that borrows another state's file can never
+blank them (Mall's v3-labels did, 2026-10-03); the build warns on a screen with
+no alt.
 
 **Glass only where something sits between** (Uttham, 2026-10-01: "for the phone
 preview no need to use the glass, use the card component, glass is only used

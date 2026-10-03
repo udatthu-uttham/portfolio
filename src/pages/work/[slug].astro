@@ -7,7 +7,7 @@ import CaseTeaser from '../../components/CaseTeaser.astro';
 import { Image } from 'astro:assets';
 import { studies } from '../../data/studies';
 import { rich } from '../../lib/rich';
-import { SITE, NAME, describe, ogCase, ogHome, workLd, caseSearch, searchTitle } from '../../lib/seo';
+import { SITE, NAME, describe, plain, ogCase, ogHome, workLd, caseSearch, searchTitle, type WorkRole } from '../../lib/seo';
 
 // Phone screens exported from the Mall Figma files and cards cropped from the deck, keyed by file name.
 const screenFiles = import.meta.glob<ImageMetadata>('../../assets/{mall,cards}/*.{jpg,png}', { eager: true, import: 'default' });
@@ -28,8 +28,16 @@ const hasArtwork = Boolean(study.deck || study.cover);
 // caseSearch); a study without an entry keeps "<study> case study — Uttham
 // Udatthu". The description is the page's own title and dek (or the study
 // summary for a case without a teaser), joined while it fits in 155. The
-// JSON-LD is an Article about the study's subject and Meesho.
+// JSON-LD is an Article about the study's subject and Meesho, and carries his
+// role on the work from the page's own facts: Role, with Timeline's years when
+// it is a span ("2022–2023"; "Six months" gives no dates).
 const search = caseSearch[study.slug];
+const fact = (label: string) => study.teaser?.facts.find((f) => f.label === label)?.value;
+const years = plain(fact('Timeline') ?? '').match(/^(\d{4})\s*[–-]\s*(\d{4})$/);
+const roleFact = fact('Role');
+const role: WorkRole | undefined = roleFact
+  ? { name: plain(roleFact), ...(years && { start: years[1], end: years[2] }) }
+  : undefined;
 const seoTitle = search ? searchTitle(search) : `${study.title} case study — ${NAME}`;
 const seoDescription = study.teaser ? describe(study.teaser.title, study.teaser.dek) : describe(study.summary);
 const seoImage = ogCase[study.slug] ?? ogHome;
@@ -43,6 +51,7 @@ const caseLd = workLd({
   image: new URL(seoImage.src, SITE).href,
   about: search?.about ?? study.title,
   keywords: [...(search?.keywords ?? []), ...study.scope],
+  role,
 });
 ---
 

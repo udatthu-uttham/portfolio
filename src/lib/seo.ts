@@ -57,16 +57,19 @@ export const ogCase: Record<string, OgImage> = {
 // employer; case and tool titles carry the employer-plus-topic long tail. Every
 // term is TRUE and on the site: "design lead" is the hero; "Product Designer"
 // is his title in the CV the hero links (Lead Product Designer, Meesho, since
-// 2022) and his role on Mall (Senior Product Designer, 2022–2023); the pod of
-// five is the product cards' Role fact. "Design manager" is NOT his title, so
-// nothing here claims it — only visible copy he chooses could (see CLAUDE.md,
-// "Domain trust"). No meta keywords (Google ignores them) and no hidden text.
+// 2022) and his role on Mall (Senior Product Designer, 2022–2023, which the
+// Mall Article carries, not the Person: see workLd); the pod of five is the
+// product cards' Role fact. "Design manager" is NOT his title, so nothing here
+// claims it — only visible copy he chooses could (see CLAUDE.md, "Domain
+// trust"). No meta keywords (Google ignores them) and no hidden text.
 //
-// The homepage: name, role, employer in the title; the hero's own two
-// sentences in the description, the first in the third person so it can carry
-// the name, plus "at Meesho".
+// The homepage: name, role, employer in the title; the description is the
+// hero's lead, word for word. It is his copy ("Uttham's copy is Uttham's"), so
+// it is not recast in the third person or given "at Meesho" to carry search
+// terms: the title already carries them. Keep it in step with the hero in
+// src/pages/index.astro.
 export const homeTitle = `${NAME} — Design Lead and Product Designer at Meesho`;
-export const homeDescription = `${NAME}, design lead, systems thinker and builder at Meesho. I run the signals at the busy intersections where user needs cross business goals.`;
+export const homeDescription = 'I’m a design lead, systems thinker and builder. I run the signals at the busy intersections where user needs cross business goals.';
 
 // A case or tool page's search terms. `query` leads the title as a searcher
 // would type it; `role` is what he was on that work, added after the name when
@@ -145,16 +148,12 @@ export const person = {
     { '@type': 'Occupation', name: 'Design Lead', description: 'Strategy and design lead for a pod of five at Meesho' },
     // the CV: "Meesho — Lead Product Designer (Apr 2022 – Present)"
     { '@type': 'Occupation', name: 'Product Designer', alternateName: 'Lead Product Designer' },
-    // a past role carries its dates on a Role (schema.org, hasOccupation): the
-    // Mall case's Role and Timeline facts and its deck's subtitle
-    {
-      '@type': 'Role',
-      roleName: 'Senior Product Designer',
-      startDate: '2022',
-      endDate: '2023',
-      description: 'Meesho Mall: product and design strategy for brand discovery at national scale',
-      hasOccupation: { '@type': 'Occupation', name: 'Product Designer' },
-    },
+    // No dated job titles here. The Mall case's Role fact (Senior Product
+    // Designer, 2022–2023) overlaps the CV's Lead Product Designer since Apr
+    // 2022, and one Person with two titles at one employer for one period reads
+    // as a contradiction to anything building a profile from it. A case's role
+    // is his role on that work, so it rides on the case's Article (workLd,
+    // `role`) instead.
   ],
   knowsAbout: [
     'Product design',
@@ -181,7 +180,12 @@ const author = { '@type': 'Person', '@id': personId, name: NAME, url: `${SITE}/`
 
 // A case study (an Article) or a tool page (a CreativeWork): the work, by the
 // Person, about its topic and the employer, with a two-step trail back to the
-// homepage.
+// homepage. A case's `role` is the page's own Role fact (and its Timeline, when
+// that is a span of years): what he was on that work. It qualifies `creator`
+// as a schema.org Role around the same Person, so the Person keeps one current
+// set of titles; `author` stays the plain Person, which is what Google reads
+// for an Article.
+export type WorkRole = { name: string; start?: string; end?: string };
 export const workLd = (p: {
   url: string;
   name: string;
@@ -191,6 +195,7 @@ export const workLd = (p: {
   type?: 'Article' | 'CreativeWork';
   about?: string;
   keywords?: string[];
+  role?: WorkRole;
 }) => ({
   '@context': 'https://schema.org',
   '@graph': [
@@ -215,7 +220,15 @@ export const workLd = (p: {
       }),
       ...(p.keywords?.length && { keywords: [...new Set(p.keywords)].join(', ') }),
       author,
-      creator: author,
+      creator: p.role
+        ? {
+            '@type': 'Role',
+            roleName: p.role.name,
+            ...(p.role.start && { startDate: p.role.start }),
+            ...(p.role.end && { endDate: p.role.end }),
+            creator: author,
+          }
+        : author,
       isPartOf: { '@id': `${SITE}/#website` },
     },
     {

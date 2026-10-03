@@ -55,9 +55,26 @@ if (data.screens && !live) {
   }
 }
 const shots = [...new Set(Object.values(stateToShot))];
+// What a screen file shows, from a record keyed by state (alts, titles): the
+// file's own entry first, under its own name, unless a state of that name
+// shows a different file; else the first state in reading order that shows
+// it and has an entry. Reading only the first state left a borrowed file
+// blank: Mall's v3-labels row borrows v3-pill and comes first, so the purple
+// tick screen had no alt and its row no card title (fixed 2026-10-03).
+const forScreen = (record: Record<string, string> | undefined, key: string) => {
+  if (!record) return undefined;
+  const file = key.split('/').pop()!;
+  if (record[file] && (stateToShot[file] ?? key) === key) return record[file];
+  return Object.keys(stateToShot)
+    .filter((s) => stateToShot[s] === key)
+    .map((s) => record[s])
+    .find(Boolean);
+};
 const altFor = (key: string) => {
-  const state = Object.keys(stateToShot).find((s) => stateToShot[s] === key)!;
-  return data.screens?.alts[state] ?? '';
+  const alt = forScreen(data.screens?.alts, key);
+  // every screen is a content image: say so at build time if one has no words
+  if (!alt) console.warn(`[case] ${key}: no alt text in screens.alts`);
+  return alt ?? '';
 };
 const dev = import.meta.env.DEV;
 const back = data.back ?? { href: '/#work', label: '← All projects' };
@@ -94,18 +111,15 @@ if (data.gate && data.experiments?.length && !rail) {
   marks.push({ id: 'full-title', title: 'The full case study', full: true });
   data.experiments.forEach((e) => marks.push({ id: idFor(e.title), title: e.title, sub: true, full: true }));
 }
-// the title on the card over the phone: per screen, from the first state that
-// shows it, so a state that borrows an earlier screen borrows its title too
+// the title on the card over the phone: per screen, as its alt is found
+// (forScreen), so a state that borrows an earlier screen borrows its title too
 const titles = data.screens?.titles;
 // A screen is a phone screen (tall) or a reference board (landscape or square,
 // e.g. an annotated framework). A board is shown whole on a widened card,
 // never cropped into the phone (Uttham, 2026-10-03: "I will give reference
 // image (figure out a way on how to place this)").
 const kindFor = (key: string) => (library[key].width / library[key].height > 0.62 ? 'board' : 'phone');
-const titleFor = (key: string) => {
-  const state = Object.keys(stateToShot).find((s) => stateToShot[s] === key);
-  return state ? titles?.[state] : undefined;
-};
+const titleFor = (key: string) => forScreen(titles, key);
 ---
 
 <div class="ct">
