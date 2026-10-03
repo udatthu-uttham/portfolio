@@ -20,10 +20,7 @@
 //
 // CATALOGUE IS MOCK (locked 2026-09-20): the products, prices and ratings in the
 // sandbox are stand-ins that read like the real thing. No Meesho business
-// figures appear here or anywhere on the page. Its product pictures are drawn,
-// not photographed, and load from its own folder (2026-10-03,
-// scripts/proto-synthetic-images.mjs), so the frame fetches nothing from
-// Meesho's image server.
+// figures appear here or anywhere on the page.
 interface Props {
   src: string; // the running build
   fill?: boolean; // fill the frame it is given (the teaser's phone) instead of drawing its own
@@ -72,20 +69,17 @@ const { src, fill = false, interactive = false } = Astro.props;
   });
 
   // The app's own small icons load at once. Every image in the build is lazy,
-  // which keeps the hundreds of product pictures from loading before anyone
-  // scrolls to them — but a lazy icon in the fixed bottom bar could be left
-  // unloaded (2026-10-02: a blank space over "My Orders"). Icons only; the
-  // product pictures stay lazy. They are local too since 2026-10-03 (the drawn
-  // catalogue under /proto/feed-ux/catalog/), so they are named out here, or
-  // every picture in the feed would load with the card.
+  // which keeps the hundreds of hotlinked product photos from swamping the
+  // image CDN — but a lazy icon in the fixed bottom bar could be left unloaded
+  // (2026-10-02: a blank space over "My Orders"). Local files only; the product
+  // photos stay lazy.
   document.querySelectorAll<HTMLIFrameElement>('.pp__frame').forEach((frame) => {
     const eager = () => {
       const doc = frame.contentDocument;
       if (!doc?.body) return;
       const wake = (root: ParentNode) =>
         root.querySelectorAll<HTMLImageElement>('img[loading="lazy"]').forEach((img) => {
-          const src = img.getAttribute('src') ?? '';
-          if (src.startsWith('/proto/') && !src.startsWith('/proto/feed-ux/catalog/')) img.loading = 'eager';
+          if ((img.getAttribute('src') ?? '').startsWith('/proto/')) img.loading = 'eager';
         });
       wake(doc);
       new MutationObserver(() => wake(doc)).observe(doc.body, { childList: true, subtree: true });
