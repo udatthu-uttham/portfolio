@@ -1,24 +1,27 @@
-// What colour a phone screen's edge is, from a band of its pixels — shared by
-// the build (src/lib/screen-edges.ts reads each export with sharp) and the
-// browser (CaseTeaser's script reads a playing clip's frames), so a still and
-// a clip settle on the same answer.
+// What colour a phone screen's edge is, from a band of its pixels: the build
+// reads each export with it (src/lib/screen-edges.ts), and scripts/clip-edges.mjs
+// each frame of a clip, so a still and a clip settle on the same answer.
 //
 // The case pages' phone mock draws a status bar above the screen and a home
 // strip under it, inside the bezel (Uttham, 2026-10-03: "create a realisitic
 // phone mock that renders this"), so the island and the clock never sit over
 // the export's own top row. Each strip takes the colour of the screen edge it
 // meets, as an app's own status bar does, and device and screenshot read as
-// one screen.
+// one screen. A clip's colours are read the same way from its frames, once,
+// by scripts/clip-edges.mjs (never from a <canvas> in the browser, which reads
+// Chromium's video darker than a Mac shows it).
 //
 // An edge's colour is the most common one along the band (quantised to 32
 // levels a channel, then averaged within that level), not the band's mean: a
 // white bottom nav with one purple tab in it is white.
 
 export type Ink = 'dark' | 'light';
-export type Edge = { top: string; topInk: Ink; foot: string; footInk: Ink };
+// topShare / footShare: how much of the edge its colour covers (1 is flat); a
+// screen shorter than the display is anchored to its busy edge by them
+export type Edge = { top: string; topInk: Ink; foot: string; footInk: Ink; topShare?: number; footShare?: number };
 export type Band = { rgb: number[]; share: number };
 
-export const WHITE_EDGE: Edge = { top: '#ffffff', topInk: 'dark', foot: '#ffffff', footInk: 'dark' };
+export const WHITE_EDGE: Edge = { top: '#ffffff', topInk: 'dark', foot: '#ffffff', footInk: 'dark', topShare: 1, footShare: 1 };
 // an edge whose commonest colour covers less than this share of it is busy
 const BUSY = 0.5;
 // --ink-900, the dark the strips' clock and glyphs take on a light edge
@@ -71,5 +74,6 @@ export const modeOf = (data: ArrayLike<number>, channels: number): Band => {
 export const edgesOf = (head: Band, tail: Band): Edge => {
   const top = head.rgb;
   const foot = tail.share >= BUSY ? tail.rgb : head.rgb;
-  return { top: toHex(top), topInk: inkOn(top), foot: toHex(foot), footInk: inkOn(foot) };
+  const share = (band: Band) => Math.round(band.share * 100) / 100;
+  return { top: toHex(top), topInk: inkOn(top), foot: toHex(foot), footInk: inkOn(foot), topShare: share(head), footShare: share(tail) };
 };

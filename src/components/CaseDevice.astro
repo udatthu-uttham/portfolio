@@ -13,8 +13,9 @@
 // arrow) with no status bar of their own, so an island laid over them would
 // hide it. Each strip takes the colour of the screen edge it meets (the
 // caller sets --ct-device-top / --ct-device-foot and data-top-ink /
-// data-foot-ink on this element; src/lib/edge-colour.ts), as an app's own
-// status bar does, so strip and screen read as one display.
+// data-foot-ink on this element, and data-following while a clip drives them
+// frame by frame; src/lib/edge-colour.ts), as an app's own status bar does, so
+// strip and screen read as one display.
 //
 // The size comes from one length the caller sets, --ct-device-screen: the
 // display's width. Everything else is a proportion of it (--ct-device-k-*, on
@@ -84,7 +85,11 @@ const { class: className, ...rest } = Astro.props;
        lighter, the keys the band's own metal */
     --ct-device-body: var(--ink-900);
     --ct-device-frame: color-mix(in oklab, var(--ink-900) 70%, var(--ink-400));
-    --ct-device-key: max(1px, calc(var(--ct-device-screen) * 0.009));
+    /* the band's width, and each key's: the band plus at least a pixel, so a
+       key always stands proud of the band, even at the mini player's 112px
+       (both had clamped to 1px there, the key hidden under the band) */
+    --ct-device-ring: max(1px, calc(var(--ct-device-screen) * 0.005));
+    --ct-device-key: calc(var(--ct-device-ring) + max(1px, calc(var(--ct-device-screen) * 0.009)));
     /* the strips' colours until the caller sets the screen's own (inline) */
     --ct-device-top: var(--paper-1);
     --ct-device-foot: var(--paper-1);
@@ -98,7 +103,7 @@ const { class: className, ...rest } = Astro.props;
     /* depth from layered shadows, not a border: the metal band as a hairline
        ring, its inner highlight, then the paper's own rest and lift shadows */
     box-shadow:
-      0 0 0 max(1px, calc(var(--ct-device-screen) * 0.005)) var(--ct-device-frame),
+      0 0 0 var(--ct-device-ring) var(--ct-device-frame),
       inset 0 0 0 1px color-mix(in oklab, var(--paper-1) 9%, transparent),
       var(--shadow-rest),
       var(--shadow-lift);
@@ -159,6 +164,9 @@ const { class: className, ...rest } = Astro.props;
     color: var(--ink-900);
     transition: background-color var(--dur-2) var(--ease-standard), color var(--dur-2) var(--ease-standard);
   }
+  /* while a clip drives them, a colour lands on the frame that brings it */
+  .ct-device[data-following] .ct-device__status,
+  .ct-device[data-following] .ct-device__home { transition: none; }
   .ct-device__status {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);

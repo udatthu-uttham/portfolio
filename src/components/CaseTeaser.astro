@@ -23,6 +23,7 @@ import CaseDevice from './CaseDevice.astro';
 import { rich } from '../lib/rich';
 import { screenEdges } from '../lib/screen-edges';
 import type { Edge } from '../lib/edge-colour';
+import clipEdges from '../data/clip-edges.json';
 import { CASE_PASSWORD_SHA256 } from '../data/case-gate';
 import type { CaseTeaserData } from '../data/case-teaser';
 
@@ -144,9 +145,9 @@ const kindFor = (key: string) => (1 / ratioOf(key) > 0.62 ? 'board' : 'phone');
 // crop them abruptly making its content gone (this is for all images you are
 // using)"). How a screen fits that display:
 //   fit — a 1 : 2 screen fills it to the pixel; a shorter one (the 9 : 16
-//         order confirmation) fits its width, centred, and the display above
-//         and below it takes the screen's own top and bottom edge colours, so
-//         it reads as one screen rather than one with bars
+//         order confirmation) fits its width and the display around it takes
+//         the screen's own top and bottom edge colours, so it reads as one
+//         screen rather than one with bars (anchorFor, below, says where)
 //   pan — a page capture taller than the display (a whole home feed) stands
 //         at its width and pans down and back; with reduced motion it scrolls
 //         by hand instead
@@ -172,9 +173,39 @@ const phones = shots.filter((key) => kindFor(key) === 'phone');
 const boards = shots.filter((key) => kindFor(key) === 'board');
 // each phone screen's top and bottom edge colour, read from the export at
 // build time (src/lib/screen-edges.ts): the status bar and home strip take
-// them, and so does the display above and below a screen shorter than it
+// them, and so does the display around a screen shorter than it
 const edges: Record<string, Edge> = {};
 for (const key of phones) edges[key] = await screenEdges((library[key] as ImageMetadata & { fsPath?: string }).fsPath);
+// WHERE A SHORTER SCREEN STANDS in the display: centred, unless one of its
+// edges is patterned and the other flat — then it stands against the patterned
+// edge and all the fill falls on the flat one, where it is the same colour as
+// the screen and leaves no seam. The order confirmation's top is a field of
+// stars (its commonest colour covers ~57% of it) over a flat purple foot:
+// centred, the stars stopped in a hard line ~30px under the status bar, on a
+// band of flat purple that read as a picture laid on purple; set to the top,
+// its header meets the status bar the way an app's does and its foot runs on
+// into the fill (2026-10-03, review of the handset).
+const FLAT = 0.9; // an edge whose commonest colour covers this much is flat
+const anchorFor = (key: string) => {
+  const edge = edges[key];
+  if (fitFor(key) !== 'fit' || ratioOf(key) > SCREEN * 0.99 || !edge) return undefined;
+  const top = (edge.topShare ?? 1) >= FLAT;
+  const foot = (edge.footShare ?? 1) >= FLAT;
+  return top === foot ? undefined : top ? 'bottom' : 'top';
+};
+// A CLIP'S STRIPS FOLLOW ITS FRAMES from a timeline read once, frame by frame,
+// with the stills' own rule (scripts/clip-edges.mjs → src/data/clip-edges.json:
+// [seconds, top, top ink, foot, foot ink] at each moment the edges change), not
+// from a canvas in the browser, which reads Chromium's video darker than a Mac
+// shows it. A clip missing from the file keeps its still's colours throughout.
+const timelines = clipEdges as Record<string, { frames: number; edges: [number, string, string, string, string][] }>;
+const edgesOfClip = (key: string) => {
+  const src = videoFor(key);
+  if (!src) return undefined;
+  const timeline = timelines[src]?.edges;
+  if (!timeline?.length) console.warn(`[case] ${src}: no colour timeline in src/data/clip-edges.json (npm run clip-edges); its strips keep the still's colours`);
+  return timeline?.length ? JSON.stringify(timeline) : undefined;
+};
 // a board is shown at most the device's width on the card, and whole in the
 // enlarged view: its sources stop at the export's own width
 const boardWidths = (key: string) => [...new Set([480, 960, 1600].map((w) => Math.min(w, library[key].width)))];
@@ -335,8 +366,8 @@ const boardWidths = (key: string) => [...new Set([480, 960, 1600].map((w) => Mat
                     // above and below it is its own edges
                     const edge = edges[key];
                     const meta = {
-                      'data-screen': key, 'data-title': titleFor(key), 'data-kind': 'phone', 'data-ratio': ratioOf(key).toFixed(4), 'data-fit': fitFor(key),
-                      'data-top': edge.top, 'data-top-ink': edge.topInk, 'data-foot': edge.foot, 'data-foot-ink': edge.footInk,
+                      'data-screen': key, 'data-title': titleFor(key), 'data-kind': 'phone', 'data-ratio': ratioOf(key).toFixed(4), 'data-fit': fitFor(key), 'data-anchor': anchorFor(key),
+                      'data-top': edge.top, 'data-top-ink': edge.topInk, 'data-foot': edge.foot, 'data-foot-ink': edge.footInk, 'data-edges': edgesOfClip(key),
                       style: `--ct-fill-top: ${edge.top}; --ct-fill-foot: ${edge.foot}`,
                     };
                     const loading = i < 2 ? 'eager' : 'lazy';
@@ -447,14 +478,17 @@ const boardWidths = (key: string) => [...new Set([480, 960, 1600].map((w) => Mat
 </div>
 
 <script>
-  import { edgesOf, modeOf, type Edge } from '../lib/edge-colour';
+  import type { Edge } from '../lib/edge-colour';
 
   // ---- the device's strips take the screen's edge colours -----------------
   // A still's are read at build time (data-top / data-foot on the screen). A
   // clip's change as it plays — the splash opens on white and fills with
-  // purple — so while one plays the strips follow its frames, read here from a
-  // few rows along each edge (the build's own rule, src/lib/edge-colour.ts),
-  // about ten times a second; once it has played they settle on its still's.
+  // purple — so a clip carries its timeline (data-edges, read frame by frame
+  // at build time: scripts/clip-edges.mjs), and while it plays the strips take
+  // the colours of the frame on show; once it has played they settle on its
+  // still's. Never read from a canvas here: Chromium hands a canvas the video
+  // darker than a Mac shows it, which left the strips a shade off the screen
+  // for the whole clip (2026-10-03).
   const tint = (device: HTMLElement | null, edge: Partial<Edge> | null) => {
     if (!device || !edge?.top || !edge.foot) return;
     device.style.setProperty('--ct-device-top', edge.top);
@@ -468,45 +502,56 @@ const boardWidths = (key: string) => [...new Set([480, 960, 1600].map((w) => Mat
     foot: screen.dataset.foot,
     footInk: screen.dataset.footInk as Edge['footInk'],
   });
-  const probe = document.createElement('canvas');
-  const probeCtx = probe.getContext('2d', { willReadFrequently: true });
-  const frameEdge = (video: HTMLVideoElement): Edge | null => {
-    const w = video.videoWidth;
-    const h = video.videoHeight;
-    if (!probeCtx || !w || !h || video.readyState < 2) return null;
-    const cols = 48;
-    const side = w * 0.04;
-    const band = Math.max(2, Math.round(h * 0.004));
-    probe.width = cols;
-    probe.height = 2;
-    try {
-      probeCtx.drawImage(video, side, 1, w - 2 * side, band, 0, 0, cols, 1);
-      probeCtx.drawImage(video, side, h - 1 - band, w - 2 * side, band, 0, 1, cols, 1);
-      const data = probeCtx.getImageData(0, 0, cols, 2).data;
-      return edgesOf(modeOf(data.subarray(0, cols * 4), 4), modeOf(data.subarray(cols * 4), 4));
-    } catch {
-      return null; // a frame the browser will not hand over: the still's colours stay
+  // a clip screen's timeline: [seconds, top, top ink, foot, foot ink] at each
+  // moment its edges change; null for a still, or a clip with none
+  type Moment = [number, string, Edge['topInk'], string, Edge['footInk']];
+  const timelines = new WeakMap<HTMLElement, Moment[] | null>();
+  const timelineOf = (screen: HTMLElement) => {
+    if (!timelines.has(screen)) {
+      let moments: Moment[] | null = null;
+      try { moments = screen.dataset.edges ? JSON.parse(screen.dataset.edges) : null; } catch { /* none */ }
+      timelines.set(screen, moments?.length ? moments : null);
     }
+    return timelines.get(screen) ?? null;
   };
-  // follow a playing clip's frames while `keep` holds; a newer call replaces
-  // an older one on the same device
+  // the edges of the frame at `time`: the last moment at or before it (a
+  // frame's presentation time can land a hair before the moment it opens)
+  const edgeAt = (screen: HTMLElement, time: number): Edge | null => {
+    const moments = timelineOf(screen);
+    if (!moments) return null;
+    let at = moments[0];
+    for (const moment of moments) {
+      if (moment[0] <= time + 0.005) at = moment;
+      else break;
+    }
+    return { top: at[1], topInk: at[2], foot: at[3], footInk: at[4] };
+  };
+  // While a clip plays, the strips follow it frame by frame, with no easing
+  // of their own (data-following), so a colour arrives on the frame that
+  // brings it; a newer call replaces an older one on the same device.
   const followers = new WeakMap<HTMLElement, number>();
-  const follow = (device: HTMLElement | null, video: HTMLVideoElement, keep: () => boolean) => {
-    if (!device) return;
+  const follow = (device: HTMLElement | null, screen: HTMLElement, video: HTMLVideoElement, keep: () => boolean) => {
+    if (!device || !timelineOf(screen)) return;
     const token = (followers.get(device) ?? 0) + 1;
     followers.set(device, token);
-    let last = 0;
-    const step = (now: number) => {
-      if (followers.get(device) !== token || !keep()) return;
-      if (now - last > 90) { last = now; tint(device, frameEdge(video)); }
+    device.dataset.following = '';
+    const step = (time: number) => {
+      if (followers.get(device) !== token) return;
+      if (!keep()) { delete device.dataset.following; return; }
+      tint(device, edgeAt(screen, time));
       schedule();
     };
     const schedule = () => {
-      if ('requestVideoFrameCallback' in video) video.requestVideoFrameCallback(step);
-      else requestAnimationFrame(step);
+      if ('requestVideoFrameCallback' in video) video.requestVideoFrameCallback((_, frame) => step(frame.mediaTime));
+      else requestAnimationFrame(() => step(video.currentTime));
     };
-    tint(device, frameEdge(video));
+    tint(device, edgeAt(screen, video.currentTime));
     schedule();
+  };
+  const unfollow = (device: HTMLElement | null) => {
+    if (!device) return;
+    followers.set(device, (followers.get(device) ?? 0) + 1);
+    delete device.dataset.following;
   };
 
   // ---- the phone follows the reading -------------------------------------
@@ -592,6 +637,7 @@ const boardWidths = (key: string) => [...new Set([480, 960, 1600].map((w) => Mat
       el.classList.add('is-ended');
       clipOf(el)?.pause();
       if (el === shown) {
+        unfollow(device);
         tint(device, edgeOf(el));
         plan();
       }
@@ -600,7 +646,7 @@ const boardWidths = (key: string) => [...new Set([480, 960, 1600].map((w) => Mat
     const followClip = (el: HTMLElement) => {
       const video = clipOf(el);
       if (!video || el !== shown || !el.classList.contains('is-cued') || ended.has(el)) return;
-      follow(device, video, () => el === shown && !ended.has(el) && !video.paused);
+      follow(device, el, video, () => el === shown && !ended.has(el) && !video.paused);
     };
     // A CLIP NEVER OPENS ON ITS STILL. The still is its ending (the order
     // confirmation's is the confirmed screen), so showing it first would give
@@ -806,11 +852,12 @@ const boardWidths = (key: string) => [...new Set([480, 960, 1600].map((w) => Mat
       panel.classList.toggle('is-board', board);
       // an empty phone is the device's own white, not the last screen's colours
       if (!screen) tint(device, { top: 'var(--paper-1)', topInk: 'dark', foot: 'var(--paper-1)', footInk: 'dark' });
-      if (!screen || board) return;
+      if (!screen || board) { unfollow(device); return; }
       // a clip that is running, or cued on its first frame, gives its frame's
       // colours; anything else its export's
       const video = clipOf(screen);
-      const live = video && screen.classList.contains('is-cued') && !ended.has(screen) ? frameEdge(video) : null;
+      const live = video && screen.classList.contains('is-cued') && !ended.has(screen) ? edgeAt(screen, video.currentTime) : null;
+      if (!live) unfollow(device);
       tint(device, live ?? edgeOf(screen));
     };
     const swap = (next: HTMLElement | null) => {
@@ -1201,6 +1248,10 @@ const boardWidths = (key: string) => [...new Set([480, 960, 1600].map((w) => Mat
           // a page capture's own proportion: the dialog's handset grows as
           // tall as a real one (19.5 : 9, in the style) to show more of it
           zoom.style.setProperty('--ct-zoom-page-r', on.dataset.ratio ?? '2');
+          // a shorter screen stands where it does on the card (anchorFor)
+          if (on.dataset.anchor) zoom.dataset.anchor = on.dataset.anchor;
+          else delete zoom.dataset.anchor;
+          unfollow(zoomDevice);
           tint(zoomDevice, edgeOf(on));
           zoom.classList.toggle('is-pan', pan);
           const clip = on.querySelector<HTMLVideoElement>('video');
@@ -1213,13 +1264,15 @@ const boardWidths = (key: string) => [...new Set([480, 960, 1600].map((w) => Mat
             video.setAttribute('aria-hidden', 'true');
             zoom.classList.add('is-cueing');
             const begun = () => zoom.classList.remove('is-cueing');
-            const fail = () => { video.pause(); video.classList.add('is-ended'); begun(); tint(zoomDevice, edgeOf(on)); };
-            video.addEventListener('loadeddata', () => { begun(); tint(zoomDevice, frameEdge(video)); }, { once: true });
+            const rest = () => { unfollow(zoomDevice); tint(zoomDevice, edgeOf(on)); };
+            const fail = () => { video.pause(); video.classList.add('is-ended'); begun(); rest(); };
+            // the clip's first frame, and from then on the frame on show
+            video.addEventListener('loadeddata', () => { begun(); tint(zoomDevice, edgeAt(on, 0) ?? edgeOf(on)); }, { once: true });
             video.addEventListener('playing', () => {
               begun();
-              follow(zoomDevice, video, () => zoom.open && video.isConnected && !video.paused);
+              follow(zoomDevice, on, video, () => zoom.open && video.isConnected && !video.paused);
             });
-            video.addEventListener('ended', () => { video.classList.add('is-ended'); tint(zoomDevice, edgeOf(on)); });
+            video.addEventListener('ended', () => { video.classList.add('is-ended'); rest(); });
             video.addEventListener('error', fail);
             cueTimer = window.setTimeout(() => { if (video.readyState < 2) fail(); }, CUE_WAIT);
             zoomMedia.append(video);
@@ -1247,6 +1300,7 @@ const boardWidths = (key: string) => [...new Set([480, 960, 1600].map((w) => Mat
         zoom.addEventListener('click', (event) => { if (event.target === zoom) zoom.close(); });
         zoom.addEventListener('close', () => {
           window.clearTimeout(cueTimer);
+          unfollow(zoomDevice);
           zoom.classList.remove('is-cueing');
           zoomMedia.replaceChildren();
           zoomBoard.replaceChildren();
@@ -1279,11 +1333,14 @@ const boardWidths = (key: string) => [...new Set([480, 960, 1600].map((w) => Mat
       // The tooltips keep clear of the card (see .ct-points__label): the
       // gutter between the card's right edge and the rail, less a --space-2
       // of air, is the most a tooltip and its tick may take (--pt-room). A
-      // tooltip whose whole title does not fit there ends in an ellipsis, and
-      // one that would keep fewer than --space-8 of it stays off. Measured
-      // again on a resize, when the card changes size, when the fonts arrive,
-      // when the current tick (and so its length) changes and when the full
-      // study's ticks join.
+      // title that misses by a --space-1 or less takes that much of the air
+      // (--pt-give) rather than lose its last letters to an ellipsis; a longer
+      // one ends in an ellipsis, and one that would keep fewer than --space-8
+      // of its title stays off. A cut or hidden title is still named on hover
+      // by the link's own title (the browser's tooltip), and its accessible
+      // name is the whole heading. Measured again on a resize, when the card
+      // changes size, when the fonts arrive, when the current tick (and so its
+      // length) changes and when the full study's ticks join.
       const pane = document.querySelector<HTMLElement>('.ct-pane');
       const px = (name: string, fallback: number) => parseFloat(getComputedStyle(nav).getPropertyValue(name)) || fallback;
       const fit = () => {
@@ -1293,6 +1350,7 @@ const boardWidths = (key: string) => [...new Set([480, 960, 1600].map((w) => Mat
         const rail = shown[0].getBoundingClientRect();
         if (!card.width || !rail.width) return;
         const air = px('--space-2', 8);
+        const give = px('--space-1', 4);
         const least = px('--space-8', 64);
         nav.style.setProperty('--pt-room', `${Math.max(0, Math.floor(rail.right - card.right - air))}px`);
         shown.forEach((a) => {
@@ -1301,9 +1359,15 @@ const boardWidths = (key: string) => [...new Set([480, 960, 1600].map((w) => Mat
           if (!label || !tick) return;
           a.removeAttribute('data-tip-off');
           // the label's right edge is a --space-2 left of its tick
-          const room = tick.getBoundingClientRect().left - air - card.right - air;
-          const whole = label.scrollWidth + 2; // its 1px border each side
-          a.toggleAttribute('data-tip-off', room < Math.min(whole, least));
+          const room = Math.floor(tick.getBoundingClientRect().left - air - card.right - air);
+          const whole = Math.ceil(label.scrollWidth + 2); // its 1px border each side
+          const short = whole - room;
+          label.style.setProperty('--pt-give', `${short > 0 && short <= give ? short : 0}px`);
+          const off = room < Math.min(whole, least);
+          a.toggleAttribute('data-tip-off', off);
+          // cut or off: the whole heading on hover, from the browser
+          if (off || short > give) a.title = a.getAttribute('aria-label') ?? '';
+          else a.removeAttribute('title');
         });
       };
       if (pane) new ResizeObserver(() => fit()).observe(pane);
@@ -1942,6 +2006,12 @@ const boardWidths = (key: string) => [...new Set([480, 960, 1600].map((w) => Mat
     transition: opacity var(--dur-2) var(--ease-exit);
   }
   .ct-screen[data-fit='fit'] { background: linear-gradient(var(--ct-fill-top) 50%, var(--ct-fill-foot) 50%); }
+  /* a shorter screen stands against its patterned edge, the fill on its flat
+     one (anchorFor in the frontmatter); centred when both edges match */
+  .ct-screen[data-anchor='top'],
+  .ct-screen[data-anchor='top'] :is(.ct-screen__still, .ct-screen__clip) { object-position: center top; }
+  .ct-screen[data-anchor='bottom'],
+  .ct-screen[data-anchor='bottom'] :is(.ct-screen__still, .ct-screen__clip) { object-position: center bottom; }
   .ct-screen.is-on {
     opacity: 1;
     pointer-events: auto;
@@ -1984,9 +2054,11 @@ const boardWidths = (key: string) => [...new Set([480, 960, 1600].map((w) => Mat
     display: grid;
     place-content: center;
     margin: 0;
-    padding: var(--space-4);
+    /* the same line in the 112px mini player, at its scale (it had been
+       hidden there, leaving a blank white handset; 2026-10-03, review) */
+    padding: min(var(--space-4), calc(var(--ct-device-screen, 200px) * 0.08));
     color: var(--ink-600);
-    font-size: var(--text-eyebrow);
+    font-size: min(var(--text-eyebrow), calc(var(--ct-device-screen, 200px) * 0.085));
     font-weight: 500;
     letter-spacing: var(--track-label);
     line-height: var(--lh-heading);
@@ -1998,9 +2070,12 @@ const boardWidths = (key: string) => [...new Set([480, 960, 1600].map((w) => Mat
   }
   .ct-phone__dev:not(:empty) { opacity: 1; transition: opacity var(--dur-3) var(--ease-enter) var(--dur-2); }
 
-  /* the device steps aside while a board stands in its place, and back */
+  /* the device steps aside while a board stands in its place, and back —
+     coming back only once the board and its "Click to enlarge" chip have
+     faded (--dur-2, their exit), so the chip never stands over the incoming
+     screen, as the empty phone's line waits for the last screen */
   .ct-panel--device :global(.ct-device) {
-    transition: opacity var(--dur-4) var(--ease-enter), visibility 0s;
+    transition: opacity var(--dur-4) var(--ease-enter) var(--dur-2), visibility 0s linear var(--dur-2);
   }
   .ct-panel.is-board :global(.ct-device) {
     opacity: 0;
@@ -2008,11 +2083,15 @@ const boardWidths = (key: string) => [...new Set([480, 960, 1600].map((w) => Mat
     transition: opacity var(--dur-2) var(--ease-exit), visibility 0s linear var(--dur-2);
   }
 
-  /* REFERENCE BOARDS stand in the device's footprint, whole, centred on the
-     card's paper: as wide as the device, or as tall as it allows with the
-     chip under it, whichever binds — so the card never changes size for one,
-     and a board is never wider or taller than the handset it replaces. The
-     chip under it says it opens full size; nothing sits on the board. */
+  /* REFERENCE BOARDS stand in the device's footprint, whole, on the card's
+     paper: as wide as the device, or as tall as it allows with the chip under
+     it, whichever binds — so the card never changes size for one, and a board
+     is never wider or taller than the handset it replaces. A board starts
+     where the device's top edge stands, one --space-3 under the title, with
+     its chip under it and the spare paper below (centred in the footprint, a
+     wide board floated 117–235px from the title that names it; 2026-10-03,
+     review of the handset). The chip says it opens full size; nothing sits on
+     the board. */
   .ct-boards {
     /* the room a board has: the footprint less its inset (none on the card,
        where the card's own padding is the margin), the chip and the gap */
@@ -2030,14 +2109,16 @@ const boardWidths = (key: string) => [...new Set([480, 960, 1600].map((w) => Mat
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     gap: var(--ct-board-gap);
     visibility: hidden;
     transition: opacity var(--dur-2) var(--ease-exit), visibility 0s linear var(--dur-2);
   }
+  /* a board arrives once whatever it replaces has gone (--dur-2): the
+     device's screen, or another board and its chip */
   .ct-board.is-on {
     visibility: visible;
-    transition: opacity var(--dur-4) var(--ease-enter), visibility 0s;
+    transition: opacity var(--dur-4) var(--ease-enter) var(--dur-2), visibility 0s linear var(--dur-2);
   }
   .ct-board__img {
     display: block;
@@ -2180,17 +2261,18 @@ const boardWidths = (key: string) => [...new Set([480, 960, 1600].map((w) => Mat
        ~49px over the phone at 1280×720): the script measures the gutter
        between the card's right edge and the rail, less a --space-2 of air
        (--pt-room), and the tooltip is never wider than what that leaves left
-       of its tick; a longer title ends in an ellipsis (Uttham, 2026-10-03:
+       of its tick; a title a --space-1 too long borrows that much of the air
+       (--pt-give), a longer one ends in an ellipsis (Uttham, 2026-10-03:
        "please truncate these"), and where the gutter cannot hold a readable
        word (data-tip-off: under --space-8 for a title that would be cut) the
-       tooltip stays off — the tick, its length and its accessible name
-       still say where the reader is. */
+       tooltip stays off — the tick, its length and its accessible name still
+       say where the reader is, and the link's own title names it on hover. */
     .ct-points__label {
       position: absolute;
       top: 50%;
       right: calc(var(--pt-tick) + var(--space-2));
       translate: 0 -50%;
-      max-width: min(var(--pt-tip), calc(var(--pt-room, var(--pt-tip)) - var(--pt-tick) - var(--space-2)));
+      max-width: min(var(--pt-tip), calc(var(--pt-room, var(--pt-tip)) - var(--pt-tick) - var(--space-2) + var(--pt-give, 0px)));
       overflow: hidden;
       padding: var(--space-1) var(--space-2);
       background: var(--paper-1);
@@ -2399,7 +2481,6 @@ const boardWidths = (key: string) => [...new Set([480, 960, 1600].map((w) => Mat
     .ct-pane__title { display: none; } /* the mini player is only the phone */
     .ct-stage { position: relative; height: auto; container-type: normal; display: block; }
     .ct-phone--live { width: 100%; border-radius: var(--radius-sm); box-shadow: var(--shadow-lift); }
-    .ct-phone__dev { display: none; }
     .ct-panel--device .ct-boards {
       /* at 112px a board keeps one small step of paper round it, and its
          chip only the magnifier */
@@ -2412,6 +2493,8 @@ const boardWidths = (key: string) => [...new Set([480, 960, 1600].map((w) => Mat
       visibility: hidden;
     }
     .ct-panel--device.is-board .ct-boards { visibility: visible; }
+    /* no title over the mini player, so a board sits in the middle of its card */
+    .ct-board { justify-content: center; }
     .ct-board__img { border-radius: var(--radius-inset); }
     .ct-board__hint { padding: 0 var(--space-1); box-shadow: none; }
     .ct-board__hint-label { display: none; }
@@ -2436,9 +2519,10 @@ const boardWidths = (key: string) => [...new Set([480, 960, 1600].map((w) => Mat
       box-shadow: var(--shadow-stuck);
       cursor: pointer;
     }
-    /* on the handset's corner its foot stands no lower than the status bar's,
-       so it never covers the screenshot */
-    .ct-panel--device .ct-pip__close { top: min(calc(-1 * var(--space-3)), calc(var(--ct-device-screen) * (var(--ct-device-k-bezel) + var(--ct-device-k-status)) - var(--space-6) - var(--space-1))); }
+    /* NEVER OVER THE DEVICE (2026-10-03, review of the handset: on its corner
+       it hid the battery and cut the body's curve): above the handset, its
+       foot a --space-2 clear of the top edge, its right edge on the device's */
+    .ct-panel--device .ct-pip__close { top: calc(-1 * (var(--space-6) + var(--space-2))); right: 0; }
     .ct-pip__close:focus-visible { outline: 2px solid var(--amber-text); outline-offset: 2px; }
     .ct-pip__restore:not([hidden]) {
       display: inline-flex;
@@ -2489,9 +2573,12 @@ const boardWidths = (key: string) => [...new Set([480, 960, 1600].map((w) => Mat
      nothing: the device, or the card, is the object. */
   .ct-zoom {
     --ct-zoom-r-max: calc(19.5 / 9);
+    /* the close control's row above the device (or the board's card): its
+       height and a --space-2 under it, out of the height budget */
+    --ct-zoom-close: calc(var(--space-7) + var(--space-2));
     --ct-device-screen: min(
       calc((100vw - 2 * var(--margin-side)) / var(--ct-device-k-wide)),
-      calc((100svh - 2 * var(--space-7)) / (var(--ct-device-k-tall) - 2 + var(--ct-zoom-r-max))),
+      calc((100svh - 2 * var(--space-7) - var(--ct-zoom-close)) / (var(--ct-device-k-tall) - 2 + var(--ct-zoom-r-max))),
       var(--ct-device-screen-max)
     );
     max-width: none;
@@ -2500,6 +2587,13 @@ const boardWidths = (key: string) => [...new Set([480, 960, 1600].map((w) => Mat
     border: 0;
     background: none;
     overflow: visible;
+  }
+  /* the close control stands in a row of its own over the device's (or the
+     card's) top-right corner, so the dialog centres the two as one */
+  .ct-zoom[open] {
+    display: grid;
+    justify-items: end;
+    gap: var(--space-2);
   }
   .ct-zoom::backdrop { background: rgba(22, 20, 14, 0.55); }
   .ct-zoom.is-board :global(.ct-zoom__device) { display: none; }
@@ -2527,6 +2621,8 @@ const boardWidths = (key: string) => [...new Set([480, 960, 1600].map((w) => Mat
     object-fit: contain;
     object-position: center;
   }
+  .ct-zoom[data-anchor='top'] .ct-zoom__media :global(:is(.ct-zoom__img, .ct-zoom__clip)) { object-position: center top; }
+  .ct-zoom[data-anchor='bottom'] .ct-zoom__media :global(:is(.ct-zoom__img, .ct-zoom__clip)) { object-position: center bottom; }
   .ct-zoom.is-pan .ct-zoom__media :global(.ct-zoom__img) { position: static; display: block; height: auto; }
   .ct-zoom__media :global(.ct-zoom__clip.is-ended) { opacity: 0; transition: opacity var(--dur-3) var(--ease-standard); }
   /* until the clip's first frame is in, the still (its ending) stays hidden:
@@ -2543,7 +2639,7 @@ const boardWidths = (key: string) => [...new Set([480, 960, 1600].map((w) => Mat
     display: block;
     width: min(
       calc(100vw - 2 * var(--margin-side) - 2 * var(--card-padding)),
-      calc((100svh - 2 * var(--space-7) - 2 * var(--card-padding)) / var(--zoom-board-r, 1)),
+      calc((100svh - 2 * var(--space-7) - var(--ct-zoom-close) - 2 * var(--card-padding)) / var(--zoom-board-r, 1)),
       var(--zoom-board-max, 1200px)
     );
     height: auto;
@@ -2555,13 +2651,13 @@ const boardWidths = (key: string) => [...new Set([480, 960, 1600].map((w) => Mat
      past the dialog's own scrolling, or lands on the dimmed page, moves
      nothing (the dialog is outside the smooth scroll: data-lenis-prevent) */
   :global(html):has(.ct-zoom[open]) { overflow: hidden; }
-  /* the close control on the device's corner, its foot never lower than the
-     status bar's (so it never reaches the screenshot at any size), or on a
-     board's card, never lower than the card's inset */
+  /* the close control: NEVER OVER THE DEVICE or the board's card (2026-10-03,
+     review of the handset: on the corner it hid the battery and broke the
+     body's outline where the phone is shown largest), but in the row above,
+     right-aligned with it, a --space-2 clear */
   .ct-zoom__close {
-    position: absolute;
-    top: min(calc(-1 * var(--space-3)), calc(var(--ct-device-screen) * (var(--ct-device-k-bezel) + var(--ct-device-k-status)) - var(--space-7) - var(--space-1)));
-    right: calc(-1 * var(--space-3));
+    order: -1;
+    position: relative;
     z-index: 2;
     display: grid;
     place-items: center;
@@ -2577,7 +2673,6 @@ const boardWidths = (key: string) => [...new Set([480, 960, 1600].map((w) => Mat
     box-shadow: var(--shadow-stuck);
     cursor: pointer;
   }
-  .ct-zoom.is-board .ct-zoom__close { top: min(calc(-1 * var(--space-3)), calc(var(--card-padding) - var(--space-7) - var(--space-1))); }
   .ct-zoom__close:focus-visible { outline: 2px solid var(--amber-text); outline-offset: 2px; }
 
   @media (prefers-reduced-motion: reduce) {
@@ -2586,9 +2681,18 @@ const boardWidths = (key: string) => [...new Set([480, 960, 1600].map((w) => Mat
       .ct-hero > * { opacity: 0; transform: none; }
     }
   }
+  /* no pan: in the 112px mini player a page capture stands whole in the
+     display, at its height, on its own edge colours — its foot would
+     otherwise sit out of sight with nothing to say so, since no chip reads at
+     that size (2026-10-03, review); a tap opens it in the dialog, where it
+     scrolls by hand */
+  @media (prefers-reduced-motion: reduce) and (max-width: 767.98px) {
+    .ct-screen--pan { background: linear-gradient(var(--ct-fill-top) 50%, var(--ct-fill-foot) 50%); }
+    .ct-screen--pan .ct-screen__scroll { display: flex; justify-content: center; }
+    .ct-screen--pan .ct-screen__page { width: auto; height: 100%; }
+  }
   /* no pan: the page scrolls by hand inside the card's phone, its chip in the
-     home strip until its foot is in view (the mini player opens it in the
-     dialog instead, where it scrolls too) */
+     home strip until its foot is in view */
   @media (prefers-reduced-motion: reduce) and (min-width: 768px) {
     .ct-screen__scroll { overflow-y: auto; scrollbar-width: thin; }
     .ct-panel:has(.ct-screen--pan.is-on) .ct-hint { display: inline-flex; }

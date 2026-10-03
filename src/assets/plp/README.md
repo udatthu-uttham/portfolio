@@ -30,13 +30,15 @@ status bar: the page's phone mock draws its own (9:41, the island) above the
 screen, and its strips take the colour of each export's top and bottom edge.
 The phone is one constant size on the page, its display 1 : 2, and nothing is
 ever cropped or stretched (Uttham, 2026-10-03): a 1 : 2 screen fills the
-display exactly; a shorter one (9 : 16) fits its width, centred, on its own
-edge colours; a page capture taller than 1 : 2 (like `scroll.png`,
+display exactly; a shorter one (9 : 16) fits its width on its own edge colours,
+centred, or against its patterned edge when the other is flat; a page capture
+taller than 1 : 2 (like `scroll.png`,
 1080 × 2820) pans down it and back, or scrolls by hand with reduced motion, its
 "Scroll ↓" chip in the phone's home strip; anything wider than a phone (width ÷
 height above 0.62: `cleanup`, `titles`, `list`, `date`) is a reference board,
-shown whole in the phone's place on the card, never larger than the phone, with
-"Click to enlarge" under it to open it full size.
+shown whole in the phone's place on the card, never larger than the phone,
+starting where the phone's top edge would, under the card's title, with "Click
+to enlarge" under it to open it full size.
 
 On hand (2026-10-03, from Uttham): `before.png` (the old feed) and `after.png` (the new feed).
 They also stand side by side, tagged Before and After, in the homepage tile (`tile` in
