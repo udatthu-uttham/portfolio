@@ -1,4 +1,11 @@
 {
+  "/media/mall-case/v3-landing-active.mp4": {
+    "frames": 241,
+    "edges": [
+      [0,"#eeedfb","dark","#ffffff","dark"],
+      [0.5,"#f2ecff","dark","#ffffff","dark"]
+    ]
+  },
   "/media/mall-case/v3-nav-pip.mp4": {
     "frames": 61,
     "edges": [
