@@ -19,6 +19,7 @@ tmp/
 Ride.png
 
 # research / tooling caches
+.clip-work/
 .tastemaker/
 .ui-forensics/
 .claude/

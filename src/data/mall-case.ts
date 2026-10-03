@@ -182,10 +182,16 @@ export const mallCase: CaseTeaserData = {
     },
     // Screens that move: his Figma animations, exported as MP4 (2026-10-03).
     // Keyed by file; the file's own still in this folder is the poster.
+    // v3-landing-active is the landing itself coming alive (2026-10-03: "v3
+    // landing active is v3 landing page … you can animate and scroll them"):
+    // the logo wall drifts, the brand cards and the Newly Launched row only
+    // peek, composed by scripts/mall-landing-clip.mjs from his export and his
+    // Figma layers; it opens and closes on the v3-landing-new screen.
     videos: {
       'v3-nav': '/media/mall-case/v3-nav.mp4',
       'v3-nav-pip': '/media/mall-case/v3-nav-pip.mp4',
       'v3-splash': '/media/mall-case/v3-splash.mp4',
+      'v3-landing-active': '/media/mall-case/v3-landing-active.mp4',
       'v3-ocp': '/media/mall-case/v3-ocp.mp4',
     },
     alts: {
