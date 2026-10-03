@@ -217,7 +217,7 @@ const homeLd = {
                       {study.tile.phones.map((p, i) => (
                         <figure class:list={['tile__phone', { 'tile__phone--old': p.tone === 'old' }]} style={`--ar: ${ratio(p)};`}>
                           {p.label && <figcaption class:list={['tile__tag', { 'tile__tag--new': p.tone === 'new' }]}>{p.label}</figcaption>}
-                          <div class="tile__screen"><Image src={tileScreens[p.image]} alt="" widths={[240, 480]} sizes="240px" /></div>
+                          <div class="tile__screen"><Image src={tileScreens[p.image]} alt="" widths={[240, 480, 720, 1080]} sizes="(max-width: 600px) 90vw, 240px" /></div>
                           {p.notes?.map((n) => (
                             <span class={`tile__note tile__note--${noteSide(study.tile!.phones, i)}`} style={`--y: ${n.y};`}>
                               <span class="tile__note-text">{n.text}</span>
@@ -1056,6 +1056,24 @@ const homeLd = {
     .tile__note .tile__note-arrow { scale: 1 -1; margin-block: 0 var(--space-1); }
     .tile__note--l .tile__note-arrow { scale: -1 -1; }
     .tile__tag { padding-inline: var(--space-2); }
+  }
+  /* PHONES SHOW THE "TO" ALONE, ZOOMED (Uttham, 2026-10-03: "in mobile view,
+     lets remove before and after just show the final version image without
+     notes and everything"; "in mobile view I want the images to be zoomed and
+     clear"; "not just sharpen I want you to keep a zoomed view as well"). No
+     "from", no tags, no notes: the final screen takes the well's whole width
+     inside one within-card step of glass, anchored at its top, and runs off
+     the well's bottom edge — the top of the screen (the search bar and first
+     row; Mall's logo wall and brand cards) read large, as a phone held up
+     close. This is his one exception to "shown whole": on a phone the whole
+     screen was too small to read. Loaded up to 1080w for a 3x display. Later
+     than the gutter and note rules above, at their specificity, so it wins. */
+  @media (max-width: 600px) {
+    .tile__media--phones { aspect-ratio: 4 / 5; align-items: start; padding: var(--space-4) var(--space-4) 0; }
+    .tile__media--phones > .tile__phone { flex: 1 1 auto; width: 100%; height: auto; margin: 0; }
+    .tile__media--phones > .tile__phone--old,
+    .tile__media--phones .tile__tag,
+    .tile__media--phones .tile__note { display: none; }
   }
   /* a study without a deck shows its cover render as a card inside the glass well */
   .tile__cover { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: var(--radius-inset); box-shadow: 0 1px 2px rgba(22, 20, 14, 0.08); }

@@ -339,7 +339,15 @@ and the wording is Uttham's to set). They stand on the pair's outer sides — th
 "from"'s to its left, the "to"'s to its right — never between the phones or over
 a screen, and **a well under 440px wide keeps only the "to"'s notes**, which is
 a tablet's two-up row, a phone and a small laptop; under 280px (a 320px phone)
-only its first, in a narrower column and hanging below its tip. **It is all
+only its first, in a narrower column and hanging below its tip. **On a phone
+(≤600px) the well shows only the "to", zoomed** (Uttham, 2026-10-03: "in mobile
+view, lets remove before and after just show the final version image without
+notes and everything"; "I want the images to be zoomed and clear … keep a
+zoomed view as well"): no "from", no tags, no notes; the final screen takes the
+well's width inside one `--space-4` of glass, anchored at its top, and runs off
+the 4 : 5 well's bottom edge, loaded up to 1080w. **This is the one place a
+screen is not shown whole** — his exception, because the whole screen was too
+small to read on a phone. **It is all
 static**: nothing in the well moves on hover; the tile keeps its tilt, border and
 arrow nudge, and the notes ride the tilt with the sheet. A case with one screen keeps one phone;
 both cases have a pair today. **Keep a phone's notes about half a screen apart**
