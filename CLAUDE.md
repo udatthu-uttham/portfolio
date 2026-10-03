@@ -871,19 +871,9 @@ while the phone cannot be seen, and with reduced motion never play. **A clip
 never opens on its still**, which is its ending: its screen arrives only once
 the clip's first frame is ready, the screen before (and its title) staying up
 until then — a frame or two when preloaded, 1.5s at most on a slow line, past
-which the still stands in and the clip plays on its next arrival. **The Mall
-landing's clip (v3-landing-active) is composed, not exported, and unused since
-2026-10-03, when its row came off the teaser** (Uttham,
-2026-10-03: "you can animate and scroll them"; "just a small peek, not full
-animation"): `scripts/mall-landing-clip.mjs` builds it from his
-`v3-landing-new.png` and his Figma layers, re-runnable once the layers listed
-in its header are exported into `.clip-work/` — the logo wall loops, **the
-brand cards row only peeks 40 pt and springs back, never carousels**, and it
-opens and closes on the export. **It never scrolls the page**: below its first
-screen his Figma frame is an earlier iteration (white Mall pill, "High
-Quality"), not the landing he shipped, so the clip stays on the screen he
-exported. **The product cards' swipeable-images clip is composed the same
-way** (Uttham, 2026-10-03: "Swipeable images in the prototype please mock by
+which the still stands in and the clip plays on its next arrival. (The Mall landing's composed clip came off with its row on 2026-10-03 and was
+deleted on 2026-10-04, "if it is not used delete it"; git history keeps it and
+its script.) **The product cards' swipeable-images clip is composed** (Uttham, 2026-10-03: "Swipeable images in the prototype please mock by
 moving images, it only there on one card, I want to move it for other 1 or 2
 products atleast . find similar images from the product repo"):
 `scripts/plp-swipe-clip.mjs` builds `public/media/plp/swipe.mp4` and its

@@ -187,10 +187,9 @@ export const mallCase: CaseTeaserData = {
     },
     // Screens that move: his Figma animations, exported as MP4 (2026-10-03).
     // Keyed by file; the file's own still in this folder is the poster.
-    // The landing page's composed clip (v3-landing-active) came off with its
-    // row (2026-10-03: "just one landing page (remove the second landing page
-    // section, we will not talk about it in preview)"): the files are kept, see
-    // src/assets/mall-case/README.md.
+    // The landing page's composed clip came off with its row (2026-10-03: "just
+    // one landing page") and was deleted (2026-10-04: "if it is not used delete
+    // it"); git history keeps it and its script.
     videos: {
       'v3-nav': '/media/mall-case/v3-nav.mp4',
       'v3-nav-pip': '/media/mall-case/v3-nav-pip.mp4',
