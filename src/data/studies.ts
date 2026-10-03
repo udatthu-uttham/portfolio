@@ -105,19 +105,21 @@ scope: ['Product card systems', 'Experiment design', 'PLP at scale'],
       pdf: '/meesho-mall-case-study.pdf',
       screen: 'v3-landing',
     },
-    // v2 → v3, from his deck export to the landing page he supplied (Uttham,
-    // 2026-10-03, on standing the v2 screen beside v3: "2 can do"). v2 sells
-    // Mall itself: the wordmark, "Branded products at best prices", its own
-    // promises; v3 sells the brands — the logo wall, the brand on every card,
+    // v2 → v3, landing page to landing page (Uttham, 2026-10-03, on standing
+    // the v2 screen beside v3: "2 can do"; then "mall landing page v2, you have
+    // used wrong reference, I have added the right one"; "update the notes
+    // accordingly"). v2 sells Mall itself — the big wordmark, "Branded products
+    // at best prices", its own promises — and keeps the brands to a thin strip
+    // of logos; v3 sells the brands — the logo wall, the brand on every card,
     // Mall shrunk to a tick (his "sell brands, not Mall"). DRAFT wording, for
-    // Uttham to rewrite. Each `y` is measured on the export: v2's
-    // "Original Brands · Direct From Company" strip at 0.31; v3's brand badge on
+    // Uttham to rewrite. Each `y` is measured on the export: v2's logo strip
+    // (Himalaya, WOW, mamaearth…) at 0.33; v3's brand badge on
     // the first card at 0.40 and the Mall tab's tick in its bottom bar at 0.93
     // (the notes need about half a screen between them, or their words collide
     // on a short tablet or laptop well).
     tile: { phones: [
-      { image: 'mall/v2-plp-badge', label: 'v2', tone: 'old', notes: [
-        { text: 'Mall sells itself', y: 0.31 },
+      { image: 'mall-case/v2-landing', label: 'v2', tone: 'old', notes: [
+        { text: 'Brands in a thin strip', y: 0.33 },
       ] },
       { image: 'mall-case/v3-landing-new', label: 'v3', tone: 'new', notes: [
         { text: 'The brand on every card', y: 0.4 },

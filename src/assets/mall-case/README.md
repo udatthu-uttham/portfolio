@@ -35,6 +35,7 @@ On hand (2026-10-03, from Uttham):
 | File | State(s) | Source |
 |---|---|---|
 | `v1-tag.png` | v1-tag (the page's first screen) | "Mall v1 PLP.png" |
+| `v2-landing.png` (1074×2154) | none on the case page; the homepage tile's v2 phone | "Mall v2 landing page.png", its 3px frame stroke trimmed |
 | `v2-home.png` (1080×2994, a tall page) | v2-home, and v2-usps / v2-pill via `screens.map` ("use the v2 home directly") | "Mall v2.png" |
 | `v2-mixed-feed.png` (360×720, 1×) | v2-mixed-feed | "Mall v2 PLP.png" |
 | `v3-pill.jpg` (360×720, 1×) | v3-pill, and v3-labels via `screens.map` | "Mall v3 PLP - FiFs.jpg" |
