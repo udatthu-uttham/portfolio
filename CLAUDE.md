@@ -91,16 +91,20 @@ keys, nav jumps, reduced motion and teaser pages never snap (`section-snap.js`).
 **An image or coloured cover sits as a card ON the pane, never filling it end to
 end** (Uttham, 2026-09-20). Keep a margin on every side so the glass reads as the
 surface underneath rather than as a frame around a picture. Size phone frames off
-the container's *height* so they stand flush on an edge instead of being cut
-mid-screen.
+the container's *height*. **A running preview** — an AI Space tool's phone —
+stands flush on the well's bottom edge instead of being cut mid-screen; **an
+export Uttham supplied is shown whole instead** (next paragraph), so it never
+stands flush.
 
 **A big image is shown whole, never pasted in or cropped abruptly** (Uttham,
 2026-10-03: "when I give big images I dont want you to just paste them or crop
 them abruptly making its content gone"). Give its frame the export's own aspect
 ratio, size it to fit (never `object-fit: cover` on a screen), and keep every
-edge of it on the glass. The homepage project tiles do this: their phones are
-whole screens standing as cards with glass on every side, not flush on the
-well's edge.
+edge of it on the glass. Nothing sits over it either: a label goes beside or
+above the picture, never on it. The homepage project tiles do this: their phones
+are whole screens standing as cards with glass on every side, not flush on the
+well's edge, and their Before/After tags stand above the phones (2026-10-03:
+half over the screen, they hid each export's search bar).
 
 ## AI Space previews: synthetic data only
 
@@ -261,7 +265,11 @@ represent the images on home page … these images have strong hook and content"
 full height in colour, its tag on amber**; both on one baseline. **Every phone
 shows its whole screen** (see Images): the frame takes the export's own aspect
 ratio, and the pair stands as cards on the glass, sized off the well's height —
-or its width, when the pair and its notes would not fit across.
+or its width, when the pair and its notes would not fit across. **Each tag stands
+one `--space-2` above its phone, never over the screen**, and the well keeps the
+tag's room out of the "to"'s height; that costs the phones about a tag's height
+on a short laptop well (1280×720: the "to" is ~74px wide), the price of showing
+every screen's top row.
 **The loupe strip is gone** (Uttham, 2026-10-03: "not liking the output of
 highlighting the change in this lets keep it like the grey and colorful ones
 only") — never put a magnifier or a crop window back on the tile. **Handwritten
@@ -273,9 +281,10 @@ part of the screen it talks about (`notes` on a phone in `src/data/studies.ts`,
 and the wording is Uttham's to set). They stand on the pair's outer sides — the
 "from"'s to its left, the "to"'s to its right — never between the phones or over
 a screen, and **a well under 440px wide keeps only the "to"'s notes**, which is
-a tablet's two-up row, a phone and a small laptop. **It is all static**: nothing
-in the well moves on hover; the tile keeps its tilt, border and arrow nudge, and
-the notes ride the tilt with the sheet. A case with one screen keeps one phone —
+a tablet's two-up row, a phone and a small laptop; under 280px (a 320px phone)
+only its first, in a narrower column and hanging below its tip. **It is all
+static**: nothing in the well moves on hover; the tile keeps its tilt, border and
+arrow nudge, and the notes ride the tilt with the sheet. A case with one screen keeps one phone —
 Meesho Mall, until Uttham approves standing his v2 deck export beside the v3
 landing (the pair is written out, commented, in `studies.ts`).
 

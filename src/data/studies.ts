@@ -21,7 +21,8 @@ export type Chapter = {
 // (0 = top, 1 = bottom). The note sits on the phone's outer side — left of the
 // "from", right of the "to" — with its words above the arrow, so keep `y` past
 // about 0.3. A phone's notes are in priority order: on a narrow sheet only the
-// "to" phone's notes stay, and on the narrowest (a 320px phone) only its first.
+// "to" phone's notes stay, and on the narrowest (a 320px phone) only its first,
+// hanging below its tip instead.
 export type TileNote = { text: string; y: number };
 
 // One phone in the homepage tile's glass well. `image` is <folder>/<state> under
@@ -29,7 +30,8 @@ export type TileNote = { text: string; y: number };
 // aspect ratio and shows the whole of it (Uttham, 2026-10-03: "when I give big
 // images I dont want you to just paste them or crop them abruptly making its
 // content gone"). tone 'old' = the "from": shorter and in grey; tone 'new' = the
-// "to": full height in colour, its tag on amber.
+// "to": full height in colour, its tag on amber. `label` is the tag, which
+// stands above its phone, never over the screen.
 export type TilePhone = { image: string; label?: string; tone?: 'old' | 'new'; notes?: TileNote[] };
 
 export type Study = {
