@@ -40,7 +40,8 @@ export type Tool = {
   helps: string[]; // how it helps, one point each, shown on /ai/<slug>. Highlights in **bold**.
   action: string; // the card's action, which reads like a case tile's "Read the case study"
   used?: { label: string; href: string }; // where it shows up in the case studies
-  visit?: { label: string; href: string }; // a live thing you can open yourself: the page's "Open the prototype ↗", and the preview's src
+  visit?: { label: string; href: string }; // the running build the preview loads; never linked from the page (Uttham, 2026-10-03: "dont give link of real prototye")
+  callout?: string; // a few words over the tool page's phone, when the reader can use the tool right there
 };
 
 export const tools: Tool[] = [
@@ -153,5 +154,10 @@ export const tools: Tool[] = [
     ],
     action: 'View more',
     visit: { label: 'Open the prototype', href: '/proto/feed-ux/index.html' },
+    // over the phone on its page, which is the prototype itself (Uttham,
+    // 2026-10-03: "let the prototype be interactable there only, and give
+    // callout on top that it is interactable"). A short label, not his copy:
+    // the wording is his to set.
+    callout: 'Try it — tap and scroll',
   },
 ];

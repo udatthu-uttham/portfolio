@@ -7,7 +7,7 @@
 // tool, the sticky phone runs it.
 //
 // NO COPY LIVES HERE. Every word comes from tools.ts (name, kicker, year, what,
-// helps, idea, made, visit) and guides.ts (title, intro, get, prompt) — Uttham's
+// helps, idea, made, callout) and guides.ts (title, intro, get, prompt) — Uttham's
 // own lines, word for word (CLAUDE.md). This file only arranges them and says
 // which step of the running tool each row shows.
 //
@@ -76,7 +76,12 @@ export const aiPage = (slug: string): CaseTeaserData => {
         : { label: 'Kind', value: `${tool.kicker} · White-label guide` },
       { label: 'Year', value: tool.year },
     ],
-    visit: tool.visit,
+    // No link out to the running build (Uttham, 2026-10-03: "dont give link
+    // of real prototye let the prototype be interactable there only, and give
+    // callout on top that it is interactable"): the phone is the prototype,
+    // and its callout says it can be used there. tool.visit stays the
+    // preview's source only.
+    callout: tool.callout,
     panelLabel: `${tool.name}, running`,
     sections: [
       // The tool's own idea, ahead of everything (Uttham, 2026-10-02: "emphasis

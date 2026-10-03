@@ -28,7 +28,7 @@ export type CaseSection = { state?: string; heading: string; blocks: CaseBlock[]
 // and the wordings outside as you did on home page"): `text` is a few words,
 // never a number; `y` is where its arrow's tip lands on the screen's left edge,
 // as a fraction of THAT screen's height (0 = top, 1 = bottom). The words stand
-// left of the arrow, on the card's paper, never over the screen.
+// left of the arrow, on the page, never over the screen.
 // A note beside the phone: its line starts ON the thing it names, inside the
 // screen, at (x, y), and runs out to its words, which stand at `ty` in the
 // notes column (shares of the screen's width and height; `ty` defaults to y).
@@ -48,7 +48,8 @@ export type CaseTeaserData = {
   dek: string; // `{source}` becomes the sourced link below
   source?: { label: string; href: string; title: string };
   back?: { href: string; label: string }; // defaults to "← All projects"
-  visit?: { href: string; label: string }; // a live thing to open in its own tab, under the facts ("Open the prototype ↗")
+  visit?: { href: string; label: string }; // a live thing to open in its own tab, under the facts (no page passes one since 2026-10-03)
+  callout?: string; // a live phone's short line above the device, e.g. that the tool can be used right there
   facts: { label: string; value: string }[];
   sections: CaseSection[];
   gate?: { text: string; cta: string };
