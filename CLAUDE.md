@@ -832,7 +832,20 @@ brand cards row only peeks 40 pt and springs back, never carousels**, and it
 opens and closes on the export. **It never scrolls the page**: below its first
 screen his Figma frame is an earlier iteration (white Mall pill, "High
 Quality"), not the landing he shipped, so the clip stays on the screen he
-exported. A new or replaced clip needs `npm run clip-edges` on macOS so the
+exported. **The product cards' swipeable-images clip is composed the same
+way** (Uttham, 2026-10-03: "Swipeable images in the prototype please mock by
+moving images, it only there on one card, I want to move it for other 1 or 2
+products atleast . find similar images from the product repo"):
+`scripts/plp-swipe-clip.mjs` builds `public/media/plp/swipe.mp4` and its
+poster `src/assets/plp/swipe.png` from his `scroll.png` — a 1 : 2 window that
+pans gently down the capture and back, in which **three cards swipe their
+picture one at a time to another kurti and back** (a critically damped spring,
+no bounce; the dot for the page on show darkens, moves and fades back), the
+second photos being public catalogue photos the prototype's bundle already
+references, cropped to the card's own image box; **the first and last frames
+are his capture to the pixel**, so the poster opens and closes it, and nothing
+else in the capture is touched (`src/assets/plp/README.md` has the row). A new
+or replaced clip needs `npm run clip-edges` on macOS so the
 handset's strips follow its frames. The mini
 player is the same handset at 112px, by the same fit rules — except that with
 reduced motion a page capture stands whole in its display (at its height, on its

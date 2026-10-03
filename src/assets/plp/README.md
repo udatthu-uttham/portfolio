@@ -19,7 +19,7 @@ and Delivery date:
 | `titles` | Seller titles | Facts in place of the title | composed: the four title variants as a 2 × 2 feed grid, the feed carrying on below |
 | `stagger` | Staggered feed (block 2) | A staggered feed | a feed with staggered columns, each card at its natural height |
 | `list` | List or grid by category (block 2) | List view by category | composed: the list-view screen only (earphones as rows) |
-| `scroll` | Swipeable images | More views and variations | a card whose swipeable images show more of the product and its variations |
+| `swipe` (state `scroll`; its clip is `public/media/plp/swipe.mp4`) | Swipeable images | More views and variations | composed clip: his Kurti feed capture (`scroll.png`), three of whose cards swipe their picture to another kurti and back, the dots following; `swipe.png` is the clip's first and last frame |
 | `bigimg` | Bigger images for fashion | Bigger images for fashion | a fashion card with the taller 4:5 image |
 | `date` | Delivery date | Dates on fast deliveries | composed: the winning card (Fast and its day count) in the new feed, among cards with no date |
 | `after` | Outcome | The new card | the new product card |
@@ -44,6 +44,31 @@ its board in `boards/` and run the script again; if a card moves, take the
 notes' new `y` from what it prints. Effective upscale on the page (1440×900,
 2× display): titles and date cards ×1.5 (the boards are 1× renders), the list
 ×1.5, the framework card ×0.9 (none).
+
+**The swipeable-images clip** (Uttham, 2026-10-03: "Swipeable images in the
+prototype please mock by moving images, it only there on one card, I want to
+move it for other 1 or 2 products atleast . find similar images from the
+product repo"). `scripts/plp-swipe-clip.mjs` (`node scripts/plp-swipe-clip.mjs`,
+macOS) builds `public/media/plp/swipe.mp4` (720 × 1440, 30 fps, 9 s, H.264,
+moov first, ~800 KB) and its poster `swipe.png` (1080 × 2160) from `scroll.png`,
+his 1080 × 2820 Kurti feed capture: a 1 : 2 window that pans gently down the
+page and back, in which three cards swipe their picture one at a time — the
+first card (row 1, left) while the window is at the top, then the right card
+of row 2 and the left card of row 3 once it has panned to the foot — each
+sliding to a second photo of a similar kurti and back on a critically damped
+spring (no bounce), the dot for the page on show darkening as the swipe
+begins, moving to the second dot as the picture passes halfway and fading
+back at rest. The second photos are three public catalogue photos the
+realistic prototype's bundle already references (kurtis 5047403, 5038838 and
+5037151), cropped square — the model's head in, the corner stamp out — and
+scaled to the card's own 528 × 531 image box; the script fetches them into
+`.clip-work/plp-swipe/photos/` (untracked) when missing. Nothing else in the
+capture is touched, and the clip's first and last frames are its top window
+to the pixel, so the poster is both what the clip opens on and what it settles
+on (reduced motion shows the poster alone). After re-rendering, run
+`npm run clip-edges` so the handset's strips follow its frames. `scroll.png`
+stays as the clip's source; it is not shown on its own once the `scroll` state
+maps to `swipe`.
 
 Export phone screens at 1 : 2 (1080 × 2160 is ideal), at 2× or more (≥ 720px
 wide), with dummy data only — no Figma links or file keys on the page, and no
