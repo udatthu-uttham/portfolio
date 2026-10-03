@@ -2,8 +2,9 @@
 // the header avatar's reveal — everything a page needs on top of its own CSS.
 // The hero's GSAP choreography and the magnetic sheets live in motion-hero.js,
 // loaded by the homepage alone, so the teaser pages never download GSAP
-// (perf pass 2026-10-02). The homepage's weak section snap rides this Lenis
-// instance from section-snap.js, and does nothing on a page without the hero.
+// (perf pass 2026-10-02). The weak snap rides this Lenis instance from
+// section-snap.js: the homepage's sections, or the resting places a reading
+// page (CaseTeaser) hands it; it does nothing on a page with neither.
 // Motion preferences can change while the page remains open, so the loops are
 // explicitly started/stopped instead of being decided only at page load.
 import Lenis from 'lenis';

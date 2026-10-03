@@ -514,6 +514,15 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
 
 <script>
   import type { Edge } from '../lib/edge-colour';
+  import { provideRestingPlaces } from '../scripts/section-snap.js';
+
+  // THE READING LINE, shared by everything that follows the reading: the phone,
+  // the text it lights and the rail's current tick all change when a heading
+  // crosses it, 40% down the screen. The phone block below replaces this with
+  // a line that slides down over the page's last half screen when the last
+  // part of the reading cannot scroll up to it.
+  const READ_LINE = 0.4;
+  let readingLine = () => innerHeight * READ_LINE;
 
   // ---- the device's strips take the screen's edge colours -----------------
   // A still's are read at build time (data-top / data-foot on the screen). A
@@ -590,10 +599,11 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
   };
 
   // ---- the phone follows the reading -------------------------------------
-  // Every [data-state] on the left is a trigger. The one crossing the reading
-  // band — the middle tenth of the screen on a laptop, the middle of what the
-  // sticky phone leaves on a phone — picks the screen. A state without a screen
-  // keeps the last one, so the phone never goes blank mid-read.
+  // Every [data-state] on the left is a trigger, and the reading is cut into
+  // parts (units, below), each a heading and what it introduces. The part
+  // whose heading last crossed the reading line picks the screen, and its text
+  // is the only text in full ink. A state without a screen keeps the last
+  // one, so the phone never goes blank mid-read.
   const panel = document.querySelector<HTMLElement>('[data-case-panel]');
   const root = document.querySelector<HTMLElement>('.ct');
   if (panel && root) {
@@ -949,32 +959,16 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
     };
 
     const wide = window.matchMedia('(min-width: 768px)');
-    const visible = new Set<HTMLElement>();
-    let io: IntersectionObserver | null = null;
 
-    const pick = () => {
-      const tail = tailBand();
-      const pool: Iterable<HTMLElement> = tail === null ? visible : triggers;
-      if (tail === null && !visible.size) return;
-      const mid = tail ?? bandCentre();
-      let best: HTMLElement | null = null;
-      let bestD = Infinity;
-      for (const el of pool) {
-        const r = el.getBoundingClientRect();
-        const d = Math.abs((r.top + r.bottom) / 2 - mid);
-        if (d < bestD) { bestD = d; best = el; }
-      }
-      if (best) choose(best, still.matches ? partOf(best, mid) : 0);
-    };
     // With reduced motion nothing plays, so a row with several screens (the
     // Mall tab: its modal, then its PiP) shares itself out among them by the
-    // reading: as the band passes from the row's top to its foot it shows
-    // each in turn, and no screen of the row is out of reach.
-    const partOf = (el: HTMLElement, mid: number) => {
+    // reading: as the reading line passes from the row's top to its foot it
+    // shows each in turn, and no screen of the row is out of reach.
+    const partOf = (el: HTMLElement, line: number) => {
       const n = filesOf(el.dataset.state!).length;
       if (n < 2) return 0;
       const r = el.getBoundingClientRect();
-      return Math.min(n - 1, Math.max(0, Math.floor(((mid - r.top) / r.height) * n)));
+      return Math.min(n - 1, Math.max(0, Math.floor(((line - r.top) / r.height) * n)));
     };
 
     // ---- each block plays as a slideshow -------------------------------------
@@ -1141,71 +1135,253 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
     }, { rootMargin: '100% 0px' });
     triggers.forEach((t) => { if (screensFor(t).some((s) => clipOf(s))) near.observe(t); });
 
-    // The reading band's centre, in viewport px: the middle of the screen at
-    // every width now that phones float the preview instead of stacking it.
-    const bandCentre = () => innerHeight / 2;
-
-    // Where too little follows a page's last rows for them to scroll up to
-    // the middle, the preview would never reach them. Only then, over the last
-    // half screen of scrolling, the band slides from the middle down to the
-    // last row's centre and every trigger is a candidate. A page whose rows
-    // all reach the middle never takes this path. "More tools" after an AI
-    // Space page (2026-10-03) shortens the slide but does not always end it:
-    // Resona's last row still misses the middle by ~70px at 1440×900 (it
-    // reaches it at 1280×720), so it keeps the slide there, over the block.
-    const tailBand = (): number | null => {
-      const last = triggers[triggers.length - 1];
-      if (!last) return null;
-      const half = innerHeight / 2;
-      const maxScroll = document.documentElement.scrollHeight - innerHeight;
-      const r = last.getBoundingClientRect();
-      const lastMid = r.top + scrollY + r.height / 2;
-      if (lastMid <= maxScroll + half) return null;
-      const remaining = maxScroll - scrollY;
-      if (remaining >= half) return null;
-      const t = 1 - Math.max(0, remaining) / half;
-      return half + t * (lastMid - maxScroll - half);
+    // ---- the reading, in parts ------------------------------------------------
+    // PROGRESSIVE READING (Uttham, 2026-10-03: "can we do progressive loading
+    // of teaser pages, before the image on the right updates sometimeas
+    // content comes, ex v2 and v3 both content exsited in a viewport and then
+    // the screen is only showing v2, this is leading to confusion"). The
+    // reading is cut into parts, and the phone and the text change together,
+    // on one trigger: the part whose heading last crossed the reading line is
+    // the one the phone shows, and its text alone is in full ink. Parts not yet
+    // reached are muted, parts already read a little less so (data-reading:
+    // ahead / now / read, styled below); nothing is hidden or moved, so the
+    // page stays scannable. Before any heading has crossed the line the first
+    // part is the one shown, as its screen is from the start.
+    // A part is one of:
+    //   own   — a section (or a full-study block) that carries its own state:
+    //           all of it, its trigger itself
+    //   block — a block of rows or steps with states, with its h3 and lead
+    //           line: one part, so a playing slideshow lights the whole block
+    //           (the row on show keeps its amber bar); with reduced motion the
+    //           reading picks its rows, row by row, as before
+    //   intro — a section's heading and the text before its first block: it
+    //           comes up with the screen of that block's first row, which
+    //           stands still until the block itself is reached ("v3: sell
+    //           brands, not Mall" and its line now bring the first v3 screen;
+    //           at the old band they were read under v2's)
+    //   none  — a section with no state anywhere (the product cards' Problem,
+    //           the prototype's every section): it keeps the screen of the
+    //           nearest earlier state, as the phone always has, and comes up by
+    //           its place in the reading
+    // A section's h2 stays in full ink while any part of its section is the
+    // one shown, so the chapter being read is always named.
+    // WHERE IT SWITCHES. The old band picked the trigger whose centre was
+    // nearest the middle tenth of the screen, so a section with a state
+    // switched as its heading entered at 55%, while a section whose first
+    // trigger sat under an intro switched only when that row reached the
+    // middle: on the Mall page at 1440×900, "v3: sell brands, not Mall" had
+    // risen to 30% of the screen, with "Decide what Mall is" at 51%, before
+    // the phone left v2 (measured 2026-10-03). Now every part switches as its
+    // heading crosses one line, 40% down, the rail's own line: a heading is in
+    // full ink before it reaches the upper part of the screen, and the rail,
+    // the text and the phone change together.
+    type Kind = 'own' | 'block' | 'intro' | 'none';
+    type Unit = {
+      kind: Kind;
+      top: HTMLElement; // its heading: where it starts
+      els: HTMLElement[]; // what lights with it
+      section: HTMLElement;
+      rows: HTMLElement[]; // block: its rows, in order
+      lead: HTMLElement | null; // own: itself; intro: the first row it leads to; none: the trigger it borrows from
+    };
+    const story = root.querySelector<HTMLElement>('.ct-story');
+    const isTrigger = (el: Element) => el instanceof HTMLElement && Boolean(el.dataset.state);
+    const before = (el: HTMLElement) => {
+      let found: HTMLElement | null = null;
+      for (const t of triggers) {
+        if (t.compareDocumentPosition(el) & Node.DOCUMENT_POSITION_FOLLOWING && !t.closest('[hidden]')) found = t;
+      }
+      return found;
+    };
+    const visibleKids = (el: Element) =>
+      [...el.children].filter((k): k is HTMLElement => k instanceof HTMLElement && !k.hidden);
+    const startOf = (els: HTMLElement[], fallback: HTMLElement) => els.find((el) => !el.classList.contains('sr-only')) ?? fallback;
+    let units: Unit[] = [];
+    const buildUnits = () => {
+      const out: Unit[] = [];
+      if (!story) return out;
+      for (const section of visibleKids(story)) {
+        if (!section.matches('.ct-section, .ct-full')) continue;
+        const kids = visibleKids(section);
+        if (!kids.length) continue;
+        if (isTrigger(section)) {
+          out.push({ kind: 'own', top: section, els: kids, section, rows: [], lead: section });
+          continue;
+        }
+        let pending: HTMLElement[] = [];
+        let last: Unit | null = null;
+        for (const kid of kids) {
+          const rows = kid.matches('.ct-steps') ? [...kid.children].filter(isTrigger) as HTMLElement[] : [];
+          if (isTrigger(kid)) {
+            // a full-study block: the separator before the first joins it
+            const unit: Unit = { kind: 'own', top: startOf(pending, kid), els: [...pending, kid], section, rows: [], lead: kid };
+            out.push(unit);
+            last = unit;
+            pending = [];
+          } else if (rows.length) {
+            // the block's own heading and lead line are the last h3 in what
+            // came before it; anything earlier is the section's intro, or a
+            // coda of the block before
+            const h3 = pending.map((el) => el.tagName).lastIndexOf('H3');
+            const own = h3 >= 0 ? pending.slice(h3) : [];
+            const rest = h3 >= 0 ? pending.slice(0, h3) : pending;
+            if (rest.length) {
+              if (!last && rest.length === 1 && rest[0].tagName === 'H2') own.unshift(rest[0]);
+              else if (!last) out.push({ kind: 'intro', top: rest[0], els: rest, section, rows: [], lead: rows[0] });
+              else if (rest[0].tagName === 'H3') out.push({ kind: 'none', top: rest[0], els: rest, section, rows: [], lead: before(rest[0]) });
+              else last.els.push(...rest);
+            }
+            const unit: Unit = { kind: 'block', top: own[0] ?? kid, els: [...own, kid], section, rows, lead: rows[0] };
+            out.push(unit);
+            last = unit;
+            pending = [];
+          } else pending.push(kid);
+        }
+        if (pending.length) {
+          if (!last || pending[0].tagName === 'H3') out.push({ kind: 'none', top: pending[0], els: pending, section, rows: [], lead: before(pending[0]) });
+          else last.els.push(...pending);
+        }
+      }
+      return out;
     };
 
-    const observe = () => {
-      io?.disconnect();
-      visible.clear();
-      const mid = bandCentre();
-      const half = innerHeight * 0.05;
-      const top = Math.max(0, Math.round(mid - half));
-      const bottom = Math.max(0, Math.round(innerHeight - mid - half));
-      io = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((e) => {
-            const el = e.target as HTMLElement;
-            if (e.isIntersecting) visible.add(el);
-            else visible.delete(el);
-          });
-          pick();
-        },
-        { rootMargin: `-${top}px 0px -${bottom}px 0px`, threshold: 0 }
-      );
-      triggers.forEach((t) => io!.observe(t));
+    // Where too little follows the page's last part (or its last row) for it
+    // to scroll up to the reading line, the phone would never reach it. Only
+    // then, over the last half screen of scrolling, the line slides down to
+    // it, so the last parts still take the phone in turn. A page whose parts
+    // all reach the line never takes this path.
+    const tail = () => {
+      const lastUnit = units[units.length - 1];
+      if (!lastUnit) return null;
+      const max = document.documentElement.scrollHeight - innerHeight;
+      const lastRow = lastUnit.rows[lastUnit.rows.length - 1];
+      const ends = [lastUnit.top, lastRow].filter((el): el is HTMLElement => Boolean(el));
+      // the furthest down of them, where it stands on the screen at the foot
+      const foot = Math.max(...ends.map((el) => el.getBoundingClientRect().top + scrollY)) - max + 1;
+      const line = innerHeight * READ_LINE;
+      return foot > line ? { max, half: innerHeight / 2, line, foot } : null;
+    };
+    const lineNow = () => {
+      const t = tail();
+      if (!t) return innerHeight * READ_LINE;
+      const remaining = t.max - scrollY;
+      if (remaining >= t.half) return t.line;
+      return t.line + (1 - Math.max(0, remaining) / t.half) * (t.foot - t.line);
+    };
+    readingLine = lineNow;
+
+    // the page's own triggers drive the phone: a slideshow block plays, a
+    // part with no block of its own holds one screen still
+    const holdOn = (trigger: HTMLElement | null) => {
+      playing = null;
+      held = false;
+      at = 0;
+      if (trigger) {
+        if (trigger === current) render();
+        else show(trigger);
+      }
+      plan();
+    };
+    // the row at the reading line: the last whose top has crossed it
+    const rowAt = (rows: HTMLElement[], line: number) => {
+      let row = rows[0];
+      rows.forEach((r) => { if (r.getBoundingClientRect().top <= line) row = r; });
+      return row;
+    };
+    const drive = (unit: Unit, line: number, arriving: boolean) => {
+      if (unit.kind === 'block') {
+        const row = rowAt(unit.rows, line);
+        if (arriving && row === current && !still.matches) stepAt = performance.now(); // its first beat in full
+        if (arriving || still.matches) choose(row, still.matches ? partOf(row, line) : 0);
+      } else if (unit.kind === 'own') {
+        if (arriving || still.matches) {
+          if (arriving) { playing = null; held = false; }
+          choose(unit.lead!, still.matches ? partOf(unit.lead!, line) : 0);
+        }
+      } else if (arriving) holdOn(unit.lead);
     };
 
-    // The observer only speaks when a row crosses the band's edge, and smooth
-    // scrolling keeps moving after it has spoken — so the choice is re-made on
-    // every scroll frame too, from the rows the observer says are in the band.
+    let active: Unit | null = null;
+    const light = () => {
+      const now = active ? units.indexOf(active) : 0;
+      units.forEach((unit, i) => {
+        const mode = i === now ? 'now' : i < now ? 'read' : 'ahead';
+        unit.els.forEach((el) => {
+          // the chapter's heading stays in ink while it is being read
+          const m = el.tagName === 'H2' && active && unit.section === active.section ? 'now' : mode;
+          if (el.dataset.reading !== m) el.dataset.reading = m;
+        });
+      });
+    };
+    const update = () => {
+      if (!units.length) return;
+      const line = lineNow();
+      let next = units[0];
+      for (const unit of units) {
+        if (unit.top.getBoundingClientRect().top <= line) next = unit;
+        else break;
+      }
+      const arriving = next !== active;
+      if (arriving) {
+        active = next;
+        light();
+      }
+      drive(next, line, arriving);
+    };
+
+    // Smooth scrolling moves the page every frame, so the part is re-read on
+    // every scroll frame.
     let frame = 0;
     window.addEventListener('scroll', () => {
       if (frame) return;
-      frame = requestAnimationFrame(() => { frame = 0; pick(); });
+      frame = requestAnimationFrame(() => { frame = 0; update(); });
     }, { passive: true });
 
-    if (triggers[0]) choose(triggers[0]);
-    observe();
-    wide.addEventListener('change', observe);
+    units = buildUnits();
+    if (!units.length && triggers[0]) choose(triggers[0]);
+    // the first lighting is a starting point, not a change: no fade on load
+    root.dataset.readingBoot = '';
+    update();
+    requestAnimationFrame(() => requestAnimationFrame(() => { delete root.dataset.readingBoot; }));
     let resizeTimer = 0;
     window.addEventListener('resize', () => {
       window.clearTimeout(resizeTimer);
-      resizeTimer = window.setTimeout(observe, 150);
+      resizeTimer = window.setTimeout(update, 150);
     });
-    document.addEventListener('case:full-open', observe);
+    // the full study opens: its blocks join the reading
+    document.addEventListener('case:full-open', () => {
+      units = buildUnits();
+      active = null;
+      update();
+    });
+
+    // ---- the weak snap: a gesture that rests near a part's start eases there
+    // (Uttham, 2026-10-03: "and some magnetic scroll to these also shuold be
+    // implemented"), the homepage's snap (section-snap.js) on this page's
+    // places: where each part's heading stands on the reading line. Forward
+    // only and with a shorter reach than the homepage's (the reasons are
+    // there). Never while a dialog is open (the enlarged screen), the live
+    // phone is enlarged on a phone, or a field (the password) has the focus.
+    const landing = (unit: Unit, t: ReturnType<typeof tail>) => {
+      const at = unit.top.getBoundingClientRect().top + scrollY;
+      const line = innerHeight * READ_LINE;
+      let s = at - line;
+      if (t && s > t.max - t.half) {
+        // where the sliding line meets it, over the last half screen
+        const k = (t.foot - t.line) / t.half;
+        s = Math.min(Math.max((at - t.foot + t.max * k) / (1 + k), t.max - t.half), t.max);
+      }
+      // a pixel past the line, so a heading that lands on it has crossed it
+      const max = document.documentElement.scrollHeight - innerHeight;
+      return Math.round(Math.min(Math.max(s + 1, 0), max));
+    };
+    provideRestingPlaces({
+      places: () => {
+        const t = tail();
+        return [...new Set(units.map((unit) => landing(unit, t)))];
+      },
+      blocked: () => Boolean(document.querySelector('dialog[open], .is-pip-big') || document.activeElement?.matches('input, textarea, select')),
+    });
   }
 
   // ---- phones: the preview floats (learnt from the bus-discovery reference) --
@@ -1380,8 +1556,8 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
   }
 
   // ---- scroll points: which section or sub-group is being read ------------
-  // The current point is the last heading whose top has passed 40% of the
-  // screen — re-checked each scroll frame, and when the full study opens (its
+  // The current point is the last heading whose top has passed the reading
+  // line (40% of the screen, as the phone's) — re-checked each scroll frame, and when the full study opens (its
   // blocks join the rail then). On a screen too short for the whole rail the
   // list scrolls, and keeps the current tick (and its tooltip) in view.
   {
@@ -1435,7 +1611,10 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
       window.addEventListener('resize', fit);
       document.fonts?.ready.then(fit);
       const update = () => {
-        const line = innerHeight * 0.4;
+        // the reading line the phone and the text follow (40% down, sliding
+        // lower over the page's last half screen where it must), so the rail,
+        // the text and the phone change together
+        const line = readingLine();
         let next: HTMLAnchorElement | null = null;
         targets.forEach((t, i) => {
           if (t && !t.closest('[hidden]') && t.getBoundingClientRect().top <= line) next = links[i];
@@ -1633,6 +1812,14 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
        stock on the board, the weakest container that groups them (no border,
        no shadow — those belong to the cards) */
     --ct-block-bg: color-mix(in oklab, var(--paper-1) 55%, transparent);
+    /* PROGRESSIVE READING (2026-10-03): how far the parts the phone is not
+       showing step back. Ahead — not yet reached — the most, but headings
+       stay near 3 : 1 on the board (body text ~2 : 1), so the page still
+       scans; read, less (headings ~4.5 : 1), so where the reader has been
+       reads as done rather than to come. Only the part on the phone is in
+       full ink (body 5.9 : 1). */
+    --ct-dim-ahead: 0.45;
+    --ct-dim-read: 0.6;
   }
 
   /* ---- hero: the case page's own entrance, the reference's content ---- */
@@ -1796,7 +1983,29 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
     background: transparent;
     transition: background-color var(--dur-2) var(--ease-standard);
   }
-  .ct-step.is-current::before { background: var(--amber-700); }
+  /* the amber bar only in the part the phone is showing: a part that keeps
+     an earlier row's screen (an intro, a section with no state) leaves that
+     row unmarked */
+  .ct-steps:not([data-reading='ahead'], [data-reading='read']) .ct-step.is-current::before { background: var(--amber-700); }
+
+  /* PROGRESSIVE READING (Uttham, 2026-10-03: "can we do progressive loading
+     of teaser pages … ex v2 and v3 both content exsited in a viewport and then
+     the screen is only showing v2, this is leading to confusion"). The script
+     cuts the reading into parts and marks each piece of a part ahead, now or
+     read, on the same trigger that changes the phone: the part on the phone
+     is in full ink, what is still to come steps back most, what has been read
+     a little less. Opacity only — nothing moves, nothing is hidden, and with
+     reduced motion it changes at once (every --dur-* is then zero). A part
+     comes up as a screen arrives (--dur-4, --ease-enter) and steps back as
+     one leaves (--dur-3). Whatever holds the focus is in full ink, wherever
+     it is. Without the script nothing is marked, so everything is in ink. */
+  .ct-story [data-reading] { transition: opacity var(--dur-3) var(--ease-standard); }
+  .ct-story [data-reading='now'] { transition: opacity var(--dur-4) var(--ease-enter); }
+  .ct-story [data-reading='ahead'] { opacity: var(--ct-dim-ahead); }
+  .ct-story [data-reading='read'] { opacity: var(--ct-dim-read); }
+  .ct-story [data-reading]:focus-within { opacity: 1; }
+  /* the first lighting, as the page loads, is a starting point: no fade */
+  .ct[data-reading-boot] .ct-story [data-reading] { transition: none; }
   /* the highlight in a row, or in a step's line under its label, is the bold */
   .ct-step :global(.em) { color: var(--ink-900); font-weight: 600; }
   /* rows or the prompt straight under a section's h2 take the heading's own
