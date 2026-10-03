@@ -171,18 +171,23 @@ export const plpCase: CaseTeaserData = {
   screens: {
     dir: 'plp',
     // the staggered feed is the new feed (2026-10-03: "stagger, you can reuse the
-    // overall new one"); cleanup, titles, list and date are his reference boards,
-    // shown whole on a widened card rather than cropped into a phone
+    // overall new one"). cleanup, titles, list and date are phone screens
+    // composed from his reference boards by scripts/plp-compose.mjs (Uttham,
+    // 2026-10-03: "I want you to show the final version only … when I gave 4
+    // product cards I want you to place thme in a mbile grid and explain not use
+    // as it is, similarly for framework the framework card should comeinside the
+    // image, and the wordings outside"); the boards themselves stay in
+    // src/assets/plp/boards/ as the script's source and are never shown raw
     map: { stagger: 'after' },
     alts: {
       before: 'The old product card',
-      cleanup: 'The card framework: the card split into zones for the picture, its facts, price, quality signals and the Fast programme',
-      titles: 'The same card four ways: the seller’s title, then one and two fact chips, and a Mall card with its chips',
+      cleanup: 'The card framework: one product card, large, under the feed’s search bar, its zones running from the picture down through its fact chips, price and timer, rating and Trusted mark, to the Fast delivery line',
+      titles: 'A feed of four cards: a kurti with the seller’s title, the same kurti with one fact chip, then with two, and a Mall shampoo whose Ad and Mall tags share the row with its facts',
       stagger: 'A product feed with staggered columns: each card at its natural height',
-      list: 'Earphones in the grid view next to the list view',
+      list: 'Earphones as list rows: each row a picture beside its fact chips, price, cash price and rating',
       scroll: 'A feed whose cards carry swipeable images, with the dots under each picture',
       bigimg: 'A fashion card with a taller 4:5 image',
-      date: 'Three cards: no delivery line, a day count, and Fast with a day count',
+      date: 'The new feed with a kurti that shows Fast and its day count at its foot, among cards with no delivery line',
       after: 'The new product card',
       cash: 'The new card with the cash-price row lit',
     },
@@ -194,12 +199,40 @@ export const plpCase: CaseTeaserData = {
       cleanup: 'The card framework',
       titles: 'Facts in place of the title',
       stagger: 'A staggered feed',
-      list: 'Grid or list, by category',
+      list: 'List view by category',
       scroll: 'More views and variations',
       bigimg: 'Bigger images for fashion',
       date: 'Dates on fast deliveries',
       after: 'The new card',
       cash: 'The cash-price row',
+    },
+    // Handwritten notes beside the phone, as on the homepage tiles: each `y` is
+    // where its arrow's tip lands, as a fraction of that screen's height, read
+    // from the composed screen (scripts/plp-compose.mjs prints them). The
+    // framework's notes are the labels on his board, word for word ("Fast
+    // Program" in the site's spelling); the rest are DRAFT wording for Uttham,
+    // true to the screens, saying what the screen shows rather than repeating
+    // the row beside it. Priority order; no numbers.
+    notes: {
+      cleanup: [
+        { text: 'Product comprehension', y: 0.426 }, // the picture
+        { text: 'Comprehension', y: 0.695 }, // the fact chips
+        { text: 'Price', y: 0.778 }, // price and the timer
+        { text: 'Quality', y: 0.866 }, // rating and the Trusted mark
+        { text: 'Fast programme', y: 0.921 }, // the delivery line
+      ],
+      titles: [
+        { text: 'The seller’s title', y: 0.41 }, // DRAFT: "Anarkali Kurti", first row
+        { text: 'Facts in its place', y: 0.759 }, // DRAFT: the Kurti · Cotton chips, second row
+      ],
+      list: [
+        { text: 'A row per product', y: 0.231 }, // DRAFT: the first row
+        { text: 'Facts beside the picture', y: 0.578 }, // DRAFT: the third row's chips
+      ],
+      date: [
+        { text: 'Fast, with a day count', y: 0.782 }, // DRAFT: the kurti's delivery line
+        { text: 'None where it isn’t fast', y: 0.406 }, // DRAFT: the shirt above it, no delivery line
+      ],
     },
   },
 };

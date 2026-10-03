@@ -209,6 +209,14 @@ const edgesOfClip = (key: string) => {
 // a board is shown at most the device's width on the card, and whole in the
 // enlarged view: its sources stop at the export's own width
 const boardWidths = (key: string) => [...new Set([480, 960, 1600].map((w) => Math.min(w, library[key].width)))];
+// HANDWRITTEN NOTES beside the phone, per screen file (screens.notes), as the
+// homepage tiles have them (Uttham, 2026-10-03: "the framework card should
+// come inside the image, and the wordings outside as you did on home page"):
+// only on a phone screen, which fills the display, so a note's `y` is a share
+// of the display's height. A page with notes keeps a notes column on its card
+// at every state (ct-panel--notes), so the card never changes size for them.
+const notesFor = (key: string) => (kindFor(key) === 'phone' ? data.screens?.notes?.[nameOf(key)] ?? [] : []);
+const noted = live ? [] : shots.filter((key) => notesFor(key).length);
 ---
 
 <div class="ct">
@@ -340,7 +348,7 @@ const boardWidths = (key: string) => [...new Set([480, 960, 1600].map((w) => Mat
       )}
     </div>
 
-    <aside class:list={['ct-panel', { 'ct-panel--live': live, 'ct-panel--device': !live, 'ct-panel--titled': titles && !live, 'ct-panel--visit': data.visit }]} aria-label={data.panelLabel ?? 'Preview'} data-case-panel data-map={JSON.stringify(stateFiles)} data-titles={titles && !live ? JSON.stringify(titles) : undefined}>
+    <aside class:list={['ct-panel', { 'ct-panel--live': live, 'ct-panel--device': !live, 'ct-panel--titled': titles && !live, 'ct-panel--visit': data.visit, 'ct-panel--notes': noted.length > 0 }]} aria-label={data.panelLabel ?? 'Preview'} data-case-panel data-map={JSON.stringify(stateFiles)} data-titles={titles && !live ? JSON.stringify(titles) : undefined}>
       <div class="ct-pane">
         {/* one line in a slot of its own height: a long title ends in an
             ellipsis and keeps its whole text as the element's title */}
@@ -412,6 +420,36 @@ const boardWidths = (key: string) => [...new Set([480, 960, 1600].map((w) => Mat
                         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="7" cy="7" r="4.6" /><path d="M10.4 10.4 14 14M7 5v4M5 7h4" /></svg>
                         <span class="ct-board__hint-label"><span class="ct-board__fine">Click</span><span class="ct-board__coarse">Tap</span> to enlarge</span>
                       </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {noted.length > 0 && (
+                /* THE NOTES, outside the device on the card's paper: one set
+                   per screen, laid over the display's box so a note's `y` lands
+                   on the screen's own height, each note standing left of it with
+                   its arrow's tip on the screen's left edge. A set fades with
+                   its screen. Decoration: the screen's alt names its zones. */
+                <div class="ct-annots" aria-hidden="true">
+                  {noted.map((key) => (
+                    <div class="ct-annots__set" data-notes-for={key}>
+                      {notesFor(key).map((n) => (
+                        <span class="ct-annot" style={`--y: ${n.y}`}>
+                          <span class="ct-annot__text">{n.text}</span>
+                          {/* the homepage tiles' arrow, drawn pointing left and
+                              mirrored here; drawn twice, a paper halo under the
+                              ink, so its tip still reads where it crosses the
+                              graphite bezel onto the screen */}
+                          <svg class="ct-annot__arrow" viewBox="0 0 44 22" fill="none">
+                            <g class="ct-annot__halo">
+                              <path d="M42 2.5c-5.5.5-11.6 1.5-17.6 5S10.6 15.8 3.5 20.5" />
+                              <path d="M11.4 21.3 3.5 20.5l2.3-7.6" />
+                            </g>
+                            <path d="M42 2.5c-5.5.5-11.6 1.5-17.6 5S10.6 15.8 3.5 20.5" />
+                            <path d="M11.4 21.3 3.5 20.5l2.3-7.6" />
+                          </svg>
+                        </span>
+                      ))}
                     </div>
                   ))}
                 </div>
@@ -860,6 +898,8 @@ const boardWidths = (key: string) => [...new Set([480, 960, 1600].map((w) => Mat
       if (!live) unfollow(device);
       tint(device, live ?? edgeOf(screen));
     };
+    // a screen's handwritten notes, beside the device: they fade with it
+    const noteSets = [...panel.querySelectorAll<HTMLElement>('[data-notes-for]')];
     const swap = (next: HTMLElement | null) => {
       dress(next);
       // the same screen stays: no new transition, its pan or clip runs on
@@ -867,6 +907,7 @@ const boardWidths = (key: string) => [...new Set([480, 960, 1600].map((w) => Mat
       const prev = shown;
       prev?.classList.remove('is-on');
       next?.classList.add('is-on');
+      noteSets.forEach((set) => set.classList.toggle('is-on', Boolean(next) && set.dataset.notesFor === next?.dataset.screen));
       shown = next;
       shownAt = performance.now();
       if (prev) leave(prev);
@@ -2196,6 +2237,107 @@ const boardWidths = (key: string) => [...new Set([480, 960, 1600].map((w) => Mat
      its chip's edge darkens, nothing moves */
   .ct-stage:has(.ct-pip__enlarge:is(:hover, :focus-visible)) .ct-board.is-on .ct-board__hint { border-color: var(--ink-400); }
 
+  /* THE NOTES (Uttham, 2026-10-03: "the framework card should come inside the
+     image, and the wordings outside as you did on home page"): the homepage
+     tiles' handwriting — Caveat in ink, a few words, the same hand-drawn arrow
+     — on the card's paper LEFT of the device, each arrow's tip on the part of
+     the screen it names (`y`, a share of the screen's height). Left, because
+     every screen they annotate sets its content against its left edge (a
+     card's chips, price, rating and delivery line; a list row's picture), and
+     because that side faces the reading, so the eye goes text, note, screen.
+     A note is one line where it can be: the words stand on the arrow's tail,
+     so a note is about a line and a half tall and the framework's four rows,
+     a little over that apart, never collide; a longer note wraps upwards.
+     The type and the arrow scale with the display (--ct-device-screen), so a
+     note keeps its place against the screen at every size. Never over the
+     screen, never between the device and the title.
+     THE COLUMN is constant: a page with notes gives its card --ct-notes-w at
+     every state, empty while a screen has none, so no state changes the
+     card's size. It is 0.46 of the display's width — the room the
+     framework's longest one-line note ("Fast programme") takes beside its
+     arrow — and only where the card's columns hold it beside a device of its
+     full size; anywhere narrower (a small laptop, a tablet) the column is 0
+     and the notes are off, rather than the phone shrinking for them (as the
+     homepage's narrow wells drop theirs). round(down, room, column) is the
+     column once the room holds it, and 0 before; a browser without round()
+     keeps 0. */
+  .ct-panel--notes { --ct-notes-w: 0px; }
+  @supports (width: round(down, 10px, 3px)) {
+    @media (min-width: 768px) {
+      .ct-panel--notes {
+        --ct-notes-col: calc(var(--ct-device-screen) * 0.46);
+        --ct-notes-room: calc(100cqw - var(--ct-device-w) - 2 * var(--card-padding) - var(--ct-card-edge));
+        --ct-notes-w: min(var(--ct-notes-col), max(0px, round(down, var(--ct-notes-room), var(--ct-notes-col))));
+      }
+    }
+  }
+  /* the notes' box: the display's height, from the card's paper (a --space-3
+     in from its edge) to the display's left edge, over which the arrows land */
+  .ct-annots {
+    position: absolute;
+    top: calc(var(--ct-device-screen) * (var(--ct-device-k-bezel) + var(--ct-device-k-status)));
+    right: calc(100% - var(--ct-device-screen) * var(--ct-device-k-bezel));
+    width: calc(var(--ct-notes-w, 0px) + var(--card-padding) + var(--ct-device-screen) * var(--ct-device-k-bezel) - var(--space-3));
+    height: calc(var(--ct-device-screen) * 2);
+    /* a container, so a column too narrow to hold the notes hides them; its
+       own lengths still resolve against the panel, and the notes inside it
+       use only em and % (their type is set here, where the display's width
+       can be read) */
+    container: ct-annots / inline-size;
+    color: var(--ink-900);
+    font-family: var(--font-hand);
+    font-size: clamp(15px, calc(var(--ct-device-screen) * 0.072), 22px);
+    font-weight: 600;
+    line-height: 1.15;
+    pointer-events: none;
+  }
+  /* a screen's notes fade with it, on the screens' own timing */
+  .ct-annots__set {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity var(--dur-2) var(--ease-exit);
+  }
+  .ct-annots__set.is-on { opacity: 1; transition: opacity var(--dur-4) var(--ease-enter); }
+  .ct-annot {
+    /* the arrow is 2em × 1em; its tip sits 0.16em in from its right end and
+       0.07em up from its foot (the tiles' drawing, mirrored) */
+    --tip-x: 0.16em;
+    --tip-y: 0.07em;
+    position: absolute;
+    right: calc(-1 * var(--tip-x) - 1px);
+    bottom: calc((1 - var(--y)) * 100% - var(--tip-y));
+    max-width: calc(100% + var(--tip-x));
+    display: flex;
+    align-items: flex-end;
+  }
+  /* the words stand on the arrow's tail (0.11em under its top), a hair clear
+     of it, so a note's words never touch the arrow of the note above */
+  .ct-annot__text {
+    min-width: 0;
+    margin: 0 0.15em 0.4em 0;
+    text-align: right;
+    text-wrap: balance;
+    rotate: -2deg;
+  }
+  .ct-annot__arrow {
+    flex: none;
+    display: block;
+    width: 2em;
+    height: 1em;
+    scale: -1 1;
+    overflow: visible;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .ct-annot__halo { stroke: var(--paper-1); stroke-width: 4.4; }
+  /* no column (it did not fit): no notes */
+  @container ct-annots (width < 96px) {
+    .ct-annot { display: none; }
+  }
+
   /* "Scroll ↓": a paper chip in the device's home strip, for a page that
      scrolls by hand (the card's page with reduced motion, the enlarged view),
      until the page's foot is in view — beside the screenshot, never on it.
@@ -2455,8 +2597,17 @@ const boardWidths = (key: string) => [...new Set([480, 960, 1600].map((w) => Mat
       height: auto;
       margin-inline: auto;
     }
-    /* the card is the device plus one inset all round, at every state */
-    .ct-panel--device .ct-pane { width: calc(var(--ct-device-w) + 2 * var(--card-padding) + var(--ct-card-edge)); }
+    /* the card is the device plus one inset all round, at every state — and,
+       on a page with notes, the notes column on its left (--ct-notes-w, 0 where
+       it does not fit), which every state keeps. With the column the card
+       stands at its columns' left edge, beside the reading, so what width is
+       spare falls in the right gutter, where the rail's tooltips need it; the
+       device's own size never depends on the notes. */
+    .ct-panel--device .ct-pane {
+      width: calc(var(--ct-device-w) + 2 * var(--card-padding) + var(--ct-card-edge) + var(--ct-notes-w, 0px));
+      padding-inline-start: calc(var(--card-padding) + var(--ct-notes-w, 0px));
+      margin-inline: max(0px, (100cqw - var(--ct-device-w) - 2 * var(--card-padding) - var(--ct-card-edge)) / 2 - var(--ct-notes-w, 0px) * 1000) auto;
+    }
     /* the live card follows its phone (reduced motion: at once, as every
        --dur-* is then zero) */
     .ct-panel--live .ct-pane {
@@ -2514,6 +2665,7 @@ const boardWidths = (key: string) => [...new Set([480, 960, 1600].map((w) => Mat
     }
     .ct-pane .bolt { display: none; }
     .ct-pane__title { display: none; } /* the mini player is only the phone */
+    .ct-annots { display: none; } /* and no notes, as its dialog has none */
     .ct-stage { position: relative; height: auto; container-type: normal; display: block; }
     .ct-phone--live { width: 100%; border-radius: var(--radius-sm); box-shadow: var(--shadow-lift); }
     .ct-panel--device .ct-boards {

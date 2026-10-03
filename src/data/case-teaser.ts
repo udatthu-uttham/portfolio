@@ -23,6 +23,14 @@ export type CaseBlock =
 
 export type CaseSection = { state?: string; heading: string; blocks: CaseBlock[] };
 
+// A handwritten note beside the case card's phone, as the homepage tiles have
+// them (Uttham, 2026-10-03: "the framework card should come inside the image,
+// and the wordings outside as you did on home page"): `text` is a few words,
+// never a number; `y` is where its arrow's tip lands on the screen's left edge,
+// as a fraction of THAT screen's height (0 = top, 1 = bottom). The words stand
+// left of the arrow, on the card's paper, never over the screen.
+export type ScreenNote = { text: string; y: number };
+
 export type Experiment = {
   state: string;
   title: string;
@@ -48,6 +56,7 @@ export type CaseTeaserData = {
     videos?: Record<string, string>; // file name → an MP4 under public/ that plays once, from its first frame, each time that screen arrives; the file's still is its poster (reduced motion) and the frame it settles on, never the one it opens on
     alts: Record<string, string>; // state or file name → what its screen shows (a file's own wins, e.g. the second of a state's screens)
     titles?: Record<string, string>; // state or file name → the short title on the card, above the phone (a state's first screen takes the state's, a later one its file's)
+    notes?: Record<string, ScreenNote[]>; // file name → handwritten notes beside the phone while that screen shows, in priority order
   };
   // The scroll points: by default every section and sub-group heading. A page
   // can limit them to the top of the page and the sections it names (Uttham,

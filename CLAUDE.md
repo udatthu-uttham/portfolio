@@ -600,7 +600,10 @@ browser's tooltip), and the tick, its length and its accessible name (the whole
 heading) still say where the reader is. Measured 2026-10-03 on all four
 CaseTeaser pages (the two cases and both AI Space pages): no tooltip touches the
 card at any width from 768px up; at 1440 the longest titles keep ~117px, at 1280
-~90px, and **below ~1200px the centred card leaves the gutter too narrow for a
+~90px (on the product cards, whose card carries the notes column, 1440×900 leaves
+57–71px — Problem, Strategy and Outcome whole, the page title off and named by
+the browser's tooltip — and 1280×720 or 1366×768 73–85px; re-measured
+2026-10-03), and **below ~1200px the centred card leaves the gutter too narrow for a
 word** (58px at 1024, 24px at 768), so only the ticks show there — on hover the
 browser's tooltip, on keyboard focus only the ring and the accessible name.
 Left-aligning the card in its columns at 900–1199px would hand the gutter its
@@ -616,7 +619,9 @@ title), Problem, Strategy and Outcome — no sub-group ticks, no full-study tick
 the mobile preview, we should optimise this space"): from 768px the device is as
 tall as the screen allows (`--ct-pane-h`, ≤`--ct-pane-max` 720px) and the card is
 the device plus one `--card-padding` all round, centred in its columns, so spare
-width falls outside the card. **The card is centred in the visible height under the header** (the sticky box is `100dvh` less the header and two gaps, so a tablet browser's sliding address bar never piles the spare height under the card; 2026-10-02: "less spacing on top than bottom"). **The card carries a title above the phone** naming what it
+width falls outside the card — plus, on a page with notes, the notes column on
+its left, when the card stands at its columns' left edge instead (see "His
+boards become phone screens" below). **The card is centred in the visible height under the header** (the sticky box is `100dvh` less the header and two gaps, so a tablet browser's sliding address bar never piles the spare height under the card; 2026-10-02: "less spacing on top than bottom"). **The card carries a title above the phone** naming what it
 shows (`screens.titles`, one short line per state; a state that borrows an
 earlier screen borrows its title): **one line in a slot of its own height**
 (`--text-small` × `--lh-statement`), weight 500 in `--ink-900`, one `--space-3`
@@ -684,7 +689,10 @@ strip**, never on the screenshot, until the foot is in view. (The splash looked
 "weird" in the old frameless 1 : 2 card because it opens on an all-white screen
 with only its logo: with no status bar, home strip or bezel it read as an empty
 white slab, not a phone. It is 1 : 2 to the pixel in the handset.) **A reference
-board** (width ÷ height above 0.62) **stands in the device's place**: whole, on
+board** (width ÷ height above 0.62) dropped in as it came **stands in the
+device's place** — a mechanism no page uses today, kept for a future board; the
+product cards' four boards are composed into phone screens instead (next
+paragraph): whole, on
 the card's paper, never wider or taller than the device, **starting where the
 device's top edge stands, one `--space-3` under the title, its "Click to enlarge"
 chip under it ("Tap" on touch) and the spare paper below** (centred in the
@@ -741,6 +749,50 @@ phone on the AI Space pages keeps its handset 9 : 19.5 and no device mock**: the
 tools draw their own chrome (the prototype its app header and bottom nav, Resona
 its own dark frame), and a status bar and home strip around them would take ~12%
 of the height and shrink the running prototype's viewport, re-laying it out.
+
+**His boards become phone screens, and their words become notes** (Uttham,
+2026-10-03: "in meesho product cards images, I gave the whole dump I want you to
+show the final version only, that is relevant for it, when I gave 4 product
+cards I want you to place thme in a mbile grid and explain not use as it is,
+similarly for framework the framework card should comeinside the image, and the
+wordings outside as you did on home page, please make it cohesive and clean and
+amazing, dont just throw all the things as I gave"). On the product cards the
+four reference boards (`src/assets/plp/boards/`) are never shown raw:
+`scripts/plp-compose.mjs` (`npm run plp-compose`) builds 1080 × 2160 screens
+from his own pixels, and the page shows those. **The final version only**: the
+list view without its grid control or variant labels; the winning date card
+(Fast and its day count) in the new feed, in place of the same kurti's card,
+among cards with no date. **Cards in a mobile grid**: the four title variants
+as the feed's own 2 × 2, at its column width, each at its own height, the feed
+carrying on below them. **The framework card inside the phone**, large on the
+feed under the app's search bar and filter row, its dashed zone boxes and
+labels gone (only the dash pixels are cleared; the timer pill's foot, hidden
+under one, is restored from its own top edge, mirrored). Each takes `after.png`'s
+search bar and filter row as its chrome, except the list, which has its own.
+Lanczos, never sharpened; the effective upscale on the page is ×1.5 for the
+title, date and list screens (the boards are 1× renders) and none for the
+framework card. **The words outside, as on the homepage**: handwritten notes
+(`screens.notes` in `src/data/plp-case.ts`, per screen file, `y` a share of
+that screen's height, priority order, no numbers), the tiles' Caveat in ink and
+the same hand-drawn arrow, on the card's paper **left of the device** — every
+one of these screens sets its content against its left edge, and that side
+faces the reading — each arrow's tip on the display's left edge at its `y`
+(measured within 0px of it, 1px inside the screen) and crossing the bezel on a
+paper halo, the words standing on the arrow's tail, so a note is about a line
+and a half tall and the framework's four rows, a little more than that apart,
+never collide. Never over the screen, never between the device and its title.
+The framework's notes are his labels word for word (Product comprehension,
+Comprehension, Price, Quality, Fast programme); the others are DRAFT wording,
+his to set. **The notes column is constant**: `--ct-notes-w`, 0.46 of the
+display's width, kept at every state (empty while a screen has none) so the
+card never changes size, and only where the card's columns hold it beside a
+full-size device — 1440×900, 1366×768 and 1280×720; at 1200×800 and narrower
+(1024×768, tablets) it is 0 and the notes are off, never the phone smaller.
+With the column the card stands at its columns' left edge, so the spare width
+goes to the rail's gutter. A screen's notes fade with it; the mini player and
+the dialog show none. Measured 2026-10-03: card 480.7 × 720 / 395.7 × 596 at
+1440×900 / 1280×720 through every state of the teaser and the full study, the
+display 273 / 222 as before; the Mall page is unchanged.
 
 **Glass only where something sits between** (Uttham, 2026-10-01: "for the phone
 preview no need to use the glass, use the card component, glass is only used
