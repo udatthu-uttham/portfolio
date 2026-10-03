@@ -751,7 +751,10 @@ strip; a clip plays from its first frame; a board opens whole on a paper card.
 dialog's × stands in a row of its own above it, right-aligned, a `--space-2`
 clear, its height taken out of the device's budget (`--ct-zoom-close`), and the
 mini player's × stands the same `--space-2` above the handset (2026-10-03, review:
-on the corner they hid the battery and broke the body's outline). **The card stands exactly
+on the corner they hid the battery and broke the body's outline). **At the end of the reading the card's foot lands level with the last card on
+the left** (Uttham, 2026-10-03: "these two should be aligned at bottom before
+both start scrolling down"): the sticky box gives back half its spare height as
+a negative bottom margin, so it stops that much lower. **The card stands exactly
 in its sticky box**: the device's height budget takes off the card's own 1px
 border (`--ct-card-edge`), which had left it 2px over at 1280×720. **The live
 phone on the AI Space pages keeps its handset 9 : 19.5 and no device mock**: the
