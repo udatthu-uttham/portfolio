@@ -325,7 +325,12 @@ these 4 slideshows, accordingly the highlight changes in the left … in all the
 blocks"): once the reading reaches a block showing two or more different
 screens, the phone runs through them a beat (2.6s) each and the row it shows
 takes the highlight; hovering a row holds it; reduced motion keeps the
-scroll-driven pick. The table is in `docs/design-tokens.md`; never drop these pages back
+scroll-driven pick. **A row with several screens plays them in turn**
+(`screens.map` to a list — the Mall tab: its modal, then its PiP), the card's
+title following the file shown; **a beat never takes a screen away before it
+has finished** — a page pans its round trip, a clip plays and holds 1.2s — and
+**rows that share a screen hand it on as it is**, with no new fade, pan or
+replay. The table is in `docs/design-tokens.md`; never drop these pages back
 to `--section-y-sm`. **Every teaser page navigates by a rail of scroll points,
 each title a tooltip** (Uttham, 2026-10-02: "the sticky notes as scroll points in
 l2 is weird lets do the one you initially made but the active or hover state show
@@ -348,6 +353,28 @@ one `--card-padding` all round, centred in its columns, so spare width falls
 outside the card. **The card is centred in the visible height under the header** (the sticky box is `100dvh` less the header and two gaps, so a tablet browser's sliding address bar never piles the spare height under the card; 2026-10-02: "less spacing on top than bottom"). **Reference boards are shown whole** (2026-10-03: "I will give reference image (figure out a way on how to place this)"): a screen wider than a phone (width/height > 0.62) drops the phone frame and the card widens to its whole column, the board contained on the paper at the phone's height; a block that holds any board keeps the card wide throughout, so the slideshow never makes it breathe. **The card carries a title above the phone** naming what it
 shows (`screens.titles`, one short line per state; a state that borrows an
 earlier screen borrows its title); the mini player on phones has none.
+
+**Nothing on the phone is ever cropped** (Uttham, 2026-10-03: "when I give big
+images I dont want you to just paste them or crop them abruptly making its
+content gone (this is for all images you are using)"). The screens are exported
+at 1 : 2, so **the frame is 1 : 2 by default and takes each screen's own
+proportion as it shows it** (`--ct-ratio`, measured inside the frame's 1px
+edges): a 1 : 2 screen meets all four edges to the pixel, and the 9 : 16 order
+confirmation makes the phone a touch wider rather than earning bars. The
+phone's height holds and its width eases (`--dur-3`); on a tablet, where the
+column binds, the width holds and the height eases instead, the card recentred.
+**A page capture taller than any handset (taller than 9 : 19.5) stands in a
+1 : 2 window and pans**: a hold at the top, an eased glide to its foot, a hold,
+and back, looping while it is shown; with reduced motion it does not move but
+scrolls by hand, a "Scroll ↓" chip at its foot until the foot is in view. **A
+file with a clip (`screens.videos`) plays it once from its first frame each
+time its screen arrives, then settles on its still** (the poster, optimised
+like any screen — for the order confirmation, whose clip ends mid-transition,
+the confirmed frame); clips load only as their rows near the reading, wait
+while the phone cannot be seen, and with reduced motion never play. The mini
+player takes the same proportions, and its full-size dialog shows the screen
+whole: a page in a 1 : 2 window that scrolls, a clip playing. The live phone on
+the AI Space pages keeps its handset 9 : 19.5, untouched.
 
 **Glass only where something sits between** (Uttham, 2026-10-01: "for the phone
 preview no need to use the glass, use the card component, glass is only used

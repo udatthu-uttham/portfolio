@@ -4,8 +4,10 @@
 // study behind a light gate. Rendered by src/components/CaseTeaser.astro.
 //
 // Any element with a `state` drives the preview: in screens mode it picks the
-// screen `screens.map[state] ?? state` from `src/assets/<screens.dir>/`; with a
-// `preview` slot (a live tool) it is announced as a `case:state` event instead.
+// screens `screens.map[state] ?? state` from `src/assets/<screens.dir>/` (one
+// file, or several that play in turn), each shown whole — never cropped; with
+// a `preview` slot (a live tool) it is announced as a `case:state` event
+// instead.
 
 export type CaseStep = { state?: string; label: string; text: string }; // a labelled ruled row; highlights in **bold**
 export type CaseRow = { state?: string; text: string }; // one ruled row of prose; highlights in **bold**
@@ -42,10 +44,10 @@ export type CaseTeaserData = {
   experiments?: Experiment[]; // the full study behind the gate; none → the card has no button
   screens?: {
     dir: 'plp' | 'mall-case'; // a folder under src/assets/ holding this page's screens
-    map?: Record<string, string | string[]>; // state → file name, when it is not the state's own name; several play in turn
-    videos?: Record<string, string>; // file name → an MP4 under public/ that plays on that screen; the file's still is its poster
-    alts: Record<string, string>; // state → what its screen shows
-    titles?: Record<string, string>; // state → the short title on the card, above the phone
+    map?: Record<string, string | string[]>; // state → file name, when it is not the state's own name; several play in turn, a beat (or a clip) each
+    videos?: Record<string, string>; // file name → an MP4 under public/ that plays once each time that screen arrives; the file's still is its poster and the frame it settles on
+    alts: Record<string, string>; // state or file name → what its screen shows (a file's own wins, e.g. the second of a state's screens)
+    titles?: Record<string, string>; // state or file name → the short title on the card, above the phone (a state's first screen takes the state's, a later one its file's)
   };
   // The scroll points: by default every section and sub-group heading. A page
   // can limit them to the top of the page and the sections it names (Uttham,
