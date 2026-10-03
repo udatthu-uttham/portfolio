@@ -34,6 +34,8 @@ interface Props {
 const { data, frame } = Astro.props;
 const live = Astro.slots.has('preview');
 const livePhone = live && frame === 'phone';
+// the way on to the next case or tool, at the end of the reading column
+const hasMore = Astro.slots.has('more');
 
 // the case studies' phone screens: plp/ and mall-case/ hold only what Uttham
 // supplies for them (2026-10-02: "remove them and ask me I will give all of
@@ -225,9 +227,11 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
     <h1>{data.title}</h1>
     <p class="ct-dek" set:html={dek} />
     {data.facts.length > 0 && (
+      /* one row from 768px, the last fact over the phone's columns; a long
+         one (Value added) is marked, so it can take what the row leaves */
       <dl class="ct-facts">
         {data.facts.map((f) => (
-          <div class="ct-facts__row"><dt>{f.label}</dt><dd set:html={rich(f.value)} /></div>
+          <div class:list={['ct-facts__row', { 'ct-facts__row--long': f.value.replace(/\*\*|\^\^/g, '').length > 60 }]}><dt>{f.label}</dt><dd set:html={rich(f.value)} /></div>
         ))}
       </dl>
     )}{data.visit && (
@@ -345,6 +349,20 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
             </article>
           ))}
         </section>
+      )}
+
+      {/* THE WAY ON, at the end of the reading and in its column (Uttham,
+          2026-10-03: "the more case section can be just a small section with
+          chevron and takes the column width of the content it should not flow
+          into the column of the phone preview, so the phone preview always
+          stays"): the page passes "More cases" or "More tools" in the `more`
+          slot, and the sticky phone stays beside it to the last row. On phones
+          the mini player steps away as it arrives (the end marker leads it). */}
+      {hasMore && (
+        <div class="ct-more">
+          <span class="ct-end" data-case-end aria-hidden="true"></span>
+          <slot name="more" />
+        </div>
       )}
     </div>
 
@@ -489,7 +507,7 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
       ))}
     </ol>
   </nav>
-  <span class="ct-end" data-case-end aria-hidden="true"></span>
+  {!hasMore && <span class="ct-end" data-case-end aria-hidden="true"></span>}
   <button class="ct-pip__restore cta cta--secondary" type="button" data-pip-restore hidden>Show preview</button>{livePhone && <div class="ct-pip__scrim" data-pip-scrim hidden></div>}
   {!live && (
     /* data-lenis-prevent: the smooth scroll would otherwise take the wheel
@@ -1785,14 +1803,40 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
   }
 </script>
 
+<script>
+  // THE PAGE'S FOOT FOLLOWS THE CARD (from 768px): the card's height, on the
+  // page's root as --ct-card-h, so the page ends exactly the room the centred
+  // card has under it below the reading's last row, and the sticky box gives
+  // the same room back as its margin (--ct-give, in the style). Measured, not
+  // derived: the card's own sums (its device, title, open link, a running
+  // tool's phone) stay the card's. A ResizeObserver catches every change of
+  // size — a new viewport, the live phone easing to its width.
+  {
+    const root = document.querySelector<HTMLElement>('.ct');
+    const card = root?.querySelector<HTMLElement>('[data-case-panel] .ct-pane');
+    if (root && card) {
+      const wide = window.matchMedia('(min-width: 768px)');
+      const measure = () => {
+        if (wide.matches) root.style.setProperty('--ct-card-h', `${card.getBoundingClientRect().height}px`);
+        else root.style.removeProperty('--ct-card-h');
+      };
+      new ResizeObserver(measure).observe(card);
+      wide.addEventListener('change', measure);
+      measure();
+    }
+  }
+</script>
+
 <style>
   .ct {
     position: relative;
     z-index: 1;
     width: min(calc(100% - var(--margin-side) * 2), var(--container-max));
     margin: 0 auto;
-    /* a whole section gap before "More cases", as between every section */
-    padding-bottom: var(--section-y);
+    /* "More cases" / "More tools" ends the reading column (.ct-more); under
+       its last row, on phones, the page's foot: one --section-y-sm. From 768px
+       the foot is the room the sticky card has under it (--ct-give, below). */
+    padding-bottom: var(--section-y-sm);
     /* ONE RUNG MORE AIR, every step of the ladder (Uttham, 2026-10-02: "the
        texts are closely placed making it too textual please use ample spacings
        and consistent spacings"). The order of the steps is unchanged, so the
@@ -1834,8 +1878,23 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
     .ct-hero > * { opacity: 0; transform: translateY(12px); }
   }
   .back-link { margin-bottom: var(--group-gap); }
+  /* THE HERO RUNS END TO END (Uttham, 2026-10-03: "the title section from
+     glance to decsion can be end to end of viewport. along with tole and
+     timeline(do this change for all teaser pages)"): the back link, the
+     title, the dek and the facts span the page's grid lines — the container,
+     the edges the header stands on — and the reading and the sticky phone
+     start under it, so the card can never reach the hero. The title takes the
+     whole width (balanced, so two lines break evenly); the dek keeps the
+     reading column's measure, so a long one still reads; the facts run in one
+     row between dashed rules drawn line to line, the last of them standing
+     over the phone's columns (from 768px; stacked rows on phones). */
+  .ct-hero {
+    /* the phone's columns as a length — the layout's 5 of 12, 3 of the
+       tablet's 8 — a percentage, so it resolves against the hero's width */
+    --ct-side-span: 5;
+    --ct-side-w: calc((100% - (var(--grid-columns) - 1) * var(--grid-gap)) * var(--ct-side-span) / var(--grid-columns) + (var(--ct-side-span) - 1) * var(--grid-gap));
+  }
   h1 {
-    max-width: 19ch;
     margin: 0;
     font-size: var(--text-hero);
     font-weight: 600;
@@ -1844,7 +1903,6 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
     text-wrap: balance;
   }
   .ct-dek {
-    max-width: 600px;
     margin: var(--content-gap) 0 0;
     color: var(--ink-600);
     font-size: var(--text-body-lg);
@@ -1860,10 +1918,9 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
     text-underline-offset: 4px;
   }
   .ct-dek :global(.ct-source:focus-visible) { outline: 2px solid var(--amber-text); outline-offset: 2px; }
-  /* Facts: label and value on one line each, the rules dashed like the
-     measure — never solid (the site draws no solid rules on paper). */
+  /* Facts: on phones, label and value on one line each; the rules dashed
+     like the measure — never solid (the site draws no solid rules on paper). */
   .ct-facts {
-    max-width: 600px;
     margin: var(--group-gap) 0 0;
     padding: var(--space-5) 0;
     display: grid;
@@ -1880,6 +1937,31 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
   }
   .ct-facts dd { margin: 0; color: var(--ink-900); font-size: var(--text-body); line-height: var(--lh-body); }
   .ct-facts dd :global(.em) { font-weight: 600; } /* a long fact (Value added) carries its highlight too */
+  /* From 768px the facts are one row, each its label over its value: the
+     ones before the last sit at their own width from the left line (a long
+     one, Value added, takes what the row leaves, wrapping), and the last
+     stands at the phone's column, so Timeline or Year sits over the card. A
+     row too narrow for them all wraps, the last keeping its column. */
+  @media (min-width: 768px) {
+    .ct-dek { max-width: calc(100% - var(--ct-side-w) - var(--grid-gap)); }
+    .ct-facts {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      gap: var(--space-5) var(--group-gap);
+    }
+    .ct-facts__row { flex: 0 1 auto; grid-template-columns: none; gap: var(--space-2); }
+    .ct-facts__row--long { flex: 1 1 32ch; min-width: 0; }
+    .ct-facts__row:last-child:not(:only-child) { flex: none; width: var(--ct-side-w); margin-inline-start: auto; }
+  }
+  /* on the tablet grid a long fact cannot share the row and still read (it
+     ran to seven lines beside Tool, with Year pushed under it): the short
+     facts keep the row, the last over the phone's columns, and the long one
+     takes the whole width under them */
+  @media (min-width: 768px) and (max-width: 900px) {
+    .ct-hero { --ct-side-span: 3; }
+    .ct-facts__row--long { order: 1; flex-basis: 100%; }
+  }
   /* a live thing the reader can open themselves: under the facts on phones,
      on the card under the phone from 768px */
   .ct-visit { margin-top: var(--group-gap); }
@@ -1905,6 +1987,9 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
      on 2026-10-02; --ct-tie split off --ct-para on 2026-10-03. */
   .ct-layout { margin-top: var(--section-y); }
   .ct-story { display: grid; gap: var(--section-y); min-width: 0; }
+  /* the way on: the reading column's last item, a section gap under the last
+     section; nothing under it, so its foot is the column's foot */
+  .ct-more { min-width: 0; }
   .ct-section, .ct-full { min-width: 0; }
   h2 {
     margin: 0;
@@ -2811,17 +2896,32 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
        is centred in its sticky box, so when the column runs out the box stops
        with half the spare height still under the card, and the card's foot
        sat above the last card on the left. The box's margin gives that half
-       back, so the box stops that much lower and the card's foot lands on the
-       column's foot, level with the last thing in the reading. */
+       back (--ct-give), so the box stops that much lower and the card's foot
+       lands on the column's foot, level with the last thing in the reading —
+       now "More cases" / "More tools" (.ct-more). AND IT NEVER LEAVES ITS
+       PLACE (Uttham, 2026-10-03: "now the out come section also should scroll
+       and the phone should be sticky to the right for both the case studies";
+       "so the phone preview always stays"): the page ends exactly the room
+       the centred card has under it (a --content-gap and that half) below the
+       column's foot, so at the very end the card is still centred where it
+       stood all the way down — through Outcome, the gate card or the full
+       study and the way on — and its foot is level with the last row. The
+       half is the box's spare height less the card's, both on the screen:
+       the card's height is measured (--ct-card-h, set by the script below the
+       main one), because a formula on the panel resolved its width against
+       the viewport and gave back 88px of a tablet's 214 (768×1024). Without
+       the script it falls back to the tallest card, which is a laptop's. */
     /* THE BOLTS NEVER TOUCH THE PHONE (Uttham, 2026-10-03: "make sure the
        bolts really dont come onto phone"): a bolt sits --bolt-inset in from
        each corner and is --bolt-size across, so the glass card's inset is the
        bolt's far edge plus a --space-2, on every side — the device, its notes
        and the card's height budget all read this one length. */
     .ct-panel--device { --card-padding: calc(var(--bolt-inset) + var(--bolt-size) + var(--space-2)); }
-    .ct-panel--device {
-      margin-bottom: calc(-1 * max(0px, (100dvh - var(--header-height) - 2 * var(--content-gap) - (var(--ct-device-screen) * var(--ct-device-k-tall) + 2 * var(--card-padding) + var(--ct-card-edge) + var(--ct-title-h) + var(--ct-foot-h))) / 2));
+    .ct {
+      --ct-give: max(0px, (100dvh - var(--header-height) - 2 * var(--content-gap) - var(--ct-card-h, min(100svh - var(--header-height) - 2 * var(--content-gap), var(--ct-pane-max)))) / 2);
+      padding-bottom: calc(var(--content-gap) + var(--ct-give));
     }
+    .ct-panel { margin-bottom: calc(-1 * var(--ct-give)); }
     /* the live phone stands as tall as the card allows and takes the width
        its proportion gives it — unless the column is narrower (a tablet),
        when it takes the column and its height follows */

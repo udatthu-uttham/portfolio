@@ -62,7 +62,12 @@ const caseLd = workLd({
   <main id="main" class="case-page" tabindex="-1">
     <GridOverlay />
     {study.teaser ? (
-      <CaseTeaser data={study.teaser} />
+      <CaseTeaser data={study.teaser}>
+        {/* the other cases, at the end of the reading column, the sticky
+            phone beside them (Uttham, 2026-10-03: "the more case section can
+            be just a small section with chevron") */}
+        <CaseIndex slot="more" items={studies.filter((s) => s.slug !== study.slug)} label="More cases" compact />
+      </CaseTeaser>
     ) : (
     <>
     <section class="case-hero" data-next-cursor-exclude>
@@ -207,7 +212,7 @@ const caseLd = workLd({
     </>
     )}
   </main>
-  <CaseIndex items={studies.filter((s) => s.slug !== study.slug)} label="More cases" end />
+  {!study.teaser && <CaseIndex items={studies.filter((s) => s.slug !== study.slug)} label="More cases" end />}
 </Base>
 
 <style>

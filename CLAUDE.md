@@ -556,6 +556,42 @@ decide" holds the staggered feed, list or grid by category, swipeable images and
 the delivery date, in that order. Block 2 has no row on the facts that replaced
 the titles yet: he said he will talk about that under value additions.
 
+**The hero runs end to end; the two columns start under it** (Uttham,
+2026-10-03: "the title section from glance to decsion can be end to end of
+viewport. along with tole and timeline(do this change for all teaser pages)").
+On all four CaseTeaser pages the back link, the title, the dek and the facts
+span the page's grid lines (the container, the edges the header stands on), and
+the reading column and the sticky phone begin below them, so the card can never
+reach the hero. **The title takes the whole width** (balanced); **the dek keeps
+the reading column's measure** (it ends where the reading column ends), so a
+long AI-page dek still reads; **the facts are one row between dashed rules
+drawn line to line**, each its label over its value, the ones before the last
+at their own width from the left line and **the last standing exactly over the
+phone's columns** (Timeline, or Year on the tool pages), from 768px. A long
+fact (over 60 characters: Value added) takes what the row leaves and wraps; on
+the 8-column tablet grid it drops under the short ones at the full width,
+because beside Tool it ran to seven lines. Phones keep the stacked label |
+value rows.
+
+**The phone stays to the very end, centred** (Uttham, 2026-10-03: "now the out
+come section also should scroll and the phone should be sticky to the right for
+both the case studies"; "so the phone preview always stays and is center
+aligned"). It used to scroll away under Outcome, because the page ended a whole
+`--section-y` plus "More cases" below the reading's last card, more than the
+room under the centred card. Now **"More cases" / "More tools" is the reading
+column's last item, and the page ends exactly the room the centred card has
+under it** (a `--content-gap` plus half the sticky box's spare height,
+`--ct-give`) below it: through Outcome, the gate card or the full study and the
+way on, the card never leaves its place, and at the last pixel its foot is level
+with the last row (measured 2026-10-03 on all four pages at 1440×900, 1280×720,
+1024×768 and 768×1024: 0–0.2px apart, the same room above and below the card).
+On a tablet in portrait that room is ~200–230px of empty page under the last
+row, the price of a centred card. The card's height comes from a
+ResizeObserver (`--ct-card-h`, the small script after the main one), not a
+formula: the old one, on the panel, resolved its width against the viewport and
+gave back 88px of a 768×1024 tablet's 214. Without the script it falls back to
+the tallest card, which is a laptop's.
+
 **Meesho Mall is the same teaser**, from `src/data/mall-case.ts`, reworked on
 2026-10-02 from his notes: Role Senior Product Designer, 2022–2023; where it
 started (competitive, better-quality alternatives for shoppers who seek quality,
@@ -866,7 +902,8 @@ mini player's × stands the same `--space-2` above the handset (2026-10-03, revi
 on the corner they hid the battery and broke the body's outline). **At the end of the reading the card's foot lands level with the last card on
 the left** (Uttham, 2026-10-03: "these two should be aligned at bottom before
 both start scrolling down"): the sticky box gives back half its spare height as
-a negative bottom margin, so it stops that much lower. **The card stands exactly
+a negative bottom margin (`--ct-give`, measured; see "The phone stays to the
+very end"), so it stops that much lower, and the page ends where it has stopped. **The card stands exactly
 in its sticky box**: the device's height budget takes off the card's own 1px
 border (`--ct-card-edge`), which had left it 2px over at 1280×720. **The live
 phone on the AI Space pages keeps its handset 9 : 19.5 and no device mock**: the
@@ -974,21 +1011,28 @@ phone; a page where everything reaches the line never takes that path.
 
 **Every tool page ends on "More tools", as a case page ends on "More cases"**
 (Uttham, 2026-10-03: "and similar to projects at the end give entry points for
-next ones in ai prototype also"): after the recipe, one `--section-y` down (the
-layout's own bottom pad) and one `--section-y-sm` above the page's end, **a
-ruled row for every other tool with a page**, in the homepage's card order,
-linking to `/ai/<slug>`. **It is the same component, `CaseIndex` with `end`**:
-cases pass their studies, tools pass rows built from `tools.ts` only — year,
-kicker, name and the card's line (`what`), nothing written for it; a row
-without a year or kicker leaves that cell empty, never invented. The label
-names what the rows are, as "More cases" does, and the homepage section calls
-them tools ("Tools I build so the team moves faster."). On Resona **its last
-part, What you get, reaches the reading line without help**; its last row
-stops ~100px under the line at 1440×900 (re-measured 2026-10-03 against the
-40% line), so the line still slides over the block for reduced motion's
+next ones in ai prototype also"), **a small section in the reading column with
+a chevron per row** ("the more case section can be just a small section with
+chevron and takes the column width of the content it should not flow into the
+column of the phone preview, so the phone preview always stays"): one
+`--section-y` under the last section, the label a `--ct-tie` over the rows,
+which stand on the faint band the page's blocks of rows share, the dashed rule
+only between rows, each row its title, its line and a chevron that nudges on
+hover; it never reaches the phone's columns, and the sticky card stands beside
+it to the end. **It is the same component, `CaseIndex` with `compact`**, passed
+in CaseTeaser's `more` slot (`end` keeps the old full-width ruled index for a
+case page without the teaser layout): cases pass their studies, tools pass rows
+built from `tools.ts` only — the name and the card's line (`what`), nothing
+written for it; every other tool with a page, in the homepage's card order,
+linking to `/ai/<slug>`. The label names what the rows are, as "More cases"
+does, and the homepage section calls them tools ("Tools I build so the team
+moves faster."). On phones the page's end marker leads the block, so the mini
+player steps away as it arrives. On Resona **its last part, What you get,
+reaches the reading line without help**; its last row stops ~85px under the
+line at 1440×900 (re-measured 2026-10-03 against the 40% line, with the block
+in the column), so the line still slides over the block for reduced motion's
 row-by-row pick; the block itself holds no trigger, so the phone never changes
-as it scrolls in, and on phones the mini player has stepped away before it
-arrives.
+as it scrolls in.
 
 **The full case study opens behind a light gate** (Uttham chose "Light
 gate only"). **The password card holds the "In the full case study" list** (2026-10-02:
