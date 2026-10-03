@@ -78,6 +78,11 @@ const idFor = (text: string) => `s-${text.toLowerCase().replace(/[^a-z0-9]+/g, '
 // A page with `rail` keeps only the top of the page and the sections it names
 // (the full study opens inside Outcome, so Outcome stays lit while it is read).
 type Mark = { id: string; title: string; sub?: boolean; full?: boolean };
+// A tooltip names its tick in a few words (Uttham, 2026-10-03: "please
+// truncate these"): a heading's lead-in before its colon ("Before v3: what
+// shoppers told us" → "Before v3"), the whole heading when it has none. The
+// link's accessible name keeps the full heading.
+const shortFor = (title: string) => title.split(/:\s/)[0];
 const rail = data.rail;
 const marks: Mark[] = rail
   ? [
@@ -298,7 +303,7 @@ const titleFor = (key: string) => {
       {marks.map((m) => (
         <li class:list={{ 'ct-points__item--sub': m.sub, 'ct-points__full': m.full }} hidden={m.full || undefined}>
           <a class="ct-points__link" href={`#${m.id}`} aria-label={m.title} data-point>
-            <span class="ct-points__label" aria-hidden="true">{m.title}</span>
+            <span class="ct-points__label" aria-hidden="true">{shortFor(m.title)}</span>
             <span class="ct-points__tick" aria-hidden="true"></span>
           </a>
         </li>

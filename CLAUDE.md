@@ -424,7 +424,11 @@ gutter (a sub-group's tick shorter, the one being read longer and in
 `--ink-900`), the full study and its blocks joining once it is open; a click
 jumps. **Only one title shows at a time, as a small paper tooltip left of its
 tick**: the current tick's, or the hovered or keyboard-focused one's instead.
-It fades, never slides. The rail is ≥768px only, since on phones the mini player
+It fades, never slides. **A tooltip names its tick in a few words** (2026-10-03:
+"please truncate these"): the heading's lead-in before its colon ("Before v3: what
+shoppers told us" → "Before v3"; the page title → "From doubt to desire"), the
+whole heading when it has none; the link's accessible name keeps the full
+heading. The rail is ≥768px only, since on phones the mini player
 owns the right edge. **A page can limit its rail** (`rail` on the page's data;
 2026-10-02: "the scroll stepper should also have limited things, outcome,
 strategy, problem, title"): the product cards keep only the top of the page (its
