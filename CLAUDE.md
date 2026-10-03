@@ -326,9 +326,11 @@ newly registered domain). On-page SEO came in the same pass. What lives where:
   blocked**. `'unsafe-inline'` stays because Astro inlines its small scripts
   and the pages use style attributes. PDFs drop the CSP so the browser's viewer
   opens them. The microphone stays allowed for this origin only, because the
-  prototype has voice search. **HSTS has no `preload` yet**: the preload list is
-  hard to leave. Add it and submit at hstspreload.org only after a few clean
-  weeks, and only if every subdomain will be HTTPS for good.
+  prototype has voice search. **HSTS carries `preload`** (Uttham, 2026-10-03:
+  he chose to preload now rather than wait a few clean weeks). The list is hard
+  to leave — removal takes months — so **every subdomain of uttham.fyi must
+  serve HTTPS for good**; never point one at a service that cannot. The
+  submission at hstspreload.org needs Cloudflare's Always Use HTTPS on first.
 - **Every page names its one address on the apex** (`<link rel="canonical">`,
   from `site` in `astro.config.mjs`), so the www and workers.dev copies fold
   into it. Titles, descriptions, Open Graph, Twitter and JSON-LD are built in
@@ -353,9 +355,10 @@ newly registered domain). On-page SEO came in the same pass. What lives where:
   abandoned.
 - **A wrong address gets `src/pages/404.astro` with a 404 status**, because
   `wrangler.jsonc` sets `not_found_handling: "404-page"`. The 404 is noindex and
-  stays out of the sitemap. `workers_dev: false` is written out there too: with
-  routes, Wrangler already turned the workers.dev address off. Set it to true to
-  get that address back.
+  stays out of the sitemap. **`workers_dev: true`** (Uttham, 2026-10-03), so the
+  site can be checked from a network that blocks uttham.fyi; with `routes`
+  present Wrangler turns that address off unless this says true. It is noindex
+  and its canonical tags name the apex.
 - **One h1 per page and no skipped levels.** "How I lead" is an h2, so its three
   principles sit under it rather than under the AI Space heading. The Resona
   preview's screen labels are paragraphs, not h4s: they are the tool's UI, not

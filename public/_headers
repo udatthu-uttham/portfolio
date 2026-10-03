@@ -7,10 +7,11 @@
 # characters a line. This file is parsed by Cloudflare, never served.
 
 /*
-  # HTTPS only, for a year, on uttham.fyi and every subdomain. No "preload"
-  # yet: the preload list is hard to leave, so it waits until this has run
-  # cleanly for a few weeks (CLAUDE.md, "Domain trust").
-  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  # HTTPS only, for a year, on uttham.fyi and every subdomain, and eligible for
+  # the browsers' preload list (Uttham, 2026-10-03, chose to preload now rather
+  # than wait). Preloading is hard to undo: removal takes months and every
+  # future subdomain must serve HTTPS (CLAUDE.md, "Domain trust").
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   # Only uttham.fyi may frame its pages: the homepage and /ai/realistic-prototype
@@ -40,7 +41,7 @@
 /proto/feed-ux/assets/*
   Cache-Control: public, max-age=31536000, immutable
 
-# The Worker's own workers.dev address (off today: wrangler.jsonc) and its
+# The Worker's own workers.dev address (on: wrangler.jsonc) and its
 # preview URLs stay out of search; the canonical tags name the apex anyway.
 https://:worker.:account.workers.dev/*
   X-Robots-Tag: noindex

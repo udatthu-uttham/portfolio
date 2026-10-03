@@ -12,12 +12,12 @@
     // trust pass, 2026-10-03); without this it got an empty 404.
     "not_found_handling": "404-page"
   },
-  // Stated, not changed: with `routes` present Wrangler already turns the
-  // portfolio.<account>.workers.dev address off on every deploy (it answers
-  // "error code: 1042"). Set true to bring it back, e.g. to check the site
-  // from a network that blocks uttham.fyi; public/_headers marks it noindex
-  // and every page's canonical tag names the apex.
-  "workers_dev": false,
+  // On, so the site can be checked from a network that blocks uttham.fyi
+  // (Uttham, 2026-10-03, asked to turn it back on after the domain trust pass;
+  // with `routes` present Wrangler turns it off unless this says true).
+  // public/_headers marks it noindex and every page's canonical tag names the
+  // apex, so search engines never index the copy.
+  "workers_dev": true,
   "routes": [
     { "pattern": "uttham.fyi", "custom_domain": true },
     { "pattern": "www.uttham.fyi", "custom_domain": true }
