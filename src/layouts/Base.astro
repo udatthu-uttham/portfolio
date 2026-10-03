@@ -17,15 +17,34 @@ import PointerRide from '../components/PointerRide.astro';
 //   <noscript> inside <head> makes the Astro compiler close the head early,
 //   which used to push every stylesheet link to after </body>.
 
+// Search and link previews (domain trust pass, 2026-10-03; CLAUDE.md, "Domain
+// trust"): every page names its one address on the apex, so the www and
+// workers.dev copies fold into it; the Open Graph and Twitter tags give
+// LinkedIn, Slack and WhatsApp a titled card with a picture; a page can add
+// its own JSON-LD. Titles and descriptions come from src/lib/seo.ts.
+import { SITE, ogHome, checkLengths, type OgImage } from '../lib/seo';
+
 interface Props {
   title: string;
   description?: string;
+  image?: OgImage; // the link-preview card; defaults to the home card
+  type?: 'website' | 'article';
+  jsonLd?: object; // schema.org data for this page
+  noindex?: boolean; // the 404 page: no canonical, kept out of the index
 }
 
 const {
   title,
   description = 'Uttham Udatthu — design leadership for commerce at India scale.',
+  image = ogHome,
+  type = 'website',
+  jsonLd,
+  noindex = false,
 } = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, SITE).href;
+const imageUrl = new URL(image.src, SITE).href;
+if (!noindex) checkLengths(Astro.url.pathname, title, description);
 ---
 
 <!doctype html>
@@ -64,6 +83,27 @@ const {
     />
     <script src="../scripts/motion.js"></script>
     <slot name="head" />
+    <!-- Search and link previews, after the preloads, so those stay in the
+         page's first ~1KB. Astro appends the stylesheets after this block,
+         ~3.5KB in: still inside the first round trip. -->
+    {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
+    <meta property="og:site_name" content="Uttham Udatthu" />
+    <meta property="og:locale" content="en_IN" />
+    <meta property="og:type" content={type} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    {!noindex && <meta property="og:url" content={canonical} />}
+    <meta property="og:image" content={imageUrl} />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content={String(image.width)} />
+    <meta property="og:image:height" content={String(image.height)} />
+    <meta property="og:image:alt" content={image.alt} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={imageUrl} />
+    <meta name="twitter:image:alt" content={image.alt} />
+    {jsonLd && <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />}
   </head>
   <body>
     <!-- scroll-reveal content starts at opacity 0 for the IntersectionObserver;

@@ -17,6 +17,7 @@ import ProtoPreview from '../../components/ProtoPreview.astro';
 import { guides } from '../../data/guides';
 import { tools } from '../../data/tools';
 import { aiPage } from '../../data/ai-pages';
+import { SITE, NAME, describe, ogHome, workLd } from '../../lib/seo';
 
 export function getStaticPaths() {
   return guides.map((guide) => ({ params: { slug: guide.slug }, props: { guide } }));
@@ -24,8 +25,22 @@ export function getStaticPaths() {
 const { guide } = Astro.props;
 const tool = tools.find((t) => t.slug === guide.slug);
 const page = aiPage(guide.slug);
+
+// Search and link previews (CLAUDE.md, "Domain trust"): "<tool> · AI Space —
+// Uttham Udatthu"; the description is the page's headline and the card's own
+// line (tools.ts `what`), joined while it fits in 155, else the line alone.
+const seoTitle = `${tool?.name ?? guide.title} · AI Space — ${NAME}`;
+const seoDescription = tool ? describe(guide.title, tool.what) : describe(guide.intro);
+const pageUrl = new URL(`/ai/${guide.slug}/`, SITE).href;
+const toolLd = workLd({
+  url: pageUrl,
+  name: tool?.name ?? guide.title,
+  headline: guide.title,
+  description: seoDescription,
+  image: new URL(ogHome.src, SITE).href,
+});
 ---
-<Base title={`${guide.title} — Uttham Udatthu`} description={guide.intro.replace(/\*\*/g, '')}>
+<Base title={seoTitle} description={seoDescription} type="article" jsonLd={toolLd}>
   <a class="skip-link" href="#main">Skip to content</a>
   <Header active="ai" />
   <main id="main" class="ai-page" tabindex="-1">

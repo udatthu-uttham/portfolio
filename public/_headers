@@ -1,0 +1,46 @@
+# Response headers for every static file Cloudflare serves from dist/ (Workers
+# static assets: https://developers.cloudflare.com/workers/static-assets/headers/).
+# Domain trust pass, 2026-10-03 — CLAUDE.md, "Domain trust", says why each one
+# is here and what to change when the site starts loading something new.
+# Rules: a URL pattern, then indented "Name: value" lines; a request takes the
+# headers of every rule it matches; "! Name" removes one; 100 rules, 2,000
+# characters a line. This file is parsed by Cloudflare, never served.
+
+/*
+  # HTTPS only, for a year, on uttham.fyi and every subdomain. No "preload"
+  # yet: the preload list is hard to leave, so it waits until this has run
+  # cleanly for a few weeks (CLAUDE.md, "Domain trust").
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  # Only uttham.fyi may frame its pages: the homepage and /ai/realistic-prototype
+  # frame /proto/feed-ux from the same origin.
+  X-Frame-Options: SAMEORIGIN
+  # Nothing here uses the camera, location, payments or device sensors. The
+  # microphone stays open to this origin only, for the prototype's voice search.
+  Permissions-Policy: accelerometer=(), camera=(), display-capture=(), geolocation=(), gyroscope=(), hid=(), magnetometer=(), microphone=(self), midi=(), payment=(), serial=(), usb=(), xr-spatial-tracking=(), browsing-topics=()
+  # What the built site loads, and nothing else. 'unsafe-inline': Astro inlines
+  # its small page scripts and the pages carry style attributes. The image hosts
+  # are the prototype's catalogue pictures; Google Fonts is the prototype's DM
+  # Sans; cloudflareinsights is Cloudflare Web Analytics, if it is ever switched
+  # on. A new embed, font or image host needs adding here first. No
+  # upgrade-insecure-requests: nothing here is loaded over http, and HSTS
+  # already covers the pages.
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://images.meesho.com https://placehold.co https://images.unsplash.com; media-src 'self'; connect-src 'self' https://cloudflareinsights.com; frame-src 'self'; frame-ancestors 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; manifest-src 'self'; worker-src 'self'
+
+# A PDF opens in the browser's own viewer, which a page policy can block.
+/*.pdf
+  ! Content-Security-Policy
+
+# Astro's and the prototype's build output: every file name carries a hash of
+# its contents, so a new build is a new name and a browser can keep these.
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/proto/feed-ux/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# The Worker's own workers.dev address (off today: wrangler.jsonc) and its
+# preview URLs stay out of search; the canonical tags name the apex anyway.
+https://:worker.:account.workers.dev/*
+  X-Robots-Tag: noindex
