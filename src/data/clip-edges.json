@@ -1,0 +1,36 @@
+{
+  "/media/mall-case/v3-nav-pip.mp4": {
+    "frames": 61,
+    "edges": [
+      [0,"#ffffff","dark","#ffffff","dark"]
+    ]
+  },
+  "/media/mall-case/v3-nav.mp4": {
+    "frames": 61,
+    "edges": [
+      [0,"#676767","light","#fefefd","dark"]
+    ]
+  },
+  "/media/mall-case/v3-ocp.mp4": {
+    "frames": 61,
+    "edges": [
+      [0,"#7028fb","light","#7028fb","light"]
+    ]
+  },
+  "/media/mall-case/v3-splash.mp4": {
+    "frames": 61,
+    "edges": [
+      [0,"#ffffff","dark","#ffffff","dark"],
+      [0.7,"#7028fc","light","#ffffff","dark"],
+      [0.9,"#7028fc","light","#7028fc","light"],
+      [1.333,"#7028fc","light","#702cfc","light"],
+      [1.367,"#7028fc","light","#7431fc","light"],
+      [1.4,"#7028fc","light","#7734fd","light"],
+      [1.433,"#7029fc","light","#793afc","light"],
+      [1.467,"#712afc","light","#7c3ffe","light"],
+      [1.5,"#7028fc","light","#7f41fe","light"],
+      [1.533,"#7028fc","light","#8144fc","light"],
+      [1.567,"#7028fc","light","#8248fc","light"]
+    ]
+  }
+}

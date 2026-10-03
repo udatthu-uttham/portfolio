@@ -9,14 +9,21 @@
 //
 // Two kinds of preview. Screens: Uttham's Figma exports, picked per state from
 // src/assets/<screens.dir>/ (a state with no screen shows the nearest earlier
-// one; the dev server names the missing one), never cropped: the phone takes
-// each screen's own proportion, a page taller than a phone pans, a still with
-// a clip plays it. Live: a `preview` slot — a running tool — which hears each
-// state as a `case:state` event. With `frame="phone"` the slot stands in the
-// teaser's own phone (a handset's 9/19.5, the mini player's tap-to-enlarge)
-// and the tool just fills it; without it the tool sizes its own frame.
+// one; the dev server names the missing one), shown in a phone mock of one
+// constant size (CaseDevice) and never cropped: a 1 : 2 screen fills its
+// display, a shorter one fits and is filled with its own edge colours, a page
+// taller than a phone pans, a still with a clip plays it, a reference board
+// stands in the device's place. Live: a `preview` slot — a running tool —
+// which hears each state as a `case:state` event. With `frame="phone"` the
+// slot stands in the teaser's own phone (a handset's 9/19.5, the mini player's
+// tap-to-enlarge) and the tool just fills it; without it the tool sizes its own
+// frame.
 import { Image, getImage } from 'astro:assets';
+import CaseDevice from './CaseDevice.astro';
 import { rich } from '../lib/rich';
+import { screenEdges } from '../lib/screen-edges';
+import type { Edge } from '../lib/edge-colour';
+import clipEdges from '../data/clip-edges.json';
 import { CASE_PASSWORD_SHA256 } from '../data/case-gate';
 import type { CaseTeaserData } from '../data/case-teaser';
 
@@ -125,26 +132,30 @@ if (data.gate && data.experiments?.length && !rail) {
 const titles = data.screens?.titles;
 const titleFor = (key: string) => forScreen(titles, key);
 // A screen is a phone screen (tall) or a reference board (landscape or square,
-// e.g. an annotated framework). A board is shown whole on a widened card,
-// never cropped into the phone (Uttham, 2026-10-03: "I will give reference
-// image (figure out a way on how to place this)").
+// e.g. an annotated framework; Uttham, 2026-10-03: "I will give reference
+// image (figure out a way on how to place this)"). A board is never put in the
+// phone: it stands in the device's place, whole, on the card's paper.
 const ratioOf = (key: string) => library[key].height / library[key].width;
 const kindFor = (key: string) => (1 / ratioOf(key) > 0.62 ? 'board' : 'phone');
-// NOTHING IS CROPPED (Uttham, 2026-10-03: "when I give big images I dont want
-// you to just paste them or crop them abruptly making its content gone (this
-// is for all images you are using)"). The phone's frame is the exports' own
-// 1 : 2 by default and takes each screen's proportion as it shows it, so a
-// screen always fills it exactly — the 9 : 16 order confirmation included. A
-// page capture taller than any handset (wider than 9 : 19.5, e.g. a whole
-// home feed) keeps the 1 : 2 frame and pans down it and back; with reduced
-// motion it scrolls by hand instead.
-const FRAME = 2; // the frame's height over its width when no screen sets it
-const HANDSET = 19.5 / 9; // the tallest screen the frame takes as it is
-const fitFor = (key: string) => (kindFor(key) === 'phone' && ratioOf(key) > HANDSET && !videoFor(key) ? 'pan' : 'fill');
-const frameFor = (key: string) => (kindFor(key) === 'board' || fitFor(key) === 'pan' ? FRAME : ratioOf(key)).toFixed(4);
-// how far a pan travels: what lies under the frame, as a share of the page's
-// own height (a translate in % is of the element's own height)
-const panFor = (key: string) => ((1 - FRAME / ratioOf(key)) * 100).toFixed(2);
+// ONE CONSTANT SIZE (Uttham, 2026-10-03: "all the aspect ratio should be fixed
+// for this card, and the content inside … everything should have constant
+// height and width"). The phone's display is 1 : 2, the exports' own
+// proportion, at every state, beat, clip and board; and NOTHING IS CROPPED OR
+// STRETCHED ("when I give big images I dont want you to just paste them or
+// crop them abruptly making its content gone (this is for all images you are
+// using)"). How a screen fits that display:
+//   fit — a 1 : 2 screen fills it to the pixel; a shorter one (the 9 : 16
+//         order confirmation) fits its width and the display around it takes
+//         the screen's own top and bottom edge colours, so it reads as one
+//         screen rather than one with bars (anchorFor, below, says where)
+//   pan — a page capture taller than the display (a whole home feed) stands
+//         at its width and pans down and back; with reduced motion it scrolls
+//         by hand instead
+const SCREEN = 2; // the display's height over its width
+const fitFor = (key: string) => (kindFor(key) === 'phone' && ratioOf(key) > SCREEN * 1.01 && !videoFor(key) ? 'pan' : 'fit');
+// how far a pan travels: what lies under the display, as a share of the
+// page's own height (a translate in % is of the element's own height)
+const panFor = (key: string) => ((1 - SCREEN / ratioOf(key)) * 100).toFixed(2);
 // Screens that move: Figma animations exported as MP4 (screens.videos, keyed by
 // file). The file's own still, optimised like every screen, is the clip's
 // poster — what reduced motion shows, and the frame the clip settles on once it
@@ -157,6 +168,47 @@ const stills: Record<string, string> = {};
 for (const key of shots) {
   if (videoFor(key)) stills[key] = (await getImage({ src: library[key], width: 720, format: 'webp' })).src;
 }
+// the phone's screens and the boards that stand in its place, in reading order
+const phones = shots.filter((key) => kindFor(key) === 'phone');
+const boards = shots.filter((key) => kindFor(key) === 'board');
+// each phone screen's top and bottom edge colour, read from the export at
+// build time (src/lib/screen-edges.ts): the status bar and home strip take
+// them, and so does the display around a screen shorter than it
+const edges: Record<string, Edge> = {};
+for (const key of phones) edges[key] = await screenEdges((library[key] as ImageMetadata & { fsPath?: string }).fsPath);
+// WHERE A SHORTER SCREEN STANDS in the display: centred, unless one of its
+// edges is patterned and the other flat — then it stands against the patterned
+// edge and all the fill falls on the flat one, where it is the same colour as
+// the screen and leaves no seam. The order confirmation's top is a field of
+// stars (its commonest colour covers ~57% of it) over a flat purple foot:
+// centred, the stars stopped in a hard line ~30px under the status bar, on a
+// band of flat purple that read as a picture laid on purple; set to the top,
+// its header meets the status bar the way an app's does and its foot runs on
+// into the fill (2026-10-03, review of the handset).
+const FLAT = 0.9; // an edge whose commonest colour covers this much is flat
+const anchorFor = (key: string) => {
+  const edge = edges[key];
+  if (fitFor(key) !== 'fit' || ratioOf(key) > SCREEN * 0.99 || !edge) return undefined;
+  const top = (edge.topShare ?? 1) >= FLAT;
+  const foot = (edge.footShare ?? 1) >= FLAT;
+  return top === foot ? undefined : top ? 'bottom' : 'top';
+};
+// A CLIP'S STRIPS FOLLOW ITS FRAMES from a timeline read once, frame by frame,
+// with the stills' own rule (scripts/clip-edges.mjs → src/data/clip-edges.json:
+// [seconds, top, top ink, foot, foot ink] at each moment the edges change), not
+// from a canvas in the browser, which reads Chromium's video darker than a Mac
+// shows it. A clip missing from the file keeps its still's colours throughout.
+const timelines = clipEdges as Record<string, { frames: number; edges: [number, string, string, string, string][] }>;
+const edgesOfClip = (key: string) => {
+  const src = videoFor(key);
+  if (!src) return undefined;
+  const timeline = timelines[src]?.edges;
+  if (!timeline?.length) console.warn(`[case] ${src}: no colour timeline in src/data/clip-edges.json (npm run clip-edges); its strips keep the still's colours`);
+  return timeline?.length ? JSON.stringify(timeline) : undefined;
+};
+// a board is shown at most the device's width on the card, and whole in the
+// enlarged view: its sources stop at the export's own width
+const boardWidths = (key: string) => [...new Set([480, 960, 1600].map((w) => Math.min(w, library[key].width)))];
 ---
 
 <div class="ct">
@@ -288,8 +340,10 @@ for (const key of shots) {
       )}
     </div>
 
-    <aside class:list={['ct-panel', { 'ct-panel--live': live, 'ct-panel--titled': titles && !live, 'ct-panel--visit': data.visit }]} aria-label={data.panelLabel ?? 'Preview'} data-case-panel data-map={JSON.stringify(stateFiles)} data-titles={titles && !live ? JSON.stringify(titles) : undefined}>
+    <aside class:list={['ct-panel', { 'ct-panel--live': live, 'ct-panel--device': !live, 'ct-panel--titled': titles && !live, 'ct-panel--visit': data.visit }]} aria-label={data.panelLabel ?? 'Preview'} data-case-panel data-map={JSON.stringify(stateFiles)} data-titles={titles && !live ? JSON.stringify(titles) : undefined}>
       <div class="ct-pane">
+        {/* one line in a slot of its own height: a long title ends in an
+            ellipsis and keeps its whole text as the element's title */}
         {titles && !live && <p class="ct-pane__title" data-pane-title aria-live="polite"></p>}
         <div class="ct-stage">
           {livePhone ? (
@@ -302,39 +356,70 @@ for (const key of shots) {
           ) : live ? (
             <div class="ct-live"><slot name="preview" /></div>
           ) : (
-            <div class="ct-phone">
-              {shots.map((key, i) => {
-                // what every screen tells the script: its file, title, kind,
-                // the frame it asks for and how it fits that frame
-                const meta = { 'data-screen': key, 'data-title': titleFor(key), 'data-kind': kindFor(key), 'data-frame': frameFor(key), 'data-ratio': ratioOf(key).toFixed(4), 'data-fit': fitFor(key) };
-                const loading = i < 2 ? 'eager' : 'lazy';
-                return videoFor(key) ? (
-                  /* a clip over its still: the clip shows from its first
-                     frame, the still once it has played (or with reduced
-                     motion, instead of it) */
-                  <div class="ct-screen ct-screen--clip" {...meta} role="img" aria-label={altFor(key)}>
-                    <img class="ct-screen__still" src={stills[key]} alt="" width="720" height={Math.round(720 * ratioOf(key))} loading={loading} decoding="async" />
-                    <video class="ct-screen__clip" data-src={videoFor(key)} muted playsinline preload="none" disablepictureinpicture disableremoteplayback aria-hidden="true"></video>
-                  </div>
-                ) : fitFor(key) === 'pan' ? (
-                  /* a page taller than the phone, in a window it pans (or,
-                     with reduced motion, scrolls) */
-                  <div class="ct-screen ct-screen--pan" {...meta} data-pan={panFor(key)}>
-                    <div class="ct-screen__scroll" data-pan-scroll>
-                      <Image class="ct-screen__page" src={library[key]} alt={altFor(key)} widths={[360, 720]} sizes="360px" loading={loading} />
+            <>
+              <CaseDevice data-device>
+                <div class="ct-phone">
+                  {phones.map((key, i) => {
+                    // what every screen tells the script: its file, title,
+                    // kind, how it fits the display and its edge colours (the
+                    // device's strips take them); a shorter screen's fill
+                    // above and below it is its own edges
+                    const edge = edges[key];
+                    const meta = {
+                      'data-screen': key, 'data-title': titleFor(key), 'data-kind': 'phone', 'data-ratio': ratioOf(key).toFixed(4), 'data-fit': fitFor(key), 'data-anchor': anchorFor(key),
+                      'data-top': edge.top, 'data-top-ink': edge.topInk, 'data-foot': edge.foot, 'data-foot-ink': edge.footInk, 'data-edges': edgesOfClip(key),
+                      style: `--ct-fill-top: ${edge.top}; --ct-fill-foot: ${edge.foot}`,
+                    };
+                    const loading = i < 2 ? 'eager' : 'lazy';
+                    return videoFor(key) ? (
+                      /* a clip over its still: the clip shows from its first
+                         frame, the still once it has played (or with reduced
+                         motion, instead of it) */
+                      <div class="ct-screen ct-screen--clip" {...meta} role="img" aria-label={altFor(key)}>
+                        <img class="ct-screen__still" src={stills[key]} alt="" width="720" height={Math.round(720 * ratioOf(key))} loading={loading} decoding="async" />
+                        <video class="ct-screen__clip" data-src={videoFor(key)} muted playsinline preload="none" disablepictureinpicture disableremoteplayback aria-hidden="true"></video>
+                      </div>
+                    ) : fitFor(key) === 'pan' ? (
+                      /* a page taller than the display, in a window it pans
+                         (or, with reduced motion, scrolls) */
+                      <div class="ct-screen ct-screen--pan" {...meta} data-pan={panFor(key)}>
+                        <div class="ct-screen__scroll" data-pan-scroll>
+                          <Image class="ct-screen__page" src={library[key]} alt={altFor(key)} widths={[360, 720]} sizes="360px" loading={loading} />
+                        </div>
+                      </div>
+                    ) : (
+                      <Image class="ct-screen" {...meta} src={library[key]} alt={altFor(key)} widths={[360, 720]} sizes="360px" loading={loading} />
+                    );
+                  })}
+                  {/* while a screen is still to come: its state's name on the
+                      dev server, a quiet line in the build */}
+                  <p class="ct-phone__dev" data-dev-label data-dev={dev ? '1' : undefined}></p>
+                </div>
+                {/* reduced motion: a page that scrolls by hand says so in the
+                    home strip, never over the screen */}
+                <span class="ct-hint" slot="home" aria-hidden="true">Scroll <span>↓</span></span>
+              </CaseDevice>
+              {boards.length > 0 && (
+                /* REFERENCE BOARDS stand in the device's place, whole, on the
+                   card's paper, never wider or taller than the device — so the
+                   card keeps its size — with a line under each that it opens
+                   full size (nothing is laid over the board itself) */
+                <div class="ct-boards">
+                  {boards.map((key) => (
+                    <div class="ct-screen ct-board" data-screen={key} data-title={titleFor(key)} data-kind="board" data-ratio={ratioOf(key).toFixed(4)} data-width={library[key].width} style={`--ct-board-r: ${ratioOf(key).toFixed(4)}`}>
+                      <Image class="ct-board__img" src={library[key]} alt={altFor(key)} widths={boardWidths(key)} sizes="(min-width: 768px) 400px, 112px" loading="lazy" />
+                      <span class="ct-board__hint" aria-hidden="true">
+                        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="7" cy="7" r="4.6" /><path d="M10.4 10.4 14 14M7 5v4M5 7h4" /></svg>
+                        <span class="ct-board__hint-label"><span class="ct-board__fine">Click</span><span class="ct-board__coarse">Tap</span> to enlarge</span>
+                      </span>
                     </div>
-                    <span class="ct-hint" aria-hidden="true">Scroll <span>↓</span></span>
-                  </div>
-                ) : (
-                  <Image class="ct-screen" {...meta} src={library[key]} alt={altFor(key)} widths={[360, 720]} sizes="360px" loading={loading} />
-                );
-              })}
-              {/* while a screen is still to come: its state's name on the dev
-                  server, a quiet line in the build */}
-              <p class="ct-phone__dev" data-dev-label data-dev={dev ? '1' : undefined}></p>
-              {/* phones only: the mini phone opens the screen full size */}
+                  ))}
+                </div>
+              )}
+              {/* opens the screen full size: the whole mini player on phones,
+                  the board standing in the device's place from 768px */}
               <button class="ct-pip__enlarge" type="button" aria-label="Enlarge the preview" data-pip-enlarge></button>
-            </div>
+            </>
           )}
           <button class="ct-pip__close" type="button" aria-label="Hide the preview" data-pip-close><span aria-hidden="true">×</span></button>
         </div>
@@ -377,15 +462,98 @@ for (const key of shots) {
        never be scrolled with a mouse or trackpad; the page behind is locked
        while it is open (the style's html:has rule) */
     <dialog class="ct-zoom" data-pip-zoom data-lenis-prevent aria-label="Preview, enlarged">
-      {/* the screen shown whole: a page capture scrolls inside, a clip plays */}
-      <div class="ct-zoom__media" data-pip-zoom-media></div>
-      <span class="ct-hint" aria-hidden="true">Scroll <span>↓</span></span>
-      <button class="ct-zoom__close" type="button" aria-label="Close the enlarged preview" data-pip-zoom-close><span aria-hidden="true">×</span></button>
+      {/* a phone screen in the same handset, larger and still 1 : 2: a page
+          capture scrolls inside it, a clip plays; a board on a paper card,
+          whole */}
+      <CaseDevice class="ct-zoom__device" data-zoom-device>
+        <div class="ct-zoom__media" data-pip-zoom-media></div>
+        <span class="ct-hint" slot="home" aria-hidden="true">Scroll <span>↓</span></span>
+      </CaseDevice>
+      <div class="ct-zoom__board" data-zoom-board></div>
+      {/* autofocus: the dialog opens with the focus on its way out, not on a
+          page that scrolls (which would draw a focus ring round the screen) */}
+      <button class="ct-zoom__close" type="button" aria-label="Close the enlarged preview" data-pip-zoom-close autofocus><span aria-hidden="true">×</span></button>
     </dialog>
   )}
 </div>
 
 <script>
+  import type { Edge } from '../lib/edge-colour';
+
+  // ---- the device's strips take the screen's edge colours -----------------
+  // A still's are read at build time (data-top / data-foot on the screen). A
+  // clip's change as it plays — the splash opens on white and fills with
+  // purple — so a clip carries its timeline (data-edges, read frame by frame
+  // at build time: scripts/clip-edges.mjs), and while it plays the strips take
+  // the colours of the frame on show; once it has played they settle on its
+  // still's. Never read from a canvas here: Chromium hands a canvas the video
+  // darker than a Mac shows it, which left the strips a shade off the screen
+  // for the whole clip (2026-10-03).
+  const tint = (device: HTMLElement | null, edge: Partial<Edge> | null) => {
+    if (!device || !edge?.top || !edge.foot) return;
+    device.style.setProperty('--ct-device-top', edge.top);
+    device.style.setProperty('--ct-device-foot', edge.foot);
+    device.dataset.topInk = edge.topInk ?? 'dark';
+    device.dataset.footInk = edge.footInk ?? 'dark';
+  };
+  const edgeOf = (screen: HTMLElement): Partial<Edge> => ({
+    top: screen.dataset.top,
+    topInk: screen.dataset.topInk as Edge['topInk'],
+    foot: screen.dataset.foot,
+    footInk: screen.dataset.footInk as Edge['footInk'],
+  });
+  // a clip screen's timeline: [seconds, top, top ink, foot, foot ink] at each
+  // moment its edges change; null for a still, or a clip with none
+  type Moment = [number, string, Edge['topInk'], string, Edge['footInk']];
+  const timelines = new WeakMap<HTMLElement, Moment[] | null>();
+  const timelineOf = (screen: HTMLElement) => {
+    if (!timelines.has(screen)) {
+      let moments: Moment[] | null = null;
+      try { moments = screen.dataset.edges ? JSON.parse(screen.dataset.edges) : null; } catch { /* none */ }
+      timelines.set(screen, moments?.length ? moments : null);
+    }
+    return timelines.get(screen) ?? null;
+  };
+  // the edges of the frame at `time`: the last moment at or before it (a
+  // frame's presentation time can land a hair before the moment it opens)
+  const edgeAt = (screen: HTMLElement, time: number): Edge | null => {
+    const moments = timelineOf(screen);
+    if (!moments) return null;
+    let at = moments[0];
+    for (const moment of moments) {
+      if (moment[0] <= time + 0.005) at = moment;
+      else break;
+    }
+    return { top: at[1], topInk: at[2], foot: at[3], footInk: at[4] };
+  };
+  // While a clip plays, the strips follow it frame by frame, with no easing
+  // of their own (data-following), so a colour arrives on the frame that
+  // brings it; a newer call replaces an older one on the same device.
+  const followers = new WeakMap<HTMLElement, number>();
+  const follow = (device: HTMLElement | null, screen: HTMLElement, video: HTMLVideoElement, keep: () => boolean) => {
+    if (!device || !timelineOf(screen)) return;
+    const token = (followers.get(device) ?? 0) + 1;
+    followers.set(device, token);
+    device.dataset.following = '';
+    const step = (time: number) => {
+      if (followers.get(device) !== token) return;
+      if (!keep()) { delete device.dataset.following; return; }
+      tint(device, edgeAt(screen, time));
+      schedule();
+    };
+    const schedule = () => {
+      if ('requestVideoFrameCallback' in video) video.requestVideoFrameCallback((_, frame) => step(frame.mediaTime));
+      else requestAnimationFrame(() => step(video.currentTime));
+    };
+    tint(device, edgeAt(screen, video.currentTime));
+    schedule();
+  };
+  const unfollow = (device: HTMLElement | null) => {
+    if (!device) return;
+    followers.set(device, (followers.get(device) ?? 0) + 1);
+    delete device.dataset.following;
+  };
+
   // ---- the phone follows the reading -------------------------------------
   // Every [data-state] on the left is a trigger. The one crossing the reading
   // band — the middle tenth of the screen on a laptop, the middle of what the
@@ -436,9 +604,8 @@ for (const key of shots) {
     let shown: HTMLElement | null = null; // the screen on the phone
     let shownAt = 0;
     let stepAt = 0; // when the slideshow last moved (a row, or a screen within one)
-    // the block being read holds a board somewhere: the card stays wide for
-    // all of it, so the slideshow never makes the card breathe in and out
-    let wideBlock = false;
+    // the handset the phone screens stand in (null in live mode)
+    const device = panel.querySelector<HTMLElement>('[data-device]');
 
     // ---- screens that move -------------------------------------------------
     // A page capture pans: down, a hold, and back, looping while it is shown.
@@ -463,12 +630,23 @@ for (const key of shots) {
       video.preload = 'auto';
       video.src = video.dataset.src;
     };
-    // a clip that has played (or cannot) settles on its still
+    // a clip that has played (or cannot) settles on its still, and the
+    // device's strips on the still's colours
     const settle = (el: HTMLElement) => {
       ended.set(el, performance.now());
       el.classList.add('is-ended');
       clipOf(el)?.pause();
-      if (el === shown) plan();
+      if (el === shown) {
+        unfollow(device);
+        tint(device, edgeOf(el));
+        plan();
+      }
+    };
+    // a clip on show and running: the strips follow its frames
+    const followClip = (el: HTMLElement) => {
+      const video = clipOf(el);
+      if (!video || el !== shown || !el.classList.contains('is-cued') || ended.has(el)) return;
+      follow(device, el, video, () => el === shown && !ended.has(el) && !video.paused);
     };
     // A CLIP NEVER OPENS ON ITS STILL. The still is its ending (the order
     // confirmation's is the confirmed screen), so showing it first would give
@@ -492,6 +670,7 @@ for (const key of shots) {
       if (!ok) settle(el);
       swap(el);
       plan();
+      followClip(el);
     };
     const cue = (el: HTMLElement, video: HTMLVideoElement) => {
       pending = el;
@@ -611,6 +790,7 @@ for (const key of shots) {
           // a start that comes after its screen gave up on it, or left
           if (el !== shown || ended.has(el)) { video.pause(); return; }
           plan();
+          followClip(el);
         });
         video.addEventListener('ended', () => settle(el));
         video.addEventListener('error', () => { if (pending === el) cued(el, false); else settle(el); });
@@ -656,16 +836,29 @@ for (const key of shots) {
       if (seqOwn && seqAt === 0) return stateTitles[state] ?? screen.dataset.title ?? '';
       return screen.dataset.title ?? stateTitles[state] ?? '';
     };
-    // the card around a screen: its title, its width, its frame's proportion
+    // The card around a screen: its title, whether a board stands in the
+    // device's place, and the device's strips. Nothing here changes a size:
+    // the card, the device and its display are one constant size per screen
+    // (Uttham, 2026-10-03: "everything should have constant height and width").
     const dress = (screen: HTMLElement | null) => {
       const title = titleOf(screen);
-      // only a change is written, so the live title never repeats itself
-      if (paneTitle && paneTitle.textContent !== title) paneTitle.textContent = title;
-      panel.classList.toggle('is-board', screen?.dataset.kind === 'board');
-      panel.classList.toggle('is-wide', screen?.dataset.kind === 'board' || wideBlock);
-      // the frame takes the screen's own proportion (CSS eases the change)
-      if (screen?.dataset.frame) panel.style.setProperty('--ct-ratio', screen.dataset.frame);
-      else panel.style.removeProperty('--ct-ratio');
+      // only a change is written, so the live title never repeats itself; the
+      // whole of it stays as the title, for the line that ends in an ellipsis
+      if (paneTitle && paneTitle.textContent !== title) {
+        paneTitle.textContent = title;
+        paneTitle.title = title;
+      }
+      const board = screen?.dataset.kind === 'board';
+      panel.classList.toggle('is-board', board);
+      // an empty phone is the device's own white, not the last screen's colours
+      if (!screen) tint(device, { top: 'var(--paper-1)', topInk: 'dark', foot: 'var(--paper-1)', footInk: 'dark' });
+      if (!screen || board) { unfollow(device); return; }
+      // a clip that is running, or cued on its first frame, gives its frame's
+      // colours; anything else its export's
+      const video = clipOf(screen);
+      const live = video && screen.classList.contains('is-cued') && !ended.has(screen) ? edgeAt(screen, video.currentTime) : null;
+      if (!live) unfollow(device);
+      tint(device, live ?? edgeOf(screen));
     };
     const swap = (next: HTMLElement | null) => {
       dress(next);
@@ -819,12 +1012,11 @@ for (const key of shots) {
       if (!sameBlock) {
         playing = group;
         held = false;
-        wideBlock = Boolean(group?.items.some((i) => screensFor(i).some((s) => s.dataset.kind === 'board')));
       }
       at = group ? group.items.indexOf(trigger) : 0;
       if (trigger === current) {
         // the same row: the reading has moved on to its next screen (reduced
-        // motion), or the block is new and only the card's width can change
+        // motion), or a new block has taken the row on as it is
         if (still.matches && seqOwn && part < seq.length) seqAt = part;
         render();
       } else show(trigger, part);
@@ -1006,35 +1198,62 @@ for (const key of shots) {
       });
       restore.addEventListener('click', () => { dismissed = false; sync(); (enlarge ?? close).focus(); });
 
-      // screens: the current screen opens in the dialog. A live tool has no
-      // single screen to show there, so the teaser's live phone grows in place.
-      // The dialog shows the screen whole, never cropped: as wide as its own
-      // proportion lets it stand in the screen's height; a page capture in a
-      // 1 : 2 window it scrolls by hand (the "Scroll" hint until its foot is
-      // in view); a clip plays once from its first frame and settles on its
-      // still, or with reduced motion shows the still. As on the phone, the
-      // clip opens on its first frame, never on its still (its ending): the
-      // card stays blank paper until that frame is in, CUE_WAIT at most, past
-      // which the still stands in and the clip does not play.
-      if (enlarge && zoom && zoomMedia && zoomClose) {
+      // screens: the current screen opens in the dialog — from the mini
+      // player on phones, and from a board standing in the device's place on
+      // the card. A live tool has no single screen to show there, so the
+      // teaser's live phone grows in place.
+      // A phone screen opens in the same handset, larger, by the same rules:
+      // the display is 1 : 2 and the device one size for every screen; a
+      // 1 : 2 screen fills it, a shorter one fits and is filled with its edge
+      // colours, a page capture scrolls by hand (the "Scroll ↓" chip in the
+      // home strip until its foot is in view), a clip plays once from its first
+      // frame and settles on its still, or with reduced motion shows the
+      // still. As on the card, the clip opens on its first frame, never on its
+      // still (its ending): the display stays its edge colour until that frame
+      // is in, CUE_WAIT at most, past which the still stands in and the clip
+      // does not play. A board opens whole on a paper card, as large as the
+      // screen allows and never past its own pixels.
+      const zoomDevice = zoom?.querySelector<HTMLElement>('[data-zoom-device]') ?? null;
+      const zoomBoard = zoom?.querySelector<HTMLElement>('[data-zoom-board]') ?? null;
+      if (enlarge && zoom && zoomMedia && zoomClose && zoomDevice && zoomBoard) {
         const stillMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
         const CUE_WAIT = 1500;
         let cueTimer = 0;
+        let opener: HTMLElement | null = null;
         zoomMedia.addEventListener('scroll', () => {
           zoom.classList.toggle('is-end', zoomMedia.scrollTop + zoomMedia.clientHeight >= zoomMedia.scrollHeight - 4);
         }, { passive: true });
-        enlarge.addEventListener('click', () => {
-          const on = panelEl.querySelector<HTMLElement>('.ct-screen.is-on');
-          const src = on instanceof HTMLImageElement ? on : on?.querySelector<HTMLImageElement>('img');
-          if (!on || !src) return;
+        const openBoard = (on: HTMLElement, src: HTMLImageElement) => {
+          const pic = document.createElement('img');
+          pic.className = 'ct-zoom__board-img';
+          if (src.srcset) {
+            pic.srcset = src.srcset;
+            pic.sizes = 'min(100vw, 1200px)';
+          }
+          pic.src = src.currentSrc || src.src;
+          pic.alt = src.alt;
+          zoomBoard.replaceChildren(pic);
+          zoom.style.setProperty('--zoom-board-r', on.dataset.ratio ?? '1');
+          zoom.style.setProperty('--zoom-board-max', `${on.dataset.width ?? 1200}px`);
+        };
+        const openScreen = (on: HTMLElement, src: HTMLImageElement) => {
           const pan = on.dataset.fit === 'pan';
           const pic = document.createElement('img');
           pic.className = 'ct-zoom__img';
           pic.src = src.currentSrc || src.src;
           pic.alt = src.alt || on.getAttribute('aria-label') || '';
           zoomMedia.replaceChildren(pic);
-          window.clearTimeout(cueTimer);
-          zoom.classList.remove('is-cueing');
+          zoomMedia.style.setProperty('--ct-fill-top', on.dataset.top ?? '');
+          zoomMedia.style.setProperty('--ct-fill-foot', on.dataset.foot ?? '');
+          // a page capture's own proportion: the dialog's handset grows as
+          // tall as a real one (19.5 : 9, in the style) to show more of it
+          zoom.style.setProperty('--ct-zoom-page-r', on.dataset.ratio ?? '2');
+          // a shorter screen stands where it does on the card (anchorFor)
+          if (on.dataset.anchor) zoom.dataset.anchor = on.dataset.anchor;
+          else delete zoom.dataset.anchor;
+          unfollow(zoomDevice);
+          tint(zoomDevice, edgeOf(on));
+          zoom.classList.toggle('is-pan', pan);
           const clip = on.querySelector<HTMLVideoElement>('video');
           if (clip?.dataset.src && !stillMotion.matches) {
             const video = document.createElement('video');
@@ -1045,19 +1264,35 @@ for (const key of shots) {
             video.setAttribute('aria-hidden', 'true');
             zoom.classList.add('is-cueing');
             const begun = () => zoom.classList.remove('is-cueing');
-            const fail = () => { video.pause(); video.classList.add('is-ended'); begun(); };
-            video.addEventListener('loadeddata', begun, { once: true });
-            video.addEventListener('playing', begun, { once: true });
-            video.addEventListener('ended', () => video.classList.add('is-ended'));
+            const rest = () => { unfollow(zoomDevice); tint(zoomDevice, edgeOf(on)); };
+            const fail = () => { video.pause(); video.classList.add('is-ended'); begun(); rest(); };
+            // the clip's first frame, and from then on the frame on show
+            video.addEventListener('loadeddata', () => { begun(); tint(zoomDevice, edgeAt(on, 0) ?? edgeOf(on)); }, { once: true });
+            video.addEventListener('playing', () => {
+              begun();
+              follow(zoomDevice, on, video, () => zoom.open && video.isConnected && !video.paused);
+            });
+            video.addEventListener('ended', () => { video.classList.add('is-ended'); rest(); });
             video.addEventListener('error', fail);
             cueTimer = window.setTimeout(() => { if (video.readyState < 2) fail(); }, CUE_WAIT);
             zoomMedia.append(video);
             video.play().catch((error: unknown) => { if ((error as DOMException)?.name === 'NotAllowedError') fail(); });
           }
-          zoom.style.setProperty('--zoom-r', (pan ? on.dataset.frame : on.dataset.ratio) ?? '2');
-          zoom.classList.toggle('is-pan', pan);
-          zoom.classList.remove('is-end');
+        };
+        enlarge.addEventListener('click', () => {
+          const on = panelEl.querySelector<HTMLElement>('.ct-screen.is-on');
+          const src = on instanceof HTMLImageElement ? on : on?.querySelector<HTMLImageElement>('img');
+          if (!on || !src) return;
+          window.clearTimeout(cueTimer);
+          zoom.classList.remove('is-cueing', 'is-end', 'is-pan');
+          const board = on.dataset.kind === 'board';
+          zoom.classList.toggle('is-board', board);
+          zoomMedia.replaceChildren();
+          zoomBoard.replaceChildren();
+          if (board) openBoard(on, src);
+          else openScreen(on, src);
           zoomMedia.scrollTop = 0;
+          opener = document.activeElement instanceof HTMLElement ? document.activeElement : enlarge;
           zoom.showModal();
         });
         zoomClose.addEventListener('click', () => zoom.close());
@@ -1065,9 +1300,14 @@ for (const key of shots) {
         zoom.addEventListener('click', (event) => { if (event.target === zoom) zoom.close(); });
         zoom.addEventListener('close', () => {
           window.clearTimeout(cueTimer);
+          unfollow(zoomDevice);
           zoom.classList.remove('is-cueing');
           zoomMedia.replaceChildren();
-          enlarge.focus();
+          zoomBoard.replaceChildren();
+          // back to what opened it, if it can still take the focus (a board
+          // the slideshow has since moved on from hides its button)
+          const back = opener && opener.isConnected && opener.offsetParent !== null ? opener : enlarge;
+          back.focus({ preventScroll: true });
         });
       } else if (enlarge && scrim) {
         const shrink = () => { grow(false); enlarge.focus(); };
@@ -1089,6 +1329,50 @@ for (const key of shots) {
       const links = [...nav.querySelectorAll<HTMLAnchorElement>('a[data-point]')];
       const targets = links.map((a) => document.getElementById(decodeURIComponent(a.hash.slice(1))));
       let current: HTMLAnchorElement | null = null;
+
+      // The tooltips keep clear of the card (see .ct-points__label): the
+      // gutter between the card's right edge and the rail, less a --space-2
+      // of air, is the most a tooltip and its tick may take (--pt-room). A
+      // title that misses by a --space-1 or less takes that much of the air
+      // (--pt-give) rather than lose its last letters to an ellipsis; a longer
+      // one ends in an ellipsis, and one that would keep fewer than --space-8
+      // of its title stays off. A cut or hidden title is still named on hover
+      // by the link's own title (the browser's tooltip), and its accessible
+      // name is the whole heading. Measured again on a resize, when the card
+      // changes size, when the fonts arrive, when the current tick (and so its
+      // length) changes and when the full study's ticks join.
+      const pane = document.querySelector<HTMLElement>('.ct-pane');
+      const px = (name: string, fallback: number) => parseFloat(getComputedStyle(nav).getPropertyValue(name)) || fallback;
+      const fit = () => {
+        const shown = links.filter((a) => a.offsetParent !== null);
+        if (!pane || !shown.length) return;
+        const card = pane.getBoundingClientRect();
+        const rail = shown[0].getBoundingClientRect();
+        if (!card.width || !rail.width) return;
+        const air = px('--space-2', 8);
+        const give = px('--space-1', 4);
+        const least = px('--space-8', 64);
+        nav.style.setProperty('--pt-room', `${Math.max(0, Math.floor(rail.right - card.right - air))}px`);
+        shown.forEach((a) => {
+          const label = a.querySelector<HTMLElement>('.ct-points__label');
+          const tick = a.querySelector<HTMLElement>('.ct-points__tick');
+          if (!label || !tick) return;
+          a.removeAttribute('data-tip-off');
+          // the label's right edge is a --space-2 left of its tick
+          const room = Math.floor(tick.getBoundingClientRect().left - air - card.right - air);
+          const whole = Math.ceil(label.scrollWidth + 2); // its 1px border each side
+          const short = whole - room;
+          label.style.setProperty('--pt-give', `${short > 0 && short <= give ? short : 0}px`);
+          const off = room < Math.min(whole, least);
+          a.toggleAttribute('data-tip-off', off);
+          // cut or off: the whole heading on hover, from the browser
+          if (off || short > give) a.title = a.getAttribute('aria-label') ?? '';
+          else a.removeAttribute('title');
+        });
+      };
+      if (pane) new ResizeObserver(() => fit()).observe(pane);
+      window.addEventListener('resize', fit);
+      document.fonts?.ready.then(fit);
       const update = () => {
         const line = innerHeight * 0.4;
         let next: HTMLAnchorElement | null = null;
@@ -1099,6 +1383,7 @@ for (const key of shots) {
         current?.removeAttribute('aria-current');
         (next as HTMLAnchorElement | null)?.setAttribute('aria-current', 'location');
         current = next;
+        fit(); // the current tick is longer, so its tooltip has less room
         const list = nav.querySelector<HTMLElement>('.ct-points__list');
         const point = current as HTMLAnchorElement | null;
         if (list && point && list.scrollHeight > list.clientHeight) {
@@ -1116,6 +1401,7 @@ for (const key of shots) {
       document.addEventListener('case:full-open', () => {
         nav.querySelectorAll<HTMLElement>('.ct-points__full').forEach((li) => { li.hidden = false; });
         update();
+        fit();
       });
       update();
     }
@@ -1637,21 +1923,43 @@ for (const key of shots) {
     border-radius: var(--radius-sm);
     box-shadow: var(--shadow-rest);
   }
-  /* THE FRAME'S PROPORTION, height over width. The screens are exported at
-     1 : 2 and the frame starts there; the script sets each screen's own as it
-     shows it (a 9 : 16 clip makes the phone a touch wider), so a screen always
-     fills the frame exactly and nothing is cropped (Uttham, 2026-10-03: "when I
-     give big images I dont want you to just paste them or crop them
-     abruptly"). The proportion is the screen's, inside the frame's two 1px
-     edges (--ct-edge), so a 1 : 2 screen meets all four edges to the pixel. A
-     live tool keeps a handset's 9 : 19.5, measured as it always was. */
-  .ct-panel { --ct-ratio: 2; --ct-edge: 2px; }
+
+  /* THE HANDSET'S PROPORTIONS (CaseDevice), as shares of its display's width,
+     W: an even bezel of 0.03 W, a 0.12 W status bar over the 1 : 2 screen, a
+     0.10 W home strip under it, the display's corner 0.10 W. Whatever holds a
+     device (the card, the mini player, the dialog) sets W — --ct-device-screen
+     — once for its viewport, from the room it has: the body is k-wide × W
+     across and k-tall × W high, so a scale drawing at every size. */
+  .ct {
+    --ct-device-k-bezel: 0.03;
+    --ct-device-k-status: 0.12;
+    --ct-device-k-home: 0.1;
+    --ct-device-k-radius: 0.1;
+    --ct-device-k-wide: calc(1 + 2 * var(--ct-device-k-bezel));
+    --ct-device-k-tall: calc(2 + var(--ct-device-k-status) + var(--ct-device-k-home) + 2 * var(--ct-device-k-bezel));
+    /* the tallest the card may be, and so the widest its display gets: what
+       is left of 720px under the card's widest inset, edge and title (~272px).
+       Nothing outside the card draws the phone wider than this (the enlarged
+       dialog; Uttham, 2026-10-03: "you can increase the phone size but not
+       the width") */
+    --ct-pane-max: 720px;
+    --ct-device-screen-max: calc((var(--ct-pane-max) - 2 * var(--space-6) - 2px - var(--text-small) * var(--lh-statement) - var(--space-3)) / var(--ct-device-k-tall));
+  }
+  /* the device's footprint, for the card around it and the boards that stand
+     in its place */
+  .ct-panel--device {
+    --ct-device-w: calc(var(--ct-device-screen) * var(--ct-device-k-wide));
+    --ct-device-h: calc(var(--ct-device-screen) * var(--ct-device-k-tall));
+  }
+
+  /* THE LIVE PHONE (the AI Space pages): a running tool in a handset's
+     9 : 19.5, sized off the stage's height AND width so it always stands
+     whole, never cut and never stretched. The case pages' device leaves it as
+     it was: an iframe moved or rescaled would reload or blur, and Resona keeps
+     its own dark chrome (from 768px the card hugs it; see --ct-phone-w). */
   .ct-panel--live { --ct-ratio: calc(19.5 / 9); --ct-edge: 0px; }
-  /* sized off the stage's height AND width, so the phone always stands whole
-     inside the pane, never cut and never stretched (from 768px the card hugs
-     the phone instead; see the panel's --ct-phone-w) */
   .ct-stage { height: 100%; container-type: size; display: grid; place-items: center; }
-  .ct-phone {
+  .ct-phone--live {
     position: relative;
     width: min(100cqw, calc(100cqh / var(--ct-ratio)));
     aspect-ratio: 1 / var(--ct-ratio);
@@ -1661,62 +1969,175 @@ for (const key of shots) {
     background: var(--paper-1);
     box-shadow: var(--shadow-rest);
   }
-  /* At rest the frame has the shown screen's own proportion, so cover fills it
-     edge to edge without losing a pixel; cover only trims anything for the
-     moment the frame is still easing from one proportion to the next. */
+
+  /* ---- the case pages' screens, in the device's 1 : 2 display ---- */
+  /* the stage is the device's footprint: the device, or a board in its place */
+  .ct-panel--device .ct-stage {
+    position: relative;
+    display: block;
+    width: var(--ct-device-w);
+    height: var(--ct-device-h);
+    margin-inline: auto;
+    container-type: normal;
+  }
+  /* the display's middle row: the screen, exactly 1 : 2 at every state */
+  .ct-panel--device .ct-phone {
+    position: relative;
+    min-height: 0;
+    overflow: hidden;
+    background: var(--paper-1);
+  }
+  /* A screen fits the display whole, never cropped and never stretched: a
+     1 : 2 screen meets all four edges, a shorter one stands centred at the
+     display's width on its own edge colours (--ct-fill-*, read from the
+     export at build time), so the order confirmation is one purple screen,
+     not a screen with bars. Screens cross-fade and never scale: a zoom-settle
+     would crop a screen's edges in the display (or push a board past the
+     device's footprint) for the length of the fade. */
   .ct-screen {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    object-position: top;
+    object-fit: contain;
+    object-position: center;
     opacity: 0;
-    scale: 1.02;
     pointer-events: none;
-    transition: opacity var(--dur-2) var(--ease-exit), scale var(--dur-2) var(--ease-exit);
+    transition: opacity var(--dur-2) var(--ease-exit);
   }
-  /* a reference board: shown whole, centred on the card's paper */
-  .ct-screen[data-kind='board'] { object-fit: contain; object-position: center; }
+  .ct-screen[data-fit='fit'] { background: linear-gradient(var(--ct-fill-top) 50%, var(--ct-fill-foot) 50%); }
+  /* a shorter screen stands against its patterned edge, the fill on its flat
+     one (anchorFor in the frontmatter); centred when both edges match */
+  .ct-screen[data-anchor='top'],
+  .ct-screen[data-anchor='top'] :is(.ct-screen__still, .ct-screen__clip) { object-position: center top; }
+  .ct-screen[data-anchor='bottom'],
+  .ct-screen[data-anchor='bottom'] :is(.ct-screen__still, .ct-screen__clip) { object-position: center bottom; }
   .ct-screen.is-on {
     opacity: 1;
-    scale: 1;
     pointer-events: auto;
-    transition: opacity var(--dur-4) var(--ease-enter), scale var(--dur-4) var(--ease-enter);
+    transition: opacity var(--dur-4) var(--ease-enter);
   }
-  /* a page taller than the phone: the whole page at the phone's width, in a
-     window the script pans it through (down, a hold, back) */
+  /* a page taller than the display: the whole page at the display's width,
+     in a window the script pans it through (down, a hold, back) */
   .ct-screen--pan, .ct-screen--clip { overflow: hidden; }
   .ct-screen__scroll { height: 100%; overflow: hidden; }
   .ct-screen__page { display: block; width: 100%; height: auto; }
   /* a clip over its still: shown once cued (its first frame is up, and the
      screen arrives only then), faded back to the still once it has played.
      While the clip shows, the still under it is hidden outright, so not even
-     a frame the clip is late to paint can show its ending through it. */
+     a frame the clip is late to paint can show its ending through it. Both
+     fit like any screen: a 1 : 2 clip (the splash) fills the display, the
+     9 : 16 confirmation stands on its purple. */
   .ct-screen__still, .ct-screen__clip {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    object-position: top;
+    object-fit: contain;
+    object-position: center;
   }
   .ct-screen__clip { opacity: 0; }
   .ct-screen--clip.is-cued .ct-screen__clip { opacity: 1; }
   .ct-screen--clip.is-cued:not(.is-ended) .ct-screen__still { visibility: hidden; }
   .ct-screen--clip.is-ended .ct-screen__clip { opacity: 0; transition: opacity var(--dur-3) var(--ease-standard); }
-  /* "Scroll ↓": a paper chip at the foot of a page that scrolls by hand (the
-     phone's page with reduced motion, the enlarged view on phones), until the
-     page's foot is in view */
-  .ct-hint {
+  /* AN EMPTY PHONE (a state whose screen is still to come, and no earlier one
+     to borrow): its display shows one quiet line in the middle, like an app's
+     own empty state — "Screen coming soon" in the build, the state's name on
+     the dev server. It is never written over a screen (Uttham, 2026-10-03:
+     "some places I have seen some placeholder text coming on top of images"):
+     the script writes it only while the phone has nothing to show, and it
+     fades in only once the last screen has faded out (--dur-2, the screen's
+     exit), so not even the outgoing frame sits under it. */
+  .ct-phone__dev {
     position: absolute;
-    left: 50%;
-    bottom: var(--space-3);
-    translate: -50% 0;
-    display: none;
+    inset: 0;
+    display: grid;
+    place-content: center;
+    margin: 0;
+    /* the same line in the 112px mini player, at its scale (it had been
+       hidden there, leaving a blank white handset; 2026-10-03, review) */
+    padding: min(var(--space-4), calc(var(--ct-device-screen, 200px) * 0.08));
+    color: var(--ink-600);
+    font-size: min(var(--text-eyebrow), calc(var(--ct-device-screen, 200px) * 0.085));
+    font-weight: 500;
+    letter-spacing: var(--track-label);
+    line-height: var(--lh-heading);
+    text-transform: uppercase;
+    text-align: center;
+    text-wrap: balance;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .ct-phone__dev:not(:empty) { opacity: 1; transition: opacity var(--dur-3) var(--ease-enter) var(--dur-2); }
+
+  /* the device steps aside while a board stands in its place, and back —
+     coming back only once the board and its "Click to enlarge" chip have
+     faded (--dur-2, their exit), so the chip never stands over the incoming
+     screen, as the empty phone's line waits for the last screen */
+  .ct-panel--device :global(.ct-device) {
+    transition: opacity var(--dur-4) var(--ease-enter) var(--dur-2), visibility 0s linear var(--dur-2);
+  }
+  .ct-panel.is-board :global(.ct-device) {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--dur-2) var(--ease-exit), visibility 0s linear var(--dur-2);
+  }
+
+  /* REFERENCE BOARDS stand in the device's footprint, whole, on the card's
+     paper: as wide as the device, or as tall as it allows with the chip under
+     it, whichever binds — so the card never changes size for one, and a board
+     is never wider or taller than the handset it replaces. A board starts
+     where the device's top edge stands, one --space-3 under the title, with
+     its chip under it and the spare paper below (centred in the footprint, a
+     wide board floated 117–235px from the title that names it; 2026-10-03,
+     review of the handset). The chip says it opens full size; nothing sits on
+     the board. */
+  .ct-boards {
+    /* the room a board has: the footprint less its inset (none on the card,
+       where the card's own padding is the margin), the chip and the gap */
+    --ct-board-inset: 0px;
+    --ct-board-gap: var(--space-3);
+    --ct-board-hint-h: var(--space-5);
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .ct-board {
+    inset: var(--ct-board-inset);
+    width: auto;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: var(--ct-board-gap);
+    visibility: hidden;
+    transition: opacity var(--dur-2) var(--ease-exit), visibility 0s linear var(--dur-2);
+  }
+  /* a board arrives once whatever it replaces has gone (--dur-2): the
+     device's screen, or another board and its chip */
+  .ct-board.is-on {
+    visibility: visible;
+    transition: opacity var(--dur-4) var(--ease-enter) var(--dur-2), visibility 0s linear var(--dur-2);
+  }
+  .ct-board__img {
+    display: block;
+    flex: none;
+    width: min(100%, calc((var(--ct-device-h) - 2 * var(--ct-board-inset) - var(--ct-board-hint-h) - var(--ct-board-gap)) / var(--ct-board-r)));
+    height: auto;
+    border-radius: var(--radius-sm);
+    /* the image's edge: 1px of pure black at low opacity, just inside */
+    outline: 1px solid oklch(0 0 0 / 0.1);
+    outline-offset: -1px;
+  }
+  /* "Click to enlarge" (or "Tap", on a touch screen): a paper chip, the
+     "Scroll ↓" chip's twin, under the board */
+  .ct-board__hint {
+    display: inline-flex;
     align-items: center;
     gap: var(--space-1);
-    padding: var(--space-1) var(--space-3);
+    height: var(--ct-board-hint-h);
+    padding: 0 var(--space-3);
     background: var(--paper-1);
     border: 1px solid var(--line-1);
     border-radius: var(--radius-pill);
@@ -1725,24 +2146,46 @@ for (const key of shots) {
     font-size: var(--text-eyebrow);
     font-weight: 500;
     letter-spacing: var(--track-label);
+    line-height: 1;
+    text-transform: uppercase;
+    white-space: nowrap;
+    transition: border-color var(--dur-1) var(--ease-standard);
+  }
+  .ct-board__hint svg { flex: none; width: 1.2em; height: 1.2em; }
+  .ct-board__coarse { display: none; }
+  @media (pointer: coarse) {
+    .ct-board__fine { display: none; }
+    .ct-board__coarse { display: inline; }
+  }
+  /* the board takes the pointer through the button laid over its footprint:
+     its chip's edge darkens, nothing moves */
+  .ct-stage:has(.ct-pip__enlarge:is(:hover, :focus-visible)) .ct-board.is-on .ct-board__hint { border-color: var(--ink-400); }
+
+  /* "Scroll ↓": a paper chip in the device's home strip, for a page that
+     scrolls by hand (the card's page with reduced motion, the enlarged view),
+     until the page's foot is in view — beside the screenshot, never on it.
+     It stands over the home indicator (which, at 0.9 opacity, is a layer of
+     its own and would otherwise paint over the chip). */
+  .ct-hint {
+    position: relative;
+    z-index: 1;
+    display: none;
+    align-items: center;
+    gap: var(--space-1);
+    height: min(var(--space-5), calc(var(--ct-device-screen) * var(--ct-device-k-home) - var(--space-1)));
+    padding: 0 var(--space-2);
+    background: var(--paper-1);
+    border: 1px solid var(--line-1);
+    border-radius: var(--radius-pill);
+    color: var(--ink-900);
+    font-size: min(var(--text-eyebrow), calc(var(--ct-device-screen) * var(--ct-device-k-home) * 0.5));
+    font-weight: 500;
+    letter-spacing: var(--track-label);
+    line-height: 1;
     text-transform: uppercase;
     white-space: nowrap;
     pointer-events: none;
     transition: opacity var(--dur-2) var(--ease-standard);
-  }
-  .is-end > .ct-hint { opacity: 0; }
-  /* which screen the phone is waiting for: the state on the dev server, "Screen
-     coming soon" in the build while the phone has nothing to show */
-  .ct-phone__dev {
-    position: absolute;
-    inset: auto var(--space-3) var(--space-3);
-    margin: 0;
-    color: var(--ink-600);
-    font-size: var(--text-eyebrow);
-    font-weight: 500;
-    letter-spacing: var(--track-label);
-    text-transform: uppercase;
-    text-align: center;
   }
 
   /* ---- scroll points: a rail of ticks in the right gutter, titles as
@@ -1813,13 +2256,23 @@ for (const key of shots) {
     .ct-points__link[aria-current='location'] .ct-points__tick { background: var(--ink-900); }
     /* the title: a small paper tooltip left of its tick, centred on it. It
        fades in place and never moves; reduced motion drops the fade with
-       every other transition (global.css). Hidden, it takes no pointer. */
+       every other transition (global.css). Hidden, it takes no pointer.
+       IT NEVER COVERS THE CARD (2026-10-03: the current tick's tooltip lay
+       ~49px over the phone at 1280×720): the script measures the gutter
+       between the card's right edge and the rail, less a --space-2 of air
+       (--pt-room), and the tooltip is never wider than what that leaves left
+       of its tick; a title a --space-1 too long borrows that much of the air
+       (--pt-give), a longer one ends in an ellipsis (Uttham, 2026-10-03:
+       "please truncate these"), and where the gutter cannot hold a readable
+       word (data-tip-off: under --space-8 for a title that would be cut) the
+       tooltip stays off — the tick, its length and its accessible name still
+       say where the reader is, and the link's own title names it on hover. */
     .ct-points__label {
       position: absolute;
       top: 50%;
       right: calc(var(--pt-tick) + var(--space-2));
       translate: 0 -50%;
-      max-width: var(--pt-tip);
+      max-width: min(var(--pt-tip), calc(var(--pt-room, var(--pt-tip)) - var(--pt-tick) - var(--space-2) + var(--pt-give, 0px)));
       overflow: hidden;
       padding: var(--space-1) var(--space-2);
       background: var(--paper-1);
@@ -1847,20 +2300,29 @@ for (const key of shots) {
       .ct-points__list:hover .ct-points__link:not(:hover) .ct-points__label { opacity: 0; visibility: hidden; }
       .ct-points__list:hover .ct-points__link:hover .ct-points__label { opacity: 1; visibility: visible; }
     }
+    .ct-points__link[data-tip-off] .ct-points__label { display: none; }
     .ct-points__link:focus-visible { outline: 2px solid var(--amber-text); outline-offset: 2px; }
   }
   @media (min-width: 768px) and (max-width: 900px) {
     .ct-points { --pt-pad: var(--space-2); }
   }
 
-  /* the card's title: what the phone is showing, one line above it */
+  /* THE CARD'S TITLE: what the phone is showing, one line in a slot of its
+     own height, so a long title never pushes the device down — it ends in an
+     ellipsis and keeps its whole text as the element's title. Small, medium
+     weight and in ink, so it names the screen without competing with the
+     dark handset under it; CENTRED, because the device is symmetrical and
+     its top corners are deeply rounded — a title set to its left edge would
+     hang past the curve and read as off-centre. One within-card step
+     (--space-3) to the device. */
   .ct-pane__title {
-    max-width: var(--ct-phone-w, none);
+    height: calc(var(--text-small) * var(--lh-statement));
     margin: 0 0 var(--space-3);
     color: var(--ink-900);
     font-size: var(--text-small);
-    font-weight: 600;
-    line-height: var(--lh-heading);
+    font-weight: 500;
+    line-height: var(--lh-statement);
+    text-align: center;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1868,6 +2330,17 @@ for (const key of shots) {
 
   /* the mini-player controls exist only on phones */
   .ct-pip__enlarge, .ct-pip__close, .ct-pip__restore, .ct-pip__scrim { display: none; }
+  /* the button that opens a screen full size covers what it opens */
+  .ct-pip__enlarge {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: zoom-in;
+  }
+  .ct-pip__enlarge:focus-visible { outline: 2px solid var(--amber-text); outline-offset: 2px; }
 
   /* Laptops and tablets: the phone stands beside the text, sticky under the
      header. On the site's 12-column grid the story takes 7 columns and the
@@ -1892,7 +2365,7 @@ for (const key of shots) {
          allows; the card is the phone plus one card inset all round, centred
          in its columns, so the spare width falls between text and card instead
          of inside it. --ct-pane-h is the tallest the card may be. */
-      --ct-pane-h: min(calc(100svh - var(--header-height) - 2 * var(--content-gap)), 720px);
+      --ct-pane-h: min(calc(100svh - var(--header-height) - 2 * var(--content-gap)), var(--ct-pane-max));
       /* THE CARD SITS CENTRED in the screen under the header (Uttham,
          2026-10-02: "the phone preview on l2 pages is not center aligned, there
          is less spacing on top than bottom when the header disappears"). The
@@ -1906,53 +2379,65 @@ for (const key of shots) {
       align-content: center;
       --ct-title-h: 0px;
       --ct-foot-h: 0px;
-      /* the phone stands as tall as the card allows and takes the width its
-         proportion gives it — unless the column is narrower (a tablet), when
-         it takes the column and its height follows. Both budgets take off the
-         card's own 1px border each side (--ct-card-edge): left in, the card
-         stood 2px taller than the sticky box at 1280×720, 1px over each end. */
+      /* Both budgets take off the card's own 1px border each side
+         (--ct-card-edge): left in, the card stood 2px taller than the sticky
+         box at 1280×720, 1px over each end. */
       --ct-card-edge: 2px;
+      container-type: inline-size;
+    }
+    /* the live phone stands as tall as the card allows and takes the width
+       its proportion gives it — unless the column is narrower (a tablet),
+       when it takes the column and its height follows */
+    .ct-panel--live {
       --ct-phone-w: min(
         calc(100cqw - 2 * var(--card-padding) - var(--ct-card-edge)),
         calc((var(--ct-pane-h) - 2 * var(--card-padding) - var(--ct-card-edge) - var(--ct-title-h) - var(--ct-foot-h) - var(--ct-edge)) / var(--ct-ratio) + var(--ct-edge))
       );
-      container-type: inline-size;
     }
-    /* the title over the phone: one line of small text and a within-card step */
-    .ct-panel--titled { --ct-title-h: calc(var(--text-small) * var(--lh-heading) + var(--space-3)); }
+    /* THE DEVICE IS ONE SIZE PER VIEWPORT (Uttham, 2026-10-03: "all the aspect
+       ratio should be fixed for this card … everything should have constant
+       height and width"). Its display's width is whichever binds first: the
+       column, or the card's tallest height less its insets, edge and title,
+       over the handset's proportions. Nothing a screen does — a clip, a page
+       that pans, a board, a long title — enters the sum, so the card, the
+       device and the 1 : 2 screen hold their size through every state, and a
+       short screen shrinks the device once, for good, not per screen. */
+    .ct-panel--device {
+      --ct-device-screen: min(
+        calc((100cqw - 2 * var(--card-padding) - var(--ct-card-edge)) / var(--ct-device-k-wide)),
+        calc((var(--ct-pane-h) - 2 * var(--card-padding) - var(--ct-card-edge) - var(--ct-title-h) - var(--ct-foot-h)) / var(--ct-device-k-tall))
+      );
+    }
+    /* the title over the phone: its one-line slot and a within-card step */
+    .ct-panel--titled { --ct-title-h: calc(var(--text-small) * var(--lh-statement) + var(--space-3)); }
     /* the open link under the phone takes its line the same way: a within-card
        step above it and the text link's own height (its underline included) */
     .ct-panel--visit { --ct-foot-h: calc(var(--space-4) + var(--text-body) * var(--lh-heading) + var(--space-2)); }
     .ct-hero .ct-visit { display: none; }
     .ct-pane__visit { display: inline-flex; margin-top: var(--space-4); }
-    /* a new proportion eases in, the card with it (reduced motion: at once,
-       as every --dur-* is then zero) */
     .ct-pane {
-      width: calc(var(--ct-phone-w) + 2 * var(--card-padding) + var(--ct-card-edge));
       max-width: 100%;
       height: auto;
       margin-inline: auto;
+    }
+    /* the card is the device plus one inset all round, at every state */
+    .ct-panel--device .ct-pane { width: calc(var(--ct-device-w) + 2 * var(--card-padding) + var(--ct-card-edge)); }
+    /* the live card follows its phone (reduced motion: at once, as every
+       --dur-* is then zero) */
+    .ct-panel--live .ct-pane {
+      width: calc(var(--ct-phone-w) + 2 * var(--card-padding) + var(--ct-card-edge));
       transition: width var(--dur-3) var(--ease-standard);
     }
     .ct-stage { height: auto; container-type: normal; display: block; }
-    .ct-phone {
+    .ct-phone--live {
       width: var(--ct-phone-w);
       height: calc((var(--ct-phone-w) - var(--ct-edge)) * var(--ct-ratio) + var(--ct-edge));
       aspect-ratio: auto;
+      margin-inline: auto;
       transition: width var(--dur-3) var(--ease-standard), height var(--dur-3) var(--ease-standard), border-color var(--dur-3) var(--ease-standard), box-shadow var(--dur-3) var(--ease-standard);
     }
-    /* BOARD MODE: the card takes its whole column and the frame drops away, so
-       a landscape board is read at the largest size the column allows; the
-       card keeps the phone's height, so nothing below it moves */
-    .ct-panel.is-wide .ct-pane { width: 100%; }
-    .ct-phone { margin-inline: auto; }
-    .ct-panel.is-board .ct-phone {
-      width: 100%;
-      border-color: transparent;
-      background: transparent;
-      box-shadow: none;
-    }
-    .ct-panel.is-board .ct-pane__title { max-width: none; }
+    /* a board on the card opens full size from the button over it */
+    .ct-panel--device.is-board .ct-pip__enlarge { display: block; }
   }
   @media (min-width: 768px) and (max-width: 900px) {
     .ct-story { grid-column: 1 / 6; }
@@ -1979,6 +2464,9 @@ for (const key of shots) {
         translate var(--dur-3) var(--ease-enter),
         visibility 0s linear var(--dur-3);
     }
+    /* the mini player is the same handset, 112px across, one size for every
+       screen; a board stands in its place on a paper card of its footprint */
+    .ct-panel--device { --ct-device-screen: calc(var(--ct-pip-w) / var(--ct-device-k-wide)); }
     .ct-panel.is-pip-on { opacity: 1; visibility: visible; translate: 0 0; transition-delay: 0s; }
     .ct-pane {
       height: auto;
@@ -1992,26 +2480,25 @@ for (const key of shots) {
     .ct-pane .bolt { display: none; }
     .ct-pane__title { display: none; } /* the mini player is only the phone */
     .ct-stage { position: relative; height: auto; container-type: normal; display: block; }
-    .ct-phone { width: 100%; border-radius: var(--radius-sm); box-shadow: var(--shadow-lift); }
-    /* the screens' mini phone takes each screen's proportion too, easing its
-       height (the live phone keeps its own, which grows in place) */
-    .ct-phone:not(.ct-phone--live) {
-      height: calc((var(--ct-pip-w) - var(--ct-edge)) * var(--ct-ratio) + var(--ct-edge));
-      aspect-ratio: auto;
-      transition: height var(--dur-3) var(--ease-standard);
+    .ct-phone--live { width: 100%; border-radius: var(--radius-sm); box-shadow: var(--shadow-lift); }
+    .ct-panel--device .ct-boards {
+      /* at 112px a board keeps one small step of paper round it, and its
+         chip only the magnifier */
+      --ct-board-inset: var(--space-1);
+      --ct-board-gap: var(--space-1);
+      --ct-board-hint-h: var(--space-4);
+      background: var(--paper-1);
+      border-radius: calc(var(--ct-device-screen) * (var(--ct-device-k-radius) + var(--ct-device-k-bezel)));
+      box-shadow: var(--shadow-rest), var(--shadow-lift);
+      visibility: hidden;
     }
-    .ct-phone__dev { display: none; }
-    .ct-pip__enlarge {
-      display: block;
-      position: absolute;
-      inset: 0;
-      z-index: 2;
-      padding: 0;
-      border: 0;
-      background: none;
-      cursor: zoom-in;
-    }
-    .ct-pip__enlarge:focus-visible { outline: 2px solid var(--amber-text); outline-offset: 2px; }
+    .ct-panel--device.is-board .ct-boards { visibility: visible; }
+    /* no title over the mini player, so a board sits in the middle of its card */
+    .ct-board { justify-content: center; }
+    .ct-board__img { border-radius: var(--radius-inset); }
+    .ct-board__hint { padding: 0 var(--space-1); box-shadow: none; }
+    .ct-board__hint-label { display: none; }
+    .ct-pip__enlarge { display: block; }
     /* a control, so the controls' square corner */
     .ct-pip__close {
       display: grid;
@@ -2032,6 +2519,10 @@ for (const key of shots) {
       box-shadow: var(--shadow-stuck);
       cursor: pointer;
     }
+    /* NEVER OVER THE DEVICE (2026-10-03, review of the handset: on its corner
+       it hid the battery and cut the body's curve): above the handset, its
+       foot a --space-2 clear of the top edge, its right edge on the device's */
+    .ct-panel--device .ct-pip__close { top: calc(-1 * (var(--space-6) + var(--space-2))); right: 0; }
     .ct-pip__close:focus-visible { outline: 2px solid var(--amber-text); outline-offset: 2px; }
     .ct-pip__restore:not([hidden]) {
       display: inline-flex;
@@ -2056,7 +2547,7 @@ for (const key of shots) {
       height: calc(var(--pip-big-w) * 19.5 / 9);
       margin: auto;
     }
-    .ct-panel.is-pip-big .ct-phone { border-radius: var(--radius-media); }
+    .ct-panel.is-pip-big .ct-phone--live { border-radius: var(--radius-media); }
     .ct-panel.is-pip-big .ct-pip__enlarge { display: none; }
     .ct-pip__scrim:not([hidden]) {
       display: block;
@@ -2067,53 +2558,107 @@ for (const key of shots) {
     }
   }
 
-  /* the enlarged screen: a phone-sized card on a dimmed page, as wide as the
-     screen's own proportion (--zoom-r, height over width) lets it stand whole
-     in the room the page leaves; a page capture takes a 1 : 2 window and
-     scrolls inside it */
+  /* THE ENLARGED SCREEN, on a dimmed page. A phone screen opens in the same
+     handset, by the same fit rules as the card: a 1 : 2 screen fills its
+     display, a shorter one stands on its own edge colours, a page capture
+     scrolls inside it by hand with the "Scroll ↓" chip in its home strip.
+     NEVER WIDER THAN THE CARD'S PHONE, ONLY TALLER (Uttham, 2026-10-03: "for
+     some contents outside l2 you can increase the phone size but not the
+     width, it should look relaistic wherever it can"): the display's width is
+     the card's largest (--ct-device-screen-max) or what the page allows, one
+     width for every screen; a page capture gets a taller display, a
+     handset's 19.5 : 9 (--ct-device-r, set by the script), so more of it
+     shows while it scrolls. A board opens on a paper card, whole, as large as
+     the page allows and never past its own pixels. The dialog itself draws
+     nothing: the device, or the card, is the object. */
   .ct-zoom {
-    --zoom-r: 2;
-    --zoom-h: calc(100svh - 2 * var(--space-7));
-    width: min(calc(100vw - 2 * var(--margin-side)), 420px, calc(var(--zoom-h) / var(--zoom-r)));
-    max-height: var(--zoom-h);
+    --ct-zoom-r-max: calc(19.5 / 9);
+    /* the close control's row above the device (or the board's card): its
+       height and a --space-2 under it, out of the height budget */
+    --ct-zoom-close: calc(var(--space-7) + var(--space-2));
+    --ct-device-screen: min(
+      calc((100vw - 2 * var(--margin-side)) / var(--ct-device-k-wide)),
+      calc((100svh - 2 * var(--space-7) - var(--ct-zoom-close)) / (var(--ct-device-k-tall) - 2 + var(--ct-zoom-r-max))),
+      var(--ct-device-screen-max)
+    );
+    max-width: none;
+    max-height: none;
     padding: 0;
     border: 0;
-    border-radius: var(--radius-media);
-    background: var(--paper-1);
-    box-shadow: var(--shadow-lift);
+    background: none;
     overflow: visible;
   }
+  /* the close control stands in a row of its own over the device's (or the
+     card's) top-right corner, so the dialog centres the two as one */
+  .ct-zoom[open] {
+    display: grid;
+    justify-items: end;
+    gap: var(--space-2);
+  }
   .ct-zoom::backdrop { background: rgba(22, 20, 14, 0.55); }
+  .ct-zoom.is-board :global(.ct-zoom__device) { display: none; }
+  .ct-zoom:not(.is-board) .ct-zoom__board { display: none; }
+  /* the device's display row, as on the card */
   .ct-zoom__media {
     position: relative;
-    max-height: var(--zoom-h);
+    min-height: 0;
     overflow: hidden;
-    border-radius: var(--radius-media);
+    background: linear-gradient(var(--ct-fill-top, var(--paper-1)) 50%, var(--ct-fill-foot, var(--paper-1)) 50%);
   }
-  .ct-zoom.is-pan .ct-zoom__media { aspect-ratio: 1 / 2; overflow-y: auto; overscroll-behavior: contain; }
+  .ct-zoom.is-pan :global(.ct-zoom__device) { --ct-device-r: min(var(--ct-zoom-page-r, 2), var(--ct-zoom-r-max)); }
+  .ct-zoom.is-pan .ct-zoom__media { overflow-y: auto; overscroll-behavior: contain; }
   .ct-zoom.is-pan .ct-hint { display: inline-flex; }
+  .ct-zoom.is-end .ct-hint { opacity: 0; }
+  /* the home indicator steps back while the chip stands in its place */
+  .ct-zoom.is-pan:not(.is-end) :global(.ct-device__bar) { opacity: 0; }
   /* the script builds the dialog's picture and clip, so they carry no scope */
-  .ct-zoom__media :global(.ct-zoom__img) { display: block; width: 100%; height: auto; }
+  .ct-zoom__media :global(.ct-zoom__img),
   .ct-zoom__media :global(.ct-zoom__clip) {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    object-position: top;
+    object-fit: contain;
+    object-position: center;
   }
+  .ct-zoom[data-anchor='top'] .ct-zoom__media :global(:is(.ct-zoom__img, .ct-zoom__clip)) { object-position: center top; }
+  .ct-zoom[data-anchor='bottom'] .ct-zoom__media :global(:is(.ct-zoom__img, .ct-zoom__clip)) { object-position: center bottom; }
+  .ct-zoom.is-pan .ct-zoom__media :global(.ct-zoom__img) { position: static; display: block; height: auto; }
   .ct-zoom__media :global(.ct-zoom__clip.is-ended) { opacity: 0; transition: opacity var(--dur-3) var(--ease-standard); }
   /* until the clip's first frame is in, the still (its ending) stays hidden:
-     the card is blank paper for that moment, at the still's size */
+     the display shows its edge colour for that moment */
   .ct-zoom.is-cueing .ct-zoom__media :global(.ct-zoom__img) { visibility: hidden; }
+  /* a board on paper: the card's inset all round, the board's own proportion */
+  .ct-zoom__board {
+    padding: var(--card-padding);
+    background: var(--paper-1);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-rest), var(--shadow-lift);
+  }
+  .ct-zoom__board :global(.ct-zoom__board-img) {
+    display: block;
+    width: min(
+      calc(100vw - 2 * var(--margin-side) - 2 * var(--card-padding)),
+      calc((100svh - 2 * var(--space-7) - var(--ct-zoom-close) - 2 * var(--card-padding)) / var(--zoom-board-r, 1)),
+      var(--zoom-board-max, 1200px)
+    );
+    height: auto;
+    border-radius: var(--radius-sm);
+    outline: 1px solid oklch(0 0 0 / 0.1);
+    outline-offset: -1px;
+  }
   /* the page behind the open dialog stays put: a wheel or swipe that runs
      past the dialog's own scrolling, or lands on the dimmed page, moves
      nothing (the dialog is outside the smooth scroll: data-lenis-prevent) */
   :global(html):has(.ct-zoom[open]) { overflow: hidden; }
+  /* the close control: NEVER OVER THE DEVICE or the board's card (2026-10-03,
+     review of the handset: on the corner it hid the battery and broke the
+     body's outline where the phone is shown largest), but in the row above,
+     right-aligned with it, a --space-2 clear */
   .ct-zoom__close {
-    position: absolute;
-    top: calc(-1 * var(--space-3));
-    right: calc(-1 * var(--space-3));
+    order: -1;
+    position: relative;
+    z-index: 2;
     display: grid;
     place-items: center;
     width: var(--space-7);
@@ -2135,14 +2680,23 @@ for (const key of shots) {
     @starting-style {
       .ct-hero > * { opacity: 0; transform: none; }
     }
-    .ct-screen, .ct-screen.is-on { scale: none; }
-    /* no pan: the page scrolls by hand inside the phone, its hint at its foot
-       (the mini player opens it in the dialog instead, where it scrolls too) */
-    .ct-screen__scroll { overflow-y: auto; scrollbar-width: thin; }
-    .ct-screen--pan .ct-hint { display: inline-flex; }
   }
+  /* no pan: in the 112px mini player a page capture stands whole in the
+     display, at its height, on its own edge colours — its foot would
+     otherwise sit out of sight with nothing to say so, since no chip reads at
+     that size (2026-10-03, review); a tap opens it in the dialog, where it
+     scrolls by hand */
   @media (prefers-reduced-motion: reduce) and (max-width: 767.98px) {
-    .ct-screen__scroll { overflow-y: hidden; }
-    .ct-screen--pan .ct-hint { display: none; }
+    .ct-screen--pan { background: linear-gradient(var(--ct-fill-top) 50%, var(--ct-fill-foot) 50%); }
+    .ct-screen--pan .ct-screen__scroll { display: flex; justify-content: center; }
+    .ct-screen--pan .ct-screen__page { width: auto; height: 100%; }
+  }
+  /* no pan: the page scrolls by hand inside the card's phone, its chip in the
+     home strip until its foot is in view */
+  @media (prefers-reduced-motion: reduce) and (min-width: 768px) {
+    .ct-screen__scroll { overflow-y: auto; scrollbar-width: thin; }
+    .ct-panel:has(.ct-screen--pan.is-on) .ct-hint { display: inline-flex; }
+    .ct-panel:has(.ct-screen--pan.is-on.is-end) .ct-hint { opacity: 0; }
+    .ct-panel:has(.ct-screen--pan.is-on:not(.is-end)) :global(.ct-device__bar) { opacity: 0; }
   }
 </style>
