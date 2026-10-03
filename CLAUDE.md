@@ -89,7 +89,10 @@ slower than any UI feedback; the values are in `docs/design-tokens.md`.
 do a weak magnetic scroll of sorts to center these sections in viewports"): a
 wheel gesture resting within 18% of a screen of a section's nav landing (Contact:
 the page bottom) eases there, **never back past where the gesture began**; touch,
-keys, nav jumps, reduced motion and teaser pages never snap (`section-snap.js`).
+keys, nav jumps and reduced motion never snap (`section-snap.js`). **The teaser
+pages settle too, more weakly** (see "Progressive reading" under the teaser
+layout): forward only, 12% of a screen, to the place where a part of the reading
+takes the phone. The homepage's rules and numbers are untouched by that.
 
 ## Images: never full-bleed inside a glass panel
 
@@ -572,8 +575,8 @@ scroll-driven pick, row by row inside a block too, and hover holds nothing
 there. **A row with several screens plays them in turn**
 (`screens.map` to a list — the Mall tab: its modal, then its PiP), the card's
 title following the file shown; with reduced motion **the reading shares the
-row out among them** — the band passing from the row's top to its foot shows
-each in turn — so no screen he supplied is out of reach. **A beat never takes
+row out among them** — the reading line passing from the row's top to its foot
+shows each in turn — so no screen he supplied is out of reach. **A beat never takes
 a screen away before it has finished** — a page pans its round trip, a clip
 plays and holds 1.2s — and **rows that share a screen hand it on as it is**,
 with no new fade, pan or replay (a row that borrows a list of screens carries
@@ -617,6 +620,54 @@ owns the right edge. **A page can limit its rail** (`rail` on the page's data;
 2026-10-02: "the scroll stepper should also have limited things, outcome,
 strategy, problem, title"): the product cards keep only the top of the page (its
 title), Problem, Strategy and Outcome — no sub-group ticks, no full-study ticks.
+
+**Progressive reading: only the part the phone shows is in full ink** (Uttham,
+2026-10-03: "can we do progressive loading of teaser pages, before the image on
+the right updates sometimeas content comes, ex v2 and v3 both content exsited in
+a viewport and then the screen is only showing v2, this is leading to
+confusion"). The reading is cut into **parts**: a section that carries a state
+(all of it); a block of rows or steps with its h3 and lead (one part, so a
+playing slideshow lights the whole block and the row on show keeps its amber
+bar); a section's **intro** — its h2 and the text before its first block —
+which **comes up with that block's first screen, held still** until the block
+itself is reached; and a section with no state anywhere (the product cards'
+Problem, every section of the prototype page), which keeps the nearest earlier
+screen and comes up by its place. **The text and the phone change on one
+trigger: a part's heading crossing the reading line, 40% down the screen — the
+rail's own line**, so rail, text and phone move together. **Parts not yet
+reached step back to `--ct-dim-ahead` (0.45), parts read to `--ct-dim-read`
+(0.6)**: opacity only, nothing hidden or moved, headings still ~3 : 1 ahead and
+~4.5 : 1 read on the board; read text is muted too, because two parts in one
+screen must never both be in full ink. A section's h2 stays in ink while any
+part of its section is shown; the amber bar shows only in the shown part;
+whatever has the focus is in ink; the hero and facts are never dimmed; no
+script, no dimming. A part comes up on `--dur-4` `--ease-enter` (a screen's
+arrival) and steps back on `--dur-3`; reduced motion, at once; the first
+lighting on load does not fade. **Why the line moved**: the old band picked the
+trigger whose centre was nearest the middle tenth of the screen, so a section
+with a state switched as its heading entered at 55% while one whose first
+trigger sat under an intro switched only when that row reached the middle — on
+Mall at 1440×900, "v3: sell brands, not Mall" had risen to 30% of the screen
+before the phone left v2. Measured 2026-10-03, Mall at 1440×900 and 1280×720,
+the product cards and both AI pages at 1440×900, 768×1024 and 375×812 (mini
+player): at every switch the heading coming into ink stood at 34–40% of the
+screen (the spread is the test pane's sparse frames, not the line) and the
+phone was showing that part's state. A clip's screen can still trail its text by its
+cue (a frame or two preloaded, 1.5s at most), as before.
+
+**The teaser pages settle into a part, weakly** (Uttham, 2026-10-03: "and some
+magnetic scroll to these also shuold be implemented"). `section-snap.js` takes
+the page's resting places from `provideRestingPlaces()` — each part's heading on
+the reading line, a pixel past it — and a wheel gesture that rests **within 12%
+of a screen short of one** eases on to it (0.8s, `--ease-enter`'s curve), so
+the reader never stops with the next heading just under the line and the phone
+still on the last screen. **Forward only**: unlike the homepage it never catches
+an overshoot, because pulling back across a line would flip the phone back to
+the screen just left; 12% rather than 18% because parts are a quarter to a whole
+screen apart, not a screen each, so most of every part stays free to stop in
+and a long section's body never pulls. Touch, keys, rail and nav jumps, reduced
+motion, an open dialog (the enlarged screen), the live phone enlarged on a phone
+and a focused field (the password) never snap.
 
 **The phone card hugs the phone** (2026-10-02: "too much padding on left right of
 the mobile preview, we should optimise this space"): from 768px the device is as
@@ -857,10 +908,10 @@ from the reading would pull it out of the reader's hands, so its rows carry no
 state, and "Open the prototype ↗" under the facts opens it full size. On phones
 a live phone opens full size *in place* on a tap (moving an iframe into the
 dialog would reload it), centred under the header over a dimmed page; × or the
-page shrinks it, a second × hides it. A page whose last rows cannot scroll up
-to the middle lets the reading band slide down over the last half screen, so
-those rows still drive the phone; a page with rows that all reach the middle
-never takes that path.
+page shrinks it, a second × hides it. A page whose last part (or, for reduced
+motion's row-by-row pick, its last row) cannot scroll up to the reading line
+lets the line slide down over the last half screen, so they still drive the
+phone; a page where everything reaches the line never takes that path.
 
 **Every tool page ends on "More tools", as a case page ends on "More cases"**
 (Uttham, 2026-10-03: "and similar to projects at the end give entry points for
@@ -872,12 +923,13 @@ cases pass their studies, tools pass rows built from `tools.ts` only — year,
 kicker, name and the card's line (`what`), nothing written for it; a row
 without a year or kicker leaves that cell empty, never invented. The label
 names what the rows are, as "More cases" does, and the homepage section calls
-them tools ("Tools I build so the team moves faster."). The block **shortens
-Resona's band slide but does not end it**: its last row still misses the middle
-by ~70px at 1440×900 (it reaches it at 1280×720), so the slide runs over the
-block and the last row still takes the phone; the block itself holds no
-trigger, so the phone never changes as it scrolls in, and on phones the mini
-player has stepped away before it arrives.
+them tools ("Tools I build so the team moves faster."). On Resona **its last
+part, What you get, reaches the reading line without help**; its last row
+stops ~100px under the line at 1440×900 (re-measured 2026-10-03 against the
+40% line), so the line still slides over the block for reduced motion's
+row-by-row pick; the block itself holds no trigger, so the phone never changes
+as it scrolls in, and on phones the mini player has stepped away before it
+arrives.
 
 **The full case study opens behind a light gate** (Uttham chose "Light
 gate only"). **The password card holds the "In the full case study" list** (2026-10-02:
