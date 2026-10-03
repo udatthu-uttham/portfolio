@@ -42,7 +42,8 @@ export type CaseTeaserData = {
   experiments?: Experiment[]; // the full study behind the gate; none → the card has no button
   screens?: {
     dir: 'plp' | 'mall-case'; // a folder under src/assets/ holding this page's screens
-    map?: Record<string, string>; // state → file name, when it is not the state's own name
+    map?: Record<string, string | string[]>; // state → file name, when it is not the state's own name; several play in turn
+    videos?: Record<string, string>; // file name → an MP4 under public/ that plays on that screen; the file's still is its poster
     alts: Record<string, string>; // state → what its screen shows
     titles?: Record<string, string>; // state → the short title on the card, above the phone
   };

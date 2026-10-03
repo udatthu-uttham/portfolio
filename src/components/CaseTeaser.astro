@@ -49,7 +49,8 @@ const states = [
 const stateToShot: Record<string, string> = {};
 if (data.screens && !live) {
   for (const state of states) {
-    const key = `${data.screens.dir}/${data.screens.map?.[state] ?? state}`;
+    const mapped = data.screens.map?.[state] ?? state;
+    const key = `${data.screens.dir}/${Array.isArray(mapped) ? mapped[0] : mapped}`;
     if (library[key]) stateToShot[state] = key;
   }
 }

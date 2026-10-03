@@ -166,14 +166,31 @@ export const mallCase: CaseTeaserData = {
 
   screens: {
     dir: 'mall-case',
+    // Uttham, 2026-10-03: "no need of v2 USPs or V2 pill use the v2 home
+    // directly, for v3-labels and pill and all v3 top designs, I have pasted
+    // ones with static contents". Those rows show the v2 home and the v3
+    // listing; the Mall tab's row plays its onboarding modal, then the PiP on
+    // the home screen (both from his Figma, the celebrity onboarding).
+    map: {
+      'v2-usps': 'v2-home',
+      'v2-pill': 'v2-home',
+      'v3-labels': 'v3-pill',
+      'v3-nav': ['v3-nav', 'v3-nav-pip'],
+    },
+    // Screens that move: his Figma animations, exported as MP4 (2026-10-03).
+    // Keyed by file; the file's own still in this folder is the poster.
+    videos: {
+      'v3-nav': '/media/mall-case/v3-nav.mp4',
+      'v3-nav-pip': '/media/mall-case/v3-nav-pip.mp4',
+      'v3-splash': '/media/mall-case/v3-splash.mp4',
+      'v3-ocp': '/media/mall-case/v3-ocp.mp4',
+    },
     alts: {
       'v1-tag': 'A listing page with the first, small “Mall” tag on a product card',
       'v2-home': 'v2: the home screen with the Mall widget and banner',
-      'v2-usps': 'v2: a Mall product page with the “Original Brands” and “Direct From Company” USPs',
-      'v2-pill': 'v2: listing cards carrying the old Mall pill and colour',
-      'v3-labels': 'v3: Mall products only from brands shoppers know, no seller labels',
       'v3-pill': 'v3: a listing page where Mall cards carry the purple tick among marketplace cards',
       'v3-nav': 'v3: the home screen with the Mall tab and its onboarding modal',
+      'v3-nav-pip': 'v3: the home screen with a picture-in-picture video introducing Mall',
       'v3-splash': 'v3: the Mall splash on a first visit',
       'v3-ftux': 'v3: the listing-page hint pointing at the Mall pill',
       'v3-pdp': 'v3: a Mall product page inside its purple enclosure',
@@ -189,11 +206,9 @@ export const mallCase: CaseTeaserData = {
     titles: {
       'v1-tag': 'The first Mall tag',
       'v2-home': 'v2: Mall everywhere',
-      'v2-usps': 'v2: USPs spelled out',
-      'v2-pill': 'v2: the old Mall pill',
-      'v3-labels': 'v3: real brands only',
       'v3-pill': 'v3: the purple tick',
       'v3-nav': 'v3: the Mall tab',
+      'v3-nav-pip': 'v3: Mall, introduced on the home',
       'v3-splash': 'v3: the first-visit splash',
       'v3-ftux': 'v3: the listing-page hint',
       'v3-pdp': 'v3: the purple product page',
