@@ -690,9 +690,12 @@ for (const key of shots) {
       // screen on show, so a row that borrows never replays its lender's
       seqAt = seqOwn ? Math.min(part ?? 0, seq.length - 1) : Math.max(0, shown ? seq.indexOf(shown) : 0);
       stepAt = performance.now();
+      // Nothing is ever written over a screen (Uttham, 2026-10-03: "placeholder
+      // text coming on top of images"): the label shows only on an empty phone,
+      // and the dev server names a borrowed state in the console instead.
       if (devLabel) {
-        if (devLabel.dataset.dev) devLabel.textContent = own.length ? '' : `No screen yet: ${state}`;
-        else devLabel.textContent = seq.length ? '' : 'Screen coming soon';
+        if (devLabel.dataset.dev && !own.length && seq.length) console.info(`[case] No screen yet: ${state}`);
+        devLabel.textContent = seq.length ? '' : devLabel.dataset.dev ? `No screen yet: ${state}` : 'Screen coming soon';
       }
       render();
     };
