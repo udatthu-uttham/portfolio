@@ -24,6 +24,27 @@ const { label, caption, rotate = 0, aspect = '46 / 62', develop = false } = Astr
   </div>
   {caption && <figcaption class="instax__caption">{caption}</figcaption>}
 </figure>
+{develop && (
+  /* Once developed, the print stays in colour for the rest of the browser
+     session (Uttham, 2026-10-03: "once hovered on photo and removed the grey
+     filter, keep it colorful throught that session"). Inline and right after
+     the figure, so a return visit in the same session paints in colour from
+     the first frame instead of fading up from grey. Storage can throw
+     (private windows, blocked site data); then it just develops per page. */
+  <script is:inline>
+    (() => {
+      const print = document.currentScript.previousElementSibling;
+      const KEY = 'portrait-developed';
+      const keep = () => print.classList.add('is-developed');
+      try { if (sessionStorage.getItem(KEY)) keep(); } catch (e) {}
+      print.addEventListener('pointerenter', (e) => {
+        if (e.pointerType !== 'mouse' && e.pointerType !== 'pen') return;
+        keep();
+        try { sessionStorage.setItem(KEY, '1'); } catch (err) {}
+      }, { once: true });
+    })();
+  </script>
+)}
 
 <style>
   .instax {
@@ -65,7 +86,8 @@ const { label, caption, rotate = 0, aspect = '46 / 62', develop = false } = Astr
      people hover, … the instax effect of shaking and revealing the colored
      version". The print waits in grey; reaching for it shakes it the way you
      shake a fresh instant photo, and the colour comes up while it settles.
-     Leaving lets it fade back to grey, a little slower, without a shake.
+     Since 2026-10-03 it stays in colour once developed, for the session
+     (see the script after the figure); a later hover still shakes it.
      Only the image greys — the paper border, the film grain and any caption
      keep their colour. Touch and coarse pointers cannot hover, so they never
      see the grey: outside the fine-pointer query the photo is full colour.
@@ -74,7 +96,7 @@ const { label, caption, rotate = 0, aspect = '46 / 62', develop = false } = Astr
      global override in global.css makes the colour switch instead of fade. */
   .instax--develop {
     --develop-in: 800ms;   /* grey → colour, while the pointer is on the print */
-    --develop-out: 1000ms; /* colour → grey after it leaves */
+    --develop-out: 1000ms; /* colour → grey; idle since the colour stays for the session (2026-10-03) */
     --develop-shake: 640ms; /* the hero's hi! sticker rides this same shake */
   }
 
@@ -92,7 +114,10 @@ const { label, caption, rotate = 0, aspect = '46 / 62', develop = false } = Astr
       transition: filter var(--develop-out) ease-in-out;
     }
 
-    .instax--develop:hover .instax__window :global(img) {
+    /* .is-developed: the first hover of the session has happened, so the
+       colour stays when the pointer leaves (the script below the figure). */
+    .instax--develop:hover .instax__window :global(img),
+    .instax--develop.is-developed .instax__window :global(img) {
       filter: grayscale(0) saturate(0.92) contrast(1.05);
       transition: filter var(--develop-in) ease-out;
     }

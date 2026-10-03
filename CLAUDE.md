@@ -69,8 +69,13 @@ no-hover pass, restored as it was — not a new one.
 "make it grey, and once people hover, we can have the instax effect of shaking
 and revealing the colored version"). `<InstaxFrame develop>` shows its image in
 greyscale at rest on fine pointers; on hover **the print gives one short decaying
-shake around its tilt and the colour comes up while it settles**, and on leave it
-fades back to grey, slower and without a shake. The shake replaces the frame's
+shake around its tilt and the colour comes up while it settles**. **Once developed
+it stays in colour for the rest of the browser session** (Uttham, 2026-10-03:
+"once hovered on photo and removed the grey filter, keep it colorful throught
+that session"): the first mouse or pen hover sets `is-developed` and a
+sessionStorage flag, an inline script after the figure restores it before the
+first paint on later pages of the session, and a later hover still shakes the
+print without greying it. The shake replaces the frame's
 hover lift; the two never stack. The hi! sticker is stuck onto the print — about
 40% of it over the print's top-right corner, clear of the face — and **rides the
 same shake about the print's centre**. Reduced motion: no shake, the colour just
