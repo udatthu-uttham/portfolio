@@ -3,22 +3,46 @@
 // board, one ruler-styled row each — year, kicker, title, one line, arrow.
 // No media, so it scales to twenty cases without the page growing much.
 //
-// Also the entry points at the END OF A PAGE (`end`): "More cases" after a
-// case study, and "More tools" after an AI Space tool page (Uttham,
-// 2026-10-03: "and similar to projects at the end give entry points for next
-// ones in ai prototype also"). Cases pass `items` (studies); anything else
-// passes `rows`, already shaped, every word from its own data file — a tool
-// row is its name, its card's line, and the year and kicker tools.ts gives it.
-// A row without a year or kicker leaves that cell empty, never invented.
+// Also the entry points at the END OF A PAGE: "More cases" after a case study,
+// and "More tools" after an AI Space tool page (Uttham, 2026-10-03: "and
+// similar to projects at the end give entry points for next ones in ai
+// prototype also"). Cases pass `items` (studies); anything else passes `rows`,
+// already shaped, every word from its own data file — a tool row is its name,
+// its card's line, and the year and kicker tools.ts gives it. A row without a
+// year or kicker leaves that cell empty, never invented.
+//
+// `compact`: the end of a teaser page, in its reading column (Uttham,
+// 2026-10-03: "the more case section can be just a small section with chevron
+// and takes the column width of the content it should not flow into the
+// column of the phone preview"): a small list, each row its title and line and
+// a chevron, on the faint band the page's blocks of rows share. `end` keeps
+// the full ruled index after a page without the teaser layout.
 import type { Study } from '../data/studies';
 import { rich } from '../lib/rich';
 
 type Row = { href: string; year?: string; kicker?: string; title: string; line: string };
-interface Props { items?: Study[]; rows?: Row[]; label?: string; end?: boolean }
-const { items = [], rows: given, label, end = false } = Astro.props;
+interface Props { items?: Study[]; rows?: Row[]; label?: string; end?: boolean; compact?: boolean }
+const { items = [], rows: given, label, end = false, compact = false } = Astro.props;
 const rows: Row[] = given ?? items.map((s) => ({ href: `/work/${s.slug}`, year: s.year, kicker: s.kicker, title: s.title, line: s.summary }));
 ---
-{rows.length > 0 && (
+{rows.length > 0 && (compact ? (
+  <nav class="case-index case-index--compact" aria-label={label ?? 'More cases'}>
+    {label && <p class="case-index__label">{label}</p>}
+    <ol class="case-index__list">
+      {rows.map((r) => (
+        <li class="case-index__row">
+          <a class="case-index__link" href={r.href} data-astro-prefetch>
+            <span class="case-index__text">
+              <span class="case-index__title">{r.title}</span>
+              <span class="case-index__line" set:html={rich(r.line)} />
+            </span>
+            <svg class="case-index__chev" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5 10.5 8 6 12.5" /></svg>
+          </a>
+        </li>
+      ))}
+    </ol>
+  </nav>
+) : (
   <nav class:list={['case-index', { 'case-index--end': end }]} aria-label={label ?? 'More cases'}>
     {label && <p class="case-index__label">{label}</p>}
     <ol class="case-index__list">
@@ -35,7 +59,7 @@ const rows: Row[] = given ?? items.map((s) => ({ href: `/work/${s.slug}`, year: 
       ))}
     </ol>
   </nav>
-)}
+))}
 
 <style>
   .case-index { position: relative; z-index: 1; }
@@ -65,13 +89,47 @@ const rows: Row[] = given ?? items.map((s) => ({ href: `/work/${s.slug}`, year: 
   .case-index__link:hover .case-index__arr { transform: translateX(4px); color: var(--ink-900); }
   .case-index__link:focus-visible { outline: 2px solid var(--ink-900); outline-offset: 2px; }
   @media (max-width: 900px) {
-    .case-index__link { grid-template-columns: 6ch auto minmax(0, 1fr) auto; }
-    .case-index__line { grid-column: 3 / span 1; grid-row: 2; }
+    .case-index:not(.case-index--compact) .case-index__link { grid-template-columns: 6ch auto minmax(0, 1fr) auto; }
+    .case-index:not(.case-index--compact) .case-index__line { grid-column: 3 / span 1; grid-row: 2; }
   }
   @media (max-width: 640px) {
-    .case-index__link { grid-template-columns: auto auto minmax(0, 1fr); row-gap: var(--space-2); }
-    .case-index__title { grid-column: 1 / -1; grid-row: 2; }
-    .case-index__line { grid-column: 1 / -1; grid-row: 3; }
-    .case-index__arr { grid-column: 3; grid-row: 1; justify-self: end; }
+    .case-index:not(.case-index--compact) .case-index__link { grid-template-columns: auto auto minmax(0, 1fr); row-gap: var(--space-2); }
+    .case-index:not(.case-index--compact) .case-index__title { grid-column: 1 / -1; grid-row: 2; }
+    .case-index:not(.case-index--compact) .case-index__line { grid-column: 1 / -1; grid-row: 3; }
+    .case-index:not(.case-index--compact) .case-index__arr { grid-column: 3; grid-row: 1; justify-self: end; }
   }
+
+  /* COMPACT, in a teaser page's reading column: the label a --ct-tie over the
+     rows, which share the reading's faint band (--ct-block-bg, --radius-sm,
+     inset --card-padding at the sides) with the dashed rule only between rows,
+     as the page's blocks of rows do. Each row is its title, its line under it
+     and a chevron at the right, centred on the pair. Hover is colour and the
+     chevron's nudge only. The page's tokens fall back to the same values
+     outside a teaser page. */
+  .case-index--compact .case-index__label { margin-bottom: var(--ct-tie, var(--space-4)); }
+  .case-index--compact .case-index__list {
+    padding: 0 var(--card-padding);
+    border-top: 0;
+    background: var(--ct-block-bg, color-mix(in oklab, var(--paper-1) 55%, transparent));
+    border-radius: var(--radius-sm);
+  }
+  .case-index--compact .case-index__row { border-bottom: 0; }
+  .case-index--compact .case-index__row + .case-index__row { border-top: 1px dashed var(--line-mark); }
+  .case-index--compact .case-index__link {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-5) 0;
+  }
+  .case-index--compact .case-index__text { display: grid; gap: var(--space-1); min-width: 0; }
+  .case-index--compact .case-index__title { font-size: var(--text-body-lg); transition: color var(--dur-2) var(--ease-standard); }
+  .case-index__chev {
+    width: var(--space-5);
+    height: var(--space-5);
+    color: var(--ink-600);
+    transition: transform var(--dur-2) var(--ease-standard), color var(--dur-2) var(--ease-standard);
+  }
+  .case-index__link:hover .case-index__chev { transform: translateX(4px); color: var(--ink-900); }
+  .case-index--compact .case-index__link:hover .case-index__title { color: var(--amber-text); }
+  .case-index--compact .case-index__link:focus-visible { outline-offset: 4px; border-radius: var(--radius-inset); }
 </style>

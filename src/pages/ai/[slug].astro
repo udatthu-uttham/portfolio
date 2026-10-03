@@ -69,17 +69,20 @@ const toolLd = workLd({
         {guide.slug === 'resona' && <ResonaPreview fill follow />}
         {guide.slug === 'realistic-prototype' && tool?.visit && <ProtoPreview src={tool.visit.href} fill interactive />}
       </Fragment>
+      {/* "More tools", as "More cases" names what its rows are; the homepage
+          section calls them tools too ("Tools I build so the team moves
+          faster."). At the end of the reading column, the running phone beside
+          it, as a case page ends (Uttham, 2026-10-03: "the more case section
+          can be just a small section with chevron") */}
+      <CaseIndex slot="more" rows={moreTools} label="More tools" compact />
     </CaseTeaser>
   </main>
-  {/* "More tools", as "More cases" names what its rows are; the homepage
-      section calls them tools too ("Tools I build so the team moves faster.") */}
-  <CaseIndex rows={moreTools} label="More tools" end />
 </Base>
 
 <style>
   /* the case page's own frame (work/[slug].astro): the header, then half a
-     section gap; the layout's own bottom pad (a whole --section-y) leads to
-     "More tools", which ends the page as "More cases" ends a case */
+     section gap; "More tools" ends the reading column, as "More cases" ends a
+     case's */
   .ai-page {
     position: relative;
     min-height: 100svh;
