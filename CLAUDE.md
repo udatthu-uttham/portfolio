@@ -542,7 +542,24 @@ homepage tile.
 `--section-y` between sections (the bus-discovery reference's 160px), `--ct-head`
 (32) from a heading to its text, `--ct-sub` (48–64) to a sub-group and above its
 heading, `--ct-para` (24) between paragraphs, rows padded `--space-6` — one rung
-up on 2026-10-02 ("the texts are closely placed making it too textual"). **Each
+up on 2026-10-02 ("the texts are closely placed making it too textual").
+**A block of rows or steps is one region** (Uttham, 2026-10-03: "the divider at
+the end of the last item?? the sectioning and association is not clear, lets
+make them more obvious and clear"): the rows share one faint band of the sheet
+stock (`--ct-block-bg`, `--paper-1` at 55% on the board, `--radius-sm`, inset
+`--card-padding` at the sides, no border or shadow), and **the dashed rule runs
+only between rows — never above the first or under the last**, where it read as
+a divider closing the block against the next heading. **Two levels only**: the
+section stays open paper and the band is the one region inside it (the gate and
+prompt cards and the sticky note are their own objects, never nested in it).
+**The sub-group heading sits outside its band, one `--ct-tie` (16) over it** —
+a third or less of the `--ct-sub` above the heading — and its lead line a
+`--space-2` under the heading, `--ct-tie` over the band. **Three levels of
+type**: section heading `--text-h3`, sub-group heading `--text-body-lg` (≥1.5×
+apart at every width; at `--text-h4` they were 1.3× and read as one level),
+then the rows' own 16–17px labels inside the band. The row being read keeps its
+amber bar, now on the band's left edge; the slideshow and hover hold are
+unchanged. **Each
 block of rows or steps plays as a slideshow** (2026-10-02: "the preview runs
 these 4 slideshows, accordingly the highlight changes in the left … in all the
 blocks"): once the reading reaches a block showing two or more different
