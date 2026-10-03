@@ -790,6 +790,313 @@ function cable(i) {
   return doc(bgOf(i, 7), '', b);
 }
 
+// ---------------------------------------------------------------- toys and storage
+//
+// Added 2026-10-03, when a review found toys showing bottles and cookers and
+// under-bed storage showing bottles and bedsheets: the bundle files them under
+// neighbouring categories (toys borrow other kinds' photos, storage sits in the
+// bedsheets feed), so they are drawn as what their titles say they are.
+
+// A rounded rectangle as a path, for piece().
+const rr = (x, y, w, h, r) =>
+  `M${x + r} ${y} L${x + w - r} ${y} Q${x + w} ${y} ${x + w} ${y + r} L${x + w} ${y + h - r} Q${x + w} ${y + h} ${x + w - r} ${y + h} L${x + r} ${y + h} Q${x} ${y + h} ${x} ${y + h - r} L${x} ${y + r} Q${x} ${y} ${x + r} ${y} Z`;
+const PLAY = [C.red, C.royal, C.mustard, C.emerald, C.coral, C.teal, C.magenta, '#F2C230'];
+
+function piggyBank(i) {
+  const base = [C.pink, C.aqua][i % 2];
+  const body = 'M106 286 A150 112 0 1 0 406 286 A150 112 0 1 0 106 286 Z';
+  let b = floor(412, 170, 16);
+  for (const x of [168, 214, 292, 338]) b += piece(rr(x - 20, 350, 40, 60, 14), dk(base, 0.12), base);
+  b += `<path d="M108 270 Q76 262 84 236 Q92 216 108 232" fill="none" stroke="${dk(base, 0.15)}" stroke-width="7" stroke-linecap="round"/>`;
+  b += piece(body, base, base, `<path d="${body}" fill="url(#puff)"/>`);
+  b += piece('M292 196 L318 138 L346 204 Z', dk(base, 0.1), base) + piece('M226 190 L238 134 L272 186 Z', dk(base, 0.1), base);
+  b += piece('M392 252 Q438 252 438 290 Q438 326 392 326 Z', dk(base, 0.14), base) + `<ellipse cx="420" cy="280" rx="5" ry="8" fill="${dk(base, 0.5)}"/><ellipse cx="420" cy="302" rx="5" ry="8" fill="${dk(base, 0.5)}"/>`;
+  b += `<circle cx="352" cy="248" r="9" fill="#2B2B30"/><circle cx="355" cy="245" r="3" fill="#fff"/>`;
+  b += `<rect x="166" y="188" width="58" height="11" rx="5.5" fill="${dk(base, 0.55)}"/><ellipse cx="195" cy="170" rx="24" ry="9" fill="url(#gold)" stroke="#8C6A22" stroke-opacity=".5"/>`;
+  return doc(bgOf(i, 1), '', b);
+}
+
+function xylophone(i) {
+  let b = floor(430, 200, 16);
+  b += piece('M120 214 L400 254 L400 276 L120 236 Z', 'url(#wood)', C.tan) + piece('M120 382 L400 334 L400 356 L120 404 Z', 'url(#wood)', C.tan);
+  PLAY.forEach((c, k) => {
+    const h = 220 - k * 16;
+    const x = 132 + k * 34;
+    b += piece(rr(x, 309 - h / 2, 28, h, 6), c, c, shine(`M${x + 8} ${309 - h / 2 + 12} L${x + 8} ${309 + h / 2 - 12}`, 0.35, 3));
+    b += `<circle cx="${x + 14}" cy="${f1(309 - h / 2 + 16)}" r="3" fill="url(#steel)"/><circle cx="${x + 14}" cy="${f1(309 + h / 2 - 16)}" r="3" fill="url(#steel)"/>`;
+  });
+  for (const [x1, y1, x2, y2] of [[330, 470, 430, 360], [372, 474, 450, 384]]) b += `<path d="M${x1} ${y1} L${x2} ${y2}" stroke="url(#wood)" stroke-width="8" stroke-linecap="round"/><circle cx="${x2}" cy="${y2}" r="15" fill="${C.red}"/><circle cx="${x2 - 5}" cy="${y2 - 5}" r="5" fill="#fff" opacity=".35"/>`;
+  return doc(bgOf(i, 2), '', b);
+}
+
+function drum(i) {
+  const base = [C.red, C.royal][i % 2];
+  let b = floor(428, 160, 16);
+  b += piece('M136 196 L376 196 L376 380 Q256 424 136 380 Z', base, base, `<path d="M136 360 Q256 404 376 360 L376 380 Q256 424 136 380 Z" fill="#F2F0EA"/>`);
+  let cords = '';
+  for (let k = 0; k < 8; k++) {
+    const x0 = 146 + k * 30;
+    cords += `<path d="M${x0} ${f1(214 + Math.abs(256 - x0) * 0.08)} L${x0 + 15} ${f1(360 + (40 - Math.abs(256 - x0 - 15) * 0.3))} L${x0 + 30} ${f1(214 + Math.abs(256 - x0 - 30) * 0.08)}" fill="none" stroke="#F2F0EA" stroke-width="4" stroke-linejoin="round"/>`;
+  }
+  b += cords;
+  b += `<ellipse cx="256" cy="196" rx="120" ry="34" fill="#F7F4EC" stroke="#CFC9BC" stroke-width="3"/><ellipse cx="256" cy="196" rx="120" ry="34" fill="none" stroke="${C.mustard}" stroke-width="9"/>`;
+  b += `<path d="M196 150 L356 90 M220 166 L392 132" stroke="url(#wood)" stroke-width="9" stroke-linecap="round"/><circle cx="356" cy="90" r="11" fill="${C.cream}"/><circle cx="392" cy="132" r="11" fill="${C.cream}"/>`;
+  return doc(bgOf(i, 3), '', b);
+}
+
+function playTent(i) {
+  const [base, acc] = [[C.cream, C.teal], [C.white, C.coral]][i % 2];
+  const tent = 'M256 104 L398 440 L114 440 Z';
+  const fab = fabric('f', 'stripe', base, acc, 2.2);
+  let b = floor(440, 200, 18);
+  b += `<path d="M232 66 L272 134 M282 66 L242 134 M256 60 L256 132" stroke="url(#wood)" stroke-width="7" stroke-linecap="round"/>`;
+  b += piece(tent, fab.fill, base, `<path d="M256 236 L306 440 L206 440 Z" fill="#3A3634" opacity=".82"/><path d="M256 236 Q236 320 166 440 L206 440 Z" fill="${base}"/><path d="M256 236 Q236 320 166 440 L206 440 Z" fill="${acc}" opacity=".35"/>`);
+  for (let k = 0; k < 5; k++) b += `<path d="M${180 + k * 36} 196 l12 22 l12 -22 Z" fill="${PLAY[k]}"/>`;
+  b += `<path d="M178 196 Q256 212 334 196" fill="none" stroke="#7A6A58" stroke-width="2"/>`;
+  return doc(bgOf(i, 4), fab.def, b);
+}
+
+// A jigsaw piece: each edge has a knob out (1), a hole in (-1) or is flat (0).
+function jigsaw(x, y, s, [t, r, bt, l]) {
+  const k = s * 0.26;
+  return (
+    `M${x} ${y} L${f1(x + s * 0.36)} ${y} C${f1(x + s * 0.3)} ${f1(y - k * t)} ${f1(x + s * 0.7)} ${f1(y - k * t)} ${f1(x + s * 0.64)} ${y} L${x + s} ${y}` +
+    ` L${x + s} ${f1(y + s * 0.36)} C${f1(x + s + k * r)} ${f1(y + s * 0.3)} ${f1(x + s + k * r)} ${f1(y + s * 0.7)} ${x + s} ${f1(y + s * 0.64)} L${x + s} ${y + s}` +
+    ` L${f1(x + s * 0.64)} ${y + s} C${f1(x + s * 0.7)} ${f1(y + s + k * bt)} ${f1(x + s * 0.3)} ${f1(y + s + k * bt)} ${f1(x + s * 0.36)} ${y + s} L${x} ${y + s}` +
+    ` L${x} ${f1(y + s * 0.64)} C${f1(x - k * l)} ${f1(y + s * 0.7)} ${f1(x - k * l)} ${f1(y + s * 0.3)} ${x} ${f1(y + s * 0.36)} Z`
+  );
+}
+
+function puzzle(i) {
+  const s = 120;
+  const pieces = [
+    [136, 136, [0, 1, -1, 0], C.red, -4], [262, 128, [0, 0, 1, -1], C.royal, 5],
+    [130, 268, [1, -1, 0, 0], C.mustard, 3], [270, 262, [-1, 0, 0, 1], C.emerald, -6],
+  ];
+  let b = '';
+  pieces.forEach(([x, y, e, c, a], k) => {
+    const d = jigsaw(x, y, s, e);
+    const col = i % 2 && k % 2 ? C.coral : c;
+    b += `<g transform="rotate(${a} ${x + s / 2} ${y + s / 2})">${drop(d, 3, 7, 0.18)}${piece(d, col, col, `<path d="${d}" fill="url(#puff)"/>`)}</g>`;
+  });
+  return doc(bgOf(i, 5), '', b);
+}
+
+function stacker(i) {
+  let b = floor(440, 150, 16);
+  b += piece('M136 424 Q256 400 376 424 Q376 448 256 452 Q136 448 136 424 Z', 'url(#wood)', C.tan);
+  b += `<rect x="246" y="130" width="20" height="300" rx="8" fill="url(#wood)"/>`;
+  const rings = [C.red, C.coral, C.mustard, C.emerald, C.royal, C.magenta];
+  rings.forEach((c, k) => {
+    const w = 220 - k * 30;
+    b += piece(rr(256 - w / 2, 380 - k * 44, w, 42, 21), c, c, shine(`M${256 - w / 2 + 18} ${392 - k * 44} L${256 + w / 2 - 30} ${392 - k * 44}`, 0.35, 4));
+  });
+  b += `<circle cx="256" cy="118" r="26" fill="${C.red}"/><circle cx="248" cy="110" r="8" fill="#fff" opacity=".35"/>`;
+  return doc(bgOf(i, 6), '', b);
+}
+
+function abacus(i) {
+  let b = floor(452, 190, 14);
+  b += `<rect x="112" y="120" width="288" height="300" rx="14" fill="none" stroke="url(#wood)" stroke-width="22"/>`;
+  b += `<path d="M120 450 L150 420 M392 450 L362 420" stroke="url(#wood)" stroke-width="14" stroke-linecap="round"/>`;
+  for (let row = 0; row < 6; row++) {
+    const y = 162 + row * 44;
+    b += `<path d="M122 ${y} L390 ${y}" stroke="url(#steel)" stroke-width="5"/>`;
+    const left = [3, 6, 2, 5, 4, 7][(row + i) % 6];
+    for (let k = 0; k < 9; k++) {
+      const x = k < left ? 142 + k * 22 : 386 - (9 - k) * 22 + 6;
+      b += `<ellipse cx="${x}" cy="${y}" rx="11" ry="15" fill="${PLAY[row]}"/><ellipse cx="${x - 3}" cy="${y - 5}" rx="4" ry="5" fill="#fff" opacity=".3"/>`;
+    }
+  }
+  return doc(bgOf(i, 7), '', b);
+}
+
+function chess(i) {
+  const board = `<pattern id="cb" width="64" height="64" patternUnits="userSpaceOnUse"><rect width="64" height="64" fill="#EAD9B8"/><rect width="32" height="32" fill="#8A5A32"/><rect x="32" y="32" width="32" height="32" fill="#8A5A32"/></pattern>`;
+  let b = `<g transform="translate(256 380) scale(1 .46) rotate(45) translate(-130 -130)"><rect x="8" y="14" width="260" height="260" fill="#000" opacity=".16" filter="url(#soft)"/><rect width="260" height="260" fill="url(#cb)" stroke="#5B3A24" stroke-width="8"/></g>`;
+  const pawn = (x, y, c) =>
+    piece(`M${x - 34} ${y} Q${x - 34} ${y - 14} ${x - 20} ${y - 18} Q${x - 10} ${y - 50} ${x - 12} ${y - 70} L${x + 12} ${y - 70} Q${x + 10} ${y - 50} ${x + 20} ${y - 18} Q${x + 34} ${y - 14} ${x + 34} ${y} Z`, c, c) +
+    `<circle cx="${x}" cy="${y - 86}" r="22" fill="${c}" stroke="${dk(c, 0.4)}" stroke-opacity=".4" stroke-width="2"/>`;
+  const rook = (x, y, c) =>
+    piece(`M${x - 40} ${y} Q${x - 40} ${y - 16} ${x - 26} ${y - 20} L${x - 22} ${y - 96} L${x - 30} ${y - 100} L${x - 30} ${y - 130} L${x - 16} ${y - 130} L${x - 16} ${y - 116} L${x - 6} ${y - 116} L${x - 6} ${y - 130} L${x + 6} ${y - 130} L${x + 6} ${y - 116} L${x + 16} ${y - 116} L${x + 16} ${y - 130} L${x + 30} ${y - 130} L${x + 30} ${y - 100} L${x + 22} ${y - 96} L${x + 26} ${y - 20} Q${x + 40} ${y - 16} ${x + 40} ${y} Z`, c, c);
+  const king = (x, y, c) =>
+    piece(`M${x - 42} ${y} Q${x - 42} ${y - 18} ${x - 26} ${y - 22} Q${x - 14} ${y - 90} ${x - 26} ${y - 140} L${x + 26} ${y - 140} Q${x + 14} ${y - 90} ${x + 26} ${y - 22} Q${x + 42} ${y - 18} ${x + 42} ${y} Z`, c, c) +
+    piece(`M${x - 32} ${y - 140} L${x + 32} ${y - 140} L${x + 22} ${y - 160} L${x - 22} ${y - 160} Z`, c, c) +
+    `<path d="M${x} ${y - 160} L${x} ${y - 196} M${x - 14} ${y - 180} L${x + 14} ${y - 180}" stroke="${c}" stroke-width="9" stroke-linecap="round"/>`;
+  const W = '#F4F1EA';
+  const K = '#2B2B30';
+  b += rook(186, 380, K) + king(262, 360, W) + pawn(334, 400, i % 2 ? W : K);
+  return doc(bgOf(i, 1), board, b);
+}
+
+function clay(i) {
+  let b = floor(430, 200, 16);
+  const tub = (x, y, c) =>
+    piece(`M${x - 56} ${y} L${x + 56} ${y} L${x + 48} ${y + 96} Q${x + 46} ${y + 106} ${x + 34} ${y + 106} L${x - 34} ${y + 106} Q${x - 46} ${y + 106} ${x - 48} ${y + 96} Z`, '#F7F7F5', '#BDBAB2', `<rect x="${x - 50}" y="${y + 34}" width="100" height="30" fill="${c}" opacity=".85"/>`) +
+    `<ellipse cx="${x}" cy="${y}" rx="56" ry="14" fill="#E9E8E4"/><path d="M${x - 46} ${y} Q${x - 30} ${y - 46} ${x} ${y - 48} Q${x + 34} ${y - 46} ${x + 46} ${y} Z" fill="${c}"/><path d="M${x - 24} ${y - 26} Q${x - 6} ${y - 38} ${x + 14} ${y - 34}" fill="none" stroke="#fff" stroke-opacity=".4" stroke-width="5" stroke-linecap="round"/>`;
+  const cols = i % 2 ? [C.mint, C.lilac, C.coral] : [C.red, '#F2C230', C.royal];
+  b += tub(174, 310, cols[0]) + tub(338, 310, cols[1]) + tub(256, 224, cols[2]);
+  b += piece('M352 410 Q420 380 452 404 Q456 420 440 426 Q400 438 360 432 Z', cols[2], cols[2]);
+  return doc(bgOf(i, 2), '', b);
+}
+
+const heart = (x, y, s, c) => `<path d="M${x} ${f1(y + s * 0.9)} C${f1(x - s * 1.4)} ${f1(y)} ${f1(x - s * 0.6)} ${f1(y - s * 0.9)} ${x} ${f1(y - s * 0.3)} C${f1(x + s * 0.6)} ${f1(y - s * 0.9)} ${f1(x + s * 1.4)} ${y} ${x} ${f1(y + s * 0.9)} Z" fill="${c}"/>`;
+const diamond = (x, y, s, c) => `<path d="M${x} ${y - s} L${f1(x + s * 0.7)} ${y} L${x} ${y + s} L${f1(x - s * 0.7)} ${y} Z" fill="${c}"/>`;
+
+function cards(i) {
+  let b = '';
+  const suits = [heart, diamond, heart, diamond];
+  const ink = [C.red, C.royal, C.emerald, C.red];
+  [-30, -10, 10, 30].forEach((a, k) => {
+    const d = rr(196, 150, 140, 200, 14);
+    const s = suits[(k + i) % 4];
+    b += `<g transform="rotate(${a} 256 420)">${drop(d, 3, 6, 0.14)}${piece(d, '#FBFAF6', '#CFC9BC', `<rect x="206" y="160" width="120" height="180" rx="8" fill="none" stroke="${ink[k]}" stroke-opacity=".35" stroke-width="2"/>`)}${s(222, 180, 9, ink[k])}${s(266, 250, 24, ink[k])}${s(310, 320, 9, ink[k])}</g>`;
+  });
+  return doc(bgOf(i, 3), '', b);
+}
+
+function poolBalls(i) {
+  const balls = [
+    [256, 200, '#F2C230'], [214, 270, C.royal], [298, 270, C.red], [172, 340, '#6B3FA0'],
+    [256, 340, C.black], [340, 340, C.coral], [214, 410, C.emerald], [298, 410, C.maroon],
+  ];
+  let defs = '<radialGradient id="ball" cx="35%" cy="30%" r="70%"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".35" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".35"/></radialGradient>';
+  let b = `<ellipse cx="262" cy="330" rx="150" ry="140" fill="#000" opacity=".14" filter="url(#soft)"/>`;
+  balls.forEach(([x, y, c], k) => {
+    const striped = (k + i) % 3 === 1;
+    b += `<circle cx="${x}" cy="${y}" r="40" fill="${striped ? '#F4F1EA' : c}"/>`;
+    if (striped) b += `<path d="M${x - 38} ${y - 14} Q${x} ${y - 20} ${x + 38} ${y - 14} L${x + 38} ${y + 14} Q${x} ${y + 20} ${x - 38} ${y + 14} Z" fill="${c}"/>`;
+    b += `<circle cx="${x}" cy="${y}" r="15" fill="#F7F5F0"/><circle cx="${x}" cy="${y}" r="40" fill="url(#ball)"/>`;
+  });
+  return doc(bgOf(i, 4), defs, b);
+}
+
+function duck(i) {
+  const base = '#F6C431';
+  let b = `<ellipse cx="256" cy="420" rx="190" ry="34" fill="${C.aqua}" opacity=".55"/><path d="M90 420 Q130 404 170 420 Q210 436 250 420 Q290 404 330 420 Q370 436 420 420" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="4"/>`;
+  b += piece('M110 330 Q100 260 170 250 Q250 246 300 280 Q330 230 360 270 Q400 330 360 384 Q310 430 200 424 Q118 414 110 330 Z', base, base, `<path d="M190 310 Q240 290 286 330 Q240 360 200 344 Z" fill="${dk(base, 0.12)}"/>`);
+  b += piece('M250 196 A70 70 0 1 0 390 196 A70 70 0 1 0 250 196 Z', base, base, `<path d="M250 196 A70 70 0 1 0 390 196 A70 70 0 1 0 250 196 Z" fill="url(#puff)"/>`);
+  b += piece('M380 196 Q434 188 446 210 Q426 230 382 222 Z', '#EE7D2A', '#C25A12');
+  b += `<circle cx="344" cy="176" r="10" fill="#2B2B30"/><circle cx="347" cy="172" r="3.5" fill="#fff"/>`;
+  return doc(bgOf(i, 5), '', b);
+}
+
+function blocks(i) {
+  let b = floor(446, 200, 16);
+  const brick = (x, y, w, c) => {
+    let o = '';
+    for (let k = 0; k < w / 40; k++) o += piece(rr(x + 8 + k * 40, y - 16, 24, 18, 5), c, c);
+    return o + piece(rr(x, y, w, 64, 6), c, c, shine(`M${x + 10} ${y + 12} L${x + w - 10} ${y + 12}`, 0.3, 4));
+  };
+  const cols = i % 2 ? [C.teal, C.coral, '#F2C230', C.royal] : [C.red, C.royal, '#F2C230', C.emerald];
+  b += brick(116, 376, 160, cols[0]) + brick(276, 376, 120, cols[1]) + brick(176, 296, 160, cols[2]) + brick(216, 216, 80, cols[3]) + brick(96, 296, 80, cols[1]);
+  return doc(bgOf(i, 6), '', b);
+}
+
+function dressUp(i) {
+  let b = floor(430, 180, 16);
+  b += piece('M120 410 Q110 300 170 230 L342 230 Q402 300 392 410 Q256 440 120 410 Z', C.magenta, C.magenta, fold('M200 250 Q186 330 170 410', 0.12) + fold('M312 250 Q326 330 342 410', 0.12) + `<path d="M120 410 Q256 440 392 410 L392 398 Q256 428 120 398 Z" fill="#F2D58A"/>`);
+  b += `<path d="M170 230 Q256 250 342 230" fill="none" stroke="#F2D58A" stroke-width="8"/>`;
+  b += piece('M168 196 L178 112 L216 156 L256 96 L296 156 L334 112 L344 196 Z', 'url(#gold)', '#8C6A22');
+  for (const [x, c] of [[212, C.red], [256, C.royal], [300, C.emerald]]) b += `<circle cx="${x}" cy="176" r="9" fill="${c}"/>`;
+  for (const [x, y] of [[178, 112], [256, 96], [334, 112]]) b += `<circle cx="${x}" cy="${y}" r="8" fill="#F5E3A8"/>`;
+  b += `<path d="M380 470 L436 300" stroke="#F4F1EA" stroke-width="8" stroke-linecap="round"/><path d="M436 262 L446 288 L474 290 L452 306 L460 332 L436 318 L412 332 L420 306 L398 290 L426 288 Z" fill="#F2C230"/>`;
+  return doc(bgOf(i, 7), '', b);
+}
+
+// ---------------------------------------------------------------- storage
+
+function underBedBag(i) {
+  const cols = [C.grey, C.navy, C.beige, C.teal, C.maroon];
+  const prints = ['check', 'solid', 'floral', 'leaf', 'dots'];
+  const base = cols[i % cols.length];
+  const fab = fabric('f', prints[i % prints.length], base, accentFor(base, i), 1);
+  const front = 'M96 270 L416 270 L416 396 Q416 410 402 410 L110 410 Q96 410 96 396 Z';
+  const lid = 'M136 196 L376 196 L416 270 L96 270 Z';
+  let b = drop(front + lid, 6, 14, 0.2);
+  b += piece(front, fab.fill, base, `<path d="M226 312 Q256 296 286 312" fill="none" stroke="${dk(base, 0.35)}" stroke-width="9" stroke-linecap="round"/>`);
+  b += piece(lid, fab.fill, base, `<path d="M162 210 L350 210 L376 256 L136 256 Z" fill="#EAF2F6" opacity=".78"/><path d="M190 224 L300 224 L316 246 L176 246 Z" fill="${lt(C.lavender, 0.2)}" opacity=".55"/>`);
+  b += `<path d="M98 272 L414 272" stroke="url(#steel)" stroke-width="4" stroke-dasharray="3 3"/><rect x="380" y="264" width="14" height="22" rx="4" fill="url(#steel)"/>`;
+  return doc(bgOf(i, 1), fab.def, b);
+}
+
+function drawerUnit(i) {
+  const tint = [C.sky, C.lilac][i % 2];
+  let b = floor(452, 150, 14);
+  b += piece('M156 96 L356 96 Q368 96 368 108 L368 424 Q368 436 356 436 L156 436 Q144 436 144 424 L144 108 Q144 96 156 96 Z', '#F7F7F5', '#BDBAB2');
+  for (let k = 0; k < 4; k++) {
+    const y = 110 + k * 80;
+    b += piece(rr(158, y, 196, 70, 6), tint, tint, `<rect x="226" y="${y + 14}" width="60" height="12" rx="6" fill="${dk(tint, 0.3)}"/>`, { outline: 0.3 });
+  }
+  for (const x of [168, 344]) b += `<circle cx="${x}" cy="446" r="10" fill="#45474D"/>`;
+  return doc(bgOf(i, 2), '', b);
+}
+
+function clothesCover(i) {
+  const base = [C.lavender, C.mint][i % 2];
+  const d = 'M160 150 Q256 118 352 150 L366 452 Q256 466 146 452 Z';
+  let b = `<path d="M256 116 L256 90 Q256 66 276 66 Q294 66 294 82" fill="none" stroke="url(#steel)" stroke-width="6" stroke-linecap="round"/>`;
+  b += drop(d) + piece(d, base, base, `<rect x="196" y="190" width="120" height="180" rx="10" fill="#EEF4F7" opacity=".8"/><path d="M216 214 Q256 202 296 214 L300 350 L212 350 Z" fill="${C.coral}" opacity=".45"/>` + `<path d="M338 160 L350 448" stroke="url(#steel)" stroke-width="3" stroke-dasharray="3 3"/>`);
+  return doc(bgOf(i, 3), '', b);
+}
+
+function fabricBin(i) {
+  const base = [C.sand, C.charcoal][i % 2];
+  const fab = fabric('f', 'check', base, accentFor(base, i), 1.2);
+  const d = 'M126 196 L386 196 L364 420 Q362 436 346 436 L166 436 Q150 436 148 420 Z';
+  let b = drop(d) + piece(d, fab.fill, base, `<rect x="216" y="226" width="80" height="22" rx="11" fill="${dk(base, 0.45)}"/>`);
+  b += piece('M118 180 L394 180 L388 214 L124 214 Z', dk(base, 0.12), base);
+  return doc(bgOf(i, 4), fab.def, b);
+}
+
+// ---------------------------------------------------------------- category strip extras
+
+function handbag(i) {
+  const base = C.tan;
+  let b = `<path d="M196 206 Q196 112 256 112 Q316 112 316 206" fill="none" stroke="${dk(base, 0.3)}" stroke-width="16" stroke-linecap="round"/>`;
+  const body = 'M150 206 L362 206 L390 404 Q392 424 372 424 L140 424 Q120 424 122 404 Z';
+  b += drop(body) + piece(body, base, base, shine('M170 230 L152 400', 0.2, 5));
+  b += piece('M146 206 L366 206 L358 290 Q256 318 154 290 Z', dk(base, 0.12), base) + `<rect x="242" y="282" width="28" height="30" rx="5" fill="url(#gold)"/>`;
+  return doc(bgOf(i, 5), '', b);
+}
+
+function headphones(i) {
+  const base = C.sky;
+  let b = `<path d="M146 330 L146 260 Q146 120 256 120 Q366 120 366 260 L366 330" fill="none" stroke="${dk(base, 0.35)}" stroke-width="22" stroke-linecap="round"/>`;
+  b += `<path d="M178 168 Q256 108 334 168" fill="none" stroke="#2B2B30" stroke-width="16" stroke-linecap="round" opacity=".85"/>`;
+  for (const x of [146, 366]) {
+    const s = x < 256 ? -1 : 1;
+    b += piece(rr(x - 46, 270, 92, 140, 40), base, base, `<path d="${rr(x - 46, 270, 92, 140, 40)}" fill="url(#puff)"/>`);
+    b += piece(rr(x - s * 30 - 22, 286, 44, 108, 22), '#2B2B30', '#111');
+  }
+  return doc(bgOf(i, 6), '', b);
+}
+
+function cricket(i) {
+  let b = floor(440, 190, 16);
+  b += `<g transform="rotate(-32 256 280)">${drop(rr(214, 190, 84, 250, 18))}${piece(rr(214, 190, 84, 250, 18), 'url(#wood)', C.tan, shine('M232 210 L232 420', 0.3, 5))}` +
+    `${piece(rr(242, 70, 28, 126, 10), '#2B2B30', '#111', `<path d="M244 90 L268 100 M244 112 L268 122 M244 134 L268 144 M244 156 L268 166" stroke="#4A4C52" stroke-width="3"/>`)}</g>`;
+  b += `<circle cx="372" cy="388" r="38" fill="${C.red}"/><path d="M346 360 Q372 388 346 416 M398 360 Q372 388 398 416" fill="none" stroke="#F4F1EA" stroke-width="3" stroke-dasharray="4 3"/><circle cx="360" cy="374" r="10" fill="#fff" opacity=".3"/>`;
+  return doc(bgOf(i, 7), '', b);
+}
+
+// The home strip's round tiles (public/proto/feed-ux/categories/), drawn on the
+// catalogue's own backdrop so they sit beside the Shirts tile, which already
+// shows a catalogue shirt. File names are the bundle's; the size is set by the
+// renderer. Accessories … Saree are not in today's strip but ship in the folder.
+export const CATEGORY_TILES = {
+  'Kurti.png': () => kurti(0),
+  'Western.png': () => coord(1),
+  'Footwear.png': () => shoes(0),
+  'Beauty.png': () => lipstick(2),
+  'Home Tex.png': () => bedsheet(0),
+  'Accessories.png': () => handbag(0),
+  'Electronics.png': () => headphones(0),
+  'Jewellery.png': () => earrings(0),
+  'SPorts.png': () => cricket(0),
+  'Saree.png': () => saree(0),
+};
+
 // ---------------------------------------------------------------- pools
 
 // The menswear and kitchen fallbacks are mixed baskets in the bundle (its
@@ -805,6 +1112,12 @@ const KITCHEN = [
   (i) => oilDispenser(i), (i) => casserole(i, C.red), (i) => plate(i), (i) => jugSet(i),
   (i) => idliStand(i), (i) => mug(i, C.sand, 'leaf'), (i) => tiffin(i), (i) => spiceBox(i),
 ];
+// Toys, in the order BY_TITLE names them: banks (2), musical (2), tents (2),
+// puzzles (2), stacker, abacus, chess, clay, cards, balls, bath, building,
+// dress-up. A repeated drawing takes its second colourway from its odd index.
+const TOYS = [piggyBank, piggyBank, xylophone, drum, playTent, playTent, puzzle, puzzle, stacker, abacus, chess, clay, cards, poolBalls, duck, blocks, dressUp];
+// Under-bed bags (0–4), a drawer unit, a clothes cover, a fabric bin.
+const STORAGE = [underBedBag, underBedBag, underBedBag, underBedBag, underBedBag, drawerUnit, clothesCover, fabricBin];
 
 // kind → { size, draw(i) }. Sizes follow how many distinct pictures of the kind
 // the bundle used: the big feeds (shirts, co-ords) get the most variety.
@@ -821,7 +1134,15 @@ export const POOLS = {
   diaper: { size: 4, draw: diaper },
   menswear: { size: MENSWEAR.length, draw: (i) => MENSWEAR[i](i) },
   kitchen: { size: KITCHEN.length, draw: (i) => KITCHEN[i](i) },
-  // One-offs: the interview participants' past orders.
+  // Toys and under-bed storage, which the bundle files under other categories
+  // (see above). The rewriter picks within a pool by title: a money bank from
+  // toy 0–1, a drawer unit from storage 5 … (BY_TITLE in
+  // proto-synthetic-images.mjs).
+  toy: { size: TOYS.length, draw: (i) => TOYS[i](i) },
+  storage: { size: STORAGE.length, draw: (i) => STORAGE[i](i) },
+  // One-offs, drawn for the sandbox's interview participants' orders, which
+  // are invented since 2026-10-03 (scripts/proto-synthetic-data.mjs; it also
+  // borrows lipstick, kitchen and toy pictures, and leaves a few of these spare).
   watch: { size: 1, draw: (i) => watch(i + 1, 'bracelet', '#1F1F22') },
   speaker: { size: 1, draw: speaker },
   hairstick: { size: 1, draw: hairStick },
