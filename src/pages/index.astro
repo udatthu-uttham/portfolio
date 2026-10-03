@@ -91,7 +91,7 @@ const principles = [
 <Base title="Uttham Udatthu — Design Lead">
   <HeroMotion slot="head" />
   <a class="skip-link" href="#main">Skip to content</a>
-  <Header />
+  <Header heroAvatar />
 
   <main id="main" tabindex="-1">
     <h1 class="sr-only">Uttham Udatthu — design lead, systems thinker and builder</h1>
@@ -419,6 +419,10 @@ const principles = [
     --footer-block: calc(var(--section-y-sm) + var(--space-3) + var(--text-body) * var(--lh-heading) + var(--space-2) + var(--card-padding));
   }
   #contact {
+    /* The How I lead sheet's two insets (see .prin), set here so the photo's
+       height budget below can reserve exactly what the sheet takes. */
+    --prin-x: var(--card-padding);
+    --prin-top: max(var(--prin-x), calc(var(--text-note) * var(--lh-heading) / 2 + var(--space-3) + var(--space-4)));
     min-height: calc(100svh - var(--header-height) - var(--footer-block));
     padding-bottom: 0;
     /* A jump lands the CONTENT one --space-6 under the header, not the top
@@ -505,11 +509,22 @@ const principles = [
        a short screen (1024x600) the hero runs past the viewport naturally and
        Projects starts at its bottom. On phones the hero is taller than the
        screen, so min-height and centring do nothing there.
-       The top pad (>= 48px) also keeps the portrait and its hi! sticker clear
-       of the header — it is never less than the group gap it replaced. */
+       OPTICALLY HIGH, NOT CENTRED (Uttham, 2026-10-03: "there is lot of top
+       space than bottom as the image is only on left side, can we optimise by
+       moving the content slightly above and keeping more space down, to
+       balance the negative space"). Centred, the slab and the scene beside it
+       — the heavy band — sat ~85px below the screen's middle, because the
+       portrait above the slab, on the left only, counted as half the block.
+       So the top pad is the header plus --space-7 only (no section above to
+       keep a rhythm with; 48px still keeps the portrait and its hi! sticker
+       clear of the header), the bottom pad stays --section-pad (it meets
+       Projects' pad), and on laptops the free space between them splits 1 : 2
+       above : below (the fr rows below), lifting the band ~30–55px and leaving
+       the larger margin at the bottom. Below 1024px the hero stacks and is
+       about a screen tall, so it simply centres. */
     min-height: 100svh;
     align-content: center;
-    padding-top: calc(var(--header-height) + var(--section-pad));
+    padding-top: calc(var(--header-height) + var(--space-7));
     padding-bottom: var(--section-pad);
   }
 
@@ -1110,16 +1125,26 @@ const principles = [
   /* ============================ principles =========================== */
   /* How I lead — three plain statements on the paper, a title and its tagline
      each (the body paragraphs went on 2026-10-01 so Contact fits one screen).
-     Space does the grouping: within an item --space-2, between items
-     --grid-gap. No row gap: the two rows are one item, and the subgrid below
-     would otherwise have a parent gap to reconcile. */
+     ONE inset does all the spacing (Uttham, 2026-10-03: "spacings can be
+     optimised … are they consistent or not, please fix them"): --prin-x is the
+     card-inset rung, --card-padding. The sheet pads it on both sides, the
+     columns sit 2 × --prin-x apart with the dashed rule centred in the gap, so
+     every column is the same width and every text edge is one --prin-x from
+     the paper's edge or a rule. Before, the sides were 48px, the gap before a
+     rule 24px and after it 32px, and the first column was 33px wider. Within
+     an item: --space-2. No row gap: the two rows are one item. */
   .prin {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0 var(--grid-gap);
+    gap: 0 calc(2 * var(--prin-x));
   }
   /* One sheet of the tiles' white stock: the principles are a paper object, not loose text. */
   .prin--sheet {
+    /* --prin-x and --prin-top live on #contact. --prin-top clears the part of
+       the "How I lead" sticker that lies ON the paper: it is centred on the top
+       edge like the tiles' washi tape, so half its height plus the few px its
+       -5° turn drops the low corner (measured 21px at 1440; the formula allows
+       24), and then one within-card step, as a taped sheet's --sheet-top does. */
     position: relative;
     z-index: 0;
     /* Narrower than the glass and slid under it like a sheet into a folder
@@ -1129,25 +1154,24 @@ const principles = [
        the heading and never behind it. A tuck costs no height — the negative
        margin hands it back — so it was never what made Contact long.
        The top margin leaves room for the sticker to clear the ruler (the ruler's
-       12px collapses into it). Inside, --space-6 clears the sticker's lower half;
-       the bottom padding is the tuck plus one small step, so only a band of
-       paper shows between the taglines and the glass. */
+       12px collapses into it). The bottom padding is the tuck plus --prin-x,
+       so the paper showing under the taglines is the same inset as the sides. */
     margin: var(--space-6) var(--group-gap) calc(-1 * var(--space-7));
-    padding: var(--space-6) var(--group-gap) calc(var(--space-4) + var(--space-7));
+    padding: var(--prin-top) var(--prin-x) calc(var(--prin-x) + var(--space-7));
     background: var(--paper-1);
     border: 1px solid var(--line-1);
     border-radius: var(--radius-sm);
     box-shadow: var(--shadow-rest);
   }
-  /* "How I lead" is an amber sticker holding the sheet's top-left corner to the
-     paper, the way the hi! sticker holds the hero photo. Handwriting, tilted, stuck. */
+  /* "How I lead" is an amber sticker holding the sheet to the paper, the way
+     the hi! sticker holds the hero photo. Handwriting, tilted, stuck. */
   .prin__title {
-    /* Stuck on the sheet's top edge, centred — the way a label goes on a folder
-       rather than dog-eared into the corner (Uttham, 2026-09-20). */
+    /* Stuck across the sheet's top edge, centred — the way a label goes on a
+       folder rather than dog-eared into the corner (Uttham, 2026-09-20). */
     position: absolute;
-    top: calc(var(--space-4) * -1);
+    top: 0;
     left: 50%;
-    translate: -50% 0;
+    translate: -50% -50%;
     z-index: 2;
     margin: 0;
     padding: var(--space-1) var(--space-3) calc(var(--space-1) + 2px);
@@ -1166,9 +1190,16 @@ const principles = [
 
   /* Each principle is two rows on a shared grid, so titles and taglines line up
      across the columns and the sheet reads as a table, not three floating blocks.
-     The tagline's underline went with the body it used to divide off. */
-  .prin__item { display: grid; grid-template-rows: subgrid; grid-row: span 2; row-gap: 0; align-content: start; }
-  .prin__item + .prin__item { padding-inline-start: var(--space-6); border-inline-start: 1px dashed var(--line-mark); }
+     The rule between two items is drawn in the middle of their gap, not as the
+     second item's border, so it takes no width from its column. */
+  .prin__item { position: relative; display: grid; grid-template-rows: subgrid; grid-row: span 2; row-gap: 0; align-content: start; }
+  .prin__item + .prin__item::before {
+    content: '';
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: calc(-1 * var(--prin-x));
+    border-inline-start: 1px dashed var(--line-mark);
+  }
   .prin__item h3 { margin: 0; font-size: var(--text-h4); letter-spacing: var(--track-heading); line-height: var(--lh-heading); text-wrap: balance; }
   .prin__item :where(p) { margin: 0; color: var(--ink-600); text-wrap: pretty; }
   .prin__item .prin__tag { margin-top: var(--space-2); color: var(--ink-600); font-family: var(--font-paper); font-size: var(--text-small); font-weight: 500; letter-spacing: var(--track-label); text-transform: uppercase; }
@@ -1207,7 +1238,9 @@ const principles = [
        panel's own padding (≤342px) plus the print's caption and border, which
        make it ~69px taller than it is wide. Measured at 1024×768 through
        1920×1080 on 2026-10-02; the old formula (295px, ÷1.23) under-reserved
-       by up to 40px. It stays ≥150px on short screens — where Contact and the
+       by up to 40px. Since 2026-10-03 the sheet's insets are tokens
+       (--prin-top, --prin-x), so the 412px is 364px plus those two: it grows
+       with the sheet instead of drifting from it. It stays ≥150px on short screens — where Contact and the
        footer still fit, with less air — and ≤340px on tall ones.
        The two moto badges came off the photo on 2026-10-01 ("for now remove
        the stickers") along with the space reserved for them; MotoSticker.astro
@@ -1223,7 +1256,7 @@ const principles = [
        bolt is owed. One within-card step in from the right edge clears it at
        every size, and the cap below gives the notes that step back. */
     --photo-inset: var(--space-4);
-    --photo-w: clamp(150px, min(calc(100svh - var(--header-height) - var(--space-6) - var(--footer-block) - 412px), calc(100cqw - var(--notes-min) - var(--group-gap) - var(--photo-inset))), 340px);
+    --photo-w: clamp(150px, min(calc(100svh - var(--header-height) - var(--space-6) - var(--footer-block) - 364px - var(--prin-top) - var(--prin-x)), calc(100cqw - var(--notes-min) - var(--group-gap) - var(--photo-inset))), 340px);
   }
 
   .contact-panel__photo :global(.instax) {
@@ -1407,19 +1440,21 @@ const principles = [
   }
 
   @media (min-width: 1024px) {
+    /* portrait row, slab row, between two free-space rows that split 1 : 2;
+       with no room to spare (short screens) both collapse to 0 */
     .hero {
-      grid-template-rows: auto auto;
+      grid-template-rows: minmax(0, 1fr) auto auto minmax(0, 2fr);
       row-gap: 0;
     }
     .hero__stage {
       grid-column: 1 / 9;
-      grid-row: 1 / 3;
+      grid-row: 2 / 4;
       display: grid;
       grid-template-rows: subgrid;
     }
     .hero__aside {
       grid-column: 9 / -1;
-      grid-row: 2;
+      grid-row: 3;
       align-self: center;
     }
   }
@@ -1442,17 +1477,13 @@ const principles = [
     .contact-panel { grid-template-columns: 1fr; align-items: start; }
     .contact-panel__photo { --photo-w: min(100%, 260px); --photo-inset: 0px; justify-self: start; }
   }
-  @media (max-width: 900px) {
-    /* the three principles stay side by side down to phone width; the body drops to small text */
-    .prin { gap: var(--space-6) var(--grid-gap); }
-    .prin__item + .prin__item { padding-inline-start: var(--space-4); }
-  }
 
   /* ============================ narrow ============================== */
   @media (max-width: 767px) {
-    .prin { grid-template-columns: 1fr; gap: var(--space-6); }
+    /* stacked: the same --prin-x either side of a rule, now horizontal */
+    .prin { grid-template-columns: 1fr; gap: calc(2 * var(--prin-x)) 0; }
     .prin__item { display: flex; flex-direction: column; }
-    .prin__item + .prin__item { padding-inline-start: 0; border-inline-start: 0; padding-top: var(--space-5); border-top: 1px dashed var(--line-mark); }
+    .prin__item + .prin__item::before { inset-block: calc(-1 * var(--prin-x)) auto; inset-inline: 0; border-inline-start: 0; border-top: 1px dashed var(--line-mark); }
     .prin--sheet { margin-inline: var(--space-4); }
     .tiles { grid-template-columns: 1fr; gap: var(--space-7); }
     .tile-reveal:nth-child(n) { transition-delay: 0ms; }

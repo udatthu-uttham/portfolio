@@ -128,8 +128,7 @@ both already sprung once:
 
 **The hero is not a rung: it is one whole screen, and so is every section after
 it** (Uttham, 2026-10-01: "in one viewport so many elements are there, I want to
-just show one section"). The hero is `min-height: 100svh` with its content
-centred and `--header-height` added to its top pad; `#work`, `#ai` and `#contact`
+just show one section"). The hero is `min-height: 100svh`; `#work`, `#ai` and `#contact`
 are `min-height: calc(100svh - var(--header-height))`, content centred. **Each
 section pads `--section-pad` — half a `--section-y` — top and bottom**, so two
 neighbours' pads meet at the boundary and content-to-content is never less than
@@ -137,6 +136,20 @@ one `--section-y`; no section owns the whole gap, so none can double it. Every
 `section[id]` lands a nav jump with `scroll-margin-top: var(--header-height)`.
 **The one exception is the last screen**: Contact has no bottom pad and shares
 its screen with the footer (see "Contact fits one screen").
+
+**The hero sits optically high, not centred** (Uttham, 2026-10-03: "there is
+lot of top space than bottom as the image is only on left side, can we optimise
+by moving the content slightly above and keeping more space down, to balance
+the negative space"). Centred, the heavy band — the glass slab and the scene
+beside it — sat ~85px below the screen's middle, because the portrait poking
+above the slab on the left only counted as half the block. The hero's top pad
+is `--header-height` + `--space-7` (no section above it to keep a rhythm with;
+48px still clears the portrait's hi! sticker), its bottom pad stays
+`--section-pad`, and on laptops (≥1024px) **the free space splits 1 : 2 above :
+below** through `minmax(0, 1fr) auto auto minmax(0, 2fr)` rows, so the band now
+sits 22–42px below the middle at 1226×924 to 1920×1080, with the larger margin
+at the bottom. With no room to spare both fr rows collapse to 0, so short
+screens are unchanged; below 1024px the hero stacks and simply centres.
 Centring is block-level `align-content: center`, so the children keep normal
 flow and their collapsing margins; a browser without it top-aligns, which is the
 old layout.
@@ -177,6 +190,15 @@ ladder and the screen contract lean on that, so never size the bar any other
 way. Above ~1350px the bar's edges and the sections' edges visibly differ; that
 is what "end to end" asks for.
 
+**While the header avatar is hidden it takes no room** (Uttham, 2026-10-03: "the
+name should be left aligned when no favicon, once it is there move the name").
+On the homepage the avatar starts folded away (`<Header heroAvatar />`, so it is
+hidden from the first paint, not after the script) and the wordmark sits on the
+left gutter; once the hero portrait scrolls out, motion.js unhides it and the
+name slides over as the avatar's width and trailing gap animate in. Reduced
+motion: the avatar fades and the name moves without sliding. The gap belongs to
+the avatar (`--avatar-gap`), not the brand's flex gap, so it folds with it.
+
 ## Contact fits one screen
 
 **Contact and the footer share the last screen** (Uttham, 2026-10-02: "reduce
@@ -194,7 +216,16 @@ size, with 6px of air at 1366×768, where the photo is at its 150px floor.
 contact section should be in one viewport, let's remove the paragraph section for
 the How I lead section"). The three principles are **a title and a tagline each,
 nothing more** — the body paragraphs are gone, and that is the owner's cut, not a
-compression, so "Uttham's copy is Uttham's" holds. **The bike photo is the panel's
+compression, so "Uttham's copy is Uttham's" holds. **The sheet runs on one inset,
+`--prin-x` = `--card-padding`** (Uttham, 2026-10-03: "spacings can be optimised
+… are they consistent or not, please fix them"): the paper's sides, the paper
+showing under the taglines, and each side of the dashed rules (drawn in the
+middle of a 2 × `--prin-x` column gap, so every column is the same width). Its
+top, `--prin-top`, clears the "How I lead" sticker — now centred on the top edge
+like washi tape — by one `--space-4`. Both tokens live on `#contact`, and the
+photo's height budget subtracts them, so a change to the sheet moves the photo
+instead of pushing Contact off the screen (re-measured: the fit at 1024×768 to
+1920×1080 is unchanged). **The bike photo is the panel's
 focus; the notes are its actions** (Uttham, 2026-10-01: "it looks like block of 4
 cards, I want the image to be more focussed, while the 3 CTAs retain their
 clickability"). The three notes sit in **one row at their own size** — two lines
