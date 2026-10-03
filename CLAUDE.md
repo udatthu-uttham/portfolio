@@ -85,14 +85,18 @@ durations (`--develop-in` / `--develop-out` / `--develop-shake`) are
 component-local on purpose, above the `--dur-*` ladder, because a develop is
 slower than any UI feedback; the values are in `docs/design-tokens.md`.
 
-**The homepage sections settle into view, weakly** (Uttham, 2026-10-03: "can we
-do a weak magnetic scroll of sorts to center these sections in viewports"): a
-wheel gesture resting within 18% of a screen of a section's nav landing (Contact:
-the page bottom) eases there, **never back past where the gesture began**; touch,
-keys, nav jumps and reduced motion never snap (`section-snap.js`). **The teaser
-pages settle too, more weakly** (see "Progressive reading" under the teaser
-layout): forward only, 12% of a screen, to the place where a part of the reading
-takes the phone. The homepage's rules and numbers are untouched by that.
+**The homepage sections settle into view, magnetically** (Uttham, 2026-10-03:
+"can we do a weak magnetic scroll of sorts to center these sections in
+viewports", then later that day "improve magnetic scroll strength on home page,
+and bring it on l2 pages as well"): a wheel gesture resting **within 30% of a
+screen** of a section's nav landing (Contact: the page bottom) eases there in
+0.6s on a damped curve (no bounce), **never back past where the gesture began**;
+touch, keys, nav jumps and reduced motion never snap (`section-snap.js`). It was
+18% and 0.8s until the second note. **The teaser pages settle too** (see "The
+teaser pages settle into a part" under the teaser layout): 22% of a screen ahead
+to the place where a part of the reading takes the phone, 10% back onto the
+part just entered, and never more than 35% of the gap between two parts, so
+every gap keeps a stretch that is nobody's. The homepage's rules hold there too.
 
 ## Images: never full-bleed inside a glass panel
 
@@ -656,19 +660,28 @@ screen (the spread is the test pane's sparse frames, not the line) and the
 phone was showing that part's state. A clip's screen can still trail its text by its
 cue (a frame or two preloaded, 1.5s at most), as before.
 
-**The teaser pages settle into a part, weakly** (Uttham, 2026-10-03: "and some
-magnetic scroll to these also shuold be implemented"). `section-snap.js` takes
-the page's resting places from `provideRestingPlaces()` — each part's heading on
-the reading line, a pixel past it — and a wheel gesture that rests **within 12%
-of a screen short of one** eases on to it (0.8s, `--ease-enter`'s curve), so
-the reader never stops with the next heading just under the line and the phone
-still on the last screen. **Forward only**: unlike the homepage it never catches
-an overshoot, because pulling back across a line would flip the phone back to
-the screen just left; 12% rather than 18% because parts are a quarter to a whole
-screen apart, not a screen each, so most of every part stays free to stop in
-and a long section's body never pulls. Touch, keys, rail and nav jumps, reduced
-motion, an open dialog (the enlarged screen), the live phone enlarged on a phone
-and a focused field (the password) never snap.
+**The teaser pages settle into a part** (Uttham, 2026-10-03: "and some
+magnetic scroll to these also shuold be implemented", then "improve magnetic
+scroll strength on home page, and bring it on l2 pages as well"). `section-snap.js`
+takes the page's resting places from `provideRestingPlaces()` — each part's
+heading on the reading line, a pixel past it — and a wheel gesture that rests
+**within 22% of a screen short of one** eases on to it (0.6s, a damped curve
+with no bounce), so the reader never stops with the next heading just under
+the line and the phone still on the last screen; a gesture down the page that
+**overshoots the part just entered by up to 10% of a screen settles back onto
+it**, the heading on the line. The pull back can only ever reach the nearest
+place behind the rest — the one the reader has just crossed — so the phone keeps
+the screen they scrolled to and never flips back to the one before; **scrolling
+up there is no pull back** (a rest just short of a landing has left that part,
+and settling onto it would flip the phone to the screen just left); and, as on
+the homepage, **never back past where the gesture began**, so a notch away from
+a part is never undone. **Neither reach covers more than 35% of the gap** between
+a place and its neighbour (two parts can stand 180px apart: an intro and its
+first block), so at least 30% of every gap is free to stop in and a long
+section's body never pulls. Until the second note it was forward only and 12%,
+on 0.8s. Touch, keys, rail and nav jumps, reduced motion, an open dialog (the
+enlarged screen), the live phone enlarged on a phone and a focused field (the
+password) never snap.
 
 **The phone card hugs the phone** (2026-10-02: "too much padding on left right of
 the mobile preview, we should optimise this space"): from 768px the device is as
