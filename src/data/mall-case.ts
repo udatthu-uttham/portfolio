@@ -179,6 +179,9 @@ export const mallCase: CaseTeaserData = {
       'v3-labels': 'v3-pill',
       'v3-nav': ['v3-nav', 'v3-nav-pip'],
       'v3-ftux': 'v3-nav',
+      // "What happened" plays the landing, then the order confirmation (Uttham,
+      // 2026-10-03: "use mall landing page + order confirmation page")
+      'v3-brands': ['v3-landing-new', 'v3-ocp'],
     },
     // Screens that move: his Figma animations, exported as MP4 (2026-10-03).
     // Keyed by file; the file's own still in this folder is the poster.
@@ -205,7 +208,6 @@ export const mallCase: CaseTeaserData = {
       'v3-landing-new': 'v3: the Mall landing page for new shoppers',
       'v3-landing-active': 'v3: the Mall landing page for returning shoppers',
       'v3-ocp': 'v3: the purple order-confirmation moment',
-      'v3-brands': 'v3: Mall with every badged product from a brand, national brands on the shelf',
       'v2-mixed-feed': 'v2: search results with Mall cards mixed between marketplace cards',
       'research-concepts': 'Badge concepts from the preference tests, side by side on a listing card',
       'v2-labels': 'v2: a Mall listing where the badge sits on small local seller labels',
@@ -222,7 +224,6 @@ export const mallCase: CaseTeaserData = {
       'v3-landing-new': 'v3: landing for newcomers',
       'v3-landing-active': 'v3: landing for regulars',
       'v3-ocp': 'v3: order confirmed in purple',
-      'v3-brands': 'Every badge a brand',
       'v2-mixed-feed': 'v2: the mixed feed',
       'research-concepts': 'Concepts shoppers tested',
       'v2-labels': 'v2: seller labels in Mall',
