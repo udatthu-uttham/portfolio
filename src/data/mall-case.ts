@@ -170,12 +170,15 @@ export const mallCase: CaseTeaserData = {
     // directly, for v3-labels and pill and all v3 top designs, I have pasted
     // ones with static contents". Those rows show the v2 home and the v3
     // listing; the Mall tab's row plays its onboarding modal, then the PiP on
-    // the home screen (both from his Figma, the celebrity onboarding).
+    // the home screen (both from his Figma, the celebrity onboarding). The
+    // first-visit hint is that same onboarding (2026-10-03: "v3-ftux is homepage
+    // ftux only, that is the animation"), so its row plays the modal again.
     map: {
       'v2-usps': 'v2-home',
       'v2-pill': 'v2-home',
       'v3-labels': 'v3-pill',
       'v3-nav': ['v3-nav', 'v3-nav-pip'],
+      'v3-ftux': 'v3-nav',
     },
     // Screens that move: his Figma animations, exported as MP4 (2026-10-03).
     // Keyed by file; the file's own still in this folder is the poster.
@@ -192,7 +195,6 @@ export const mallCase: CaseTeaserData = {
       'v3-nav': 'v3: the home screen with the Mall tab and its onboarding modal',
       'v3-nav-pip': 'v3: the home screen with a picture-in-picture video introducing Mall',
       'v3-splash': 'v3: the Mall splash on a first visit',
-      'v3-ftux': 'v3: the listing-page hint pointing at the Mall pill',
       'v3-pdp': 'v3: a Mall product page inside its purple enclosure',
       'v3-landing-new': 'v3: the Mall landing page for new shoppers',
       'v3-landing-active': 'v3: the Mall landing page for returning shoppers',
@@ -210,7 +212,6 @@ export const mallCase: CaseTeaserData = {
       'v3-nav': 'v3: the Mall tab',
       'v3-nav-pip': 'v3: Mall, introduced on the home',
       'v3-splash': 'v3: the first-visit splash',
-      'v3-ftux': 'v3: the listing-page hint',
       'v3-pdp': 'v3: the purple product page',
       'v3-landing-new': 'v3: landing for newcomers',
       'v3-landing-active': 'v3: landing for regulars',

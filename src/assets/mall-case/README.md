@@ -40,7 +40,7 @@ On hand (2026-10-03, from Uttham):
 | `v3-pill.jpg` (360×720, 1×) | v3-pill, and v3-labels via `screens.map` | "Mall v3 PLP - FiFs.jpg" |
 | `v3-pdp.jpg` | v3-pdp | "Mall v3 PDPmall PDP.jpg" |
 | `v3-landing-new.png` | v3-landing-new; also the homepage tile | "Mall v3 Landing Page.png" (identical) |
-| `v3-nav.png` + `public/media/mall-case/v3-nav.mp4` | v3-nav, first | Figma "Mall v3 Homepage - new entrypoint" |
+| `v3-nav.png` + `public/media/mall-case/v3-nav.mp4` | v3-nav, first; and v3-ftux via `screens.map` ("v3-ftux is homepage ftux only, that is the animation") | Figma "Mall v3 Homepage - new entrypoint" |
 | `v3-nav-pip.png` + `…/v3-nav-pip.mp4` | v3-nav, second | Figma "Mall v3 Homepage - PIP" |
 | `v3-splash.png` + `…/v3-splash.mp4` | v3-splash | Figma "mall v3- Splash" |
 | `v3-ocp.png` + `…/v3-ocp.mp4` (1080×1920, 9:16) | v3-ocp | Figma "success screen 2" |
