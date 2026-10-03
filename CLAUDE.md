@@ -547,37 +547,89 @@ It fades, never slides. **A tooltip names its tick in a few words** (2026-10-03:
 "please truncate these"): the heading's lead-in before its colon ("Before v3: what
 shoppers told us" → "Before v3"; the page title → "From doubt to desire"), the
 whole heading when it has none; the link's accessible name keeps the full
-heading. The rail is ≥768px only, since on phones the mini player
+heading. **A tooltip never covers the card** (2026-10-03: the current tick's lay
+~49px over the phone at 1280×720): the script measures the gutter between the
+card's right edge and the rail (`--pt-room`), and a tooltip is never wider than
+what that leaves left of its tick, less a `--space-2` of air; a longer title ends
+in an ellipsis, and where the gutter cannot hold `--space-8` of a cut title the
+tooltip stays off (`data-tip-off`) — the tick, its length and its accessible name
+still say where the reader is. Measured 2026-10-03: no tooltip touches the card
+at 1440×900, 1280×720, 1024×768 or 768×1024; at 1440 the longest titles keep
+~117px, at 1280 ~90px, and at 1024 and below the centred card leaves the gutter
+too narrow for a word, so only the ticks show there (left-aligning the card in
+its columns would hand the tooltips its spare width; that is Uttham's call). The
+rail is ≥768px only, since on phones the mini player
 owns the right edge. **A page can limit its rail** (`rail` on the page's data;
 2026-10-02: "the scroll stepper should also have limited things, outcome,
 strategy, problem, title"): the product cards keep only the top of the page (its
 title), Problem, Strategy and Outcome — no sub-group ticks, no full-study ticks.
 
 **The phone card hugs the phone** (2026-10-02: "too much padding on left right of
-the mobile preview, we should optimise this space"): from 768px the phone is as
-tall as the screen allows (`--ct-pane-h`, ≤720px) and the card is the phone plus
-one `--card-padding` all round, centred in its columns, so spare width falls
-outside the card. **The card is centred in the visible height under the header** (the sticky box is `100dvh` less the header and two gaps, so a tablet browser's sliding address bar never piles the spare height under the card; 2026-10-02: "less spacing on top than bottom"). **Reference boards are shown whole** (2026-10-03: "I will give reference image (figure out a way on how to place this)"): a screen wider than a phone (width/height > 0.62) drops the phone frame and the card widens to its whole column, the board contained on the paper at the phone's height; a block that holds any board keeps the card wide throughout, so the slideshow never makes it breathe. **The card carries a title above the phone** naming what it
+the mobile preview, we should optimise this space"): from 768px the device is as
+tall as the screen allows (`--ct-pane-h`, ≤`--ct-pane-max` 720px) and the card is
+the device plus one `--card-padding` all round, centred in its columns, so spare
+width falls outside the card. **The card is centred in the visible height under the header** (the sticky box is `100dvh` less the header and two gaps, so a tablet browser's sliding address bar never piles the spare height under the card; 2026-10-02: "less spacing on top than bottom"). **The card carries a title above the phone** naming what it
 shows (`screens.titles`, one short line per state; a state that borrows an
-earlier screen borrows its title); the mini player on phones has none. **A
+earlier screen borrows its title): **one line in a slot of its own height**
+(`--text-small` × `--lh-statement`), weight 500 in `--ink-900`, one `--space-3`
+over the device; a long title ends in an ellipsis and keeps its whole text as
+the element's title. It is centred, not set left: the handset is symmetrical and
+its top corners are deeply rounded, so a title on the device's left edge hangs
+past the curve and reads off-centre. The mini player on phones has none. **A
 screen's alt and title are its file's own entry first**, then the first state
 showing it that has one, so a row that borrows another state's file can never
 blank them (Mall's v3-labels did, 2026-10-03); the build warns on a screen with
 no alt.
 
-**Nothing on the phone is ever cropped** (Uttham, 2026-10-03: "when I give big
-images I dont want you to just paste them or crop them abruptly making its
-content gone (this is for all images you are using)"). The screens are exported
-at 1 : 2, so **the frame is 1 : 2 by default and takes each screen's own
-proportion as it shows it** (`--ct-ratio`, measured inside the frame's 1px
-edges): a 1 : 2 screen meets all four edges to the pixel, and the 9 : 16 order
-confirmation makes the phone a touch wider rather than earning bars. The
-phone's height holds and its width eases (`--dur-3`); on a tablet, where the
-column binds, the width holds and the height eases instead, the card recentred.
-**A page capture taller than any handset (taller than 9 : 19.5) stands in a
-1 : 2 window and pans**: a hold at the top, an eased glide to its foot, a hold,
-and back, looping while it is shown; with reduced motion it does not move but
-scrolls by hand, a "Scroll ↓" chip at its foot until the foot is in view. **A
+**The screens stand in a realistic handset of one constant size** (Uttham,
+2026-10-03: "can you create a realisitic phone mock that renders this a,so the
+title and spacings of this card can be optimised"; "all the aspect ratio should
+be fixed for this card, and the content inside … everything should have constant
+height and width for the l2 preview page"; "fixed phone size I meant").
+`CaseDevice.astro` draws it in CSS, no images and no brand marks: a graphite body
+with an even bezel, a status bar (9:41, the island, signal, Wi-Fi, battery)
+**above** the screenshot and a home strip **below** it, both inside the bezel and
+never over the export's own top row (the exports carry no status bar of their
+own), and two volume keys and a side key. Every length is a share of the
+display's width, `--ct-device-screen` (`--ct-device-k-*`: bezel 0.03, status bar
+0.12, home strip 0.10, display corner 0.10); the body's corner is exactly the
+display's plus the bezel, depth is the paper's own layered shadows, and the
+display has a 1px `oklch(0 0 0 / 0.1)` edge. **The status bar and home strip take
+the colour of the screen edge they meet**, read from each export at build time
+(`src/lib/screen-edges.ts`, rules in `src/lib/edge-colour.ts`) and from a clip's
+frames while it plays, so strip and screenshot read as one display. **On a given
+viewport the card, the device and its 1 : 2 display never change size**: the
+display's width is the column or the card's tallest height over the handset's
+proportions, whichever binds, set once per viewport, and no state, beat, clip,
+board or title enters the sum, so a short screen shrinks the device once, never
+per state. Measured 2026-10-03 at 1440×900 / 1280×720 / 1024×768 / 768×1024
+(display 273 / 222 / 251 / 198px wide) and in the 112px mini player at 375×812:
+one card size and one display size through every state and beat on both pages.
+
+**Nothing on the phone is ever cropped or stretched** (Uttham, 2026-10-03: "when
+I give big images I dont want you to just paste them or crop them abruptly making
+its content gone (this is for all images you are using)"). **A 1 : 2 screen
+fills the display to the pixel** (1080×2160, 1440×2880, 360×720, the 1088×2176
+clips, the splash and its 720×1440 clip); **a shorter one fits its width,
+centred, on its own top and bottom edge colours** (the 9 : 16 order
+confirmation: one purple screen, not a screen with bars); **a page capture taller
+than 1 : 2 stands at the display's width and pans**: a hold at the top, an eased
+glide to its foot, a hold, and back, looping while it is shown; with reduced
+motion it does not move but scrolls by hand, **its "Scroll ↓" chip in the home
+strip**, never on the screenshot, until the foot is in view. (The splash looked
+"weird" in the old frameless 1 : 2 card because it opens on an all-white screen
+with only its logo: with no status bar, home strip or bezel it read as an empty
+white slab, not a phone. It is 1 : 2 to the pixel in the handset.) **A reference
+board** (width ÷ height above 0.62) **stands in the device's place**: whole,
+centred on the card's paper, never wider or taller than the device, with a
+"Click to enlarge" chip under it ("Tap" on touch); the whole footprint opens it
+in the dialog, and the card keeps its size (this retires the 2026-10-03 card that
+widened to its column for a board). **An empty phone** — a state with no screen
+and nothing earlier to borrow, Mall's v1-tag until he supplies it — shows one
+quiet line in the middle of its white display, "Screen coming soon" in the build
+and the state's name on the dev server, fading in only once the last screen has
+faded out; a state that borrows a screen only logs `[case] No screen yet` to the
+console. **A
 file with a clip (`screens.videos`) plays it once from its first frame each
 time its screen arrives, then settles on its still** (the poster, optimised
 like any screen — for the order confirmation, whose clip ends mid-transition,
@@ -587,13 +639,23 @@ never opens on its still**, which is its ending: its screen arrives only once
 the clip's first frame is ready, the screen before (and its title) staying up
 until then — a frame or two when preloaded, 1.5s at most on a slow line, past
 which the still stands in and the clip plays on its next arrival. The mini
-player takes the same proportions, and its full-size dialog shows the screen
-whole: a page in a 1 : 2 window that scrolls (by wheel and trackpad too: the
-dialog is outside the smooth scroll, `data-lenis-prevent`, and the page behind
-it is locked), a clip playing from its first frame. **The card stands exactly
-in its sticky box**: the phone's height budget takes off the card's own 1px
-border (`--ct-card-edge`), which had left it 2px over at 1280×720. The live
-phone on the AI Space pages keeps its handset 9 : 19.5.
+player is the same handset at 112px, by the same fit rules. **Its full-size
+dialog is never wider than the card's phone, only taller** (Uttham, 2026-10-03:
+"for some contents outside l2 you can increase the phone size but not the width,
+it should look relaistic wherever it can"): one width for every screen, the
+card's largest display (`--ct-device-screen-max`, ~272px) or what the page
+allows; a page capture gets a handset's 19.5 : 9 display there and scrolls by
+hand (by wheel and trackpad too: the dialog is outside the smooth scroll,
+`data-lenis-prevent`, and the page behind it is locked), its chip in the home
+strip; a clip plays from its first frame; a board opens whole on a paper card.
+Every close control stands with its foot no lower than the status bar (or a
+board card's inset), so none covers a screenshot. **The card stands exactly
+in its sticky box**: the device's height budget takes off the card's own 1px
+border (`--ct-card-edge`), which had left it 2px over at 1280×720. **The live
+phone on the AI Space pages keeps its handset 9 : 19.5 and no device mock**: the
+tools draw their own chrome (the prototype its app header and bottom nav, Resona
+its own dark frame), and a status bar and home strip around them would take ~12%
+of the height and shrink the running prototype's viewport, re-laying it out.
 
 **Glass only where something sits between** (Uttham, 2026-10-01: "for the phone
 preview no need to use the glass, use the card component, glass is only used

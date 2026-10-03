@@ -10,11 +10,17 @@ Mall deck's exports in `../mall/` stay where they are: the homepage tile still
 stands its phone on one of them.
 
 Export phone screens at 1 : 2 (1080 × 2160 is ideal), at 2× or more (≥ 720px
-wide), with dummy data only. Any height works and nothing is ever cropped
-(Uttham, 2026-10-03): the phone takes a screen's own proportion (the 9 : 16
-order confirmation makes it a touch wider); a page capture taller than a
-handset (like `v2-home.png`) stands in a 1 : 2 window and pans down it and
-back, or scrolls by hand with reduced motion.
+wide), with dummy data only, and no status bar: the page's phone mock draws its
+own (9:41, the island) above the screen, its strips in the colour of each
+export's top and bottom edge (a clip's, frame by frame while it plays). The
+phone is one constant size on the page, its display 1 : 2, and nothing is ever
+cropped or stretched (Uttham, 2026-10-03): a 1 : 2 screen fills the display
+exactly (the splash, the Mall tab and its PiP, the listing and product pages);
+the 9 : 16 order confirmation fits its width, centred, on its own purple; a page
+capture taller than 1 : 2 (like `v2-home.png`) pans down it and back, or
+scrolls by hand with reduced motion, its "Scroll ↓" chip in the phone's home
+strip. Until `v1-tag` arrives its phone is empty and says "Screen coming soon"
+in the middle of the display.
 
 A state can show several files in turn (`screens.map`, e.g. `v3-nav`: the
 modal, then the PiP), each with its own title and alt where `screens.titles` /
