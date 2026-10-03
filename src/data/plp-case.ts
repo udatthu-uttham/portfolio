@@ -178,10 +178,10 @@ export const plpCase: CaseTeaserData = {
     // as it is, similarly for framework the framework card should comeinside the
     // image, and the wordings outside"); the boards themselves stay in
     // src/assets/plp/boards/ as the script's source and are never shown raw
-    map: { stagger: 'after' },
+    map: { stagger: 'after', cleanup: 'framework' },
     alts: {
       before: 'The old product card',
-      cleanup: 'The card framework: one product card, large, under the feed’s search bar, its zones running from the picture down through its fact chips, price and timer, rating and Trusted mark, to the Fast delivery line',
+      cleanup: 'The card framework: one product card, large on the feed, its zones running from the picture down through its fact chips, price and timer, rating and Trusted mark, to the Fast delivery line',
       titles: 'A feed of four cards: a kurti with the seller’s title, the same kurti with one fact chip, then with two, and a Mall shampoo whose Ad and Mall tags share the row with its facts',
       stagger: 'A product feed with staggered columns: each card at its natural height',
       list: 'Earphones as list rows: each row a picture beside its fact chips, price, cash price and rating',
@@ -216,7 +216,7 @@ export const plpCase: CaseTeaserData = {
     // framework's words are the labels on his board ("Fast Program" in the
     // site's spelling); the rest are DRAFT wording for Uttham. No numbers.
     notes: {
-      cleanup: [
+      framework: [
         { text: 'Product comprehension', x: 0.19, y: 0.364, ty: 0.36 }, // on the picture
         { text: 'Comprehension', x: 0.09, y: 0.619, ty: 0.56 }, // the fact chips
         { text: 'Price', x: 0.09, y: 0.673, ty: 0.68 }, // price and the timer

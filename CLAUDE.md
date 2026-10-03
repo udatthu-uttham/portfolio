@@ -642,11 +642,17 @@ no alt.
 title and spacings of this card can be optimised"; "all the aspect ratio should
 be fixed for this card, and the content inside … everything should have constant
 height and width for the l2 preview page"; "fixed phone size I meant").
-`CaseDevice.astro` draws it in CSS, no images and no brand marks: a graphite body
-with an even bezel, a status bar (9:41, the island, signal, Wi-Fi, battery)
-**above** the screenshot and a home strip **below** it, both inside the bezel and
-never over the export's own top row (the exports carry no status bar of their
-own), and two volume keys and a side key. Every length is a share of the
+`CaseDevice.astro` draws it in CSS, no images and no brand marks, as **an
+Android handset of the Pixel / OnePlus kind** (2026-10-03: "instead of iphone
+lets use oneplus or pixel phone"): a graphite body with an even bezel, an
+Android status bar (the clock at the left, a punch-hole camera in the middle,
+Wi-Fi, signal and battery at the right) **above** the screenshot and a
+gesture-bar strip **below** it, both inside the bezel and never over the
+export's own top row (the exports carry no status bar of their own), and the
+power key and volume rocker both on the right edge. **The sticky card around
+it is glass, pinned by four bolts** (2026-10-03: "glass will have bolts"), and
+**its title above the device is set at `--text-body-lg`, weight 600**, so it
+registers ("the title on the can be more bigger"). Every length is a share of the
 display's width, `--ct-device-screen` (`--ct-device-k-*`: bezel 0.03, status bar
 0.12, home strip 0.10, display corner 0.10); the body's corner is exactly the
 display's plus the bezel, depth is the paper's own layered shadows, and the

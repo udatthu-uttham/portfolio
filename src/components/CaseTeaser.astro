@@ -350,6 +350,11 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
 
     <aside class:list={['ct-panel', { 'ct-panel--live': live, 'ct-panel--device': !live, 'ct-panel--titled': titles && !live, 'ct-panel--visit': data.visit, 'ct-panel--notes': noted.length > 0 }]} aria-label={data.panelLabel ?? 'Preview'} data-case-panel data-map={JSON.stringify(stateFiles)} data-titles={titles && !live ? JSON.stringify(titles) : undefined}>
       <div class="ct-pane glass">
+        {/* glass is pinned by its four bolts, as on the homepage panes */}
+        <span class="bolt bolt--tl" aria-hidden="true"></span>
+        <span class="bolt bolt--tr" aria-hidden="true"></span>
+        <span class="bolt bolt--bl" aria-hidden="true"></span>
+        <span class="bolt bolt--br" aria-hidden="true"></span>
         {/* one line in a slot of its own height: a long title ends in an
             ellipsis and keeps its whole text as the element's title */}
         {titles && !live && <p class="ct-pane__title" data-pane-title aria-live="polite"></p>}
@@ -2519,12 +2524,15 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
      its top corners are deeply rounded — a title set to its left edge would
      hang past the curve and read as off-centre. One within-card step
      (--space-3) to the device. */
+  /* the title names the screen at a glance (Uttham, 2026-10-03: "the title
+     on the can be more bigger, it not not getting registered now") */
   .ct-pane__title {
-    height: calc(var(--text-small) * var(--lh-statement));
-    margin: 0 0 var(--space-3);
+    height: calc(var(--text-body-lg) * var(--lh-statement));
+    margin: 0 0 var(--space-4);
     color: var(--ink-900);
-    font-size: var(--text-small);
-    font-weight: 500;
+    font-size: var(--text-body-lg);
+    font-weight: 600;
+    letter-spacing: var(--track-heading);
     line-height: var(--lh-statement);
     text-align: center;
     white-space: nowrap;
@@ -2613,7 +2621,7 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
       );
     }
     /* the title over the phone: its one-line slot and a within-card step */
-    .ct-panel--titled { --ct-title-h: calc(var(--text-small) * var(--lh-statement) + var(--space-3)); }
+    .ct-panel--titled { --ct-title-h: calc(var(--text-body-lg) * var(--lh-statement) + var(--space-4)); }
     /* the open link under the phone takes its line the same way: a within-card
        step above it and the text link's own height (its underline included) */
     .ct-panel--visit { --ct-foot-h: calc(var(--space-4) + var(--text-body) * var(--lh-heading) + var(--space-2)); }

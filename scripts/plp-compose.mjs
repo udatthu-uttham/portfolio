@@ -257,7 +257,9 @@ const report = {};
   const big = await card(clean, { left: 0, top: 0, width: info.width, height: info.height }, width);
   const left = Math.round((W - width) / 2);
   const top = Math.round(3 + (FOOT - 3 - big.height) / 2);
-  await save('cleanup', [{ input: big.buf, left, top }, ...(await frame())], FEED);
+  // saved as framework.png (the cleanup state maps to it): a new name, so no
+  // browser keeps showing the earlier composition with the search bar
+  await save('framework', [{ input: big.buf, left, top }, ...(await frame())], FEED);
   // where each note's line starts: on the element it names, or in the card's
   // white margin just left of it (board coordinates), as shares of the screen
   const pt = (x, y) => ({ x: ((left + (x - box.left) * big.scale) / W).toFixed(3), y: at(top + (y - box.top) * big.scale) });

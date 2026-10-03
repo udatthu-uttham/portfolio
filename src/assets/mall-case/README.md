@@ -11,7 +11,7 @@ stands its phone on one of them.
 
 Export phone screens at 1 : 2 (1080 × 2160 is ideal), at 2× or more (≥ 720px
 wide), with dummy data only, and no status bar: the page's phone mock draws its
-own (9:41, the island) above the screen, its strips in the colour of each
+own (an Android status bar: the clock, the punch-hole camera) above the screen, its strips in the colour of each
 export's top and bottom edge (a clip's, frame by frame while it plays, from
 `src/data/clip-edges.json`: **after adding or replacing a clip in
 `public/media/`, run `npm run clip-edges`** on a Mac, or its strips keep the

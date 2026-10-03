@@ -1,10 +1,12 @@
 ---
 // The handset the case pages' screens stand in (Uttham, 2026-10-03: "can you
 // create a realisitic phone mock that renders this a,so the title and spacings
-// of this card can be optimised"), drawn in CSS: a graphite body with a bezel
-// of even thickness, a display with a status bar (9:41, the island, signal,
-// Wi-Fi and battery) and a home strip, two volume keys and a side key. No
-// brand marks, no images.
+// of this card can be optimised"), drawn in CSS — an Android handset of the
+// Pixel / OnePlus kind (2026-10-03: "instead of iphone lets use oneplus or pixel
+// phone"): a graphite body with a bezel of even thickness, a display with an
+// Android status bar (the clock on the left, a punch-hole camera in the middle,
+// Wi-Fi, signal and battery on the right) and a gesture-bar strip, its power
+// key and volume rocker both on the right edge. No brand marks, no images.
 //
 // The screen itself is the caller's: the default slot is the display's middle
 // row, exactly 1 : 2, the proportion of Uttham's exports. The status bar sits
@@ -36,24 +38,18 @@ const { class: className, ...rest } = Astro.props;
 <div class:list={['ct-device', className]} {...rest}>
   <div class="ct-device__glass">
     <div class="ct-device__status" aria-hidden="true">
-      <span class="ct-device__time">9:41</span>
-      <span class="ct-device__island"></span>
+      <span class="ct-device__time">9:30</span>
+      <span class="ct-device__camera"></span>
       <span class="ct-device__icons">
-        <svg class="ct-device__icon ct-device__icon--signal" viewBox="0 0 17 11" fill="currentColor">
-          <rect x="0" y="7" width="3" height="4" rx="1" />
-          <rect x="4.6" y="5" width="3" height="6" rx="1" />
-          <rect x="9.2" y="2.6" width="3" height="8.4" rx="1" />
-          <rect x="13.8" y="0" width="3" height="11" rx="1" />
+        <svg class="ct-device__icon ct-device__icon--wifi" viewBox="0 0 16 12" fill="currentColor">
+          <path d="M8 11.6 0.4 3.9a10.8 10.8 0 0 1 15.2 0Z" />
         </svg>
-        <svg class="ct-device__icon ct-device__icon--wifi" viewBox="0 0 15 11" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
-          <path d="M1.2 3.9a9 9 0 0 1 12.6 0" />
-          <path d="M3.6 6.4a5.6 5.6 0 0 1 7.8 0" />
-          <path d="M6 8.9a2.2 2.2 0 0 1 3 0" />
+        <svg class="ct-device__icon ct-device__icon--signal" viewBox="0 0 12 12" fill="currentColor">
+          <path d="M11.5 0.5v11h-11Z" />
         </svg>
-        <svg class="ct-device__icon ct-device__icon--battery" viewBox="0 0 25 12" fill="currentColor">
-          <rect x="0.6" y="0.6" width="21" height="10.8" rx="3.2" fill="none" stroke="currentColor" stroke-width="1.1" opacity="0.4" />
-          <rect x="2.3" y="2.3" width="17.6" height="7.4" rx="1.7" />
-          <rect x="23" y="4" width="1.6" height="4" rx="0.8" opacity="0.4" />
+        <svg class="ct-device__icon ct-device__icon--battery" viewBox="0 0 8 13" fill="currentColor">
+          <rect x="2.6" y="0" width="2.8" height="1.6" rx="0.5" />
+          <rect x="0.5" y="1.4" width="7" height="11.1" rx="1.4" />
         </svg>
       </span>
     </div>
@@ -108,27 +104,24 @@ const { class: className, ...rest } = Astro.props;
       var(--shadow-rest),
       var(--shadow-lift);
   }
-  /* the keys, on the band: two volume keys on the left (one drawn, its twin
-     as a shadow under it), the side key on the right */
+  /* the keys, on the band, both on the right edge as on a Pixel or a OnePlus:
+     the power key, then the longer volume rocker under it */
   .ct-device::before,
   .ct-device::after {
     content: '';
     position: absolute;
+    right: calc(-1 * var(--ct-device-key));
     width: var(--ct-device-key);
     background: var(--ct-device-frame);
+    border-radius: 0 var(--ct-device-key) var(--ct-device-key) 0;
   }
   .ct-device::before {
-    left: calc(-1 * var(--ct-device-key));
-    top: calc(var(--ct-device-screen) * 0.5);
-    height: calc(var(--ct-device-screen) * 0.15);
-    border-radius: var(--ct-device-key) 0 0 var(--ct-device-key);
-    box-shadow: 0 calc(var(--ct-device-screen) * 0.21) 0 var(--ct-device-frame);
+    top: calc(var(--ct-device-screen) * 0.46);
+    height: calc(var(--ct-device-screen) * 0.13);
   }
   .ct-device::after {
-    right: calc(-1 * var(--ct-device-key));
-    top: calc(var(--ct-device-screen) * 0.62);
-    height: calc(var(--ct-device-screen) * 0.26);
-    border-radius: 0 var(--ct-device-key) var(--ct-device-key) 0;
+    top: calc(var(--ct-device-screen) * 0.68);
+    height: calc(var(--ct-device-screen) * 0.3);
   }
 
   /* the display: status bar, the caller's screen, home strip */
@@ -180,24 +173,27 @@ const { class: className, ...rest } = Astro.props;
     line-height: 1;
   }
   .ct-device[data-top-ink='light'] .ct-device__status { color: var(--paper-1); }
-  /* the clock and the glyphs each centred in the "ear" beside the island */
-  .ct-device__time { justify-self: center; }
-  .ct-device__island {
-    width: calc(var(--ct-device-screen) * 0.29);
-    height: calc(var(--ct-device-screen) * 0.08);
-    border-radius: var(--radius-pill);
+  /* Android: the clock at the left, the glyphs at the right, each a
+     status-bar margin in from its edge, the punch-hole camera between them */
+  .ct-device__status { padding-inline: calc(var(--ct-device-screen) * 0.06); }
+  .ct-device__time { justify-self: start; }
+  .ct-device__camera {
+    width: calc(var(--ct-device-screen) * 0.055);
+    aspect-ratio: 1;
+    border-radius: 50%;
     background: var(--ct-device-body);
+    box-shadow: inset 0 0 0 calc(var(--ct-device-screen) * 0.008) color-mix(in oklab, var(--ct-device-body) 80%, var(--paper-1));
   }
   .ct-device__icons {
-    justify-self: center;
+    justify-self: end;
     display: flex;
     align-items: center;
-    gap: calc(var(--ct-device-screen) * 0.014);
+    gap: calc(var(--ct-device-screen) * 0.016);
   }
-  .ct-device__icon { display: block; height: calc(var(--ct-device-screen) * 0.031); width: auto; }
-  .ct-device__icon--signal { aspect-ratio: 17 / 11; }
-  .ct-device__icon--wifi { aspect-ratio: 15 / 11; }
-  .ct-device__icon--battery { aspect-ratio: 25 / 12; height: calc(var(--ct-device-screen) * 0.034); }
+  .ct-device__icon { display: block; height: calc(var(--ct-device-screen) * 0.034); width: auto; }
+  .ct-device__icon--wifi { aspect-ratio: 16 / 12; }
+  .ct-device__icon--signal { aspect-ratio: 1; }
+  .ct-device__icon--battery { aspect-ratio: 8 / 13; height: calc(var(--ct-device-screen) * 0.038); }
 
   .ct-device__home {
     display: grid;
@@ -208,7 +204,8 @@ const { class: className, ...rest } = Astro.props;
   /* the home indicator; the "Scroll ↓" chip, when it shows, stands over it */
   .ct-device__home > :global(*) { grid-area: 1 / 1; }
   .ct-device__bar {
-    width: calc(var(--ct-device-screen) * 0.36);
+    /* Android's gesture handle, shorter than an iPhone's home indicator */
+    width: calc(var(--ct-device-screen) * 0.26);
     height: max(1.5px, calc(var(--ct-device-screen) * 0.014));
     border-radius: var(--radius-pill);
     background: currentColor;

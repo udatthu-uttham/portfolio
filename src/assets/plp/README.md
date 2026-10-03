@@ -12,7 +12,7 @@ the phone:
 |---|---|---|---|
 | `before` | Context | The old card | the old product card in the feed |
 | `before-annotated` | Problem | Which team added what | the old card, each element labelled with the team that added it |
-| `cleanup` | Card framework | The card framework | composed: the framework card alone, large, on the feed under the search bar and filter row; its zone labels are notes beside the phone |
+| `framework` (state `cleanup`) | Card framework | The card framework | composed: the framework card alone, large, on the feed under the search bar and filter row; its zone labels are notes beside the phone |
 | `titles` | Clearer titles | Facts in place of the title | composed: the four title variants as a 2 × 2 feed grid, the feed carrying on below |
 | `stagger` | Staggered feed | A staggered feed | a feed with staggered columns, each card at its natural height |
 | `list` | List or grid by category | List view by category | composed: the list-view screen only (earphones as rows) |
@@ -44,7 +44,7 @@ notes' new `y` from what it prints. Effective upscale on the page (1440×900,
 
 Export phone screens at 1 : 2 (1080 × 2160 is ideal), at 2× or more (≥ 720px
 wide), with dummy data only — no Figma links or file keys on the page, and no
-status bar: the page's phone mock draws its own (9:41, the island) above the
+status bar: the page's phone mock draws its own (an Android status bar: the clock, the punch-hole camera) above the
 screen, and its strips take the colour of each export's top and bottom edge.
 The phone is one constant size on the page, its display 1 : 2, and nothing is
 ever cropped or stretched (Uttham, 2026-10-03): a 1 : 2 screen fills the
