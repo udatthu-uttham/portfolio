@@ -2834,6 +2834,16 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
      the device. */
   /* the title names the screen at a glance (Uttham, 2026-10-03: "the title
      on the can be more bigger, it not not getting registered now") */
+  /* the title may run wider than the device, centred over it, up to the
+     columns' width, so a long one ("v3: Mall, introduced on the home") reads
+     whole now the card around the phone is gone */
+  .ct-panel--device .ct-pane__title {
+    position: relative;
+    left: 50%;
+    width: max-content;
+    max-width: 100cqw;
+    translate: -50% 0;
+  }
   .ct-pane__title {
     height: calc(var(--text-body-lg) * var(--lh-statement));
     margin: 0 0 var(--space-4);

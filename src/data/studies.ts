@@ -23,7 +23,11 @@ export type Chapter = {
 // about 0.3. A phone's notes are in priority order: on a narrow sheet only the
 // "to" phone's notes stay, and on the narrowest (a 320px phone) only its first,
 // hanging below its tip instead.
-export type TileNote = { text: string; y: number };
+// `x` (optional) carries the arrow on INTO the screen, as a thin line ending
+// in a dot on the part it names, at (x, y) — for a part away from the note's
+// side, e.g. a card in the far column (Uttham, 2026-10-03: "the third product
+// in new one shows this"). Only on the "to" phone.
+export type TileNote = { text: string; y: number; x?: number };
 
 // One phone in the homepage tile's glass well. `image` is <folder>/<state> under
 // src/assets (the case page's own screens); the phone takes the export's own
@@ -97,7 +101,7 @@ scope: ['Product card systems', 'Experiment design', 'PLP at scale'],
       ] },
       { image: 'plp/after', label: 'After', tone: 'new', notes: [
         { text: 'Facts replace the title', y: 0.31 },
-        { text: 'Images scroll', y: 0.658 },
+        { text: 'Images scroll', y: 0.658, x: 0.25 }, // on the yellow kurti's carousel dots, left column
       ] },
     ] },
     // The case page is Uttham's teaser layout (2026-10-01); the six-chapter

@@ -382,7 +382,7 @@ screen is not shown whole** — his exception, because the whole screen was too
 small to read on a phone. **It is all
 static**: nothing in the well moves on hover; the tile keeps its tilt, border and
 arrow nudge, and the notes ride the tilt with the sheet. A case with one screen keeps one phone;
-both cases have a pair today. **Keep a phone's notes about half a screen apart**
+both cases have a pair today. **A note can carry on into the screen** (`x` on a "to" note: a thin ink line on a paper halo from its arrow's tip to a dot on the part it names, for a part in the far column — the product cards' "Images scroll" lands on the yellow kurti's carousel dots, 2026-10-03). **Keep a phone's notes about half a screen apart**
 (`y` 0.4 and 0.91 on the Mall "to"), or their words collide on a short tablet or
 laptop well. **Where the truth leaves them closer, the lower note is one line**:
 the product cards' "to" has "Facts replace the title" at 0.31 (the shampoo's

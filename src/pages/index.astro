@@ -219,8 +219,9 @@ const homeLd = {
                           {p.label && <figcaption class:list={['tile__tag', { 'tile__tag--new': p.tone === 'new' }]}>{p.label}</figcaption>}
                           <div class="tile__screen"><Image src={tileScreens[p.image]} alt="" widths={[240, 480, 720, 1080]} sizes="(max-width: 600px) 90vw, 240px" /></div>
                           {p.notes?.map((n) => (
-                            <span class={`tile__note tile__note--${noteSide(study.tile!.phones, i)}`} style={`--y: ${n.y};`}>
+                            <span class={`tile__note tile__note--${noteSide(study.tile!.phones, i)}`} style={`--y: ${n.y};${n.x != null ? ` --x: ${n.x};` : ''}`}>
                               <span class="tile__note-text">{n.text}</span>
+                              {n.x != null && <span class="tile__note-lead"></span>}
                               {/* drawn once, pointing left; the left-side note mirrors it */}
                               <svg class="tile__note-arrow" viewBox="0 0 44 22" fill="none">
                                 <path d="M42 2.5c-5.5.5-11.6 1.5-17.6 5S10.6 15.8 3.5 20.5" />
@@ -858,6 +859,11 @@ const homeLd = {
     text-wrap: balance;
   }
   .tile__desc :global(.em) { color: var(--ink-900); font-weight: 600; }
+  /* in the two-up tablet row a lead can take a third line (the product cards'
+     does at 768px): both sheets keep room for three, so their wells line up */
+  @media (min-width: 601px) and (max-width: 1023px) {
+    .tiles--work .tile__desc { min-height: calc(3em * var(--lh-body)); }
+  }
 
   .tile__media {
     /* Taller than the old 16/10: a phone standing in the well needs the height,
@@ -1033,6 +1039,35 @@ const homeLd = {
     stroke-linejoin: round;
   }
   .tile__note--l .tile__note-arrow { scale: -1 1; margin-inline: 0 calc(var(--space-1) * -1); }
+  /* A note with an `x` carries on INTO the screen: from its arrow's tip on the
+     screen's edge, a thin ink line on a paper halo runs across to a dot on the
+     part it names (Uttham, 2026-10-03: "the third product in new one shows
+     this" — the kurti's carousel dots sit in the far column). The line hangs
+     from the note's foot, which is the tip's height, and is as long as the
+     screen's width from x to its right edge (--ph-h × --ar, the "to" phone). */
+  .tile__note-lead {
+    position: absolute;
+    right: 100%;
+    bottom: 0;
+    width: calc((1 - var(--x)) * var(--ph-h) * var(--ar));
+    height: 1.5px;
+    border-radius: 1px;
+    background: currentColor;
+    box-shadow: 0 0 0 1.5px rgb(255 255 255 / 0.85);
+    pointer-events: none;
+  }
+  .tile__note-lead::before {
+    content: '';
+    position: absolute;
+    left: -3px;
+    top: 50%;
+    width: 7px;
+    height: 7px;
+    margin-top: -3.5px;
+    border-radius: 50%;
+    background: currentColor;
+    box-shadow: 0 0 0 2px var(--paper-1);
+  }
   /* A narrow well — a tablet's two-up row, a phone, a small laptop — has room
      for one column of notes beside the pair, so the "from" side's notes drop
      and the "to" keeps its own. */

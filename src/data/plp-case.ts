@@ -76,6 +76,9 @@ export const plpCase: CaseTeaserData = {
           kind: 'steps',
           heading: '2. Add what helps them decide',
           steps: [
+            // what replaced the seller titles, promised by the row above (his
+            // own sentence from before the rename, 2026-10-02)
+            { state: 'titles', label: 'Facts in place of the title', text: 'We replaced them with **the important facts shoppers need before making a decision.**' },
             { state: 'stagger', label: 'Staggered feed', text: 'Cards at their natural height, so more fit on a screen.' },
             { state: 'list', label: 'List or grid by category', text: 'Rows where details decide, grid where looks decide.' },
             { state: 'scroll', label: 'Swipeable images', text: 'We added more swipeable images because **shoppers form better conviction from them** before opening the product. They show more of the product and the variations it comes in.' },
