@@ -7,7 +7,7 @@ import CaseTeaser from '../../components/CaseTeaser.astro';
 import { Image } from 'astro:assets';
 import { studies } from '../../data/studies';
 import { rich } from '../../lib/rich';
-import { SITE, NAME, describe, ogCase, ogHome, workLd } from '../../lib/seo';
+import { SITE, NAME, describe, ogCase, ogHome, workLd, caseSearch, searchTitle } from '../../lib/seo';
 
 // Phone screens exported from the Mall Figma files and cards cropped from the deck, keyed by file name.
 const screenFiles = import.meta.glob<ImageMetadata>('../../assets/{mall,cards}/*.{jpg,png}', { eager: true, import: 'default' });
@@ -22,19 +22,27 @@ export function getStaticPaths() {
 const { study } = Astro.props;
 const hasArtwork = Boolean(study.deck || study.cover);
 
-// Search and link previews (CLAUDE.md, "Domain trust"): "<study> case study —
-// Uttham Udatthu"; the description is the page's own title and dek (or the
-// study summary for a case without a teaser), joined while it fits in 155.
-const seoTitle = `${study.title} case study — ${NAME}`;
+// Search and link previews (CLAUDE.md, "Domain trust"): the employer-plus-topic
+// query a searcher types, then his name and his role on the work, e.g. "Meesho
+// Mall case study — Uttham Udatthu, product designer" (src/lib/seo.ts,
+// caseSearch); a study without an entry keeps "<study> case study — Uttham
+// Udatthu". The description is the page's own title and dek (or the study
+// summary for a case without a teaser), joined while it fits in 155. The
+// JSON-LD is an Article about the study's subject and Meesho.
+const search = caseSearch[study.slug];
+const seoTitle = search ? searchTitle(search) : `${study.title} case study — ${NAME}`;
 const seoDescription = study.teaser ? describe(study.teaser.title, study.teaser.dek) : describe(study.summary);
 const seoImage = ogCase[study.slug] ?? ogHome;
 const pageUrl = new URL(`/work/${study.slug}/`, SITE).href;
 const caseLd = workLd({
+  type: 'Article',
   url: pageUrl,
   name: `${study.title} case study`,
   headline: study.teaser ? study.teaser.title : study.title,
   description: seoDescription,
   image: new URL(seoImage.src, SITE).href,
+  about: search?.about ?? study.title,
+  keywords: [...(search?.keywords ?? []), ...study.scope],
 });
 ---
 

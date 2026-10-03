@@ -335,13 +335,52 @@ newly registered domain). On-page SEO came in the same pass. What lives where:
   from `site` in `astro.config.mjs`), so the www and workers.dev copies fold
   into it. Titles, descriptions, Open Graph, Twitter and JSON-LD are built in
   `src/lib/seo.ts` and printed by `src/layouts/Base.astro`, after the font
-  preloads. **They are assembled from copy already on the site, never written
-  fresh**: the hero line on the homepage, title plus dek on a case page, the
-  guide's headline plus the card's line on a tool page. They are joined only
-  while they fit 60 / 155 characters, otherwise the shorter whole sentence is
-  used, and the build warns when one runs over. The homepage carries the
-  `Person` (with LinkedIn and GitHub in `sameAs`). Case and tool pages carry a
-  `CreativeWork` by that Person plus a two-step `BreadcrumbList`.
+  preloads. **Descriptions are assembled from copy already on the site, never
+  written fresh**: the hero line on the homepage, title plus dek on a case page,
+  the guide's headline plus who uses the tool (its Value added line) on a tool
+  page, or the card's line where that runs long. They are joined only while they fit
+  155 characters, otherwise the shorter whole sentence is used, and the build
+  warns when a title passes 60 or a description 155.
+- **Titles name him, his roles, his employer and the page's topic**, the words
+  people search for (Uttham, 2026-10-03: "it should trigger for uttham, or
+  product designer, design manager and all relevant scopes I hope"). Home is
+  "Uttham Udatthu — Design Lead and Product Designer at Meesho"; a case is the
+  employer-plus-topic query, then his name and his role on it ("Meesho Mall case
+  study — Uttham Udatthu, product designer"); a tool is its name and kind ("Realistic
+  prototype for user research — Uttham Udatthu"). The terms live in `caseSearch`
+  and `toolSearch` in `src/lib/seo.ts`. **Every role term must be one he holds
+  and the site shows**: design lead (the hero, the pod of five), Product
+  Designer (the CV he links: Lead Product Designer at Meesho; Senior Product
+  Designer on Mall). **"Design manager" is not his title, so nothing claims
+  it**; it can only come from visible copy he writes. No meta keywords (Google
+  ignores them), no hidden text.
+- **The JSON-LD describes one person and his work.** Home carries a
+  `ProfilePage` whose main entity is the `Person`: given and family name, the
+  handles' order (`Udatthu Uttham`) as `alternateName`, `jobTitle` Design Lead,
+  `hasOccupation` (Design Lead; Product Designer; Senior Product Designer on Mall
+  2022–2023 as a dated `Role`), `worksFor` Meesho (meesho.com, its Wikipedia
+  page), `knowsAbout` only what the site shows him doing, `alumniOf` from the CV,
+  LinkedIn and GitHub in `sameAs`. The `WebSite` gives `uttham.fyi` as its
+  alternate name. **A case page is an `Article` about its subject and Meesho**,
+  with keywords from its topic and the study's scope; a tool page is a
+  `CreativeWork` about its subject; each has a two-step `BreadcrumbList`.
+  validator.schema.org reported no errors and no warnings on all five pages (2026-10-03).
+- **What will and won't rank, honestly** (searched 2026-10-03, before the site
+  was indexed): **his full name and "Udatthu" are winnable within weeks of
+  indexing** — today only a ZoomInfo listing and dictionary pages answer them.
+  **"Meesho Mall case study" and "Meesho product card case study" are
+  winnable**: the first returns news coverage and students' concept redesigns,
+  the second only Meesho's own card-holder listings, and no first-hand
+  designer's case study ranks for either. "Product designer Meesho" and "design
+  lead Meesho" are Meesho's own job ads and job boards; he can appear beside
+  them, not above them. **Bare "Uttham" is unreliable**: engines fold it into
+  "Uttam" (Uttam Kumar and other Wikipedia pages) and the Sanskrit word; the
+  domain helps, but expect months, not weeks. **Generic "product designer",
+  "design manager" and "product designer Bangalore portfolio" will not rank**:
+  Coursera, Glassdoor, job boards and portfolio directories own them, and the
+  site names no city. The biggest lever left is visible text, which is his to
+  write: a short line carrying his name, role and Meesho (options proposed
+  2026-10-03, not applied).
 - **Link previews are drawn in the site's own stock**, from
   `scripts/og/og-card.html` (its comment has the render command), as
   `public/og/<card>.jpg` at 1200×630. That is a card for home and one for each

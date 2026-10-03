@@ -17,7 +17,7 @@ import ProtoPreview from '../../components/ProtoPreview.astro';
 import { guides } from '../../data/guides';
 import { tools } from '../../data/tools';
 import { aiPage } from '../../data/ai-pages';
-import { SITE, NAME, describe, ogHome, workLd } from '../../lib/seo';
+import { SITE, NAME, describe, describeWhole, firstSentence, ogHome, workLd, toolSearch, searchTitle } from '../../lib/seo';
 
 export function getStaticPaths() {
   return guides.map((guide) => ({ params: { slug: guide.slug }, props: { guide } }));
@@ -26,11 +26,19 @@ const { guide } = Astro.props;
 const tool = tools.find((t) => t.slug === guide.slug);
 const page = aiPage(guide.slug);
 
-// Search and link previews (CLAUDE.md, "Domain trust"): "<tool> · AI Space —
-// Uttham Udatthu"; the description is the page's headline and the card's own
-// line (tools.ts `what`), joined while it fits in 155, else the line alone.
-const seoTitle = `${tool?.name ?? guide.title} · AI Space — ${NAME}`;
-const seoDescription = tool ? describe(guide.title, tool.what) : describe(guide.intro);
+// Search and link previews (CLAUDE.md, "Domain trust"): the tool's name and
+// what kind of tool it is, as a searcher would put it, then his name, e.g.
+// "Realistic prototype for user research — Uttham Udatthu" (src/lib/seo.ts,
+// toolSearch); a tool without an entry keeps "<tool> · AI Space — Uttham
+// Udatthu". The description is the page's headline and who uses the tool (the
+// first sentence of its Value added fact) when the two fit in 155 whole — it
+// names Meesho — else the headline and the card's own line (tools.ts `what`),
+// else that line alone.
+const search = toolSearch[guide.slug];
+const seoTitle = search ? searchTitle(search) : `${tool?.name ?? guide.title} · AI Space — ${NAME}`;
+const seoDescription = tool
+  ? (tool.value && describeWhole(guide.title, firstSentence(tool.value))) || describe(guide.title, tool.what)
+  : describe(guide.intro);
 const pageUrl = new URL(`/ai/${guide.slug}/`, SITE).href;
 const toolLd = workLd({
   url: pageUrl,
@@ -38,6 +46,8 @@ const toolLd = workLd({
   headline: guide.title,
   description: seoDescription,
   image: new URL(ogHome.src, SITE).href,
+  about: search?.about,
+  keywords: search?.keywords,
 });
 ---
 <Base title={seoTitle} description={seoDescription} type="article" jsonLd={toolLd}>
