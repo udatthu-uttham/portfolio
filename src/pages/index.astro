@@ -33,33 +33,20 @@ const tileFiles = import.meta.glob<ImageMetadata>('../assets/{plp,mall,mall-case
 const tileScreens: Record<string, ImageMetadata> = Object.fromEntries(
   Object.entries(tileFiles).map(([path, img]) => [path.split('/').slice(-2).join('/').replace(/\.(png|jpe?g|webp)$/, ''), img])
 );
-// The loupe strip: one paper strip across a from → to pair, magnifying the same
-// region of both screens (Uttham, 2026-10-03: "from what to what"). It renders
-// only when a tile has exactly two phones and both carry a loupe window.
-const hasLoupe = (phones: TilePhone[]) => phones.length === 2 && phones.every((p) => p.loupe);
-// Each crop is a CSS window over the export itself: the image is scaled so the
-// window's width fills the crop, then shifted by the window's offset, all as
-// fractions of the source so the numbers stay in the export's own pixels.
-const crop = (p: TilePhone) => {
-  const img = tileScreens[p.image];
-  const [x, y, w, h] = p.loupe!;
-  return {
-    img,
-    style: `--fx: ${x / img.width}; --fy: ${y / img.height}; --fw: ${w / img.width}; aspect-ratio: ${w} / ${h};`,
-    // never ask a small export (the 720px v2 deck frame) for a bigger copy
-    widths: [480, 960].filter((n) => n <= img.width),
-    // the crop is at most ~160px wide; the whole image is that over its fraction
-    sizes: `${Math.ceil((160 * img.width) / w)}px`,
-  };
-};
-if (import.meta.env.DEV) {
-  for (const s of studies) {
-    const phones = s.tile?.phones;
-    if (!phones || !hasLoupe(phones)) continue;
-    const [a, b] = phones.map((p) => p.loupe![2] / p.loupe![3]);
-    if (Math.abs(a - b) / Math.max(a, b) > 0.02) console.warn(`[tile loupe] ${s.slug}: the two windows differ in aspect ratio (${a.toFixed(2)} vs ${b.toFixed(2)}); the crops will not match.`);
-  }
-}
+// Each phone takes its export's own aspect ratio, so the whole screen shows and
+// nothing is cropped (Uttham, 2026-10-03: "when I give big images I dont want
+// you to just paste them or crop them abruptly making its content gone"). The
+// well sizes the pair from the sum of their widths per unit of height — the
+// "from" stands at --tile-from-h of the "to" — so they fit its height and width
+// at once (the CSS at .tile__media--phones).
+const FROM_H = 0.86;
+const ratio = (p: TilePhone) => tileScreens[p.image].width / tileScreens[p.image].height;
+const pairStyle = (phones: TilePhone[]) =>
+  `--tile-from-h: ${FROM_H}; --pair-w: ${phones.reduce((sum, p) => sum + ratio(p) * (p.tone === 'old' ? FROM_H : 1), 0)}; --gaps: ${phones.length - 1};`;
+// A pair's notes go on the outer sides: the first phone's to its left, the
+// last phone's to its right, so no note ever sits between the two screens.
+const noteSide = (phones: TilePhone[], i: number) => (phones.length > 1 && i === 0 ? 'l' : 'r');
+const hasNotes = (phones: TilePhone[], side: 'l' | 'r') => phones.some((p, i) => p.notes?.length && noteSide(phones, i) === side);
 
 // The replicate button hands over the guide's prompt verbatim, so the card and
 // the guide page can never drift apart.
@@ -199,28 +186,33 @@ const homeLd = {
                   <h3>{study.title}</h3>
                   <p class="tile__desc" set:html={rich(study.summary)} />
                   {study.tile && study.tile.phones.every((p) => tileScreens[p.image]) ? (
-                    <div class="tile__media glass tile__media--phones" aria-hidden="true">
-                      {study.tile.phones.map((p) => (
-                        <figure class:list={['tile__phone', { 'tile__phone--old': p.tone === 'old' }]}>
+                    <div
+                      class:list={[
+                        'tile__media glass tile__media--phones',
+                        {
+                          'tile__media--tags': study.tile.phones.some((p) => p.label),
+                          'tile__media--notes-l': hasNotes(study.tile.phones, 'l'),
+                          'tile__media--notes-r': hasNotes(study.tile.phones, 'r'),
+                        },
+                      ]}
+                      style={pairStyle(study.tile.phones)}
+                      aria-hidden="true">
+                      {study.tile.phones.map((p, i) => (
+                        <figure class:list={['tile__phone', { 'tile__phone--old': p.tone === 'old' }]} style={`--ar: ${ratio(p)};`}>
                           {p.label && <figcaption class:list={['tile__tag', { 'tile__tag--new': p.tone === 'new' }]}>{p.label}</figcaption>}
                           <div class="tile__screen"><Image src={tileScreens[p.image]} alt="" widths={[240, 480]} sizes="240px" /></div>
+                          {p.notes?.map((n) => (
+                            <span class={`tile__note tile__note--${noteSide(study.tile!.phones, i)}`} style={`--y: ${n.y};`}>
+                              <span class="tile__note-text">{n.text}</span>
+                              {/* drawn once, pointing left; the left-side note mirrors it */}
+                              <svg class="tile__note-arrow" viewBox="0 0 44 22" fill="none">
+                                <path d="M42 2.5c-5.5.5-11.6 1.5-17.6 5S10.6 15.8 3.5 20.5" />
+                                <path d="M11.4 21.3 3.5 20.5l2.3-7.6" />
+                              </svg>
+                            </span>
+                          ))}
                         </figure>
                       ))}
-                      {hasLoupe(study.tile.phones) && (
-                        <span class="tile__loupe">
-                          {study.tile.phones.map((p, i) => {
-                            const c = crop(p);
-                            return (
-                              <Fragment>
-                                {i === 1 && <span class="tile__loupe-arr">→</span>}
-                                <span class:list={['tile__crop', { 'tile__crop--old': p.tone === 'old' }]} style={c.style}>
-                                  <Image src={c.img} alt="" widths={c.widths} sizes={c.sizes} />
-                                </span>
-                              </Fragment>
-                            );
-                          })}
-                        </span>
-                      )}
                     </div>
                   ) : (
                   <div class={`tile__media glass ${study.deck ? 'tile__media--deck' : ''}`}>
@@ -889,104 +881,88 @@ const homeLd = {
     box-shadow: var(--shadow-rest);
   }
   .tile__deck img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
-  /* THE TILE'S PHONES: the case page's own screens, standing flush on the
-     well's bottom edge like the AI cards' phones — one, or two side by side for
-     a from → to (Uttham, 2026-10-03: "from what to what, it should look like 2
-     phones showing both the variations"). Each is sized off the well's height;
-     the two share the width with a within-card gap. The tag sits on a phone's
-     top edge, half over the glass; the "to" tag is on the amber note stock.
-     The "from" stands shorter and in grey, the "to" full height in colour, and
-     one paper loupe strip across both magnifies the same region of each screen,
-     so the change itself reads at tile size ("these images have strong hook and
-     content"). All of it is static: the tile keeps its magnetic tilt, border and
-     arrow nudge and nothing in the well moves; the strip rides the tilt with the
-     sheet. The strip overlays the well, so the sheet gains no row. */
+  /* THE TILE'S PHONES: the case page's own screens — one, or two side by side
+     for a from → to (Uttham, 2026-10-03: "from what to what, it should look like
+     2 phones showing both the variations"). Each phone takes its export's own
+     aspect ratio (--ar, read from the image) and shows the WHOLE screen: no
+     cover crop, nothing lost under the well's edge ("when I give big images I
+     dont want you to just paste them or crop them abruptly making its content
+     gone"). So they stand as cards ON the glass, with glass on every side
+     (CLAUDE.md, Images), sized off the well's height. The "from" stands shorter
+     and in grey, the "to" full height in colour; each tag stands just above
+     its phone, never over the screen, the "to" tag on the amber note stock.
+     The loupe strip that magnified one card of each came off the same day
+     ("lets keep it like the grey and colorful ones only"); handwritten notes
+     beside the pair say what changed instead ("maybe add some highlights in
+     text around the thumbnail about what we changed"). All of it is static:
+     the tile keeps its magnetic tilt, border and arrow nudge, the notes ride
+     the tilt with the sheet, and nothing in the well moves. */
   .tile__media--phones {
-    --tile-from-h: 86%;                         /* the "from" phone's height in the well */
+    /* The well is the container its phones size against: 100cqh is the height
+       between its top and bottom pads, 100cqw its width. --tile-from-h, --pair-w
+       and --gaps come from the frontmatter (FROM_H and the images' sizes). */
+    container: phones / size;
     --tile-mute: grayscale(1) contrast(0.92);   /* the "from" screen, static */
-    --tile-loupe-w: 360px;                      /* the strip's widest */
+    --tag-room: 0px;
     align-items: end;
     gap: var(--space-4);
-    padding: var(--space-6) var(--space-5) 0;
+    /* one within-card step of glass above and below, and on a side without
+       notes; the tags stand inside it, in --tag-room */
+    padding: var(--space-4) 0;
   }
-  /* A card ON the glass, never across it: at least --space-5 of glass at its
-     sides and bottom at every width, capped at --tile-loupe-w on wide wells. */
-  .tile__loupe {
-    position: absolute;
-    left: 50%;
-    bottom: var(--space-5);
-    translate: -50% 0;
-    z-index: 2;
-    width: min(100% - 2 * var(--space-5), var(--tile-loupe-w));
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-    align-items: center;
-    gap: var(--space-2);
-    padding: var(--space-2);
-    background: var(--paper-1);
-    border: 1px solid var(--line-1);
-    border-radius: var(--radius-sm);
-    box-shadow: var(--shadow-stuck);
-    /* undo the well's label type */
-    text-transform: none;
-    letter-spacing: normal;
+  /* A pair's tags stand ABOVE their phones, never over them: half over the
+     screen, they hid each export's search bar, and a "from" narrower than its
+     tag lost the whole row. So the well keeps the tag's own box (its line,
+     padding and border, as .tile__tag sets them) and one --space-2 to the
+     phone out of the "to"'s height. A well without tags (Mall) keeps it all. */
+  .tile__media--tags {
+    --tag-room: calc(var(--text-eyebrow) * var(--lh-heading) + 2 * var(--space-1) + 2px + var(--space-2));
   }
-  /* Each crop is a window over the export: the box takes the window's aspect
-     ratio, the image is scaled so the window's width fills it and shifted by
-     the window's offset. translate's percentages are of the image's own box, so
-     they are exactly the source fractions. */
-  .tile__crop {
-    position: relative;
-    display: block;
-    overflow: hidden;
-    border-radius: var(--radius-inset);
-    box-shadow: 0 0 0 1px var(--line-0);
-    background: var(--paper-1);
-  }
-  .tile__crop img {
-    position: absolute;
-    top: 0;
-    left: 0;
-    display: block;
-    max-width: none;
-    width: calc(100% / var(--fw));
-    height: auto;
-    translate: calc(var(--fx) * -100%) calc(var(--fy) * -100%);
-  }
-  /* ink, and its own class, so the sheet's hover arrow nudge never moves it */
-  .tile__loupe-arr { color: var(--ink-600); font-size: var(--text-body); font-weight: 500; line-height: 1; }
   .tile__phone {
+    /* A side with notes keeps a note's column of glass, a side without one
+       within-card step; the phones are centred WITH those margins, so the
+       pair and its notes read as one balanced group. */
+    --note-w: clamp(112px, 24cqw, 136px);
+    --gut-l: var(--space-4);
+    --gut-r: var(--space-4);
+    /* The "to" phone's height: the well's less its tag, unless the pair and
+       its gutters would then be wider than the well — then what the width
+       allows. --pair-w is the pair's width per unit of that height, so both
+       phones compute the same number and neither is ever squeezed out of its
+       ratio. */
+    --ph-h: min(100cqh - var(--tag-room), (100cqw - var(--gut-l) - var(--gut-r) - var(--gaps) * var(--space-4)) / var(--pair-w));
     position: relative;
-    height: 100%;
-    /* an aspect-ratio box may grow to fit its content; the screenshot inside
-       is far taller than the phone, so the box keeps its own ratio instead */
-    min-height: 0;
-    max-width: 52%;
-    aspect-ratio: 9 / 15;
-    margin: 0;
+    flex: none;
+    height: var(--ph-h);
+    aspect-ratio: var(--ar);
+    /* When the width is what limits the pair, the slack goes above (its tag)
+       and below it in equal parts, not all above: the pair keeps one baseline
+       and sits centred in the glass instead of sinking to its floor. */
+    margin: 0 0 calc((100cqh - var(--tag-room) - var(--ph-h)) / 2);
   }
-  .tile__phone:not(:only-child) { max-width: calc(50% - var(--space-2)); }
+  .tile__phone:first-child { margin-inline-start: var(--gut-l); }
+  .tile__phone:last-child { margin-inline-end: var(--gut-r); }
   /* after .tile__phone, which sets the full height this overrides */
-  .tile__phone--old { height: var(--tile-from-h); }
+  .tile__phone--old { height: calc(var(--ph-h) * var(--tile-from-h)); }
+  .tile__media--notes-r > .tile__phone { --gut-r: var(--note-w); }
   .tile__screen {
     width: 100%;
     height: 100%;
     overflow: hidden;
-    border: 1px solid var(--line-1);
-    border-bottom: 0;
-    border-radius: 18px 18px 0 0;
-    background: #fff;
-    box-shadow: var(--shadow-rest);
+    /* A ring, not a border, so the screen box keeps the export's exact ratio;
+       and a small radius — an 18px corner at a phone's width clipped the
+       export's own search box. */
+    border-radius: var(--radius-sm);
+    background: var(--paper-1);
+    box-shadow: 0 0 0 1px var(--line-1), var(--shadow-rest);
   }
-  .tile__screen img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
-  .tile__phone--old .tile__screen img,
-  .tile__crop--old img { filter: var(--tile-mute); }
+  .tile__screen img { display: block; width: 100%; height: 100%; object-fit: contain; }
+  .tile__phone--old .tile__screen img { filter: var(--tile-mute); }
   .tile__tag {
     position: absolute;
-    top: 0;
+    bottom: calc(100% + var(--space-2));
     left: 50%;
-    z-index: 1;
-    translate: -50% -50%;
+    translate: -50% 0;
     padding: var(--space-1) var(--space-3);
     border: 1px solid var(--line-1);
     border-radius: var(--radius-pill);
@@ -1001,6 +977,69 @@ const homeLd = {
     box-shadow: var(--shadow-rest);
   }
   .tile__tag--new { background: var(--amber-400); color: var(--ink-900); }
+  /* THE NOTES: the paper's handwriting, in ink, straight on the glass beside a
+     phone, each with a hand-drawn arrow whose tip lands on the part of the
+     screen it talks about (`y` in studies.ts, a fraction of that screen's
+     height). The words sit above the arrow, so a note's bottom edge is its
+     tip. A note lives in its side's --note-w of glass and never crosses a
+     screen. */
+  .tile__note {
+    position: absolute;
+    bottom: calc((1 - var(--y)) * 100%);
+    width: calc(var(--note-w) - var(--space-2));
+    display: flex;
+    flex-direction: column;
+    color: var(--ink-900);
+    font-family: var(--font-hand);
+    font-size: var(--text-note);
+    font-weight: 600;
+    line-height: var(--lh-heading);
+    letter-spacing: 0;
+    text-transform: none;
+  }
+  .tile__note--r { left: 100%; align-items: flex-start; text-align: left; }
+  .tile__note--l { right: 100%; align-items: flex-end; text-align: right; }
+  .tile__note-text { text-wrap: balance; rotate: -2deg; }
+  .tile__note--r .tile__note-text { padding-inline-start: var(--space-2); }
+  .tile__note--l .tile__note-text { padding-inline-end: var(--space-2); }
+  /* The tip just over the screen's edge, never short of it. Two classes, so
+     the well's own `svg { width: 100% }` (for case art) never stretches it. */
+  .tile__note .tile__note-arrow {
+    display: block;
+    width: 2.2em;   /* part of the handwriting, so it scales with it */
+    height: auto;
+    margin-block-start: var(--space-1);
+    margin-inline-start: calc(var(--space-1) * -1);
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .tile__note--l .tile__note-arrow { scale: -1 1; margin-inline: 0 calc(var(--space-1) * -1); }
+  /* A narrow well — a tablet's two-up row, a phone, a small laptop — has room
+     for one column of notes beside the pair, so the "from" side's notes drop
+     and the "to" keeps its own. */
+  .tile__note--l { display: none; }
+  @container phones (min-width: 440px) {
+    .tile__note--l { display: flex; }
+    .tile__media--notes-l > .tile__phone { --gut-l: var(--note-w); }
+  }
+  /* The narrowest well (a 320px phone) is too short for two notes on one
+     side: a phone's notes are in priority order, and only its first stays.
+     Its column narrows to 96px (three short lines), which is what lets the
+     pair stand on the well's height rather than its width there, and the note
+     hangs BELOW its tip, the arrow drawn upwards, because three lines above a
+     tip high on the screen ran into the glass's top edge. The tags take a
+     tighter pad, so a tag wider than its small phone still clears its
+     neighbour and the well's edge. */
+  @container phones (max-width: 279px) {
+    .tile__phone { --note-w: 96px; }
+    .tile__note + .tile__note { display: none; }
+    .tile__note { bottom: auto; top: calc(var(--y) * 100%); flex-direction: column-reverse; }
+    .tile__note .tile__note-arrow { scale: 1 -1; margin-block: 0 var(--space-1); }
+    .tile__note--l .tile__note-arrow { scale: -1 -1; }
+    .tile__tag { padding-inline: var(--space-2); }
+  }
   /* a study without a deck shows its cover render as a card inside the glass well */
   .tile__cover { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: var(--radius-inset); box-shadow: 0 1px 2px rgba(22, 20, 14, 0.08); }
   .tile__media :global(svg),
@@ -1050,9 +1089,10 @@ const homeLd = {
   .tool__link:focus-visible { outline: none; }
   .tool__link:focus-visible::after { outline: 2px solid var(--amber-text); outline-offset: var(--space-1); }
 
-  /* The Projects well exactly — 4/3, phone standing flush on the bottom edge,
-     glass showing on the other three sides. `container` lets each preview ask
-     how much room it actually got. */
+  /* The Projects well's 4/3, but a tool's phone is a running preview, not an
+     export to show whole: it stands flush on the bottom edge, glass showing
+     on the other three sides. `container` lets each preview ask how much room
+     it actually got. */
   .tile__media--tool {
     position: relative;
     container: well / inline-size;

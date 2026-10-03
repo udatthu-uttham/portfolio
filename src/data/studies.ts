@@ -14,16 +14,25 @@ export type Chapter = {
   notes?: { text: string; source: string; tilt: string }[]; // a cluster of sticky notes in the side column
 };
 
+// A handwritten note beside a tile's phone, the way a crit board is annotated
+// (Uttham, 2026-10-03: "maybe add some highlights in text around the thumbnail
+// about what we changed"). `text` is a few words, true to what the screen
+// shows; `y` is where its arrow lands, as a fraction of THIS screen's height
+// (0 = top, 1 = bottom). The note sits on the phone's outer side — left of the
+// "from", right of the "to" — with its words above the arrow, so keep `y` past
+// about 0.3. A phone's notes are in priority order: on a narrow sheet only the
+// "to" phone's notes stay, and on the narrowest (a 320px phone) only its first,
+// hanging below its tip instead.
+export type TileNote = { text: string; y: number };
+
 // One phone in the homepage tile's glass well. `image` is <folder>/<state> under
-// src/assets (the case page's own screens). tone 'old' = the "from": shorter and
-// muted; tone 'new' = the "to": full height, its tag on amber. `loupe` = the
-// region of THIS screen the paper loupe strip magnifies, [x, y, w, h] in the
-// export's own pixels. The strip renders only when a tile has exactly two phones
-// and both carry a loupe, so the change itself is legible at tile size (Uttham,
-// 2026-10-03: "create phone mocks to represent the images on home page … these
-// images have strong hook and content"). Keep a pair's two windows the same
-// aspect ratio so the two crops are identical objects.
-export type TilePhone = { image: string; label?: string; tone?: 'old' | 'new'; loupe?: [number, number, number, number] };
+// src/assets (the case page's own screens); the phone takes the export's own
+// aspect ratio and shows the whole of it (Uttham, 2026-10-03: "when I give big
+// images I dont want you to just paste them or crop them abruptly making its
+// content gone"). tone 'old' = the "from": shorter and in grey; tone 'new' = the
+// "to": full height in colour, its tag on amber. `label` is the tag, which
+// stands above its phone, never over the screen.
+export type TilePhone = { image: string; label?: string; tone?: 'old' | 'new'; notes?: TileNote[] };
 
 export type Study = {
   slug: string;
@@ -61,15 +70,22 @@ scope: ['Product card systems', 'Experiment design', 'PLP at scale'],
     cover: { image: 'stagger-cover', caption: 'Left: every card padded to its row. Right: height follows content, and an extra card enters by the third row.' },
     // The old feed and the new one, side by side (Uttham, 2026-10-03: "highlight
     // the old and new in the first, basically from what to what, it should look
-    // like 2 phones showing both the variations"), and one paper loupe across
-    // both on the same shampoo card, so the hook reads at tile size ("these
-    // images have strong hook and content"): a line of name text becomes fact
-    // chips. Before stops above the price pill (y≈835), so its struck price never
-    // shows; After stops above the price row. Both start at x 546, clear of the
-    // column gutter and the screen's right-edge line.
+    // like 2 phones showing both the variations"), grey and colour, with a few
+    // handwritten notes on what changed ("lets keep it like the grey and colorful
+    // ones only, maybe add some highlights in text around the thumbnail about what
+    // we changed"). DRAFT wording, for Uttham to rewrite. Each `y` is measured on
+    // the 1080×2160 export: Before's first row is padded to its taller card, so
+    // the shirt card has blank paper under its rating (y≈0.46–0.51); After's
+    // shampoo card carries chips in place of its name (0.31–0.35) and the
+    // right-hand column ends a card at 0.837 where the left ended one at 0.778.
     tile: { phones: [
-      { image: 'plp/before', label: 'Before', tone: 'old', loupe: [546, 698, 528, 129] },
-      { image: 'plp/after', label: 'After', tone: 'new', loupe: [546, 646, 528, 129] },
+      { image: 'plp/before', label: 'Before', tone: 'old', notes: [
+        { text: 'Padded to the tallest card', y: 0.49 },
+      ] },
+      { image: 'plp/after', label: 'After', tone: 'new', notes: [
+        { text: 'Facts replace the title', y: 0.33 },
+        { text: 'Cards at natural height', y: 0.837 },
+      ] },
     ] },
     // The case page is Uttham's teaser layout (2026-10-01); the six-chapter
     // "exchange rate" draft it replaces is in git history.
@@ -89,12 +105,12 @@ scope: ['Product card systems', 'Experiment design', 'PLP at scale'],
       pdf: '/meesho-mall-case-study.pdf',
       screen: 'v3-landing',
     },
-    // The Mall landing page he supplied (2026-10-03), in the tile's phone. The
-    // v2 → v3 pair waits for Uttham's yes on standing his deck export as the
-    // "from"; until then the tile keeps one phone and no loupe. Once he agrees:
+    // The Mall landing page he supplied (2026-10-03), in the tile's phone, whole.
+    // The v2 → v3 pair waits for Uttham's yes on standing his deck export as the
+    // "from"; until then the tile keeps one phone. Once he agrees:
     //   tile: { phones: [
-    //     { image: 'mall/v2-plp-badge', label: 'v2', tone: 'old', loupe: [0, 200, 720, 176] },
-    //     { image: 'mall-case/v3-landing-new', label: 'v3', tone: 'new', loupe: [0, 416, 1080, 264] },
+    //     { image: 'mall/v2-plp-badge', label: 'v2', tone: 'old' },
+    //     { image: 'mall-case/v3-landing-new', label: 'v3', tone: 'new' },
     //   ] },
     // (v2: wordmark, "Branded products at best prices", logo tiles; v3: tick
     // "Mall", "Original Brands, Top Quality", the logo wall — his "sell brands,
