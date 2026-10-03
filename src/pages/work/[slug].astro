@@ -207,9 +207,7 @@ const caseLd = workLd({
     </>
     )}
   </main>
-  <section class="more-cases" aria-label="More cases">
-    <CaseIndex items={studies.filter((s) => s.slug !== study.slug)} label="More cases" />
-  </section>
+  <CaseIndex items={studies.filter((s) => s.slug !== study.slug)} label="More cases" end />
 </Base>
 
 <style>
@@ -354,7 +352,6 @@ const caseLd = workLd({
   .chapter__note p { margin: 0; font-size: var(--text-note); font-weight: 500; line-height: var(--lh-heading); }
   .chapter__note small { display: block; margin-top: var(--space-3); font-family: var(--font-paper); font-size: var(--text-small); color: var(--ink-600); }
   .case-details { padding: var(--section-y-sm) 0; }
-  .more-cases { position: relative; z-index: 1; width: min(calc(100% - var(--margin-side) * 2), var(--container-max)); margin: 0 auto var(--section-y-sm); }
   .case-details__container { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); gap: var(--group-gap); }
   .case-details__focus { max-width: 660px; margin: var(--content-gap) 0 0; font-size: var(--text-h3); font-weight: 600; letter-spacing: var(--track-heading); line-height: var(--lh-heading); }
   ul { display: flex; flex-wrap: wrap; gap: var(--space-2); margin: var(--content-gap) 0 0; padding: 0; list-style: none; }

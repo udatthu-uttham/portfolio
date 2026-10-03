@@ -12,6 +12,7 @@ import Base from '../../layouts/Base.astro';
 import Header from '../../components/Header.astro';
 import GridOverlay from '../../components/GridOverlay.astro';
 import CaseTeaser from '../../components/CaseTeaser.astro';
+import CaseIndex from '../../components/CaseIndex.astro';
 import ResonaPreview from '../../components/ResonaPreview.astro';
 import ProtoPreview from '../../components/ProtoPreview.astro';
 import { guides } from '../../data/guides';
@@ -39,6 +40,14 @@ const seoTitle = search ? searchTitle(search) : `${tool?.name ?? guide.title} ·
 const seoDescription = tool
   ? (tool.value && describeWhole(guide.title, firstSentence(tool.value))) || describe(guide.title, tool.what)
   : describe(guide.intro);
+// The entry points to the other tools, after the recipe, as a case page ends
+// on "More cases" (Uttham, 2026-10-03: "and similar to projects at the end
+// give entry points for next ones in ai prototype also"): every other tool
+// with a page, in the homepage's card order, each row its name, its card's
+// line, and its year and kicker — nothing but what tools.ts already says.
+const moreTools = tools
+  .filter((t) => t.slug !== guide.slug && guides.some((g) => g.slug === t.slug))
+  .map((t) => ({ href: `/ai/${t.slug}`, year: t.year, kicker: t.kicker, title: t.name, line: t.what }));
 const pageUrl = new URL(`/ai/${guide.slug}/`, SITE).href;
 const toolLd = workLd({
   url: pageUrl,
@@ -62,11 +71,15 @@ const toolLd = workLd({
       </Fragment>
     </CaseTeaser>
   </main>
+  {/* "More tools", as "More cases" names what its rows are; the homepage
+      section calls them tools too ("Tools I build so the team moves faster.") */}
+  <CaseIndex rows={moreTools} label="More tools" end />
 </Base>
 
 <style>
   /* the case page's own frame (work/[slug].astro): the header, then half a
-     section gap; the layout's own bottom pad ends the page */
+     section gap; the layout's own bottom pad (a whole --section-y) leads to
+     "More tools", which ends the page as "More cases" ends a case */
   .ai-page {
     position: relative;
     min-height: 100svh;

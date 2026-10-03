@@ -61,7 +61,7 @@ screen too (see the screen contract below).
 | — Tape bite | `--tape-bite` | `18px` | flat | The part of the tape lying on the sheet: the 32×87px strip turned 92° stands 35px tall, centred on the edge |
 | — Sheet content | `--sheet-in` | budget − `--sec-chrome` − sheet padding, `clamp(360px, …, 480px)` | 396 / 470 / 480 at 1280×800 / 1440×900 / ≥1324×967 | Content height of a Projects or AI Space sheet on a laptop (≥1024px), so the section is one screen |
 | 4 · Within a card | `--space-4` / `--space-2` | 16px / 8px | flat | Stack between a card's blocks / between answer lines |
-| — Supporting detail | `--section-y-sm` | `clamp(48px, 5vw, 72px)` | 48 → 72 | Case-page chapters, case details, page navigator, footer |
+| — Supporting detail | `--section-y-sm` | `clamp(48px, 5vw, 72px)` | 48 → 72 | Case-page chapters, case details, page navigator, footer; under the last row of More cases / More tools, where a case or AI Space page ends |
 | — Content gap | `--content-gap` | `clamp(16px, 2vw, 24px)` | 16 → 24 | Related text and grid gutters |
 | — Group gap | `--group-gap` | `clamp(24px, 3.5vw, 48px)` | 24 → 48 | Column groups and panel side padding |
 | — Control gap | `--control-gap` | `12px` | flat | Controls that belong together |
@@ -143,7 +143,7 @@ The stack, largest first:
 
 | Gap | Token | 375 / 1280 / 1440 |
 | --- | --- | --- |
-| Hero → story, section → section, story → More cases, full-study block → block | `--section-y` | 96 / 141 / 158 |
+| Hero → story, section → section, story → More cases (an AI Space page: → More tools), full-study block → block | `--section-y` | 96 / 141 / 158 |
 | Text → a sub-group (rows, note, list, gate card), and above a sub-group heading | `--ct-sub` = `max(--space-7, --group-gap × 4/3)` | 48 / 60 / 64 |
 | Heading → its text | `--ct-head` = `--space-6` | 32 |
 | Sub-group heading → its rows; paragraph → paragraph | `--ct-para` = `--space-5` | 24 |

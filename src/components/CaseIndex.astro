@@ -2,24 +2,33 @@
 // The second layer of the Projects section: every case that is not on the
 // board, one ruler-styled row each — year, kicker, title, one line, arrow.
 // No media, so it scales to twenty cases without the page growing much.
-// Also used at the end of a case page as "More cases".
+//
+// Also the entry points at the END OF A PAGE (`end`): "More cases" after a
+// case study, and "More tools" after an AI Space tool page (Uttham,
+// 2026-10-03: "and similar to projects at the end give entry points for next
+// ones in ai prototype also"). Cases pass `items` (studies); anything else
+// passes `rows`, already shaped, every word from its own data file — a tool
+// row is its name, its card's line, and the year and kicker tools.ts gives it.
+// A row without a year or kicker leaves that cell empty, never invented.
 import type { Study } from '../data/studies';
 import { rich } from '../lib/rich';
 
-interface Props { items: Study[]; label?: string }
-const { items, label } = Astro.props;
+type Row = { href: string; year?: string; kicker?: string; title: string; line: string };
+interface Props { items?: Study[]; rows?: Row[]; label?: string; end?: boolean }
+const { items = [], rows: given, label, end = false } = Astro.props;
+const rows: Row[] = given ?? items.map((s) => ({ href: `/work/${s.slug}`, year: s.year, kicker: s.kicker, title: s.title, line: s.summary }));
 ---
-{items.length > 0 && (
-  <nav class="case-index" aria-label={label ?? 'More cases'}>
+{rows.length > 0 && (
+  <nav class:list={['case-index', { 'case-index--end': end }]} aria-label={label ?? 'More cases'}>
     {label && <p class="case-index__label">{label}</p>}
     <ol class="case-index__list">
-      {items.map((s) => (
+      {rows.map((r) => (
         <li class="case-index__row">
-          <a class="case-index__link" href={`/work/${s.slug}`} data-astro-prefetch>
-            <span class="case-index__year">{s.year}</span>
-            <span class="case-index__kicker">{s.kicker}</span>
-            <span class="case-index__title">{s.title}</span>
-            <span class="case-index__line" set:html={rich(s.summary)} />
+          <a class="case-index__link" href={r.href} data-astro-prefetch>
+            <span class="case-index__year">{r.year}</span>
+            {r.kicker ? <span class="case-index__kicker">{r.kicker}</span> : <span />}
+            <span class="case-index__title">{r.title}</span>
+            <span class="case-index__line" set:html={rich(r.line)} />
             <span class="case-index__arr" aria-hidden="true">→</span>
           </a>
         </li>
@@ -30,6 +39,9 @@ const { items, label } = Astro.props;
 
 <style>
   .case-index { position: relative; z-index: 1; }
+  /* at the end of a page: the page's own column, after the layout's whole
+     --section-y bottom pad, and one --section-y-sm under the last row */
+  .case-index--end { width: min(calc(100% - var(--margin-side) * 2), var(--container-max)); margin: 0 auto var(--section-y-sm); }
   .case-index__label { margin: 0 0 var(--space-3); color: var(--ink-600); font-family: var(--font-paper); font-size: var(--text-eyebrow); font-weight: 500; letter-spacing: var(--track-label); text-transform: uppercase; }
   .case-index__list { margin: 0; padding: 0; list-style: none; border-top: 1px dashed var(--line-mark); }
   .case-index__row { border-bottom: 1px dashed var(--line-mark); }
