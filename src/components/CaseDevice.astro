@@ -1,0 +1,206 @@
+---
+// The handset the case pages' screens stand in (Uttham, 2026-10-03: "can you
+// create a realisitic phone mock that renders this a,so the title and spacings
+// of this card can be optimised"), drawn in CSS: a graphite body with a bezel
+// of even thickness, a display with a status bar (9:41, the island, signal,
+// Wi-Fi and battery) and a home strip, two volume keys and a side key. No
+// brand marks, no images.
+//
+// The screen itself is the caller's: the default slot is the display's middle
+// row, exactly 1 : 2, the proportion of Uttham's exports. The status bar sits
+// ABOVE that row and the home strip below it, inside the bezel, never over the
+// screenshot: his exports start on their own header row (a search bar, a back
+// arrow) with no status bar of their own, so an island laid over them would
+// hide it. Each strip takes the colour of the screen edge it meets (the
+// caller sets --ct-device-top / --ct-device-foot and data-top-ink /
+// data-foot-ink on this element; src/lib/edge-colour.ts), as an app's own
+// status bar does, so strip and screen read as one display.
+//
+// The size comes from one length the caller sets, --ct-device-screen: the
+// display's width. Everything else is a proportion of it (--ct-device-k-*, on
+// the teaser's root), so the handset is a scale drawing at every size — the
+// sticky card, the 112px mini player, the enlarged dialog. The `home` slot
+// holds the "Scroll ↓" chip, which stands in the home strip rather than on the
+// screenshot.
+interface Props {
+  class?: string;
+  [attr: string]: unknown;
+}
+const { class: className, ...rest } = Astro.props;
+---
+
+<div class:list={['ct-device', className]} {...rest}>
+  <div class="ct-device__glass">
+    <div class="ct-device__status" aria-hidden="true">
+      <span class="ct-device__time">9:41</span>
+      <span class="ct-device__island"></span>
+      <span class="ct-device__icons">
+        <svg class="ct-device__icon ct-device__icon--signal" viewBox="0 0 17 11" fill="currentColor">
+          <rect x="0" y="7" width="3" height="4" rx="1" />
+          <rect x="4.6" y="5" width="3" height="6" rx="1" />
+          <rect x="9.2" y="2.6" width="3" height="8.4" rx="1" />
+          <rect x="13.8" y="0" width="3" height="11" rx="1" />
+        </svg>
+        <svg class="ct-device__icon ct-device__icon--wifi" viewBox="0 0 15 11" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
+          <path d="M1.2 3.9a9 9 0 0 1 12.6 0" />
+          <path d="M3.6 6.4a5.6 5.6 0 0 1 7.8 0" />
+          <path d="M6 8.9a2.2 2.2 0 0 1 3 0" />
+        </svg>
+        <svg class="ct-device__icon ct-device__icon--battery" viewBox="0 0 25 12" fill="currentColor">
+          <rect x="0.6" y="0.6" width="21" height="10.8" rx="3.2" fill="none" stroke="currentColor" stroke-width="1.1" opacity="0.4" />
+          <rect x="2.3" y="2.3" width="17.6" height="7.4" rx="1.7" />
+          <rect x="23" y="4" width="1.6" height="4" rx="0.8" opacity="0.4" />
+        </svg>
+      </span>
+    </div>
+    <slot />
+    <div class="ct-device__home" aria-hidden="true">
+      <span class="ct-device__bar"></span>
+      <slot name="home" />
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Every length is a share of the display's width (W, --ct-device-screen):
+       bezel          0.03 W, even all round
+       status bar     0.12 W (the clock, the island, the glyphs)
+       screen         2 W    (the caller's 1 : 2 row)
+       home strip     0.10 W (the home indicator)
+     so the body is 1.06 W × 2.28 W, a modern handset's ~19.5 : 9. The radii
+     are concentric: the display's corner is 0.10 W, no deeper than either
+     strip, so it never rounds a corner off the screenshot; the body's is that
+     plus the bezel (outer = inner + padding). */
+  .ct-device {
+    --ct-device-w: calc(var(--ct-device-screen) * var(--ct-device-k-wide));
+    --ct-device-h: calc(var(--ct-device-screen) * var(--ct-device-k-tall));
+    --ct-device-bezel: calc(var(--ct-device-screen) * var(--ct-device-k-bezel));
+    --ct-device-radius: calc(var(--ct-device-screen) * var(--ct-device-k-radius));
+    /* graphite: the body is the darkest ink, the metal band around it a step
+       lighter, the keys the band's own metal */
+    --ct-device-body: var(--ink-900);
+    --ct-device-frame: color-mix(in oklab, var(--ink-900) 70%, var(--ink-400));
+    --ct-device-key: max(1px, calc(var(--ct-device-screen) * 0.009));
+    /* the strips' colours until the caller sets the screen's own (inline) */
+    --ct-device-top: var(--paper-1);
+    --ct-device-foot: var(--paper-1);
+    position: relative;
+    box-sizing: border-box;
+    width: var(--ct-device-w);
+    height: var(--ct-device-h);
+    padding: var(--ct-device-bezel);
+    border-radius: calc(var(--ct-device-radius) + var(--ct-device-bezel));
+    background: var(--ct-device-body);
+    /* depth from layered shadows, not a border: the metal band as a hairline
+       ring, its inner highlight, then the paper's own rest and lift shadows */
+    box-shadow:
+      0 0 0 max(1px, calc(var(--ct-device-screen) * 0.005)) var(--ct-device-frame),
+      inset 0 0 0 1px color-mix(in oklab, var(--paper-1) 9%, transparent),
+      var(--shadow-rest),
+      var(--shadow-lift);
+  }
+  /* the keys, on the band: two volume keys on the left (one drawn, its twin
+     as a shadow under it), the side key on the right */
+  .ct-device::before,
+  .ct-device::after {
+    content: '';
+    position: absolute;
+    width: var(--ct-device-key);
+    background: var(--ct-device-frame);
+  }
+  .ct-device::before {
+    left: calc(-1 * var(--ct-device-key));
+    top: calc(var(--ct-device-screen) * 0.5);
+    height: calc(var(--ct-device-screen) * 0.15);
+    border-radius: var(--ct-device-key) 0 0 var(--ct-device-key);
+    box-shadow: 0 calc(var(--ct-device-screen) * 0.21) 0 var(--ct-device-frame);
+  }
+  .ct-device::after {
+    right: calc(-1 * var(--ct-device-key));
+    top: calc(var(--ct-device-screen) * 0.62);
+    height: calc(var(--ct-device-screen) * 0.26);
+    border-radius: 0 var(--ct-device-key) var(--ct-device-key) 0;
+  }
+
+  /* the display: status bar, the caller's screen, home strip */
+  .ct-device__glass {
+    position: relative;
+    display: grid;
+    grid-template-rows:
+      calc(var(--ct-device-screen) * var(--ct-device-k-status))
+      calc(var(--ct-device-screen) * 2)
+      calc(var(--ct-device-screen) * var(--ct-device-k-home));
+    height: 100%;
+    overflow: hidden;
+    border-radius: var(--ct-device-radius);
+    /* under the rows, the same two colours, so no seam between them can show
+       the body through */
+    background: linear-gradient(var(--ct-device-top) 50%, var(--ct-device-foot) 50%);
+    isolation: isolate;
+  }
+  /* the glass's edge: a 1px ring of pure black at low opacity, drawn just
+     inside, so a white screen still has an edge against the bezel */
+  .ct-device__glass::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: inherit;
+    outline: 1px solid oklch(0 0 0 / 0.1);
+    outline-offset: -1px;
+    pointer-events: none;
+  }
+  .ct-device__status,
+  .ct-device__home {
+    color: var(--ink-900);
+    transition: background-color var(--dur-2) var(--ease-standard), color var(--dur-2) var(--ease-standard);
+  }
+  .ct-device__status {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: center;
+    background-color: var(--ct-device-top);
+    font-family: var(--font-paper);
+    font-size: calc(var(--ct-device-screen) * 0.043);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+    line-height: 1;
+  }
+  .ct-device[data-top-ink='light'] .ct-device__status { color: var(--paper-1); }
+  /* the clock and the glyphs each centred in the "ear" beside the island */
+  .ct-device__time { justify-self: center; }
+  .ct-device__island {
+    width: calc(var(--ct-device-screen) * 0.29);
+    height: calc(var(--ct-device-screen) * 0.08);
+    border-radius: var(--radius-pill);
+    background: var(--ct-device-body);
+  }
+  .ct-device__icons {
+    justify-self: center;
+    display: flex;
+    align-items: center;
+    gap: calc(var(--ct-device-screen) * 0.014);
+  }
+  .ct-device__icon { display: block; height: calc(var(--ct-device-screen) * 0.031); width: auto; }
+  .ct-device__icon--signal { aspect-ratio: 17 / 11; }
+  .ct-device__icon--wifi { aspect-ratio: 15 / 11; }
+  .ct-device__icon--battery { aspect-ratio: 25 / 12; height: calc(var(--ct-device-screen) * 0.034); }
+
+  .ct-device__home {
+    display: grid;
+    place-items: center;
+    background-color: var(--ct-device-foot);
+  }
+  .ct-device[data-foot-ink='light'] .ct-device__home { color: var(--paper-1); }
+  /* the home indicator; the "Scroll ↓" chip, when it shows, stands over it */
+  .ct-device__home > :global(*) { grid-area: 1 / 1; }
+  .ct-device__bar {
+    width: calc(var(--ct-device-screen) * 0.36);
+    height: max(1.5px, calc(var(--ct-device-screen) * 0.014));
+    border-radius: var(--radius-pill);
+    background: currentColor;
+    opacity: 0.9;
+    transition: opacity var(--dur-2) var(--ease-standard);
+  }
+</style>
