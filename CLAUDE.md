@@ -237,17 +237,18 @@ ladder pass is `plans/023`, the screen contract is `plans/024`. Re-measure
 before trusting any pixel figure recorded in an older plan — three of them were
 stale.
 
-## Header: end to end
+## Header: its content on the grid lines
 
-**The header's content spans the full viewport at every width** (Uttham,
-2026-10-01: "the header top nav should always be end to end"). `.site-header__inner`
-is `width: 100%` with `padding-inline: var(--margin-side)`, so the wordmark sits
-on the left gutter and the nav on the right one; **it is not capped to
-`--container-max`** — only the page sections below keep the 1200px column. Its
-height is still `--header-height` at every breakpoint, and both the rhythm
-ladder and the screen contract lean on that, so never size the bar any other
-way. Above ~1350px the bar's edges and the sections' edges visibly differ; that
-is what "end to end" asks for.
+**The header bar runs edge to edge, and its content stands on the page's grid
+lines** (Uttham, 2026-10-03: "the header content als should have the same
+spacing left and right along the grid lines"). `.site-header__inner` insets its
+content by GridOverlay's own `--edge` — `--margin-side`, or half of what the
+viewport leaves beside `--container-max`, rounded down to a pixel — so the
+wordmark starts on the left line and the nav ends on the right one at every
+width. This replaces 2026-10-01's "the header top nav should always be end to
+end", when the content ran to the viewport's gutters. Its height is still
+`--header-height` at every breakpoint, and both the rhythm ladder and the
+screen contract lean on that, so never size the bar any other way.
 
 **While the header avatar is hidden it takes no room** (Uttham, 2026-10-03: "the
 name should be left aligned when no favicon, once it is there move the name").

@@ -48,15 +48,17 @@ const { active = 'about', heroAvatar = false } = Astro.props;
     border-top: none;
   }
 
-  /* End to end at every width (Uttham, 2026-10-01: "the header top nav should
-     always be end to end"). The bar's content is NOT capped to
-     --container-max: the wordmark sits on the left gutter and the nav on the
-     right gutter of the viewport, whatever its width. The page sections below
-     keep their 1200px container — only the bar runs edge to edge. Height is
-     untouched: --header-height still sets the rhythm (min-height below). */
+  /* The bar runs edge to edge; its CONTENT stands on the page's grid lines
+     (Uttham, 2026-10-03: "the header content als should have the same spacing
+     left and right along the grid lines"; it ran to the viewport's gutters
+     from 2026-10-01). The inset is GridOverlay's own --edge — the side margin,
+     or half of what the viewport leaves beside the 1200px container, rounded
+     down to a pixel as the lines are — so the wordmark starts on the left line
+     and the nav ends on the right one at every width. Height is untouched:
+     --header-height still sets the rhythm (min-height below). */
   .site-header__inner {
     width: 100%;
-    padding-inline: var(--margin-side);
+    padding-inline: round(down, max(var(--margin-side), (100% - var(--container-max)) / 2), 1px);
     display: flex;
     align-items: center;
     justify-content: space-between;
