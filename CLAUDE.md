@@ -279,6 +279,61 @@ square to the head (the collar goes) so it still reads as a face at 16px.
 stock, with an 8% margin, because iOS paints a transparent touch icon black. Linked once, in `src/layouts/Base.astro`. If the avatar changes,
 regenerate all three from it — never draw a separate mark.
 
+## Domain trust
+
+**uttham.fyi has to look like a real, maintained personal site to the filters
+recruiters sit behind** (Uttham, 2026-10-03: "how can we make our domain more
+trustable, find ways and lets execute that"; his office Netskope blocks it as a
+newly registered domain). On-page SEO came in the same pass. What lives where:
+
+- **`public/_headers` sets the security headers on every response**: HSTS,
+  nosniff, Referrer-Policy, `X-Frame-Options: SAMEORIGIN`, a Permissions-Policy
+  and an enforced Content-Security-Policy. It also sets long caching on the
+  hashed `/_astro/*` and `/proto/feed-ux/assets/*`, and noindex on workers.dev.
+  The CSP lists exactly what the build loads, so **a new embed, font, image host
+  or analytics script needs adding to the CSP first, or it is silently
+  blocked**. `'unsafe-inline'` stays because Astro inlines its small scripts
+  and the pages use style attributes. PDFs drop the CSP so the browser's viewer
+  opens them. The microphone stays allowed for this origin only, because the
+  prototype has voice search. **HSTS has no `preload` yet**: the preload list is
+  hard to leave. Add it and submit at hstspreload.org only after a few clean
+  weeks, and only if every subdomain will be HTTPS for good.
+- **Every page names its one address on the apex** (`<link rel="canonical">`,
+  from `site` in `astro.config.mjs`), so the www and workers.dev copies fold
+  into it. Titles, descriptions, Open Graph, Twitter and JSON-LD are built in
+  `src/lib/seo.ts` and printed by `src/layouts/Base.astro`, after the font
+  preloads. **They are assembled from copy already on the site, never written
+  fresh**: the hero line on the homepage, title plus dek on a case page, the
+  guide's headline plus the card's line on a tool page. They are joined only
+  while they fit 60 / 155 characters, otherwise the shorter whole sentence is
+  used, and the build warns when one runs over. The homepage carries the
+  `Person` (with LinkedIn and GitHub in `sameAs`). Case and tool pages carry a
+  `CreativeWork` by that Person plus a two-step `BreadcrumbList`.
+- **Link previews are drawn in the site's own stock**, from
+  `scripts/og/og-card.html` (its comment has the render command), as
+  `public/og/<card>.jpg` at 1200×630. That is a card for home and one for each
+  case; tool pages use home. **Keep each under 300KB, or WhatsApp drops the
+  picture.** They repeat the case titles and deks, so re-render after changing
+  either.
+- **`/sitemap-index.xml` comes from `@astrojs/sitemap`**, pinned to 3.7.0, the
+  last release for Astro 5. `public/robots.txt` names it.
+  `public/.well-known/security.txt` gives the contact-panel email and
+  **expires 2027-10-01; renew it before then**, because a stale one reads as
+  abandoned.
+- **A wrong address gets `src/pages/404.astro` with a 404 status**, because
+  `wrangler.jsonc` sets `not_found_handling: "404-page"`. The 404 is noindex and
+  stays out of the sitemap. `workers_dev: false` is written out there too: with
+  routes, Wrangler already turned the workers.dev address off. Set it to true to
+  get that address back.
+- **One h1 per page and no skipped levels.** "How I lead" is an h2, so its three
+  principles sit under it rather than under the AI Space heading. The Resona
+  preview's screen labels are paragraphs, not h4s: they are the tool's UI, not
+  the page's outline. The styles are unchanged.
+
+Everything else is dashboard or third-party work that only Uttham can do: DNSSEC,
+email anti-spoofing records, the www → apex redirect, Search Console and Bing,
+and the web-filter recategorisation requests.
+
 ## Case study pages: the teaser layout
 
 **The product-cards case study (`/work/a-line-of-card-height`) is Uttham's teaser

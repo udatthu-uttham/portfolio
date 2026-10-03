@@ -7,6 +7,7 @@ import CaseTeaser from '../../components/CaseTeaser.astro';
 import { Image } from 'astro:assets';
 import { studies } from '../../data/studies';
 import { rich } from '../../lib/rich';
+import { SITE, NAME, describe, ogCase, ogHome, workLd } from '../../lib/seo';
 
 // Phone screens exported from the Mall Figma files and cards cropped from the deck, keyed by file name.
 const screenFiles = import.meta.glob<ImageMetadata>('../../assets/{mall,cards}/*.{jpg,png}', { eager: true, import: 'default' });
@@ -20,9 +21,24 @@ export function getStaticPaths() {
 
 const { study } = Astro.props;
 const hasArtwork = Boolean(study.deck || study.cover);
+
+// Search and link previews (CLAUDE.md, "Domain trust"): "<study> case study —
+// Uttham Udatthu"; the description is the page's own title and dek (or the
+// study summary for a case without a teaser), joined while it fits in 155.
+const seoTitle = `${study.title} case study — ${NAME}`;
+const seoDescription = study.teaser ? describe(study.teaser.title, study.teaser.dek) : describe(study.summary);
+const seoImage = ogCase[study.slug] ?? ogHome;
+const pageUrl = new URL(`/work/${study.slug}/`, SITE).href;
+const caseLd = workLd({
+  url: pageUrl,
+  name: `${study.title} case study`,
+  headline: study.teaser ? study.teaser.title : study.title,
+  description: seoDescription,
+  image: new URL(seoImage.src, SITE).href,
+});
 ---
 
-<Base title={`${study.teaser ? study.teaser.title : study.title} — Uttham Udatthu`} description={study.summary.replace(/\^\^|\*\*/g, '')}>
+<Base title={seoTitle} description={seoDescription} image={seoImage} type="article" jsonLd={caseLd}>
   <a class="skip-link" href="#main">Skip to content</a>
   <Header active="projects" />
 

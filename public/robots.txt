@@ -1,0 +1,6 @@
+# uttham.fyi: every page is public and may be crawled. The sitemap is built by
+# @astrojs/sitemap (astro.config.mjs); the canonical address is the apex.
+User-agent: *
+Allow: /
+
+Sitemap: https://uttham.fyi/sitemap-index.xml

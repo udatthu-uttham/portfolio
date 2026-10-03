@@ -1,0 +1,8 @@
+# Security contact for uttham.fyi (RFC 9116). The address is the one on the
+# site's contact panel. Renew Expires before it passes: a stale file reads as
+# an abandoned site (CLAUDE.md, "Domain trust").
+Contact: mailto:ultimateuttham@gmail.com
+Expires: 2027-10-01T00:00:00.000Z
+Preferred-Languages: en
+Canonical: https://uttham.fyi/.well-known/security.txt
+Canonical: https://www.uttham.fyi/.well-known/security.txt

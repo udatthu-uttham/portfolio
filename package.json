@@ -10,6 +10,7 @@
     "case-password": "node scripts/set-case-password.mjs"
   },
   "dependencies": {
+    "@astrojs/sitemap": "3.7.0",
     "astro": "^5.2.0",
     "gsap": "^3.12.7",
     "lenis": "^1.1.20"

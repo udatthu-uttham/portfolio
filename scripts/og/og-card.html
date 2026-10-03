@@ -1,0 +1,176 @@
+<!doctype html>
+<!--
+  The link-preview cards (og:image / twitter:image), 1200×630, drawn in the
+  site's own stock: the board, a white print, the washi tape, one amber
+  highlight. Domain trust pass, 2026-10-03 (CLAUDE.md, "Domain trust").
+
+  One template, three cards, picked by ?card= — home, a-line-of-card-height,
+  meesho-mall. The words are the site's own (the hero line, each case page's
+  title and dek); change them in the data first, then here. Re-render a card
+  with headless Chrome from the repo root, then save it as a JPEG through sharp
+  (a dependency already): the grain makes a PNG ~500KB, and WhatsApp drops a
+  preview image much over 300KB.
+
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new \
+      --hide-scrollbars --force-device-scale-factor=1 --window-size=1200,630 \
+      --virtual-time-budget=4000 --allow-file-access-from-files \
+      --screenshot=/tmp/og.png "file://$PWD/scripts/og/og-card.html?card=home"
+    node -e "require('sharp')('/tmp/og.png').jpeg({ quality: 82, mozjpeg: true }).toFile('public/og/home.jpg')"
+
+  src/lib/seo.ts points each page at /og/<card>.jpg and declares 1200×630.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<style>
+  @font-face { font-family: 'General Sans'; src: url(../../public/fonts/general-sans-400.woff2) format('woff2'); font-weight: 400; }
+  @font-face { font-family: 'General Sans'; src: url(../../public/fonts/general-sans-500.woff2) format('woff2'); font-weight: 500; }
+  @font-face { font-family: 'General Sans'; src: url(../../public/fonts/general-sans-600.woff2) format('woff2'); font-weight: 600; }
+  @font-face { font-family: 'Caveat'; src: url(../../public/fonts/caveat-variable.woff2) format('woff2'); font-weight: 400 700; }
+
+  :root {
+    --paper-0: #e9ebec; --paper-1: #ffffff; --paper-2: #dbdee0;
+    --ink-900: #16140e; --ink-600: #5c594f;
+    --line-1: rgba(22, 20, 14, 0.13);
+    --amber-500: #f3b44a; --amber-400: #f7c36d;
+    --shadow-rest: 0 2px 5px -2px rgba(22, 20, 14, 0.1), 0 10px 20px -14px rgba(22, 20, 14, 0.16);
+    --shadow-stuck: 0 8px 14px -8px rgba(22, 20, 14, 0.28);
+    --shadow-lift: 0 16px 28px -14px rgba(22, 20, 14, 0.32);
+    --track-label: 0.06em; --track-heading: -0.015em;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; width: 1200px; height: 630px; overflow: hidden; }
+  body {
+    position: relative;
+    font-family: 'General Sans', system-ui, sans-serif;
+    color: var(--ink-900);
+    background: var(--paper-0);
+    -webkit-font-smoothing: antialiased;
+  }
+  /* the board's tooth, as on the site (body::before in global.css) */
+  body::before {
+    content: ''; position: absolute; inset: 0; z-index: 0; opacity: 0.55; mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='t'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='2.5' intercept='-0.4'/%3E%3CfeFuncG type='linear' slope='2.5' intercept='-0.4'/%3E%3CfeFuncB type='linear' slope='2.5' intercept='-0.4'/%3E%3CfeFuncA type='table' tableValues='1 1'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23t)'/%3E%3C/svg%3E");
+    background-size: 180px 180px;
+  }
+  /* the dotted column grid that runs under every page */
+  body::after {
+    content: ''; position: absolute; inset: 0; z-index: 0;
+    background-image: radial-gradient(rgba(22, 20, 14, 0.16) 1px, transparent 1.4px);
+    background-size: 24px 24px; background-position: 12px 12px;
+  }
+  .card { position: absolute; inset: 0; z-index: 1; }
+  .card[hidden] { display: none; }
+
+  .eyebrow { margin: 0; font-size: 18px; font-weight: 500; letter-spacing: var(--track-label); text-transform: uppercase; color: var(--ink-600); }
+  .sticker {
+    display: inline-flex; align-items: center; padding: 12px 22px; border-radius: 6px;
+    background: var(--amber-500); color: var(--ink-900);
+    font-size: 20px; font-weight: 600; letter-spacing: var(--track-label); text-transform: uppercase;
+    box-shadow: var(--shadow-stuck), inset 0 1px 0 rgba(255, 255, 255, 0.3); rotate: -2deg;
+  }
+
+  /* ---------- home ---------- */
+  .home__print {
+    position: absolute; left: 112px; top: 96px; width: 330px;
+    padding: 14px 14px 30px; background: var(--paper-1); border: 1px solid rgba(22, 20, 14, 0.07);
+    border-radius: 8px; box-shadow: var(--shadow-lift); rotate: -5deg;
+  }
+  .home__print img { display: block; width: 100%; aspect-ratio: 46 / 62; object-fit: cover; border-radius: 2px; }
+  .home__hi { position: absolute; left: 368px; top: 52px; width: 132px; rotate: 6deg; filter: drop-shadow(0 8px 10px rgba(22, 20, 14, 0.22)); }
+  .home__hi text { font-family: 'Caveat', cursive; font-weight: 600; font-size: 76px; fill: var(--ink-900); }
+  .home__copy { position: absolute; left: 560px; right: 72px; top: 0; bottom: 0; display: flex; flex-direction: column; justify-content: center; gap: 24px; }
+  .home__name { margin: 0; font-size: 92px; font-weight: 600; line-height: 1; letter-spacing: -0.025em; }
+  .home__line { margin: 0; font-size: 36px; font-weight: 500; line-height: 1.2; letter-spacing: var(--track-heading); text-wrap: balance; }
+  .home__copy .sticker { align-self: flex-start; margin-top: 16px; }
+
+  /* ---------- case ---------- */
+  .case__copy { position: absolute; left: 80px; top: 64px; bottom: 56px; width: 560px; display: flex; flex-direction: column; justify-content: center; gap: 22px; }
+  .case__title { margin: 0; font-size: 54px; font-weight: 600; line-height: 1.08; letter-spacing: var(--track-heading); text-wrap: balance; }
+  .case__dek { margin: 0; font-size: 26px; font-weight: 400; line-height: 1.35; color: var(--ink-600); text-wrap: pretty; }
+  .case__copy .sticker { align-self: flex-start; margin-top: 18px; }
+  .case__sheet {
+    position: absolute; right: 72px; top: 64px; bottom: 56px; width: 440px;
+    padding: 40px 24px 24px; background: var(--paper-1); border: 1px solid var(--line-1);
+    border-radius: 8px; box-shadow: var(--shadow-lift);
+  }
+  .case__tape { position: absolute; top: 0; left: calc(50% - 22px); width: 44px; translate: 0 -50%; rotate: 92deg; mix-blend-mode: multiply; opacity: 0.9; }
+  .case__well {
+    height: 100%; border-radius: 8px; overflow: hidden; display: flex; align-items: flex-end; justify-content: center; gap: 16px;
+    padding: 34px 20px 0;
+    background: linear-gradient(118deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.3) 18%, rgba(255,255,255,0) 44%, rgba(255,255,255,0.14) 78%, rgba(255,255,255,0.3) 100%), #eef0f1;
+    box-shadow: inset 0 0 0 1px rgba(22, 20, 14, 0.1), inset 0 1px 3px rgba(22, 20, 14, 0.08);
+  }
+  .phone { position: relative; height: 100%; aspect-ratio: 9 / 15; }
+  .phone:not(:only-child) { max-width: calc(50% - 8px); }
+  .phone--old { height: 86%; }
+  .phone__screen { width: 100%; height: 100%; overflow: hidden; border: 1px solid var(--line-1); border-bottom: 0; border-radius: 22px 22px 0 0; background: #fff; box-shadow: var(--shadow-rest); }
+  .phone__screen img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+  .phone--old img { filter: grayscale(1) contrast(0.92); }
+  .phone__tag {
+    position: absolute; top: 0; left: 50%; z-index: 1; translate: -50% -50%; padding: 5px 14px;
+    border: 1px solid var(--line-1); border-radius: 999px; background: var(--paper-1); color: var(--ink-600);
+    font-size: 15px; font-weight: 500; letter-spacing: var(--track-label); text-transform: uppercase; white-space: nowrap;
+  }
+  .phone__tag--new { background: var(--amber-400); color: var(--ink-900); }
+</style>
+</head>
+<body>
+  <!-- Home: the hero's develop print, in colour, with its hi! sticker; the
+       name and the hero's own line (index.astro h1). -->
+  <section class="card" data-card="home" hidden>
+    <figure class="home__print" style="margin:0"><img src="../../src/assets/uttham-portrait.webp" alt="" /></figure>
+    <svg class="home__hi" viewBox="0 0 162 182" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M79.8821 8.2943C80.9133 8.19248 82.0087 8.21067 83.0474 8.19606C99.42 7.96546 116.605 13.594 129.442 23.9002C136.985 29.911 143.285 37.3334 147.99 45.753C150.581 50.2959 151.785 53.279 153.547 58.1583C155.741 64.2313 156.948 69.6592 157.443 76.1348C158.085 84.5195 157.237 92.8084 155.338 100.979C154.741 103.553 153.685 106.193 152.937 108.739C149.212 120.352 143.122 131.691 135.45 141.151C127.468 150.899 117.699 159.035 106.667 165.12C104.034 166.55 101.253 167.811 98.4935 168.972C97.287 169.48 96.0176 170.347 94.7646 170.845C90.7328 172.448 86.6426 173.571 82.5303 174.832C77.0357 176.517 71.9139 177.822 66.1661 178.42C64.4826 178.505 60.0559 179.624 58.9909 178.447C58.7592 176.431 65.0708 173.183 66.5687 171.791C67.2991 171.112 68.2874 170.019 69.0121 169.41C72.3814 166.578 74.7823 163.079 77.4512 159.621C78.1773 158.675 78.8968 157.176 79.5564 156.113C73.9568 156.421 65.4103 154.199 60.0001 152.699C59.1274 152.457 58.1078 151.881 57.2439 151.565C48.4742 148.354 40.5046 143.454 33.624 137.151C-1.88644 105.338 1.97028 47.7411 41.5231 21.0905C43.1586 19.9885 44.6432 18.6744 46.3989 17.8118C52.105 15.0081 57.4908 12.2778 63.6889 10.6963C67.8174 9.6698 72.0156 8.94833 76.2499 8.53774C77.482 8.41423 78.6475 8.41689 79.8821 8.2943Z" fill="#C8871F"/>
+      <path d="M81.4301 14.9427C94.3175 14.4649 107.069 17.7142 118.156 24.3009C127.526 29.8738 134.572 37.1508 140.433 46.2602C150.25 61.5162 153.175 79.7633 149.205 97.422C148.693 99.7026 147.857 102.118 147.179 104.374C144.919 112.139 141.669 119.582 137.509 126.517C124.714 147.755 103.082 162.767 79.1387 168.665C79.7652 167.649 80.6187 166.597 81.358 165.643C84.121 162.25 85.7492 158.431 88.0109 154.741C88.9528 153.203 89.7851 151.721 90.5589 150.088C70.3738 149.876 53.8585 146.501 38.405 132.503C-6.44102 91.8817 20.1838 17.1758 81.4301 14.9427Z" fill="#F3B44A"/>
+      <text x="79" y="108" text-anchor="middle">hi!</text>
+    </svg>
+    <div class="home__copy">
+      <h1 class="home__name">Uttham Udatthu</h1>
+      <p class="home__line">Design lead, systems thinker and builder.</p>
+      <span class="sticker">uttham.fyi</span>
+    </div>
+  </section>
+
+  <!-- Product cards: the page's title and dek (plp-case.ts), and the homepage
+       tile's from → to (studies.ts tile). -->
+  <section class="card" data-card="a-line-of-card-height" hidden>
+    <div class="case__copy">
+      <p class="eyebrow">Case study · Uttham Udatthu</p>
+      <h1 class="case__title">From a glance to a decision</h1>
+      <p class="case__dek">Rethinking Meesho’s product card for 250&nbsp;million people who browse by picture.</p>
+      <span class="sticker">uttham.fyi</span>
+    </div>
+    <div class="case__sheet">
+      <img class="case__tape" src="../../public/assets/stickers/washi.svg" alt="" />
+      <div class="case__well">
+        <figure class="phone phone--old" style="margin:0"><span class="phone__tag">Before</span><div class="phone__screen"><img src="../../src/assets/plp/before.png" alt="" /></div></figure>
+        <figure class="phone" style="margin:0"><span class="phone__tag phone__tag--new">After</span><div class="phone__screen"><img src="../../src/assets/plp/after.png" alt="" /></div></figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- Meesho Mall: the page's title and dek (mall-case.ts), and the tile's one
+       phone, the v3 landing page. -->
+  <section class="card" data-card="meesho-mall" hidden>
+    <div class="case__copy">
+      <p class="eyebrow">Case study · Uttham Udatthu</p>
+      <h1 class="case__title">From doubt to desire: building India’s new trust in online brands</h1>
+      <p class="case__dek">Rebuilding Meesho Mall so shoppers recognise brands by colour before they read a word.</p>
+      <span class="sticker">uttham.fyi</span>
+    </div>
+    <div class="case__sheet">
+      <img class="case__tape" src="../../public/assets/stickers/washi.svg" alt="" />
+      <div class="case__well">
+        <figure class="phone" style="margin:0"><div class="phone__screen"><img src="../../src/assets/mall-case/v3-landing-new.png" alt="" /></div></figure>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const want = new URLSearchParams(location.search).get('card') || 'home';
+    const card = document.querySelector(`[data-card="${want}"]`) || document.querySelector('[data-card="home"]');
+    card.hidden = false;
+  </script>
+</body>
+</html>

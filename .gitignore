@@ -4,6 +4,7 @@ node_modules/
 # astro / build
 dist/
 .astro/
+.wrangler/
 
 # local scratch and backups
 tmp/

@@ -12,6 +12,7 @@ import HeroMotion from '../components/HeroMotion.astro';
 import { studies, contact, type TilePhone } from '../data/studies';
 import { rich } from '../lib/rich';
 import CaseIndex from '../components/CaseIndex.astro';
+import { SITE, NAME, person } from '../lib/seo';
 import ResonaPreview from '../components/ResonaPreview.astro';
 import ProtoPreview from '../components/ProtoPreview.astro';
 const featuredStudies = studies.filter((s) => s.featured);
@@ -86,9 +87,21 @@ const principles = [
     tag: 'Elevate the craft and automate repetitive flows.',
   },
 ];
+
+// Search and link previews (CLAUDE.md, "Domain trust"): the title is the
+// hidden h1 below, the description the hero's own lead, word for word.
+const seoTitle = `${NAME} — Design lead, systems thinker and builder`;
+const seoDescription = 'I’m a design lead, systems thinker and builder. I run the signals at the busy intersections where user needs cross business goals.';
+const homeLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    { '@type': 'WebSite', '@id': `${SITE}/#website`, url: `${SITE}/`, name: NAME, inLanguage: 'en', publisher: { '@id': person['@id'] } },
+    { ...person, image: new URL(portrait.src, SITE).href, mainEntityOfPage: `${SITE}/` },
+  ],
+};
 ---
 
-<Base title="Uttham Udatthu — Design Lead">
+<Base title={seoTitle} description={seoDescription} jsonLd={homeLd}>
   <HeroMotion slot="head" />
   <a class="skip-link" href="#main">Skip to content</a>
   <Header />
@@ -182,7 +195,7 @@ const principles = [
                   href={`/work/${study.slug}`}
                   data-magnetic
                   data-astro-prefetch>
-                  <img class="tape" src="/assets/stickers/washi.svg" alt="" aria-hidden="true" />
+                  <img class="tape" src="/assets/stickers/washi.svg" alt="" width="128" height="349" aria-hidden="true" />
                   <h3>{study.title}</h3>
                   <p class="tile__desc" set:html={rich(study.summary)} />
                   {study.tile && study.tile.phones.every((p) => tileScreens[p.image]) ? (
@@ -250,7 +263,7 @@ const principles = [
             tools.map((tool, index) => (
               <div class="tile-reveal rv" style={`--tile-layer: ${tools.length - index};`}>
                 <article class="tile tile--ai" data-magnetic>
-                  <img class="tape" src="/assets/stickers/washi.svg" alt="" aria-hidden="true" />
+                  <img class="tape" src="/assets/stickers/washi.svg" alt="" width="128" height="349" aria-hidden="true" />
                   <div class="tool__copy">
                     <h3><a class="tool__link" href={`/ai/${tool.slug}`} data-astro-prefetch>{tool.name}</a></h3>
                     <p class="tile__desc" set:html={rich(tool.what)} />
@@ -276,7 +289,7 @@ const principles = [
       <!-- How I lead: one white paper sheet, the same stock as the case tiles,
            so the three principles read as one object pinned above the glass -->
       <div class="prin prin--sheet rv">
-        <h3 class="prin__title">How I lead</h3>
+        <h2 class="prin__title">How I lead</h2>
         {
           principles.map((p, index) => (
             <div class:list={['prin__item', 'rv', { 'rv-d1': index === 1, 'rv-d2': index === 2 }]}>
