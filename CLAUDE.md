@@ -587,7 +587,14 @@ while the phone cannot be seen, and with reduced motion never play. **A clip
 never opens on its still**, which is its ending: its screen arrives only once
 the clip's first frame is ready, the screen before (and its title) staying up
 until then — a frame or two when preloaded, 1.5s at most on a slow line, past
-which the still stands in and the clip plays on its next arrival. The mini
+which the still stands in and the clip plays on its next arrival. **The Mall
+landing's clip (v3-landing-active) is composed, not exported** (Uttham,
+2026-10-03: "you can animate and scroll them"; "just a small peek, not full
+animation"): `scripts/mall-landing-clip.mjs` builds it from his
+`v3-landing-new.png` and his Figma layers, re-runnable once the layers listed
+in its header are exported into `.clip-work/` — the logo wall loops, **the two
+card rows only peek 40 pt and spring back, never carousel**, and it opens and
+closes on the export. The mini
 player takes the same proportions, and its full-size dialog shows the screen
 whole: a page in a 1 : 2 window that scrolls (by wheel and trackpad too: the
 dialog is outside the smooth scroll, `data-lenis-prevent`, and the page behind
