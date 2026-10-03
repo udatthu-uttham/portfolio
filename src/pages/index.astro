@@ -9,7 +9,7 @@ import HiSticker from '../components/HiSticker.astro';
 // The hero's GSAP chunk, into Base's head slot: this is the only page with a
 // hero or with magnetic tiles, so it is the only page that loads GSAP.
 import HeroMotion from '../components/HeroMotion.astro';
-import { studies, contact } from '../data/studies';
+import { studies, contact, type TilePhone } from '../data/studies';
 import { rich } from '../lib/rich';
 import CaseIndex from '../components/CaseIndex.astro';
 import ResonaPreview from '../components/ResonaPreview.astro';
@@ -25,11 +25,40 @@ const coverFiles = import.meta.glob<ImageMetadata>('../assets/{mall,cards}/*.{jp
 const covers: Record<string, ImageMetadata> = Object.fromEntries(
   Object.entries(coverFiles).map(([path, img]) => [path.split('/').pop()!.replace(/\.(jpg|png)$/, ''), img])
 );
-// The tiles' phones show the case pages' own screens, keyed <folder>/<state>.
-const tileFiles = import.meta.glob<ImageMetadata>('../assets/{plp,mall-case}/*.{png,jpg,jpeg,webp}', { eager: true, import: 'default' });
+// The tiles' phones show the case pages' own screens, keyed <folder>/<state>
+// (mall/ too, so the deck's own exports can stand as a "from"; coverFiles
+// already imports them, so the build does no extra work).
+const tileFiles = import.meta.glob<ImageMetadata>('../assets/{plp,mall,mall-case}/*.{png,jpg,jpeg,webp}', { eager: true, import: 'default' });
 const tileScreens: Record<string, ImageMetadata> = Object.fromEntries(
   Object.entries(tileFiles).map(([path, img]) => [path.split('/').slice(-2).join('/').replace(/\.(png|jpe?g|webp)$/, ''), img])
 );
+// The loupe strip: one paper strip across a from → to pair, magnifying the same
+// region of both screens (Uttham, 2026-10-03: "from what to what"). It renders
+// only when a tile has exactly two phones and both carry a loupe window.
+const hasLoupe = (phones: TilePhone[]) => phones.length === 2 && phones.every((p) => p.loupe);
+// Each crop is a CSS window over the export itself: the image is scaled so the
+// window's width fills the crop, then shifted by the window's offset, all as
+// fractions of the source so the numbers stay in the export's own pixels.
+const crop = (p: TilePhone) => {
+  const img = tileScreens[p.image];
+  const [x, y, w, h] = p.loupe!;
+  return {
+    img,
+    style: `--fx: ${x / img.width}; --fy: ${y / img.height}; --fw: ${w / img.width}; aspect-ratio: ${w} / ${h};`,
+    // never ask a small export (the 720px v2 deck frame) for a bigger copy
+    widths: [480, 960].filter((n) => n <= img.width),
+    // the crop is at most ~160px wide; the whole image is that over its fraction
+    sizes: `${Math.ceil((160 * img.width) / w)}px`,
+  };
+};
+if (import.meta.env.DEV) {
+  for (const s of studies) {
+    const phones = s.tile?.phones;
+    if (!phones || !hasLoupe(phones)) continue;
+    const [a, b] = phones.map((p) => p.loupe![2] / p.loupe![3]);
+    if (Math.abs(a - b) / Math.max(a, b) > 0.02) console.warn(`[tile loupe] ${s.slug}: the two windows differ in aspect ratio (${a.toFixed(2)} vs ${b.toFixed(2)}); the crops will not match.`);
+  }
+}
 
 // The replicate button hands over the guide's prompt verbatim, so the card and
 // the guide page can never drift apart.
@@ -157,13 +186,28 @@ const principles = [
                   <h3>{study.title}</h3>
                   <p class="tile__desc" set:html={rich(study.summary)} />
                   {study.tile && study.tile.phones.every((p) => tileScreens[p.image]) ? (
-                    <div class="tile__media glass tile__media--phones">
+                    <div class="tile__media glass tile__media--phones" aria-hidden="true">
                       {study.tile.phones.map((p) => (
-                        <figure class="tile__phone">
+                        <figure class:list={['tile__phone', { 'tile__phone--old': p.tone === 'old' }]}>
                           {p.label && <figcaption class:list={['tile__tag', { 'tile__tag--new': p.tone === 'new' }]}>{p.label}</figcaption>}
                           <div class="tile__screen"><Image src={tileScreens[p.image]} alt="" widths={[240, 480]} sizes="240px" /></div>
                         </figure>
                       ))}
+                      {hasLoupe(study.tile.phones) && (
+                        <span class="tile__loupe">
+                          {study.tile.phones.map((p, i) => {
+                            const c = crop(p);
+                            return (
+                              <Fragment>
+                                {i === 1 && <span class="tile__loupe-arr">→</span>}
+                                <span class:list={['tile__crop', { 'tile__crop--old': p.tone === 'old' }]} style={c.style}>
+                                  <Image src={c.img} alt="" widths={c.widths} sizes={c.sizes} />
+                                </span>
+                              </Fragment>
+                            );
+                          })}
+                        </span>
+                      )}
                     </div>
                   ) : (
                   <div class={`tile__media glass ${study.deck ? 'tile__media--deck' : ''}`}>
@@ -819,11 +863,70 @@ const principles = [
   .tile__deck img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
   /* THE TILE'S PHONES: the case page's own screens, standing flush on the
      well's bottom edge like the AI cards' phones — one, or two side by side for
-     a before → after (Uttham, 2026-10-03). Each is sized off the well's height;
+     a from → to (Uttham, 2026-10-03: "from what to what, it should look like 2
+     phones showing both the variations"). Each is sized off the well's height;
      the two share the width with a within-card gap. The tag sits on a phone's
-     top edge, half over the glass; the after's is on the amber note stock, so
-     the change reads at a glance. */
-  .tile__media--phones { align-items: end; gap: var(--space-4); padding: var(--space-6) var(--space-5) 0; }
+     top edge, half over the glass; the "to" tag is on the amber note stock.
+     The "from" stands shorter and in grey, the "to" full height in colour, and
+     one paper loupe strip across both magnifies the same region of each screen,
+     so the change itself reads at tile size ("these images have strong hook and
+     content"). All of it is static: the tile keeps its magnetic tilt, border and
+     arrow nudge and nothing in the well moves; the strip rides the tilt with the
+     sheet. The strip overlays the well, so the sheet gains no row. */
+  .tile__media--phones {
+    --tile-from-h: 86%;                         /* the "from" phone's height in the well */
+    --tile-mute: grayscale(1) contrast(0.92);   /* the "from" screen, static */
+    --tile-loupe-w: 360px;                      /* the strip's widest */
+    align-items: end;
+    gap: var(--space-4);
+    padding: var(--space-6) var(--space-5) 0;
+  }
+  /* A card ON the glass, never across it: at least --space-5 of glass at its
+     sides and bottom at every width, capped at --tile-loupe-w on wide wells. */
+  .tile__loupe {
+    position: absolute;
+    left: 50%;
+    bottom: var(--space-5);
+    translate: -50% 0;
+    z-index: 2;
+    width: min(100% - 2 * var(--space-5), var(--tile-loupe-w));
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2);
+    background: var(--paper-1);
+    border: 1px solid var(--line-1);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-stuck);
+    /* undo the well's label type */
+    text-transform: none;
+    letter-spacing: normal;
+  }
+  /* Each crop is a window over the export: the box takes the window's aspect
+     ratio, the image is scaled so the window's width fills it and shifted by
+     the window's offset. translate's percentages are of the image's own box, so
+     they are exactly the source fractions. */
+  .tile__crop {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    border-radius: var(--radius-inset);
+    box-shadow: 0 0 0 1px var(--line-0);
+    background: var(--paper-1);
+  }
+  .tile__crop img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: block;
+    max-width: none;
+    width: calc(100% / var(--fw));
+    height: auto;
+    translate: calc(var(--fx) * -100%) calc(var(--fy) * -100%);
+  }
+  /* ink, and its own class, so the sheet's hover arrow nudge never moves it */
+  .tile__loupe-arr { color: var(--ink-600); font-size: var(--text-body); font-weight: 500; line-height: 1; }
   .tile__phone {
     position: relative;
     height: 100%;
@@ -835,6 +938,8 @@ const principles = [
     margin: 0;
   }
   .tile__phone:not(:only-child) { max-width: calc(50% - var(--space-2)); }
+  /* after .tile__phone, which sets the full height this overrides */
+  .tile__phone--old { height: var(--tile-from-h); }
   .tile__screen {
     width: 100%;
     height: 100%;
@@ -846,6 +951,8 @@ const principles = [
     box-shadow: var(--shadow-rest);
   }
   .tile__screen img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+  .tile__phone--old .tile__screen img,
+  .tile__crop--old img { filter: var(--tile-mute); }
   .tile__tag {
     position: absolute;
     top: 0;

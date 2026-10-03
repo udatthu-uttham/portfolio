@@ -186,6 +186,8 @@ White liquid glass keeps its diagonal sheen, single warm glow, 8px blur, saturat
 
 Every bolt requires **16px of clear space** around its footprint. The static content inset is `18 + 16 + 16 = 50px` from the frame's top and bottom. Case artboards own this padding; SVGs and placeholders fill the remaining interior without adding another padding layer. Hero and contact panels pad vertically by the bolt zone plus one small step (`--bolted-panel-padding`, 58px; reduced 2026-09-18 from a minimum of 82 because the glass read as mostly empty). The workboard reserves 64px for tape and sheets (`--bolted-board-padding`), 96px at the bottom on layouts with magnetic hover. These dimensions keep the current tallest card clear even at its maximum 4°/2.5° tilt. Recheck the projected bounds if card copy or hover amplitude changes. Side padding retains the group token so narrow screens keep their reading width.
 
+**Project tile from → to (2026-10-03).** Three component-tier tokens, set on `.tile__media--phones` in `src/pages/index.astro`: `--tile-from-h: 86%` (the "from" phone's height in the well; the "to" stands at 100%), `--tile-mute: grayscale(1) contrast(0.92)` (the "from" screen and its loupe crop, static — set it to `none` to drop the grey and let the size step and the amber "to" tag carry the change) and `--tile-loupe-w: 360px` (the loupe strip's widest). The strip itself is the paper card recipe from existing tokens: `--paper-1`, 1px `--line-1`, `--radius-sm`, `--shadow-stuck`, `--space-2` padding and gap, `--space-5` of glass at its sides and bottom; each crop is `--radius-inset` with a `--line-0` hairline; the arrow between them is `--ink-600` at `--text-body`.
+
 ## Color
 
 | Family | Values |

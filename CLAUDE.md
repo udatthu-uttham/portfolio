@@ -239,11 +239,31 @@ prototype is opened from the teaser page instead. The copy buttons are gone from
 the cards; the prompt is copied on the teaser page.
 
 How the two differ: **a case sheet stacks** — title, lead, the well, the action —
-and on a laptop its well takes the height the copy leaves, so the cover sits as a
-card on the pane; **a tool sheet sets its copy on the left and its phone on the
-right** wherever the sheet is at least 540px wide (the phone column is
-`clamp(220px, 40cqw, 280px)`), with the name, line and action **one block centred
-against the phone's glass well**, and stacks like a case sheet below that. The well holds **one phone standing flush on the bottom edge and
+and on a laptop its well takes the height the copy leaves; **a tool sheet sets its
+copy on the left and its phone on the right** wherever the sheet is at least 540px
+wide (the phone column is `clamp(220px, 40cqw, 280px)`), with the name, line and
+action **one block centred against the phone's glass well**, and stacks like a
+case sheet below that.
+
+**A case sheet's well shows the case's own screens as a from → to** (Uttham,
+2026-10-03: "highlight the old and new in the first, basically from what to what,
+it should look like 2 phones showing both the variations"; "create phone mocks to
+represent the images on home page … these images have strong hook and content").
+**The "from" phone stands shorter (86% of the well) and in grey; the "to" stands
+full height in colour, its tag on amber**; both flush on the bottom edge, sized
+off the well's height. **One paper loupe strip across both magnifies the same
+region of each screen**, so the change itself reads at tile size — on product
+cards, a line of name text becoming fact chips. The crops are CSS windows over
+his exports (`loupe` in `src/data/studies.ts`, `[x, y, w, h]` in the export's own
+pixels, both windows the same aspect ratio), never pre-cropped files, and they
+stop above the price rows. **It is all static**: nothing in the well moves on
+hover (the tile keeps its tilt, border and arrow nudge), the strip overlays the
+well so the sheet gains no row, and it renders only when a tile has exactly two
+phones that both carry a loupe. A case with one screen keeps one phone and no
+strip — Meesho Mall, until Uttham approves standing his v2 deck export beside the
+v3 landing (the pair is written out, commented, in `studies.ts`).
+
+A tool sheet's well holds **one phone standing flush on the bottom edge and
 nothing else** — no step list, no page list, no caption beside it — and the phone
 is as tall as the well, so it takes a handset's proportions rather than a fixed
 9/15. Keep the two sections within sight of each other in height: if a card is
