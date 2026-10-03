@@ -95,17 +95,22 @@
     border-radius: 8px; box-shadow: var(--shadow-lift);
   }
   .case__tape { position: absolute; top: 0; left: calc(50% - 22px); width: 44px; translate: 0 -50%; rotate: 92deg; mix-blend-mode: multiply; opacity: 0.9; }
+  /* Whole screens, never cropped (Uttham, 2026-10-03: "when I give big images I
+     dont want you to just paste them or crop them abruptly making its content
+     gone (this is for all images you are using)"): each phone takes its
+     export's own 1:2, stands on one line with a margin on every side, and a
+     pair is sized so both fit the well's width. */
   .case__well {
     height: 100%; border-radius: 8px; overflow: hidden; display: flex; align-items: flex-end; justify-content: center; gap: 16px;
-    padding: 34px 20px 0;
+    padding: 34px 20px 24px;
     background: linear-gradient(118deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.3) 18%, rgba(255,255,255,0) 44%, rgba(255,255,255,0.14) 78%, rgba(255,255,255,0.3) 100%), #eef0f1;
     box-shadow: inset 0 0 0 1px rgba(22, 20, 14, 0.1), inset 0 1px 3px rgba(22, 20, 14, 0.08);
   }
-  .phone { position: relative; height: 100%; aspect-ratio: 9 / 15; }
-  .phone:not(:only-child) { max-width: calc(50% - 8px); }
-  .phone--old { height: 86%; }
-  .phone__screen { width: 100%; height: 100%; overflow: hidden; border: 1px solid var(--line-1); border-bottom: 0; border-radius: 22px 22px 0 0; background: #fff; box-shadow: var(--shadow-rest); }
-  .phone__screen img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+  .phone { position: relative; height: 100%; aspect-ratio: 1 / 2; }
+  .phone:not(:only-child) { height: 340px; }
+  .phone--old:not(:only-child) { height: 292px; }
+  .phone__screen { width: 100%; height: 100%; overflow: hidden; border: 1px solid var(--line-1); border-radius: 18px; background: #fff; box-shadow: var(--shadow-rest); }
+  .phone__screen img { display: block; width: 100%; height: 100%; object-fit: contain; }
   .phone--old img { filter: grayscale(1) contrast(0.92); }
   .phone__tag {
     position: absolute; top: 0; left: 50%; z-index: 1; translate: -50% -50%; padding: 5px 14px;
