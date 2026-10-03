@@ -9,9 +9,11 @@
 // 1. The interview setup's four participants (demo-01 … demo-04) and their
 //    orders. Their order histories read like real research participants', so
 //    they are replaced wholesale by PARTICIPANTS below: invented orders of the
-//    same shape — every field the app reads, the same product kinds spread
-//    differently across the four, the same status mix, dates in the same
-//    weeks, round prices. Nothing of the old records is kept here.
+//    same shape — every field the app reads, the same status mix, dates in the
+//    same weeks, round prices, one repurchase each — dealt afresh, so no
+//    basket here shares more than one kind with any old one and no kind keeps
+//    its old status, date or repurchase role (see ORDERS). Nothing of the old
+//    records is kept here.
 // 2. Brand and seller names in catalogue titles, keyed in TITLES by a hash of
 //    the old title (so this file does not repeat them) → the same title
 //    without the name.
@@ -22,6 +24,10 @@
 //    "/proto/feed-ux/" basename), so My Orders opened at
 //    /proto/feed-ux/proto/feed-ux/orders and an order's detail link
 //    (/orders/<id>) matched no route and rendered blank.
+//
+// Left as it is: the setup screen's own copy, which still introduces the
+// participants as loaded "from the workbook" with "their real orders". It is
+// the prototype's UI copy, so rewording it is Uttham's call (2026-10-03).
 //
 // Only those strings change. The bundle gets a new content-hashed name
 // (scripts/proto-bundle.mjs), since /proto/feed-ux/assets/* is cached as
@@ -41,35 +47,42 @@ const key = (s) => createHash('sha256').update(s).digest('hex').slice(0, 16);
 // One order: [pid, title, picture, category, subcategory, orderedOn, status,
 // price, mrp, paid, repurchase's previous order date]. Pictures are the drawn
 // catalogue's (scripts/proto-catalog-art.mjs). A repurchase is a free-size
-// consumable, as in the build's own records.
+// item people buy again, as in the build's own records.
+//
+// Dealt so that no basket here shares more than one kind with any of the
+// build's four (2026-10-03 review: a first deal had moved whole baskets onto
+// other labels): each basket takes at most one kind from each of the old ones
+// and at least one kind none of them had. The repurchases are kinds that were never
+// repurchases, no kind keeps its old status or date, and the build's status
+// mix (9 Delivered, 5 Shipped, 2 Return, 2 RTO, 1 Ordered, 1 Cancelled) holds.
 const ORDERS = {
   'demo-01': [
-    ['812045531', "Women's Georgette Saree with Blouse Piece | Floral Print | Festive Wear", 'saree-03', 'Women Sarees', 'Sarees', '2026-08-14', 'Delivered', 450, 600, 480],
-    ['806617240', 'Insulated Lunch Bag | Leak Proof and Washable | For Office and School', 'lunchbag-01', 'Kids', 'Bags & Backpacks', '2026-08-09', 'Shipped', 180, 250, 200],
-    ['1027730415', "Women's Cotton Non-Padded Sports Bra | Daily Wear", 'sportsbra-01', 'Women Comfortwear', 'Sports Bra', '2026-08-11', 'Return', 120, 200, 150],
-    ['731904826', 'Sheer Net Door Curtains, 7 Feet | Pack of 2', 'curtain-01', 'Home Decor & Furnishings', 'Curtains', '2026-08-05', 'Delivered', 260, 350, 290],
-    ['768250193', '3-in-1 Fast Charging Cable | Type-C and Micro USB | 1.2 m', 'cable-01', 'Mobiles, Electronics Accessories & Small Appliances', 'Cables', '2026-08-16', 'Delivered', 150, 250, 170, '2026-07-12'],
+    ['742318650', "Men's Analog Watch with Metal Strap | Black Dial", 'watch-01', 'Watches', 'Analog Watches', '2026-08-09', 'Delivered', 350, 500, 370],
+    ['702964381', 'Cotton Diwan Set | 1 Single Bedsheet, 5 Cushion Covers and 2 Bolster Covers', 'diwan-01', 'Home Decor & Furnishings', 'Diwan Cover Sets', '2026-08-04', 'Delivered', 450, 600, 470],
+    ['689153027', "Women's Cotton Embroidered Readymade Blouse", 'blouse-01', 'Ethnic Wear', 'Blouses', '2026-08-11', 'Return', 180, 250, 200],
+    ['778420516', 'Decorative LED Night Lamp | Warm Glow | Plug-In', 'incense-02', 'Home Decor & Furnishings', 'Night Lamps', '2026-08-07', 'Delivered', 120, 200, 140],
+    ['1024586137', 'Ultra Thin Sanitary Pads, XL | Pack of 30', 'pads-01', 'Health & Wellness', 'Menstrual/Sanitary pads', '2026-08-15', 'Shipped', 250, 320, 230, '2026-07-14'],
   ],
   'demo-02': [
-    ['694418207', 'Gold-Plated Jhumka Earrings for Women', 'earrings-01', 'Women Jewellery', 'Earrings & Studs', '2026-08-04', 'Delivered', 110, 180, 130],
-    ['752093614', "Men's Analog Watch with Metal Strap | Black Dial", 'watch-01', 'Watches', 'Analog Watches', '2026-08-12', 'RTO', 240, 400, 260],
-    ['683315902', "Women's Cotton Embroidered Readymade Blouse", 'blouse-01', 'Ethnic Wear', 'Blouses', '2026-08-07', 'Shipped', 160, 220, 180],
-    ['720648351', 'Decorative LED Night Lamp | Warm Glow | Plug-In', 'incense-02', 'Home Decor & Furnishings', 'Night Lamps', '2026-08-10', 'Delivered', 130, 200, 150],
-    ['745129086', 'Ultra Thin Sanitary Pads, XL | Pack of 30', 'pads-01', 'Health & Wellness', 'Menstrual/Sanitary pads', '2026-08-15', 'Delivered', 290, 350, 270, '2026-07-16'],
+    ['1036219844', "Women's Rayon Printed Straight Kurti | Daily Wear", 'kurti-04', 'Women Kurtis, Kurta Sets & Suits', 'Kurtis & Kurtas', '2026-08-10', 'Delivered', 280, 380, 300],
+    ['715802963', 'Sheer Net Door Curtains, 7 Feet | Pack of 2', 'curtain-01', 'Home Decor & Furnishings', 'Curtains', '2026-08-14', 'Shipped', 300, 400, 320],
+    ['761594028', 'Creamy Matte Bullet Lipstick | Long Lasting | Red', 'lipstick-01', 'Beauty & Personal Care', 'Lipsticks', '2026-08-05', 'Delivered', 140, 200, 120, '2026-06-28'],
+    ['730268417', 'Insulated Lunch Bag | Leak Proof and Washable | For Office and School', 'lunchbag-01', 'Kids', 'Bags & Backpacks', '2026-08-12', 'Shipped', 200, 280, 220],
+    ['667418295', '3-in-1 Fast Charging Cable | Type-C and Micro USB | 1.2 m', 'cable-01', 'Mobiles, Electronics Accessories & Small Appliances', 'Cables', '2026-08-08', 'RTO', 130, 220, 150],
   ],
   'demo-03': [
-    ['1031862247', "Women's Rayon Printed Straight Kurti | Daily Wear", 'kurti-04', 'Women Kurtis, Kurta Sets & Suits', 'Kurtis & Kurtas', '2026-08-17', 'Ordered', 250, 330, 270],
-    ['709551438', 'Cotton Diwan Set | 1 Single Bedsheet, 5 Cushion Covers and 2 Bolster Covers', 'diwan-01', 'Home Decor & Furnishings', 'Diwan Cover Sets', '2026-08-08', 'Cancelled', 400, 520, 430],
-    ['688204715', 'Cotton Double Bedsheet with 2 Pillow Covers | Floral Print', 'bedsheet-03', 'Home Decor & Furnishings', 'Bedsheets', '2026-08-06', 'Delivered', 380, 500, 400],
-    ['739018562', 'Wooden Finish Wireless Speaker | Portable', 'speaker-01', 'Mobiles, Electronics Accessories & Small Appliances', 'Smart Speakers', '2026-08-03', 'Return', 300, 450, 320],
-    ['716437290', 'Hair Touch-Up Stick for Grey Roots | Black', 'hairstick-01', 'Beauty & Personal Care', 'Hair Color', '2026-08-13', 'Shipped', 190, 260, 210, '2026-06-20'],
+    ['1012843576', "Men's Cotton Straight Kurta | Festive Wear", 'kurta-01', 'Men Fashion', 'Kurtas', '2026-08-03', 'Delivered', 320, 450, 340],
+    ['694207731', "Women's Georgette Saree with Blouse Piece | Floral Print | Festive Wear", 'saree-03', 'Women Sarees', 'Sarees', '2026-08-12', 'Cancelled', 500, 700, 520],
+    ['784531960', 'Airtight Kitchen Storage Containers, 1 Litre | Set of 3', 'kitchen-03', 'Home & Kitchen', 'Kitchen Storage', '2026-08-16', 'Ordered', 240, 350, 220, '2026-07-20'],
+    ['723906148', 'Wooden Finish Wireless Speaker | Portable', 'speaker-01', 'Mobiles, Electronics Accessories & Small Appliances', 'Smart Speakers', '2026-08-09', 'Delivered', 400, 600, 420],
+    ['748115372', "Women's Cotton Non-Padded Sports Bra | Daily Wear", 'sportsbra-01', 'Women Comfortwear', 'Sports Bra', '2026-08-07', 'Return', 150, 250, 170],
   ],
   'demo-04': [
-    ['664902173', "Men's Cotton Straight Kurta | Festive Wear", 'kurta-01', 'Men Fashion', 'Kurtas', '2026-08-05', 'Shipped', 220, 300, 240],
-    ['1019347708', "Women's Seamless Sports Bra | Pack of 3", 'sportsbra-02', 'Women Comfortwear', 'Sports Bra', '2026-08-14', 'RTO', 230, 300, 250],
-    ['697760324', 'Oxidised Silver Drop Earrings | Pack of 2', 'earrings-02', 'Women Jewellery', 'Earrings & Studs', '2026-08-09', 'Shipped', 90, 150, 110],
-    ['725386019', 'Brass Finish Incense Stick Holder | Pooja Decor', 'incense-01', 'Home Decor & Furnishings', 'Incense Holders', '2026-08-11', 'Delivered', 120, 180, 140],
-    ['758841630', 'Baby Diaper Pants, Medium (7–12 kg) | Pack of 60', 'diaper-02', 'Beauty & Personal Care', 'Baby Diapers', '2026-08-07', 'Delivered', 600, 800, 560, '2026-07-09'],
+    ['1029371604', 'Cotton Double Bedsheet with 2 Pillow Covers | Floral Print', 'bedsheet-03', 'Home Decor & Furnishings', 'Bedsheets', '2026-08-11', 'Delivered', 420, 550, 440],
+    ['708642319', 'Gold-Plated Jhumka Earrings for Women', 'earrings-01', 'Women Jewellery', 'Earrings & Studs', '2026-08-13', 'Shipped', 100, 160, 90, '2026-07-03'],
+    ['676835142', 'Stacking Rings Toy for Toddlers | 7 Rings', 'toy-09', 'Kids', 'Learning Toys', '2026-08-05', 'RTO', 160, 250, 180],
+    ['752690483', 'Baby Diaper Pants, Medium (7–12 kg) | Pack of 60', 'diaper-02', 'Beauty & Personal Care', 'Baby Diapers', '2026-08-15', 'Shipped', 650, 850, 670],
+    ['741286059', 'Stainless Steel Tiffin Box | 3 Tier', 'kitchen-11', 'Home & Kitchen', 'Lunch Boxes', '2026-08-06', 'Delivered', 350, 500, 370],
   ],
 };
 

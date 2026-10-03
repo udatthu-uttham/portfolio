@@ -129,10 +129,14 @@ drawn picture of the same kind** under `public/proto/feed-ux/catalog/` (shirts,
 co-ords, sarees, cookers … from `scripts/proto-catalog-art.mjs`: no photo,
 person, logo or lettering), and **draws the home strip's round category tiles**
 (`categories/*.png`, which were photographs of models and products) under their
-own names. **A card shows its own kind**: a product its category files as
-something else — toys and under-bed storage under bedsheets, dresses, tops and
-trousers under co-ords, track pants and kurtas under shirts — is pictured by its
-title (`BY_TITLE`), per record, not per URL. The map in
+own names. **A card's picture follows the chip on the card**, which names the
+record's category, not its title: a dress filed under co-ords shows a co-ord
+set, because a feed card shows "Co-ord Set" and no title (2026-10-03 review:
+pictures by title put ten trousers and tops under "Co-ord Set" chips on the
+home feed's first screen). **Toys and under-bed storage are the exception**:
+their category pictures were bottles, cookers and bedsheets, so they are
+pictured by their titles (`BY_TITLE`), per record, not per URL, as the brief
+asked; storage keeps its "Bedsheet" chip. The map in
 `scripts/proto-synthetic-images.json` is keyed by a hash of each URL, so the
 same product always gets the same picture and the current files do not list
 the addresses; **the bundle committed before 2026-10-03 still holds them in git
@@ -140,12 +144,16 @@ history**.
 
 **The prototype's records are synthetic too** (2026-10-03 review).
 `scripts/proto-synthetic-data.mjs` **replaces the interview setup's four
-participants' orders with invented ones** of the same shape (the same product
-kinds spread differently, the same status mix, dates in the same weeks, round
-prices), **takes brand and seller names out of catalogue titles**, drops each
-record's link to the marketplace listing it was copied from (nothing rendered
-it), and fixes the My Orders routes, which carried the base path twice and left
-an order's detail page blank. Ids, prices and ratings are still the build's own.
+participants' orders with invented ones** of the same shape (the same status
+mix, dates in the same weeks, round prices, one repurchase each), **dealt so
+that no basket shares more than one kind with any old one** and no kind keeps
+its old status, date or repurchase role, **takes brand and seller names out of
+catalogue titles**, drops each record's link to the marketplace listing it was
+copied from (nothing rendered it), and fixes the My Orders routes, which carried
+the base path twice and left an order's detail page blank. The catalogue's ids,
+prices and ratings are still the build's own. The setup screen still introduces
+the participants as "their real orders" loaded "from the workbook": that is the
+prototype's UI copy, left for Uttham to reword.
 **After any rebuild of the prototype from its source, run both scripts, images
 then data** (`--check` on each says whether anything is left); each renames the
 bundle, because `/proto/feed-ux/assets/*` is cached as immutable, and a second

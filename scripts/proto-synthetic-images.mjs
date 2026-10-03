@@ -30,13 +30,16 @@
 //    given a picture of that kind. Products are dealt round the kind's pool in
 //    feed order, so neighbours in a feed differ; a product's gallery takes the
 //    pictures after its hero. A URL it cannot classify stops the run.
-// 3. A catalogue record whose title names another kind than its category —
-//    toys and under-bed storage filed under bedsheets, dresses under co-ord
-//    sets, track pants under shirts — is pictured by its title instead
-//    (BY_TITLE), per record rather than per URL: the build gave such records
-//    photos that other records also use, so the URL alone cannot say which
-//    kind a card is. This runs on remote and local addresses alike, so it also
-//    corrects a bundle that is already self-hosted.
+// 3. Toys and under-bed storage are pictured by their titles instead
+//    (BY_TITLE), per record rather than per URL: the build files them under
+//    other kinds (storage in the bedsheets feed) and gave them photos that
+//    other records also use (toys borrowed bottles and cookers), so the URL
+//    alone cannot say which kind a card is. This runs on remote and local
+//    addresses alike, so it also corrects a bundle that is already
+//    self-hosted. Every other record keeps its category's kind, even where
+//    its title names another (a dress in the co-ord feed): a feed card shows
+//    its category as a chip and not its title, so a picture that followed the
+//    title would contradict the chip on the card (2026-10-03 review).
 // 4. The rewritten bundle gets a new content-hashed name (scripts/proto-bundle.mjs).
 //    Only image strings change; every other byte of the bundle is left as it was.
 //
@@ -140,17 +143,19 @@ const SUBCATEGORY = {
   Cables: 'cable', Blouses: 'blouse', Curtains: 'curtain', Sarees: 'saree', 'Menstrual/Sanitary pads': 'pads',
   // The invented orders' spellings (scripts/proto-synthetic-data.mjs); the
   // incense pool's second picture is the lamp.
-  'Baby Diapers': 'diaper', 'Night Lamps': 'incense',
+  'Baby Diapers': 'diaper', 'Night Lamps': 'incense', Lipsticks: 'lipstick', 'Kitchen Storage': 'kitchen',
+  'Lunch Boxes': 'kitchen', 'Learning Toys': 'toy',
 };
 const BASKET = { mens: 'menswear', kitchen_utility: 'kitchen' };
 const FALLBACK = { Product: 'catalog/placeholder-product.svg', Color: 'catalog/placeholder-color.svg', Shade: 'catalog/placeholder-shade.svg' };
 
 // A catalogue record pictured by its title, where its category would picture
 // it as something else (2026-10-03 review: toys showed bottles and cookers,
-// under-bed storage showed bottles, the western feed's dresses showed co-ord
-// sets). [category it applies in (null: any), title test, kind, the pool's
-// pictures to choose from (default: all)]. First match wins; a match on the
-// record's own category kind changes nothing.
+// under-bed storage showed bottles and bedsheets). [category it applies in,
+// title test, kind, the pool's pictures to choose from (default: all)]. First
+// match wins; a match on the record's own category kind changes nothing. Only
+// these two categories: elsewhere the card's chip names the category, so the
+// picture follows it (see 3. above).
 const BY_TITLE = [
   ['kids_toys', /top & bottom/i, 'coord'],
   ['kids_toys', /bank/i, 'toy', [0, 1]],
@@ -171,19 +176,6 @@ const BY_TITLE = [
   ['home_bedsheets', /clothes cover/i, 'storage', [6]],
   ['home_bedsheets', /basket|bins?\b|boxes/i, 'storage', [7]],
   ['home_bedsheets', /storage/i, 'storage', [0, 1, 2, 3, 4]],
-  [null, /\bmen\b.*kurta sets?\b/i, 'kurta', [3, 4, 5]],
-  [null, /\bmen\b.*kurtas?\b/i, 'kurta', [0, 1, 2]],
-  [null, /saree/i, 'saree'],
-  [null, /kurta|kurti|dupatta/i, 'kurti'],
-  [null, /top & bottom|nightsuit/i, 'coord'],
-  [null, /dress/i, 'dress'],
-  [null, /tunic|top ?wear|\btops\b/i, 'top'],
-  [null, /track ?pants/i, 'trousers', [5, 6, 7]],
-  [null, /jeans/i, 'trousers', [3, 4]],
-  [null, /trouser|pants|palazzo/i, 'trousers', [0, 1, 2]],
-  [null, /brief/i, 'briefs'],
-  [null, /blouse/i, 'blouse'],
-  [null, /shirt/i, 'shirt'],
 ];
 
 function kindOf(rec) {
@@ -199,7 +191,7 @@ function kindOf(rec) {
 // The title's kind and pictures, when they differ from the category's.
 function titleKind(rec) {
   if (!rec.categoryId || !rec.title) return null;
-  const hit = BY_TITLE.find(([cat, re]) => (cat === null || cat === rec.categoryId) && re.test(rec.title));
+  const hit = BY_TITLE.find(([cat, re]) => cat === rec.categoryId && re.test(rec.title));
   if (!hit || hit[2] === CATEGORY[rec.categoryId]) return null;
   return { kind: hit[2], pick: hit[3] ?? [...Array(POOLS[hit[2]].size).keys()] };
 }

@@ -238,11 +238,9 @@ function kurti(i) {
   return doc(bgOf(i), fab.def + clip('kc', KURTI), b);
 }
 
-const KURTA = 'M216 96 Q256 112 296 96 L334 106 Q352 112 358 132 L392 330 L356 340 L338 214 L340 460 L172 460 L174 214 L156 340 L120 330 L154 132 Q160 112 178 106 Z';
-
 function mensKurta(i) {
   const base = [C.cream, C.sky, C.maroon][i % 3];
-  const d = KURTA;
+  const d = 'M216 96 Q256 112 296 96 L334 106 Q352 112 358 132 L392 330 L356 340 L338 214 L340 460 L172 460 L174 214 L156 340 L120 330 L154 132 Q160 112 178 106 Z';
   const fab = fabric('f', 'pinstripe', base, dk(base, 0.08), 0.8);
   let b = drop(d);
   b += piece(d, fab.fill, base, fold('M174 214 Q190 250 184 290') + fold('M338 214 Q322 250 328 290') + fold('M174 404 L174 460', 0.3, 2) + fold('M338 404 L338 460', 0.3, 2) + fold('M124 316 L160 326', 0.15, 2) + fold('M388 316 L352 326', 0.15, 2));
@@ -792,101 +790,12 @@ function cable(i) {
   return doc(bgOf(i, 7), '', b);
 }
 
-// ---------------------------------------------------------------- kinds the feeds file under another category
+// ---------------------------------------------------------------- toys and storage
 //
-// Added 2026-10-03, when a review found cards whose picture was not their own
-// kind: the "western" feed's dresses, tops and trousers showed co-ord sets, the
-// shirts feed's track pants and kurtas showed shirts, toys showed bottles and
-// cookers, and under-bed storage showed bottles and bedsheets. The bundle files
-// those products under a neighbouring category, so they are now drawn as what
-// their titles say they are.
-
-const DRESSES = [
-  // Short sleeves, A-line to the knee.
-  { d: 'M214 92 Q256 118 298 92 L338 104 L374 160 L342 178 L322 152 L318 214 L322 234 L374 446 Q256 470 138 446 L190 234 L194 214 L190 152 L170 178 L138 160 L174 104 Z', waist: 214 },
-  // Strappy fit-and-flare.
-  { d: 'M204 126 Q230 150 256 150 Q282 150 308 126 L320 134 Q318 188 306 218 L386 448 Q256 476 126 448 L206 218 Q194 188 192 134 Z', waist: 206, straps: true },
-  // Long sleeves, to the ankle.
-  { d: 'M220 84 Q256 108 292 84 L330 94 Q346 100 352 116 L392 300 L360 310 L328 176 L322 222 L364 470 Q256 490 148 470 L190 222 L184 176 L152 310 L120 300 L160 116 Q166 100 182 94 Z', waist: 216 },
-];
-
-function dress(i) {
-  const cols = [C.coral, C.navy, C.mint, C.black, C.lilac, C.mustard, C.wine, C.sky];
-  const prints = ['floral', 'solid', 'dots', 'leaf', 'solid', 'check', 'floral', 'stripe'];
-  const base = cols[(i * 5) % cols.length];
-  const acc = accentFor(base, i + 1);
-  const fab = fabric('f', prints[i % prints.length], base, acc, 1);
-  const { d, waist, straps } = DRESSES[i % DRESSES.length];
-  let b = '';
-  if (straps) b += `<path d="M214 132 L222 74 M298 132 L290 74" stroke="${dk(base, 0.1)}" stroke-width="8" stroke-linecap="round"/>`;
-  b += drop(d);
-  b += piece(d, fab.fill, base,
-    `<g clip-path="url(#dc)"><rect x="100" y="${waist}" width="312" height="16" fill="${dk(base, 0.2)}" opacity=".9"/></g>` +
-      fold(`M230 ${waist + 34} Q216 360 194 448`, 0.08) + fold(`M282 ${waist + 34} Q296 360 318 448`, 0.08) + fold(`M256 ${waist + 40} L256 456`, 0.05));
-  b += `<path d="M214 92 Q256 118 298 92 Q256 104 214 92 Z" fill="${dk(base, 0.35)}"/>`;
-  return doc(bgOf(i, 3), fab.def + clip('dc', d), b);
-}
-
-// A top or tunic on its own: the co-ord tops, without their bottoms.
-function top(i) {
-  const cols = [C.white, C.blush, C.teal, C.mustard, C.lavender, C.black, C.peach, C.emerald];
-  const prints = ['solid', 'floral', 'stripe', 'solid', 'dots', 'leaf', 'check', 'solid'];
-  const base = cols[(i * 3) % cols.length];
-  const fab = fabric('f', prints[i % prints.length], base, accentFor(base, i + 2), 1);
-  const d = COORD_TOPS[i % COORD_TOPS.length];
-  let b = drop(d) + piece(d, fab.fill, base, fold('M190 150 Q200 180 196 214', 0.08) + fold('M322 150 Q312 180 316 214', 0.08));
-  b += `<path d="M214 78 Q256 100 298 78 Q256 90 214 78 Z" fill="${dk(base, 0.35)}"/>`;
-  return doc(bgOf(i, 4), fab.def, b);
-}
-
-const TROUSERS = 'M196 104 L316 104 L320 132 L338 430 Q340 446 324 446 L282 446 Q268 446 266 432 L256 222 L246 432 Q244 446 230 446 L188 446 Q172 446 174 430 L192 132 Z';
-const PALAZZO = 'M198 104 L314 104 L318 132 L380 444 Q332 458 284 446 L256 226 L228 446 Q180 458 132 444 L194 132 Z';
-
-// Women's trousers (0–1), palazzos (2), jeans (3–4) and men's track pants (5–7).
-function trousers(i) {
-  if (i >= 5) return trackPants(i, [C.charcoal, C.navy, C.black][i - 5]);
-  const denim = i === 3 || i === 4;
-  const base = [C.beige, C.black, C.maroon, C.denim, lt(C.denim, 0.32)][i];
-  const d = i === 2 ? PALAZZO : TROUSERS;
-  const fab = i === 2 ? fabric('f', 'floral', base, C.cream, 0.9) : denim ? fabric('f', 'pinstripe', base, lt(base, 0.18), 0.5) : { def: '', fill: base };
-  const stitch = denim ? '#D8A535' : dk(base, 0.3);
-  let deco = `<g clip-path="url(#tr)"><rect x="120" y="104" width="280" height="28" fill="${dk(base, 0.14)}"/></g>`;
-  deco += fold('M256 132 L256 222', 0.16, 2) + fold('M214 250 Q222 330 214 420', 0.07) + fold('M298 250 Q290 330 298 420', 0.07);
-  deco += `<path d="M198 142 Q224 150 230 132 M314 142 Q288 150 282 132" fill="none" stroke="${stitch}" stroke-width="2.5" ${denim ? 'stroke-dasharray="5 4"' : ''}/>`;
-  if (denim) deco += `<path d="M262 134 L262 196 Q258 210 244 208" fill="none" stroke="${stitch}" stroke-width="2.5" stroke-dasharray="5 4"/><circle cx="200" cy="146" r="3" fill="url(#brass)"/><circle cx="312" cy="146" r="3" fill="url(#brass)"/>`;
-  let b = drop(d) + piece(d, fab.fill, base, deco);
-  for (const x of [212, 300]) b += `<rect x="${x - 4}" y="100" width="8" height="34" rx="3" fill="${dk(base, 0.2)}"/>`;
-  b += `<circle cx="256" cy="118" r="5" fill="${denim ? 'url(#brass)' : dk(base, 0.4)}"/>`;
-  return doc(bgOf(i, 5), fab.def + clip('tr', d), b);
-}
-
-function briefs(i) {
-  const d = 'M150 196 L362 196 L356 252 Q306 262 284 330 L228 330 Q206 262 156 252 Z';
-  const sets = [[C.black, C.navy, C.grey], [C.blush, C.lilac, C.mint], [C.white, C.sky, C.peach]][i % 3];
-  const one = (base, tr) =>
-    `<g transform="${tr}">${drop(d, 4, 8, 0.16)}` +
-    piece(d, base, base, `<g clip-path="url(#bf)"><rect x="140" y="196" width="232" height="22" fill="${dk(base, 0.2)}"/></g>` + fold('M160 248 Q210 262 230 322', 0.14, 2) + fold('M352 248 Q302 262 282 322', 0.14, 2)) +
-    '</g>';
-  const b = one(sets[0], 'translate(-64 -70) rotate(-8 256 260)') + one(sets[1], 'translate(64 -40) rotate(7 256 260)') + one(sets[2], 'translate(0 70)');
-  return doc(bgOf(i, 6), clip('bf', d), b);
-}
-
-// A men's kurta with its pyjama laid beside it.
-function kurtaSet(i) {
-  const [base, pyj] = [[C.navy, C.cream], [C.mustard, C.white], [C.emerald, C.cream]][i % 3];
-  const fab = fabric('f', 'pinstripe', base, dk(base, 0.08), 0.8);
-  const pyjama = 'M206 250 L306 250 L320 470 L274 470 L256 340 L238 470 L192 470 Z';
-  let b = `<g transform="translate(92 -6)">${drop(pyjama)}${piece(pyjama, pyj, pyj, `<rect x="204" y="250" width="104" height="18" fill="${dk(pyj, 0.12)}"/>` + fold('M256 268 L256 340', 0.14, 2))}</g>`;
-  b += `<g transform="translate(-60 0)">${drop(KURTA)}`;
-  b += piece(KURTA, fab.fill, base, fold('M174 214 Q190 250 184 290') + fold('M338 214 Q322 250 328 290') + fold('M174 404 L174 460', 0.3, 2) + fold('M338 404 L338 460', 0.3, 2));
-  b += piece('M216 96 Q256 112 296 96 L296 82 Q256 98 216 82 Z', fab.fill, base);
-  b += piece('M250 104 L262 104 L262 226 L250 226 Z', fab.fill, base, '', { outline: 0.3 });
-  for (const y of [126, 158, 190, 216]) b += `<circle cx="256" cy="${y}" r="4" fill="#C9A24A"/>`;
-  b += '</g>';
-  return doc(bgOf(i, 2), fab.def, b);
-}
-
-// ---------------------------------------------------------------- toys
+// Added 2026-10-03, when a review found toys showing bottles and cookers and
+// under-bed storage showing bottles and bedsheets: the bundle files them under
+// neighbouring categories (toys borrow other kinds' photos, storage sits in the
+// bedsheets feed), so they are drawn as what their titles say they are.
 
 // A rounded rectangle as a path, for piece().
 const rr = (x, y, w, h, r) =>
@@ -1225,23 +1134,20 @@ export const POOLS = {
   diaper: { size: 4, draw: diaper },
   menswear: { size: MENSWEAR.length, draw: (i) => MENSWEAR[i](i) },
   kitchen: { size: KITCHEN.length, draw: (i) => KITCHEN[i](i) },
-  // Products a feed files under a neighbouring category (see above). The
-  // rewriter picks within a pool by title: jeans from trousers 3–4, a kurta set
-  // from kurta 3–5, a money bank from toy 0 … (BY_TITLE in
+  // Toys and under-bed storage, which the bundle files under other categories
+  // (see above). The rewriter picks within a pool by title: a money bank from
+  // toy 0–1, a drawer unit from storage 5 … (BY_TITLE in
   // proto-synthetic-images.mjs).
-  dress: { size: 6, draw: dress },
-  top: { size: 6, draw: top },
-  trousers: { size: 8, draw: trousers },
-  briefs: { size: 3, draw: briefs },
-  kurta: { size: 6, draw: (i) => (i < 3 ? mensKurta(i) : kurtaSet(i)) },
   toy: { size: TOYS.length, draw: (i) => TOYS[i](i) },
   storage: { size: STORAGE.length, draw: (i) => STORAGE[i](i) },
-  // One-offs, drawn for the sandbox's interview participants' orders (which
-  // are invented since 2026-10-03; scripts/proto-synthetic-data.mjs).
+  // One-offs, drawn for the sandbox's interview participants' orders, which
+  // are invented since 2026-10-03 (scripts/proto-synthetic-data.mjs; it also
+  // borrows lipstick, kitchen and toy pictures, and leaves a few of these spare).
   watch: { size: 1, draw: (i) => watch(i + 1, 'bracelet', '#1F1F22') },
   speaker: { size: 1, draw: speaker },
   hairstick: { size: 1, draw: hairStick },
   lunchbag: { size: 1, draw: lunchBag },
+  kurta: { size: 1, draw: mensKurta },
   diwan: { size: 1, draw: diwanSet },
   incense: { size: 2, draw: (i) => (i === 0 ? incense(i) : lamp(i)) },
   sportsbra: { size: 2, draw: sportsBra },
