@@ -24,8 +24,14 @@ the phone:
 Full case study only: `cash` (The cash-price row). The other blocks reuse the
 names above. The scan-order screens (`scan-*`) left with that section.
 
-Export phone screens portrait (about 9 : 19.5), at 2× or more (≥ 720px wide),
-with dummy data only — no Figma links or file keys on the page.
+Export phone screens at 1 : 2 (1080 × 2160 is ideal), at 2× or more (≥ 720px
+wide), with dummy data only — no Figma links or file keys on the page. Any
+height works and nothing is ever cropped (Uttham, 2026-10-03): the phone takes
+a screen's own proportion (a 9 : 16 screen makes it a touch wider); a page
+capture taller than a handset (like `scroll.png`, 1080 × 2820) stands in a
+1 : 2 window and pans down it and back, or scrolls by hand with reduced
+motion; anything wider than a phone (width ÷ height above 0.62) is a reference
+board, shown whole on a widened card.
 
 On hand (2026-10-03, from Uttham): `before.png` (the old feed) and `after.png` (the new feed).
 They also stand side by side, tagged Before and After, in the homepage tile (`tile` in

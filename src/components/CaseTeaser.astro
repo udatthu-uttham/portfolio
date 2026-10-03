@@ -9,12 +9,13 @@
 //
 // Two kinds of preview. Screens: Uttham's Figma exports, picked per state from
 // src/assets/<screens.dir>/ (a state with no screen shows the nearest earlier
-// one; the dev server names the missing one). Live: a `preview` slot — a
-// running tool — which hears each state as a `case:state` event. With
-// `frame="phone"` the slot stands in the teaser's own phone (the screens' 9/19.5
-// frame, the mini player's tap-to-enlarge) and the tool just fills it; without
-// it the tool sizes its own frame.
-import { Image } from 'astro:assets';
+// one; the dev server names the missing one), never cropped: the phone takes
+// each screen's own proportion, a page taller than a phone pans, a still with
+// a clip plays it. Live: a `preview` slot — a running tool — which hears each
+// state as a `case:state` event. With `frame="phone"` the slot stands in the
+// teaser's own phone (a handset's 9/19.5, the mini player's tap-to-enlarge)
+// and the tool just fills it; without it the tool sizes its own frame.
+import { Image, getImage } from 'astro:assets';
 import { rich } from '../lib/rich';
 import { CASE_PASSWORD_SHA256 } from '../data/case-gate';
 import type { CaseTeaserData } from '../data/case-teaser';
@@ -45,20 +46,24 @@ const states = [
     ...(data.experiments ?? []).map((e) => e.state),
   ].filter((x): x is string => Boolean(x))),
 ];
-// state → the screen file that shows it, for the states that have one
-const stateToShot: Record<string, string> = {};
+// state → the screen files that show it, in the order they play, for the
+// states that have any. A state can name several (`screens.map`, e.g. the Mall
+// tab's onboarding modal, then its PiP): they play in turn.
+const stateFiles: Record<string, string[]> = {};
 if (data.screens && !live) {
+  const { dir, map } = data.screens;
   for (const state of states) {
-    const mapped = data.screens.map?.[state] ?? state;
-    const key = `${data.screens.dir}/${Array.isArray(mapped) ? mapped[0] : mapped}`;
-    if (library[key]) stateToShot[state] = key;
+    const mapped = map?.[state] ?? state;
+    const keys = (Array.isArray(mapped) ? mapped : [mapped]).map((name) => `${dir}/${name}`).filter((key) => library[key]);
+    if (keys.length) stateFiles[state] = keys;
   }
 }
-const shots = [...new Set(Object.values(stateToShot))];
-const altFor = (key: string) => {
-  const state = Object.keys(stateToShot).find((s) => stateToShot[s] === key)!;
-  return data.screens?.alts[state] ?? '';
-};
+const shots = [...new Set(Object.values(stateFiles).flat())];
+const nameOf = (key: string) => key.slice(key.indexOf('/') + 1);
+const firstState = (key: string) => Object.keys(stateFiles).find((s) => stateFiles[s].includes(key));
+// alts and titles are keyed by the file where it has its own (v3-nav-pip),
+// else by the first state that shows it
+const altFor = (key: string) => data.screens?.alts[nameOf(key)] ?? data.screens?.alts[firstState(key) ?? ''] ?? '';
 const dev = import.meta.env.DEV;
 const back = data.back ?? { href: '/#work', label: '← All projects' };
 const hasFull = Boolean(data.gate && data.experiments?.length);
@@ -99,18 +104,44 @@ if (data.gate && data.experiments?.length && !rail) {
   marks.push({ id: 'full-title', title: 'The full case study', full: true });
   data.experiments.forEach((e) => marks.push({ id: idFor(e.title), title: e.title, sub: true, full: true }));
 }
-// the title on the card over the phone: per screen, from the first state that
-// shows it, so a state that borrows an earlier screen borrows its title too
+// the title on the card over the phone: per screen, its file's own or the
+// first state's that shows it, so a state that borrows an earlier screen
+// borrows its title too
 const titles = data.screens?.titles;
+const titleFor = (key: string) => titles?.[nameOf(key)] ?? titles?.[firstState(key) ?? ''];
 // A screen is a phone screen (tall) or a reference board (landscape or square,
 // e.g. an annotated framework). A board is shown whole on a widened card,
 // never cropped into the phone (Uttham, 2026-10-03: "I will give reference
 // image (figure out a way on how to place this)").
-const kindFor = (key: string) => (library[key].width / library[key].height > 0.62 ? 'board' : 'phone');
-const titleFor = (key: string) => {
-  const state = Object.keys(stateToShot).find((s) => stateToShot[s] === key);
-  return state ? titles?.[state] : undefined;
-};
+const ratioOf = (key: string) => library[key].height / library[key].width;
+const kindFor = (key: string) => (1 / ratioOf(key) > 0.62 ? 'board' : 'phone');
+// NOTHING IS CROPPED (Uttham, 2026-10-03: "when I give big images I dont want
+// you to just paste them or crop them abruptly making its content gone (this
+// is for all images you are using)"). The phone's frame is the exports' own
+// 1 : 2 by default and takes each screen's proportion as it shows it, so a
+// screen always fills it exactly — the 9 : 16 order confirmation included. A
+// page capture taller than any handset (wider than 9 : 19.5, e.g. a whole
+// home feed) keeps the 1 : 2 frame and pans down it and back; with reduced
+// motion it scrolls by hand instead.
+const FRAME = 2; // the frame's height over its width when no screen sets it
+const HANDSET = 19.5 / 9; // the tallest screen the frame takes as it is
+const fitFor = (key: string) => (kindFor(key) === 'phone' && ratioOf(key) > HANDSET && !videoFor(key) ? 'pan' : 'fill');
+const frameFor = (key: string) => (kindFor(key) === 'board' || fitFor(key) === 'pan' ? FRAME : ratioOf(key)).toFixed(4);
+// how far a pan travels: what lies under the frame, as a share of the page's
+// own height (a translate in % is of the element's own height)
+const panFor = (key: string) => ((1 - FRAME / ratioOf(key)) * 100).toFixed(2);
+// Screens that move: Figma animations exported as MP4 (screens.videos, keyed by
+// file). The file's own still, optimised like every screen, is the clip's
+// poster — what reduced motion shows, and the frame the clip settles on once it
+// has played: for most clips the closing frame; for the order confirmation,
+// whose clip ends mid-transition, the confirmed screen. Being an ending, it is
+// never what a clip opens on, so the <video> carries no poster attribute: the
+// still sits under it instead.
+const videoFor = (key: string) => data.screens?.videos?.[nameOf(key)];
+const stills: Record<string, string> = {};
+for (const key of shots) {
+  if (videoFor(key)) stills[key] = (await getImage({ src: library[key], width: 720, format: 'webp' })).src;
+}
 ---
 
 <div class="ct">
@@ -242,7 +273,7 @@ const titleFor = (key: string) => {
       )}
     </div>
 
-    <aside class:list={['ct-panel', { 'ct-panel--live': live, 'ct-panel--titled': titles && !live, 'ct-panel--visit': data.visit }]} aria-label={data.panelLabel ?? 'Preview'} data-case-panel data-map={JSON.stringify(stateToShot)} data-titles={titles && !live ? JSON.stringify(titles) : undefined}>
+    <aside class:list={['ct-panel', { 'ct-panel--live': live, 'ct-panel--titled': titles && !live, 'ct-panel--visit': data.visit }]} aria-label={data.panelLabel ?? 'Preview'} data-case-panel data-map={JSON.stringify(stateFiles)} data-titles={titles && !live ? JSON.stringify(titles) : undefined}>
       <div class="ct-pane">
         {titles && !live && <p class="ct-pane__title" data-pane-title aria-live="polite"></p>}
         <div class="ct-stage">
@@ -257,19 +288,32 @@ const titleFor = (key: string) => {
             <div class="ct-live"><slot name="preview" /></div>
           ) : (
             <div class="ct-phone">
-              {shots.map((key, i) => (
-                <Image
-                  class="ct-screen"
-                  data-screen={key}
-                  data-title={titleFor(key)}
-                  data-kind={kindFor(key)}
-                  src={library[key]}
-                  alt={altFor(key)}
-                  widths={[360, 720]}
-                  sizes="360px"
-                  loading={i < 2 ? 'eager' : 'lazy'}
-                />
-              ))}
+              {shots.map((key, i) => {
+                // what every screen tells the script: its file, title, kind,
+                // the frame it asks for and how it fits that frame
+                const meta = { 'data-screen': key, 'data-title': titleFor(key), 'data-kind': kindFor(key), 'data-frame': frameFor(key), 'data-ratio': ratioOf(key).toFixed(4), 'data-fit': fitFor(key) };
+                const loading = i < 2 ? 'eager' : 'lazy';
+                return videoFor(key) ? (
+                  /* a clip over its still: the clip shows from its first
+                     frame, the still once it has played (or with reduced
+                     motion, instead of it) */
+                  <div class="ct-screen ct-screen--clip" {...meta} role="img" aria-label={altFor(key)}>
+                    <img class="ct-screen__still" src={stills[key]} alt="" width="720" height={Math.round(720 * ratioOf(key))} loading={loading} decoding="async" />
+                    <video class="ct-screen__clip" data-src={videoFor(key)} muted playsinline preload="none" disablepictureinpicture disableremoteplayback aria-hidden="true"></video>
+                  </div>
+                ) : fitFor(key) === 'pan' ? (
+                  /* a page taller than the phone, in a window it pans (or,
+                     with reduced motion, scrolls) */
+                  <div class="ct-screen ct-screen--pan" {...meta} data-pan={panFor(key)}>
+                    <div class="ct-screen__scroll" data-pan-scroll>
+                      <Image class="ct-screen__page" src={library[key]} alt={altFor(key)} widths={[360, 720]} sizes="360px" loading={loading} />
+                    </div>
+                    <span class="ct-hint" aria-hidden="true">Scroll <span>↓</span></span>
+                  </div>
+                ) : (
+                  <Image class="ct-screen" {...meta} src={library[key]} alt={altFor(key)} widths={[360, 720]} sizes="360px" loading={loading} />
+                );
+              })}
               {/* while a screen is still to come: its state's name on the dev
                   server, a quiet line in the build */}
               <p class="ct-phone__dev" data-dev-label data-dev={dev ? '1' : undefined}></p>
@@ -313,8 +357,14 @@ const titleFor = (key: string) => {
   <span class="ct-end" data-case-end aria-hidden="true"></span>
   <button class="ct-pip__restore cta cta--secondary" type="button" data-pip-restore hidden>Show preview</button>{livePhone && <div class="ct-pip__scrim" data-pip-scrim hidden></div>}
   {!live && (
-    <dialog class="ct-zoom" data-pip-zoom aria-label="Preview, enlarged">
-      <img class="ct-zoom__img" data-pip-zoom-img alt="" />
+    /* data-lenis-prevent: the smooth scroll would otherwise take the wheel
+       over the dialog and scroll the page behind it, so a page capture could
+       never be scrolled with a mouse or trackpad; the page behind is locked
+       while it is open (the style's html:has rule) */
+    <dialog class="ct-zoom" data-pip-zoom data-lenis-prevent aria-label="Preview, enlarged">
+      {/* the screen shown whole: a page capture scrolls inside, a clip plays */}
+      <div class="ct-zoom__media" data-pip-zoom-media></div>
+      <span class="ct-hint" aria-hidden="true">Scroll <span>↓</span></span>
       <button class="ct-zoom__close" type="button" aria-label="Close the enlarged preview" data-pip-zoom-close><span aria-hidden="true">×</span></button>
     </dialog>
   )}
@@ -332,29 +382,298 @@ const titleFor = (key: string) => {
     const byKey = new Map(
       [...panel.querySelectorAll<HTMLElement>('[data-screen]')].map((el) => [el.dataset.screen!, el])
     );
-    // state → its screen, resolved at build time (data-map); empty in live mode
-    const stateMap: Record<string, string> = JSON.parse(panel.dataset.map || '{}');
-    const shots = { get: (state: string) => byKey.get(stateMap[state]) };
+    // state → its screens, in the order they play, resolved at build time
+    // (data-map); empty in live mode
+    const stateMap: Record<string, string[]> = JSON.parse(panel.dataset.map || '{}');
+    const filesOf = (state: string) =>
+      (stateMap[state] ?? []).map((key) => byKey.get(key)).filter((el): el is HTMLElement => Boolean(el));
     const devLabel = panel.querySelector<HTMLElement>('[data-dev-label]');
     const paneTitle = panel.querySelector<HTMLElement>('[data-pane-title]');
     const stateTitles: Record<string, string> = JSON.parse(panel.dataset.titles ?? '{}');
     const triggers = [...root.querySelectorAll<HTMLElement>('[data-state]')];
-    // A state with no screen yet shows the nearest earlier state's screen, in
+    // A state with no screen yet shows the nearest earlier state's screens, in
     // reading order — the same whether the reader scrolled down to it, jumped
     // to it or reloaded on it.
-    const fallback = new Map<HTMLElement, HTMLElement | undefined>();
-    let lastShot: HTMLElement | undefined;
+    const lender = new Map<HTMLElement, string | undefined>();
+    let lastOwn: string | undefined;
     triggers.forEach((t) => {
-      lastShot = shots.get(t.dataset.state!) ?? lastShot;
-      fallback.set(t, lastShot);
+      if (filesOf(t.dataset.state!).length) lastOwn = t.dataset.state;
+      lender.set(t, lastOwn);
     });
-    let shown: HTMLElement | null = null;
-    let current: HTMLElement | null = null;
+    const screensFor = (trigger: HTMLElement) => {
+      const from = lender.get(trigger);
+      return from ? filesOf(from) : [];
+    };
+
+    const still = window.matchMedia('(prefers-reduced-motion: reduce)');
+    // the slideshow's beat, and how long a clip's last frame (or its still)
+    // stays before the slideshow moves on
+    const BEAT = 2600;
+    const HOLD = 1200;
+    // a clip that has not started this long after it was asked to (a slow or
+    // failed load) stops holding the slideshow up; its still stands in
+    const CLIP_WAIT = 6000;
+
+    let current: HTMLElement | null = null; // the row being shown
+    let seq: HTMLElement[] = []; // its screens, in the order they play
+    let seqAt = 0;
+    let seqOwn = false; // the screens are the row's own, not borrowed
+    let shown: HTMLElement | null = null; // the screen on the phone
+    let shownAt = 0;
+    let stepAt = 0; // when the slideshow last moved (a row, or a screen within one)
     // the block being read holds a board somewhere: the card stays wide for
     // all of it, so the slideshow never makes the card breathe in and out
     let wideBlock = false;
 
-    const show = (trigger: HTMLElement) => {
+    // ---- screens that move -------------------------------------------------
+    // A page capture pans: down, a hold, and back, looping while it is shown.
+    // A clip plays once from its first frame each time its screen arrives, then
+    // fades back to its still. Both wait while the phone cannot be seen (a
+    // hidden tab, the panel scrolled away, the mini player hidden) and neither
+    // runs with reduced motion: the page then scrolls by hand and the clip shows
+    // its still. A clip that arrives where it cannot be seen (a jump from the
+    // top lands it before the phone is reported in view) waits on its first
+    // frame and plays once the phone can be seen.
+    const pans = new Map<HTMLElement, { anim: Animation; total: number }>();
+    const ended = new Map<HTMLElement, number>();
+    const clipOf = (el: HTMLElement | null) => el?.querySelector<HTMLVideoElement>('video') ?? null;
+    let seen = true;
+    let pipOn = true;
+    const canCue = () => !still.matches && !document.hidden;
+    const canPlay = () => canCue() && seen && pipOn;
+    // a clip's file is fetched only once its row is near the reading, or its
+    // screen is asked to play — never with reduced motion
+    const load = (video: HTMLVideoElement) => {
+      if (video.getAttribute('src') || !video.dataset.src || still.matches) return;
+      video.preload = 'auto';
+      video.src = video.dataset.src;
+    };
+    // a clip that has played (or cannot) settles on its still
+    const settle = (el: HTMLElement) => {
+      ended.set(el, performance.now());
+      el.classList.add('is-ended');
+      clipOf(el)?.pause();
+      if (el === shown) plan();
+    };
+    // A CLIP NEVER OPENS ON ITS STILL. The still is its ending (the order
+    // confirmation's is the confirmed screen), so showing it first would give
+    // the ending away and then cut back to the start. A clip's screen arrives
+    // only once the clip's first frame is ready — the screen before it stays
+    // up until then, its title with it — and plays from there. Preloaded as its
+    // row nears the reading, that is a frame or two; on a cold jump it is the
+    // first chunk of the file. A clip whose first frame has not come within
+    // CUE_WAIT (a slow line) arrives as its still and does not play this time.
+    const CUE_WAIT = 1500;
+    let pending: HTMLElement | null = null; // the clip screen waiting for its first frame
+    let cueTimer = 0;
+    const atStart = (video: HTMLVideoElement) => video.readyState >= 2 && !video.seeking && video.currentTime < 0.1;
+    const cued = (el: HTMLElement, ok: boolean) => {
+      if (pending !== el) return;
+      pending = null;
+      window.clearTimeout(cueTimer);
+      ended.delete(el);
+      el.classList.remove('is-ended');
+      el.classList.toggle('is-cued', ok);
+      if (!ok) settle(el);
+      swap(el);
+      plan();
+    };
+    const cue = (el: HTMLElement, video: HTMLVideoElement) => {
+      pending = el;
+      load(video);
+      window.clearTimeout(cueTimer);
+      cueTimer = window.setTimeout(() => cued(el, false), CUE_WAIT);
+      if (atStart(video)) { cued(el, true); return; }
+      // played before: back to its first frame ('seeked' cues it)
+      if (video.readyState >= 2) {
+        try { video.currentTime = 0; } catch { /* not seekable: the wait runs out */ }
+        return;
+      }
+      // nothing loaded yet: playing it is what fetches it everywhere (iOS
+      // ignores preload), and muted it may; its first 'playing' cues it
+      video.play().catch((error: unknown) => { if ((error as DOMException)?.name === 'NotAllowedError') cued(el, false); });
+    };
+    const uncue = () => {
+      if (!pending) return;
+      const el = pending;
+      pending = null;
+      window.clearTimeout(cueTimer);
+      clipOf(el)?.pause();
+    };
+    // a browser that refuses to play it (a battery saver) leaves the still,
+    // and the slideshow treats it as one; an interrupted play just waits
+    const play = (el: HTMLElement, video: HTMLVideoElement) => {
+      video.play().catch((error: unknown) => { if ((error as DOMException)?.name === 'NotAllowedError') settle(el); });
+    };
+
+    const startPan = (el: HTMLElement) => {
+      const page = el.querySelector<HTMLElement>('.ct-screen__page');
+      const travel = Number(el.dataset.pan);
+      if (!page || !(travel > 0)) return;
+      pans.get(el)?.anim.cancel();
+      // slow enough to read: about a tenth of a second per percent of the page
+      // it travels (2–5s down), back up in half that, a hold at each end
+      const down = Math.min(5000, Math.max(2000, travel * 100));
+      const up = down / 2;
+      const total = HOLD + down + HOLD + up;
+      const ease = 'cubic-bezier(0.65, 0, 0.35, 1)';
+      const top = 'translateY(0)';
+      const bottom = `translateY(-${travel}%)`;
+      const anim = page.animate(
+        [
+          { transform: top, offset: 0 },
+          { transform: top, offset: HOLD / total, easing: ease },
+          { transform: bottom, offset: (HOLD + down) / total },
+          { transform: bottom, offset: (HOLD + down + HOLD) / total, easing: ease },
+          { transform: top, offset: 1 },
+        ],
+        { duration: total, iterations: Infinity }
+      );
+      if (!canPlay()) anim.pause();
+      pans.set(el, { anim, total });
+    };
+    // a clip arrives cued (its first frame up) and plays on from there, or,
+    // out of sight, holds that frame until sync() starts it; one whose first
+    // frame never came stays on its still
+    const startClip = (el: HTMLElement) => {
+      const video = clipOf(el);
+      if (!video) return;
+      if (!el.classList.contains('is-cued')) {
+        if (!ended.has(el)) settle(el);
+        return;
+      }
+      const go = canPlay();
+      if (!go) video.pause();
+      if (video.paused && video.currentTime >= 0.1) {
+        try { video.currentTime = 0; } catch { /* it plays from where it is */ }
+      }
+      if (go) play(el, video);
+    };
+    // what a screen does as it arrives, and as it leaves (once its fade-out is
+    // over, unless it has come straight back)
+    const enter = (el: HTMLElement) => {
+      const scroller = el.querySelector<HTMLElement>('[data-pan-scroll]');
+      if (scroller) {
+        scroller.scrollTop = 0;
+        el.classList.remove('is-end');
+        // only the page on show can be scrolled to, by hand, beside the text
+        scroller.tabIndex = still.matches && wide.matches ? 0 : -1;
+      }
+      if (still.matches) return;
+      if (el.dataset.fit === 'pan') startPan(el);
+      startClip(el);
+    };
+    const leave = (el: HTMLElement) => {
+      const scroller = el.querySelector<HTMLElement>('[data-pan-scroll]');
+      if (scroller) scroller.tabIndex = -1;
+      window.setTimeout(() => {
+        if (el === shown || el === pending) return;
+        pans.get(el)?.anim.cancel();
+        pans.delete(el);
+        clipOf(el)?.pause();
+        el.classList.remove('is-cued', 'is-ended');
+      }, 700);
+    };
+    // the shown screen keeps moving only while the phone can be seen
+    const sync = () => {
+      if (!shown) return;
+      const go = canPlay();
+      const pan = pans.get(shown)?.anim;
+      if (pan) { if (go) pan.play(); else pan.pause(); }
+      const video = clipOf(shown);
+      if (video && shown.classList.contains('is-cued') && !ended.has(shown)) { if (go) play(shown, video); else video.pause(); }
+    };
+    byKey.forEach((el) => {
+      const video = clipOf(el);
+      if (video) {
+        // the first frame is ready: back from a seek, or loaded fresh
+        const ready = () => { if (pending === el && atStart(video)) cued(el, true); };
+        video.addEventListener('loadeddata', ready);
+        video.addEventListener('seeked', ready);
+        video.addEventListener('playing', () => {
+          // started to fetch it: it is at its first frame and running
+          if (pending === el) { cued(el, true); return; }
+          // a start that comes after its screen gave up on it, or left
+          if (el !== shown || ended.has(el)) { video.pause(); return; }
+          plan();
+        });
+        video.addEventListener('ended', () => settle(el));
+        video.addEventListener('error', () => { if (pending === el) cued(el, false); else settle(el); });
+      }
+      const scroller = el.querySelector<HTMLElement>('[data-pan-scroll]');
+      if (scroller) {
+        // the "Scroll" hint stays until the page's foot is in view
+        scroller.addEventListener('scroll', () => {
+          el.classList.toggle('is-end', scroller.scrollTop + scroller.clientHeight >= scroller.scrollHeight - 4);
+        }, { passive: true });
+      }
+    });
+
+    // How long the shown screen still needs before it may be replaced: a pan
+    // finishes its round trip, a clip plays and holds. A still image needs
+    // nothing beyond the beat.
+    const readyIn = (el: HTMLElement | null, now: number) => {
+      if (!el || still.matches) return 0;
+      const pan = pans.get(el);
+      if (pan) {
+        const t = Number(pan.anim.currentTime ?? 0);
+        const into = t % pan.total;
+        return t >= pan.total && into < HOLD ? 0 : pan.total - into;
+      }
+      const video = clipOf(el);
+      if (video) {
+        const end = ended.get(el);
+        if (end !== undefined) return Math.max(0, end + HOLD - now);
+        if (!video.paused && video.duration) return (video.duration - video.currentTime) * 1000 + HOLD;
+        // not playing yet: wait for it ('playing' plans again), never forever
+        return Math.max(0, CLIP_WAIT - (now - shownAt));
+      }
+      return 0;
+    };
+
+    // ---- what the phone shows ------------------------------------------------
+    // The card's title names the screen on the phone: a row's first screen is
+    // named by the row's own title, any later one by its file's (the Mall tab's
+    // PiP), and a borrowed screen keeps the title it came with.
+    const titleOf = (screen: HTMLElement | null) => {
+      const state = current?.dataset.state ?? '';
+      if (!screen) return stateTitles[state] ?? '';
+      if (seqOwn && seqAt === 0) return stateTitles[state] ?? screen.dataset.title ?? '';
+      return screen.dataset.title ?? stateTitles[state] ?? '';
+    };
+    // the card around a screen: its title, its width, its frame's proportion
+    const dress = (screen: HTMLElement | null) => {
+      const title = titleOf(screen);
+      // only a change is written, so the live title never repeats itself
+      if (paneTitle && paneTitle.textContent !== title) paneTitle.textContent = title;
+      panel.classList.toggle('is-board', screen?.dataset.kind === 'board');
+      panel.classList.toggle('is-wide', screen?.dataset.kind === 'board' || wideBlock);
+      // the frame takes the screen's own proportion (CSS eases the change)
+      if (screen?.dataset.frame) panel.style.setProperty('--ct-ratio', screen.dataset.frame);
+      else panel.style.removeProperty('--ct-ratio');
+    };
+    const swap = (next: HTMLElement | null) => {
+      dress(next);
+      // the same screen stays: no new transition, its pan or clip runs on
+      if (next === shown) return;
+      const prev = shown;
+      prev?.classList.remove('is-on');
+      next?.classList.add('is-on');
+      shown = next;
+      shownAt = performance.now();
+      if (prev) leave(prev);
+      if (next) enter(next);
+    };
+    const render = () => {
+      const next = seq[seqAt] ?? null;
+      if (next && next === pending) return; // its first frame is on its way
+      uncue();
+      const video = next !== shown ? clipOf(next) : null;
+      if (next && video && canCue()) cue(next, video);
+      else swap(next);
+    };
+
+    const show = (trigger: HTMLElement, part?: number) => {
       if (trigger === current) return;
       current?.classList.remove('is-current');
       trigger.classList.add('is-current');
@@ -363,23 +682,19 @@ const titleFor = (key: string) => {
       panel.dataset.showing = state;
       // a live preview (a running tool in the slot) follows along by event
       document.dispatchEvent(new CustomEvent('case:state', { detail: { state } }));
-      const own = shots.get(state);
-      const next = own ?? fallback.get(trigger) ?? null;
+      const own = filesOf(state);
+      seq = own.length ? own : screensFor(trigger);
+      seqOwn = own.length > 0;
+      // a row's own screens start from the first (under reduced motion, from
+      // wherever the reading is in the row); borrowed ones carry on from the
+      // screen on show, so a row that borrows never replays its lender's
+      seqAt = seqOwn ? Math.min(part ?? 0, seq.length - 1) : Math.max(0, shown ? seq.indexOf(shown) : 0);
+      stepAt = performance.now();
       if (devLabel) {
-        if (devLabel.dataset.dev) devLabel.textContent = own ? '' : `No screen yet: ${state}`;
-        else devLabel.textContent = next ? '' : 'Screen coming soon';
+        if (devLabel.dataset.dev) devLabel.textContent = own.length ? '' : `No screen yet: ${state}`;
+        else devLabel.textContent = seq.length ? '' : 'Screen coming soon';
       }
-      // the card's title names what the phone shows: the screen's own title,
-      // or — before any screen exists — the state's
-      // (a state with its own screen names it itself, even when another state
-      // shares the file)
-      if (paneTitle) paneTitle.textContent = (own ? stateTitles[state] : undefined) ?? next?.dataset.title ?? stateTitles[state] ?? '';
-      panel.classList.toggle('is-board', next?.dataset.kind === 'board');
-      panel.classList.toggle('is-wide', next?.dataset.kind === 'board' || wideBlock);
-      if (next === shown) return;
-      shown?.classList.remove('is-on');
-      next?.classList.add('is-on');
-      shown = next;
+      render();
     };
 
     const wide = window.matchMedia('(min-width: 768px)');
@@ -398,7 +713,17 @@ const titleFor = (key: string) => {
         const d = Math.abs((r.top + r.bottom) / 2 - mid);
         if (d < bestD) { bestD = d; best = el; }
       }
-      if (best) choose(best);
+      if (best) choose(best, still.matches ? partOf(best, mid) : 0);
+    };
+    // With reduced motion nothing plays, so a row with several screens (the
+    // Mall tab: its modal, then its PiP) shares itself out among them by the
+    // reading: as the band passes from the row's top to its foot it shows
+    // each in turn, and no screen of the row is out of reach.
+    const partOf = (el: HTMLElement, mid: number) => {
+      const n = filesOf(el.dataset.state!).length;
+      if (n < 2) return 0;
+      const r = el.getBoundingClientRect();
+      return Math.min(n - 1, Math.max(0, Math.floor(((mid - r.top) / r.height) * n)));
     };
 
     // ---- each block plays as a slideshow -------------------------------------
@@ -411,9 +736,12 @@ const titleFor = (key: string) => {
     // highlight; scrolling within the block leaves it playing, scrolling to
     // another block or section hands over. Hovering or focusing a row holds
     // the slideshow on that row. Reduced motion, or a hidden tab: no
-    // autoplay — the reading picks the row, as before.
-    const BEAT = 2600;
-    const still = window.matchMedia('(prefers-reduced-motion: reduce)');
+    // autoplay — the reading picks the row, as before, and within a row with
+    // several screens it picks the screen too (partOf, above).
+    // A row with several screens plays them in turn, a beat each, and so does
+    // a lone state with several (it loops them). A beat never takes a screen
+    // away before it has finished: a pan completes its round trip, a clip
+    // plays and holds. Rows that share a screen hand it on as it is.
     const groupOf = (el: HTMLElement) => {
       const list = el.parentElement;
       if (!list?.classList.contains('ct-steps')) return null;
@@ -425,47 +753,124 @@ const titleFor = (key: string) => {
     let held = false;
     let beat = 0;
     const stopBeat = () => { window.clearTimeout(beat); beat = 0; };
-    const nextBeat = () => {
+    // the next step: the row's next screen, else the block's next row, else
+    // (a held row, a lone state) back to the first of several screens
+    const upcoming = (): { row?: HTMLElement; screen: HTMLElement | null } | null => {
+      if (seqAt < seq.length - 1) return { screen: seq[seqAt + 1] };
+      if (playing && !held) {
+        const row = playing.items[(at + 1) % playing.items.length];
+        return { row, screen: screensFor(row)[0] ?? null };
+      }
+      if (seq.length > 1) return { screen: seq[0] };
+      return null;
+    };
+    const plan = () => {
       stopBeat();
-      if (!playing || held || still.matches || document.hidden) return;
-      beat = window.setTimeout(() => {
-        if (!playing) return;
+      if (still.matches || document.hidden) return;
+      const next = upcoming();
+      if (!next) return;
+      const now = performance.now();
+      const wait = next.screen === shown ? 0 : readyIn(shown, now);
+      const due = Math.max(stepAt + BEAT, now + wait);
+      beat = window.setTimeout(step, Math.max(0, due - now));
+    };
+    const step = () => {
+      beat = 0;
+      // a clip that stalled or paused since the beat was set is still owed
+      // its time: plan again rather than cut it off
+      const next = upcoming();
+      if (next && next.screen !== shown && readyIn(shown, performance.now()) > 50) { plan(); return; }
+      if (seqAt < seq.length - 1) seqAt += 1;
+      else if (playing && !held) {
         at = (at + 1) % playing.items.length;
         show(playing.items[at]);
-        nextBeat();
-      }, BEAT);
+        plan();
+        return;
+      } else if (seq.length > 1) seqAt = 0;
+      else return;
+      stepAt = performance.now();
+      render();
+      plan();
     };
-    const choose = (trigger: HTMLElement) => {
+    const choose = (trigger: HTMLElement, part = 0) => {
       const group = groupOf(trigger);
-      if (playing && group && group.list === playing.list) return; // the block plays on
-      playing = group;
-      held = false;
+      const sameBlock = Boolean(playing && group && group.list === playing.list);
+      // the block plays on — unless nothing plays (reduced motion), when the
+      // reading picks each row and each of a row's screens, as it always did
+      if (sameBlock && !still.matches) return;
+      if (!sameBlock) {
+        playing = group;
+        held = false;
+        wideBlock = Boolean(group?.items.some((i) => screensFor(i).some((s) => s.dataset.kind === 'board')));
+      }
       at = group ? group.items.indexOf(trigger) : 0;
-      wideBlock = Boolean(group?.items.some((i) => (shots.get(i.dataset.state!) ?? fallback.get(i))?.dataset.kind === 'board'));
-      show(trigger);
-      nextBeat();
+      if (trigger === current) {
+        // the same row: the reading has moved on to its next screen (reduced
+        // motion), or the block is new and only the card's width can change
+        if (still.matches && seqOwn && part < seq.length) seqAt = part;
+        render();
+      } else show(trigger, part);
+      plan();
     };
     document.querySelectorAll<HTMLElement>('.ct-steps').forEach((list) => {
       const hold = (event: Event) => {
+        // reduced motion: nothing plays, so there is nothing to hold — the
+        // reading alone picks, and a pointer resting on the text while the
+        // wheel turns cannot pull the phone away from it
+        if (still.matches) return;
         const item = (event.target as HTMLElement).closest<HTMLElement>('.ct-step[data-state]');
         if (!item || !playing || playing.list !== list) return;
         held = true;
-        stopBeat();
         at = playing.items.indexOf(item);
         show(item);
+        plan();
       };
       const release = () => {
         if (!playing || playing.list !== list) return;
         held = false;
-        nextBeat();
+        stepAt = performance.now();
+        plan();
       };
       list.addEventListener('pointerover', hold);
       list.addEventListener('focusin', hold);
       list.addEventListener('pointerleave', release);
       list.addEventListener('focusout', release);
     });
-    document.addEventListener('visibilitychange', nextBeat);
-    still.addEventListener('change', nextBeat);
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) stepAt = performance.now();
+      sync();
+      plan();
+    });
+    // reduced motion switched on or off mid-read: the shown screen arrives
+    // again under the new rule
+    still.addEventListener('change', () => {
+      uncue();
+      const el = shown;
+      if (el) {
+        pans.get(el)?.anim.cancel();
+        pans.delete(el);
+        clipOf(el)?.pause();
+        ended.delete(el);
+        el.classList.remove('is-cued', 'is-ended');
+        enter(el);
+      }
+      render(); // a clip that was waiting for its first frame arrives under the new rule
+      stepAt = performance.now();
+      plan();
+    });
+    // the phone in view, and (on phones) the mini player out
+    const phoneEl = panel.querySelector<HTMLElement>('.ct-phone');
+    if (phoneEl) new IntersectionObserver(([e]) => { seen = e.isIntersecting; sync(); }).observe(phoneEl);
+    document.addEventListener('case:pip', (event) => { pipOn = (event as CustomEvent<{ on: boolean }>).detail.on; sync(); });
+    // clips are fetched as their rows come within a screen of the reading
+    const near = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (!e.isIntersecting) return;
+        const el = e.target as HTMLElement;
+        screensFor(el).forEach((s) => { const video = clipOf(s); if (video) load(video); });
+      });
+    }, { rootMargin: '100% 0px' });
+    triggers.forEach((t) => { if (screensFor(t).some((s) => clipOf(s))) near.observe(t); });
 
     // The reading band's centre, in viewport px: the middle of the screen at
     // every width now that phones float the preview instead of stacking it.
@@ -547,7 +952,7 @@ const titleFor = (key: string) => {
     const close = document.querySelector<HTMLButtonElement>('[data-pip-close]');
     const enlarge = document.querySelector<HTMLButtonElement>('[data-pip-enlarge]');
     const zoom = document.querySelector<HTMLDialogElement>('[data-pip-zoom]');
-    const zoomImg = document.querySelector<HTMLImageElement>('[data-pip-zoom-img]');
+    const zoomMedia = document.querySelector<HTMLElement>('[data-pip-zoom-media]');
     const zoomClose = document.querySelector<HTMLButtonElement>('[data-pip-zoom-close]');
     const scrim = document.querySelector<HTMLElement>('[data-pip-scrim]');
     if (panelEl && heroEl && endEl && restore && close) {
@@ -570,6 +975,8 @@ const titleFor = (key: string) => {
         if (!inPlay) grow(false);
         panelEl.classList.toggle('is-pip-on', inPlay && !dismissed);
         restore.hidden = !(inPlay && dismissed);
+        // the phone's moving screens wait while the mini player is away
+        document.dispatchEvent(new CustomEvent('case:pip', { detail: { on: !phone.matches || (inPlay && !dismissed) } }));
       };
       new IntersectionObserver(([e]) => { heroGone = !e.isIntersecting && e.boundingClientRect.bottom <= 0; sync(); }).observe(heroEl);
       new IntersectionObserver(([e]) => { atEnd = e.isIntersecting || e.boundingClientRect.top < 0; sync(); }).observe(endEl);
@@ -583,18 +990,67 @@ const titleFor = (key: string) => {
 
       // screens: the current screen opens in the dialog. A live tool has no
       // single screen to show there, so the teaser's live phone grows in place.
-      if (enlarge && zoom && zoomImg && zoomClose) {
+      // The dialog shows the screen whole, never cropped: as wide as its own
+      // proportion lets it stand in the screen's height; a page capture in a
+      // 1 : 2 window it scrolls by hand (the "Scroll" hint until its foot is
+      // in view); a clip plays once from its first frame and settles on its
+      // still, or with reduced motion shows the still. As on the phone, the
+      // clip opens on its first frame, never on its still (its ending): the
+      // card stays blank paper until that frame is in, CUE_WAIT at most, past
+      // which the still stands in and the clip does not play.
+      if (enlarge && zoom && zoomMedia && zoomClose) {
+        const stillMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+        const CUE_WAIT = 1500;
+        let cueTimer = 0;
+        zoomMedia.addEventListener('scroll', () => {
+          zoom.classList.toggle('is-end', zoomMedia.scrollTop + zoomMedia.clientHeight >= zoomMedia.scrollHeight - 4);
+        }, { passive: true });
         enlarge.addEventListener('click', () => {
-          const on = panelEl.querySelector<HTMLImageElement>('.ct-screen.is-on');
-          if (!on) return;
-          zoomImg.src = on.currentSrc || on.src;
-          zoomImg.alt = on.alt;
+          const on = panelEl.querySelector<HTMLElement>('.ct-screen.is-on');
+          const src = on instanceof HTMLImageElement ? on : on?.querySelector<HTMLImageElement>('img');
+          if (!on || !src) return;
+          const pan = on.dataset.fit === 'pan';
+          const pic = document.createElement('img');
+          pic.className = 'ct-zoom__img';
+          pic.src = src.currentSrc || src.src;
+          pic.alt = src.alt || on.getAttribute('aria-label') || '';
+          zoomMedia.replaceChildren(pic);
+          window.clearTimeout(cueTimer);
+          zoom.classList.remove('is-cueing');
+          const clip = on.querySelector<HTMLVideoElement>('video');
+          if (clip?.dataset.src && !stillMotion.matches) {
+            const video = document.createElement('video');
+            video.className = 'ct-zoom__clip';
+            video.muted = true;
+            video.playsInline = true;
+            video.src = clip.dataset.src;
+            video.setAttribute('aria-hidden', 'true');
+            zoom.classList.add('is-cueing');
+            const begun = () => zoom.classList.remove('is-cueing');
+            const fail = () => { video.pause(); video.classList.add('is-ended'); begun(); };
+            video.addEventListener('loadeddata', begun, { once: true });
+            video.addEventListener('playing', begun, { once: true });
+            video.addEventListener('ended', () => video.classList.add('is-ended'));
+            video.addEventListener('error', fail);
+            cueTimer = window.setTimeout(() => { if (video.readyState < 2) fail(); }, CUE_WAIT);
+            zoomMedia.append(video);
+            video.play().catch((error: unknown) => { if ((error as DOMException)?.name === 'NotAllowedError') fail(); });
+          }
+          zoom.style.setProperty('--zoom-r', (pan ? on.dataset.frame : on.dataset.ratio) ?? '2');
+          zoom.classList.toggle('is-pan', pan);
+          zoom.classList.remove('is-end');
+          zoomMedia.scrollTop = 0;
           zoom.showModal();
         });
         zoomClose.addEventListener('click', () => zoom.close());
         // a tap on the dimmed backdrop closes it too
         zoom.addEventListener('click', (event) => { if (event.target === zoom) zoom.close(); });
-        zoom.addEventListener('close', () => enlarge.focus());
+        zoom.addEventListener('close', () => {
+          window.clearTimeout(cueTimer);
+          zoom.classList.remove('is-cueing');
+          zoomMedia.replaceChildren();
+          enlarge.focus();
+        });
       } else if (enlarge && scrim) {
         const shrink = () => { grow(false); enlarge.focus(); };
         enlarge.addEventListener('click', () => { grow(true); close.focus(); });
@@ -1163,20 +1619,33 @@ const titleFor = (key: string) => {
     border-radius: var(--radius-sm);
     box-shadow: var(--shadow-rest);
   }
+  /* THE FRAME'S PROPORTION, height over width. The screens are exported at
+     1 : 2 and the frame starts there; the script sets each screen's own as it
+     shows it (a 9 : 16 clip makes the phone a touch wider), so a screen always
+     fills the frame exactly and nothing is cropped (Uttham, 2026-10-03: "when I
+     give big images I dont want you to just paste them or crop them
+     abruptly"). The proportion is the screen's, inside the frame's two 1px
+     edges (--ct-edge), so a 1 : 2 screen meets all four edges to the pixel. A
+     live tool keeps a handset's 9 : 19.5, measured as it always was. */
+  .ct-panel { --ct-ratio: 2; --ct-edge: 2px; }
+  .ct-panel--live { --ct-ratio: calc(19.5 / 9); --ct-edge: 0px; }
   /* sized off the stage's height AND width, so the phone always stands whole
      inside the pane, never cut and never stretched (from 768px the card hugs
      the phone instead; see the panel's --ct-phone-w) */
   .ct-stage { height: 100%; container-type: size; display: grid; place-items: center; }
   .ct-phone {
     position: relative;
-    width: min(100cqw, calc(100cqh * 9 / 19.5));
-    aspect-ratio: 9 / 19.5;
+    width: min(100cqw, calc(100cqh / var(--ct-ratio)));
+    aspect-ratio: 1 / var(--ct-ratio);
     overflow: hidden;
     border: 1px solid var(--line-1);
     border-radius: var(--radius-media);
     background: var(--paper-1);
     box-shadow: var(--shadow-rest);
   }
+  /* At rest the frame has the shown screen's own proportion, so cover fills it
+     edge to edge without losing a pixel; cover only trims anything for the
+     moment the frame is still easing from one proportion to the next. */
   .ct-screen {
     position: absolute;
     inset: 0;
@@ -1186,6 +1655,7 @@ const titleFor = (key: string) => {
     object-position: top;
     opacity: 0;
     scale: 1.02;
+    pointer-events: none;
     transition: opacity var(--dur-2) var(--ease-exit), scale var(--dur-2) var(--ease-exit);
   }
   /* a reference board: shown whole, centred on the card's paper */
@@ -1193,8 +1663,56 @@ const titleFor = (key: string) => {
   .ct-screen.is-on {
     opacity: 1;
     scale: 1;
+    pointer-events: auto;
     transition: opacity var(--dur-4) var(--ease-enter), scale var(--dur-4) var(--ease-enter);
   }
+  /* a page taller than the phone: the whole page at the phone's width, in a
+     window the script pans it through (down, a hold, back) */
+  .ct-screen--pan, .ct-screen--clip { overflow: hidden; }
+  .ct-screen__scroll { height: 100%; overflow: hidden; }
+  .ct-screen__page { display: block; width: 100%; height: auto; }
+  /* a clip over its still: shown once cued (its first frame is up, and the
+     screen arrives only then), faded back to the still once it has played.
+     While the clip shows, the still under it is hidden outright, so not even
+     a frame the clip is late to paint can show its ending through it. */
+  .ct-screen__still, .ct-screen__clip {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+  }
+  .ct-screen__clip { opacity: 0; }
+  .ct-screen--clip.is-cued .ct-screen__clip { opacity: 1; }
+  .ct-screen--clip.is-cued:not(.is-ended) .ct-screen__still { visibility: hidden; }
+  .ct-screen--clip.is-ended .ct-screen__clip { opacity: 0; transition: opacity var(--dur-3) var(--ease-standard); }
+  /* "Scroll ↓": a paper chip at the foot of a page that scrolls by hand (the
+     phone's page with reduced motion, the enlarged view on phones), until the
+     page's foot is in view */
+  .ct-hint {
+    position: absolute;
+    left: 50%;
+    bottom: var(--space-3);
+    translate: -50% 0;
+    display: none;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-1) var(--space-3);
+    background: var(--paper-1);
+    border: 1px solid var(--line-1);
+    border-radius: var(--radius-pill);
+    box-shadow: var(--shadow-rest);
+    color: var(--ink-900);
+    font-size: var(--text-eyebrow);
+    font-weight: 500;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    white-space: nowrap;
+    pointer-events: none;
+    transition: opacity var(--dur-2) var(--ease-standard);
+  }
+  .is-end > .ct-hint { opacity: 0; }
   /* which screen the phone is waiting for: the state on the dev server, "Screen
      coming soon" in the build while the phone has nothing to show */
   .ct-phone__dev {
@@ -1370,9 +1888,15 @@ const titleFor = (key: string) => {
       align-content: center;
       --ct-title-h: 0px;
       --ct-foot-h: 0px;
+      /* the phone stands as tall as the card allows and takes the width its
+         proportion gives it — unless the column is narrower (a tablet), when
+         it takes the column and its height follows. Both budgets take off the
+         card's own 1px border each side (--ct-card-edge): left in, the card
+         stood 2px taller than the sticky box at 1280×720, 1px over each end. */
+      --ct-card-edge: 2px;
       --ct-phone-w: min(
-        calc(100cqw - 2 * var(--card-padding)),
-        calc((var(--ct-pane-h) - 2 * var(--card-padding) - var(--ct-title-h) - var(--ct-foot-h)) * 9 / 19.5)
+        calc(100cqw - 2 * var(--card-padding) - var(--ct-card-edge)),
+        calc((var(--ct-pane-h) - 2 * var(--card-padding) - var(--ct-card-edge) - var(--ct-title-h) - var(--ct-foot-h) - var(--ct-edge)) / var(--ct-ratio) + var(--ct-edge))
       );
       container-type: inline-size;
     }
@@ -1383,8 +1907,10 @@ const titleFor = (key: string) => {
     .ct-panel--visit { --ct-foot-h: calc(var(--space-4) + var(--text-body) * var(--lh-heading) + var(--space-2)); }
     .ct-hero .ct-visit { display: none; }
     .ct-pane__visit { display: inline-flex; margin-top: var(--space-4); }
+    /* a new proportion eases in, the card with it (reduced motion: at once,
+       as every --dur-* is then zero) */
     .ct-pane {
-      width: calc(var(--ct-phone-w) + 2 * var(--card-padding) + 2px);
+      width: calc(var(--ct-phone-w) + 2 * var(--card-padding) + var(--ct-card-edge));
       max-width: 100%;
       height: auto;
       margin-inline: auto;
@@ -1393,9 +1919,9 @@ const titleFor = (key: string) => {
     .ct-stage { height: auto; container-type: normal; display: block; }
     .ct-phone {
       width: var(--ct-phone-w);
-      height: calc(var(--ct-phone-w) * 19.5 / 9);
+      height: calc((var(--ct-phone-w) - var(--ct-edge)) * var(--ct-ratio) + var(--ct-edge));
       aspect-ratio: auto;
-      transition: width var(--dur-3) var(--ease-standard), border-color var(--dur-3) var(--ease-standard), box-shadow var(--dur-3) var(--ease-standard);
+      transition: width var(--dur-3) var(--ease-standard), height var(--dur-3) var(--ease-standard), border-color var(--dur-3) var(--ease-standard), box-shadow var(--dur-3) var(--ease-standard);
     }
     /* BOARD MODE: the card takes its whole column and the frame drops away, so
        a landscape board is read at the largest size the column allows; the
@@ -1425,7 +1951,8 @@ const titleFor = (key: string) => {
       right: var(--margin-side);
       bottom: calc(var(--space-5) + env(safe-area-inset-bottom, 0px));
       z-index: var(--z-float);
-      width: 112px;
+      --ct-pip-w: 112px;
+      width: var(--ct-pip-w);
       opacity: 0;
       visibility: hidden;
       translate: 0 var(--space-4);
@@ -1448,6 +1975,13 @@ const titleFor = (key: string) => {
     .ct-pane__title { display: none; } /* the mini player is only the phone */
     .ct-stage { position: relative; height: auto; container-type: normal; display: block; }
     .ct-phone { width: 100%; border-radius: var(--radius-sm); box-shadow: var(--shadow-lift); }
+    /* the screens' mini phone takes each screen's proportion too, easing its
+       height (the live phone keeps its own, which grows in place) */
+    .ct-phone:not(.ct-phone--live) {
+      height: calc((var(--ct-pip-w) - var(--ct-edge)) * var(--ct-ratio) + var(--ct-edge));
+      aspect-ratio: auto;
+      transition: height var(--dur-3) var(--ease-standard);
+    }
     .ct-phone__dev { display: none; }
     .ct-pip__enlarge {
       display: block;
@@ -1515,10 +2049,15 @@ const titleFor = (key: string) => {
     }
   }
 
-  /* the enlarged screen: a phone-sized card on a dimmed page */
+  /* the enlarged screen: a phone-sized card on a dimmed page, as wide as the
+     screen's own proportion (--zoom-r, height over width) lets it stand whole
+     in the room the page leaves; a page capture takes a 1 : 2 window and
+     scrolls inside it */
   .ct-zoom {
-    width: min(calc(100vw - 2 * var(--margin-side)), 420px);
-    max-height: calc(100svh - 2 * var(--space-7));
+    --zoom-r: 2;
+    --zoom-h: calc(100svh - 2 * var(--space-7));
+    width: min(calc(100vw - 2 * var(--margin-side)), 420px, calc(var(--zoom-h) / var(--zoom-r)));
+    max-height: var(--zoom-h);
     padding: 0;
     border: 0;
     border-radius: var(--radius-media);
@@ -1527,14 +2066,32 @@ const titleFor = (key: string) => {
     overflow: visible;
   }
   .ct-zoom::backdrop { background: rgba(22, 20, 14, 0.55); }
-  .ct-zoom__img {
-    display: block;
-    width: 100%;
-    max-height: calc(100svh - 2 * var(--space-7));
-    object-fit: contain;
-    object-position: top;
+  .ct-zoom__media {
+    position: relative;
+    max-height: var(--zoom-h);
+    overflow: hidden;
     border-radius: var(--radius-media);
   }
+  .ct-zoom.is-pan .ct-zoom__media { aspect-ratio: 1 / 2; overflow-y: auto; overscroll-behavior: contain; }
+  .ct-zoom.is-pan .ct-hint { display: inline-flex; }
+  /* the script builds the dialog's picture and clip, so they carry no scope */
+  .ct-zoom__media :global(.ct-zoom__img) { display: block; width: 100%; height: auto; }
+  .ct-zoom__media :global(.ct-zoom__clip) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+  }
+  .ct-zoom__media :global(.ct-zoom__clip.is-ended) { opacity: 0; transition: opacity var(--dur-3) var(--ease-standard); }
+  /* until the clip's first frame is in, the still (its ending) stays hidden:
+     the card is blank paper for that moment, at the still's size */
+  .ct-zoom.is-cueing .ct-zoom__media :global(.ct-zoom__img) { visibility: hidden; }
+  /* the page behind the open dialog stays put: a wheel or swipe that runs
+     past the dialog's own scrolling, or lands on the dimmed page, moves
+     nothing (the dialog is outside the smooth scroll: data-lenis-prevent) */
+  :global(html):has(.ct-zoom[open]) { overflow: hidden; }
   .ct-zoom__close {
     position: absolute;
     top: calc(-1 * var(--space-3));
@@ -1561,5 +2118,13 @@ const titleFor = (key: string) => {
       .ct-hero > * { opacity: 0; transform: none; }
     }
     .ct-screen, .ct-screen.is-on { scale: none; }
+    /* no pan: the page scrolls by hand inside the phone, its hint at its foot
+       (the mini player opens it in the dialog instead, where it scrolls too) */
+    .ct-screen__scroll { overflow-y: auto; scrollbar-width: thin; }
+    .ct-screen--pan .ct-hint { display: inline-flex; }
+  }
+  @media (prefers-reduced-motion: reduce) and (max-width: 767.98px) {
+    .ct-screen__scroll { overflow-y: hidden; }
+    .ct-screen--pan .ct-hint { display: none; }
   }
 </style>
