@@ -44,8 +44,8 @@ export type CaseTeaserData = {
   experiments?: Experiment[]; // the full study behind the gate; none → the card has no button
   screens?: {
     dir: 'plp' | 'mall-case'; // a folder under src/assets/ holding this page's screens
-    map?: Record<string, string | string[]>; // state → file name, when it is not the state's own name; several play in turn, a beat (or a clip) each
-    videos?: Record<string, string>; // file name → an MP4 under public/ that plays once each time that screen arrives; the file's still is its poster and the frame it settles on
+    map?: Record<string, string | string[]>; // state → file name, when it is not the state's own name; several play in turn, a beat (or a clip) each, or with reduced motion as the reading passes through the row
+    videos?: Record<string, string>; // file name → an MP4 under public/ that plays once, from its first frame, each time that screen arrives; the file's still is its poster (reduced motion) and the frame it settles on, never the one it opens on
     alts: Record<string, string>; // state or file name → what its screen shows (a file's own wins, e.g. the second of a state's screens)
     titles?: Record<string, string>; // state or file name → the short title on the card, above the phone (a state's first screen takes the state's, a later one its file's)
   };

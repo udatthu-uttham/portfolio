@@ -18,10 +18,14 @@ back, or scrolls by hand with reduced motion.
 
 A state can show several files in turn (`screens.map`, e.g. `v3-nav`: the
 modal, then the PiP), each with its own title and alt where `screens.titles` /
-`screens.alts` name the file. A file with a clip in `screens.videos` plays it
-once, from its first frame, each time its screen arrives, then settles on the
-still in this folder; with reduced motion only the still shows. Its slideshow
-beat waits for the clip plus a 1.2 s hold.
+`screens.alts` name the file; with reduced motion the reading shows them in
+turn as it passes through the row. A file with a clip in `screens.videos` plays
+it once, from its first frame, each time its screen arrives, then settles on
+the still in this folder; with reduced motion only the still shows. The still
+is never what a clip opens on: the screen arrives once the clip's first frame
+is ready (the screen before stays up until then, 1.5 s at most; past that the
+still stands in and the clip waits for its next arrival). Its slideshow beat
+waits for the clip plus a 1.2 s hold.
 
 The list of states and their card titles is in `src/data/mall-case.ts`
 (`screens.titles`).
@@ -42,8 +46,8 @@ On hand (2026-10-03, from Uttham):
 
 The videos are Figma's own MP4 export of each frame (2 s, re-encoded to 720px
 H.264, ~250–550 KB, the same proportion as their still); the PNG beside each is
-its poster and the frame it settles on after playing: the closing frame, or for
-v3-ocp the "Order Confirmed!" frame (its clip ends mid-transition, so it fades
-back to the confirmation).
+its poster (what reduced motion shows) and the frame it settles on after
+playing: the closing frame, or for v3-ocp the "Order Confirmed!" frame (its clip
+ends mid-transition, so it fades back to the confirmation).
 The two 360×720 files are 1× exports and read soft on a 2× screen; a 3× export
 replaces them by name.

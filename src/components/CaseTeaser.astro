@@ -127,9 +127,11 @@ const frameFor = (key: string) => (kindFor(key) === 'board' || fitFor(key) === '
 const panFor = (key: string) => ((1 - FRAME / ratioOf(key)) * 100).toFixed(2);
 // Screens that move: Figma animations exported as MP4 (screens.videos, keyed by
 // file). The file's own still, optimised like every screen, is the clip's
-// poster and the frame it settles on once it has played — for most clips the
-// closing frame; for the order confirmation, whose clip ends mid-transition,
-// the confirmed screen.
+// poster — what reduced motion shows, and the frame the clip settles on once it
+// has played: for most clips the closing frame; for the order confirmation,
+// whose clip ends mid-transition, the confirmed screen. Being an ending, it is
+// never what a clip opens on, so the <video> carries no poster attribute: the
+// still sits under it instead.
 const videoFor = (key: string) => data.screens?.videos?.[nameOf(key)];
 const stills: Record<string, string> = {};
 for (const key of shots) {
@@ -287,11 +289,12 @@ for (const key of shots) {
                 const meta = { 'data-screen': key, 'data-title': titleFor(key), 'data-kind': kindFor(key), 'data-frame': frameFor(key), 'data-ratio': ratioOf(key).toFixed(4), 'data-fit': fitFor(key) };
                 const loading = i < 2 ? 'eager' : 'lazy';
                 return videoFor(key) ? (
-                  /* a clip over its still: the still shows until the clip
-                     plays, and again once it has */
+                  /* a clip over its still: the clip shows from its first
+                     frame, the still once it has played (or with reduced
+                     motion, instead of it) */
                   <div class="ct-screen ct-screen--clip" {...meta} role="img" aria-label={altFor(key)}>
                     <img class="ct-screen__still" src={stills[key]} alt="" width="720" height={Math.round(720 * ratioOf(key))} loading={loading} decoding="async" />
-                    <video class="ct-screen__clip" data-src={videoFor(key)} poster={stills[key]} muted playsinline preload="none" disablepictureinpicture disableremoteplayback aria-hidden="true"></video>
+                    <video class="ct-screen__clip" data-src={videoFor(key)} muted playsinline preload="none" disablepictureinpicture disableremoteplayback aria-hidden="true"></video>
                   </div>
                 ) : fitFor(key) === 'pan' ? (
                   /* a page taller than the phone, in a window it pans (or,
@@ -349,7 +352,11 @@ for (const key of shots) {
   <span class="ct-end" data-case-end aria-hidden="true"></span>
   <button class="ct-pip__restore cta cta--secondary" type="button" data-pip-restore hidden>Show preview</button>{livePhone && <div class="ct-pip__scrim" data-pip-scrim hidden></div>}
   {!live && (
-    <dialog class="ct-zoom" data-pip-zoom aria-label="Preview, enlarged">
+    /* data-lenis-prevent: the smooth scroll would otherwise take the wheel
+       over the dialog and scroll the page behind it, so a page capture could
+       never be scrolled with a mouse or trackpad; the page behind is locked
+       while it is open (the style's html:has rule) */
+    <dialog class="ct-zoom" data-pip-zoom data-lenis-prevent aria-label="Preview, enlarged">
       {/* the screen shown whole: a page capture scrolls inside, a clip plays */}
       <div class="ct-zoom__media" data-pip-zoom-media></div>
       <span class="ct-hint" aria-hidden="true">Scroll <span>↓</span></span>
@@ -419,13 +426,16 @@ for (const key of shots) {
     // fades back to its still. Both wait while the phone cannot be seen (a
     // hidden tab, the panel scrolled away, the mini player hidden) and neither
     // runs with reduced motion: the page then scrolls by hand and the clip shows
-    // its still.
+    // its still. A clip that arrives where it cannot be seen (a jump from the
+    // top lands it before the phone is reported in view) waits on its first
+    // frame and plays once the phone can be seen.
     const pans = new Map<HTMLElement, { anim: Animation; total: number }>();
     const ended = new Map<HTMLElement, number>();
     const clipOf = (el: HTMLElement | null) => el?.querySelector<HTMLVideoElement>('video') ?? null;
     let seen = true;
     let pipOn = true;
-    const canPlay = () => !still.matches && !document.hidden && seen && pipOn;
+    const canCue = () => !still.matches && !document.hidden;
+    const canPlay = () => canCue() && seen && pipOn;
     // a clip's file is fetched only once its row is near the reading, or its
     // screen is asked to play — never with reduced motion
     const load = (video: HTMLVideoElement) => {
@@ -437,7 +447,53 @@ for (const key of shots) {
     const settle = (el: HTMLElement) => {
       ended.set(el, performance.now());
       el.classList.add('is-ended');
+      clipOf(el)?.pause();
       if (el === shown) plan();
+    };
+    // A CLIP NEVER OPENS ON ITS STILL. The still is its ending (the order
+    // confirmation's is the confirmed screen), so showing it first would give
+    // the ending away and then cut back to the start. A clip's screen arrives
+    // only once the clip's first frame is ready — the screen before it stays
+    // up until then, its title with it — and plays from there. Preloaded as its
+    // row nears the reading, that is a frame or two; on a cold jump it is the
+    // first chunk of the file. A clip whose first frame has not come within
+    // CUE_WAIT (a slow line) arrives as its still and does not play this time.
+    const CUE_WAIT = 1500;
+    let pending: HTMLElement | null = null; // the clip screen waiting for its first frame
+    let cueTimer = 0;
+    const atStart = (video: HTMLVideoElement) => video.readyState >= 2 && !video.seeking && video.currentTime < 0.1;
+    const cued = (el: HTMLElement, ok: boolean) => {
+      if (pending !== el) return;
+      pending = null;
+      window.clearTimeout(cueTimer);
+      ended.delete(el);
+      el.classList.remove('is-ended');
+      el.classList.toggle('is-cued', ok);
+      if (!ok) settle(el);
+      swap(el);
+      plan();
+    };
+    const cue = (el: HTMLElement, video: HTMLVideoElement) => {
+      pending = el;
+      load(video);
+      window.clearTimeout(cueTimer);
+      cueTimer = window.setTimeout(() => cued(el, false), CUE_WAIT);
+      if (atStart(video)) { cued(el, true); return; }
+      // played before: back to its first frame ('seeked' cues it)
+      if (video.readyState >= 2) {
+        try { video.currentTime = 0; } catch { /* not seekable: the wait runs out */ }
+        return;
+      }
+      // nothing loaded yet: playing it is what fetches it everywhere (iOS
+      // ignores preload), and muted it may; its first 'playing' cues it
+      video.play().catch((error: unknown) => { if ((error as DOMException)?.name === 'NotAllowedError') cued(el, false); });
+    };
+    const uncue = () => {
+      if (!pending) return;
+      const el = pending;
+      pending = null;
+      window.clearTimeout(cueTimer);
+      clipOf(el)?.pause();
     };
     // a browser that refuses to play it (a battery saver) leaves the still,
     // and the slideshow treats it as one; an interrupted play just waits
@@ -471,15 +527,22 @@ for (const key of shots) {
       if (!canPlay()) anim.pause();
       pans.set(el, { anim, total });
     };
+    // a clip arrives cued (its first frame up) and plays on from there, or,
+    // out of sight, holds that frame until sync() starts it; one whose first
+    // frame never came stays on its still
     const startClip = (el: HTMLElement) => {
       const video = clipOf(el);
       if (!video) return;
-      load(video);
-      ended.delete(el);
-      el.classList.remove('is-playing', 'is-ended');
-      if (!video.getAttribute('src')) return;
-      try { video.currentTime = 0; } catch { /* not seekable yet: it starts at 0 anyway */ }
-      if (canPlay()) play(el, video);
+      if (!el.classList.contains('is-cued')) {
+        if (!ended.has(el)) settle(el);
+        return;
+      }
+      const go = canPlay();
+      if (!go) video.pause();
+      if (video.paused && video.currentTime >= 0.1) {
+        try { video.currentTime = 0; } catch { /* it plays from where it is */ }
+      }
+      if (go) play(el, video);
     };
     // what a screen does as it arrives, and as it leaves (once its fade-out is
     // over, unless it has come straight back)
@@ -499,11 +562,11 @@ for (const key of shots) {
       const scroller = el.querySelector<HTMLElement>('[data-pan-scroll]');
       if (scroller) scroller.tabIndex = -1;
       window.setTimeout(() => {
-        if (el === shown) return;
+        if (el === shown || el === pending) return;
         pans.get(el)?.anim.cancel();
         pans.delete(el);
         clipOf(el)?.pause();
-        el.classList.remove('is-playing', 'is-ended');
+        el.classList.remove('is-cued', 'is-ended');
       }, 700);
     };
     // the shown screen keeps moving only while the phone can be seen
@@ -513,21 +576,24 @@ for (const key of shots) {
       const pan = pans.get(shown)?.anim;
       if (pan) { if (go) pan.play(); else pan.pause(); }
       const video = clipOf(shown);
-      if (video?.getAttribute('src') && !ended.has(shown)) { if (go) play(shown, video); else video.pause(); }
+      if (video && shown.classList.contains('is-cued') && !ended.has(shown)) { if (go) play(shown, video); else video.pause(); }
     };
     byKey.forEach((el) => {
       const video = clipOf(el);
       if (video) {
-        // the clip covers its still from its first painted frame, so the
-        // still (its closing frame) never flashes in between
+        // the first frame is ready: back from a seek, or loaded fresh
+        const ready = () => { if (pending === el && atStart(video)) cued(el, true); };
+        video.addEventListener('loadeddata', ready);
+        video.addEventListener('seeked', ready);
         video.addEventListener('playing', () => {
-          const reveal = () => { if (!ended.has(el) && !video.paused) el.classList.add('is-playing'); };
-          if ('requestVideoFrameCallback' in video) video.requestVideoFrameCallback(reveal);
-          window.setTimeout(reveal, 120); // in case no frame callback comes
-          if (el === shown) plan();
+          // started to fetch it: it is at its first frame and running
+          if (pending === el) { cued(el, true); return; }
+          // a start that comes after its screen gave up on it, or left
+          if (el !== shown || ended.has(el)) { video.pause(); return; }
+          plan();
         });
         video.addEventListener('ended', () => settle(el));
-        video.addEventListener('error', () => settle(el));
+        video.addEventListener('error', () => { if (pending === el) cued(el, false); else settle(el); });
       }
       const scroller = el.querySelector<HTMLElement>('[data-pan-scroll]');
       if (scroller) {
@@ -570,14 +636,19 @@ for (const key of shots) {
       if (seqOwn && seqAt === 0) return stateTitles[state] ?? screen.dataset.title ?? '';
       return screen.dataset.title ?? stateTitles[state] ?? '';
     };
-    const render = () => {
-      const next = seq[seqAt] ?? null;
-      if (paneTitle) paneTitle.textContent = titleOf(next);
-      panel.classList.toggle('is-board', next?.dataset.kind === 'board');
-      panel.classList.toggle('is-wide', next?.dataset.kind === 'board' || wideBlock);
+    // the card around a screen: its title, its width, its frame's proportion
+    const dress = (screen: HTMLElement | null) => {
+      const title = titleOf(screen);
+      // only a change is written, so the live title never repeats itself
+      if (paneTitle && paneTitle.textContent !== title) paneTitle.textContent = title;
+      panel.classList.toggle('is-board', screen?.dataset.kind === 'board');
+      panel.classList.toggle('is-wide', screen?.dataset.kind === 'board' || wideBlock);
       // the frame takes the screen's own proportion (CSS eases the change)
-      if (next?.dataset.frame) panel.style.setProperty('--ct-ratio', next.dataset.frame);
+      if (screen?.dataset.frame) panel.style.setProperty('--ct-ratio', screen.dataset.frame);
       else panel.style.removeProperty('--ct-ratio');
+    };
+    const swap = (next: HTMLElement | null) => {
+      dress(next);
       // the same screen stays: no new transition, its pan or clip runs on
       if (next === shown) return;
       const prev = shown;
@@ -588,8 +659,16 @@ for (const key of shots) {
       if (prev) leave(prev);
       if (next) enter(next);
     };
+    const render = () => {
+      const next = seq[seqAt] ?? null;
+      if (next && next === pending) return; // its first frame is on its way
+      uncue();
+      const video = next !== shown ? clipOf(next) : null;
+      if (next && video && canCue()) cue(next, video);
+      else swap(next);
+    };
 
-    const show = (trigger: HTMLElement) => {
+    const show = (trigger: HTMLElement, part?: number) => {
       if (trigger === current) return;
       current?.classList.remove('is-current');
       trigger.classList.add('is-current');
@@ -601,7 +680,10 @@ for (const key of shots) {
       const own = filesOf(state);
       seq = own.length ? own : screensFor(trigger);
       seqOwn = own.length > 0;
-      seqAt = 0;
+      // a row's own screens start from the first (under reduced motion, from
+      // wherever the reading is in the row); borrowed ones carry on from the
+      // screen on show, so a row that borrows never replays its lender's
+      seqAt = seqOwn ? Math.min(part ?? 0, seq.length - 1) : Math.max(0, shown ? seq.indexOf(shown) : 0);
       stepAt = performance.now();
       if (devLabel) {
         if (devLabel.dataset.dev) devLabel.textContent = own.length ? '' : `No screen yet: ${state}`;
@@ -626,7 +708,17 @@ for (const key of shots) {
         const d = Math.abs((r.top + r.bottom) / 2 - mid);
         if (d < bestD) { bestD = d; best = el; }
       }
-      if (best) choose(best);
+      if (best) choose(best, still.matches ? partOf(best, mid) : 0);
+    };
+    // With reduced motion nothing plays, so a row with several screens (the
+    // Mall tab: its modal, then its PiP) shares itself out among them by the
+    // reading: as the band passes from the row's top to its foot it shows
+    // each in turn, and no screen of the row is out of reach.
+    const partOf = (el: HTMLElement, mid: number) => {
+      const n = filesOf(el.dataset.state!).length;
+      if (n < 2) return 0;
+      const r = el.getBoundingClientRect();
+      return Math.min(n - 1, Math.max(0, Math.floor(((mid - r.top) / r.height) * n)));
     };
 
     // ---- each block plays as a slideshow -------------------------------------
@@ -639,7 +731,8 @@ for (const key of shots) {
     // highlight; scrolling within the block leaves it playing, scrolling to
     // another block or section hands over. Hovering or focusing a row holds
     // the slideshow on that row. Reduced motion, or a hidden tab: no
-    // autoplay — the reading picks the row, as before.
+    // autoplay — the reading picks the row, as before, and within a row with
+    // several screens it picks the screen too (partOf, above).
     // A row with several screens plays them in turn, a beat each, and so does
     // a lone state with several (it loops them). A beat never takes a screen
     // away before it has finished: a pan completes its round trip, a clip
@@ -694,19 +787,32 @@ for (const key of shots) {
       render();
       plan();
     };
-    const choose = (trigger: HTMLElement) => {
+    const choose = (trigger: HTMLElement, part = 0) => {
       const group = groupOf(trigger);
-      if (playing && group && group.list === playing.list) return; // the block plays on
-      playing = group;
-      held = false;
+      const sameBlock = Boolean(playing && group && group.list === playing.list);
+      // the block plays on — unless nothing plays (reduced motion), when the
+      // reading picks each row and each of a row's screens, as it always did
+      if (sameBlock && !still.matches) return;
+      if (!sameBlock) {
+        playing = group;
+        held = false;
+        wideBlock = Boolean(group?.items.some((i) => screensFor(i).some((s) => s.dataset.kind === 'board')));
+      }
       at = group ? group.items.indexOf(trigger) : 0;
-      wideBlock = Boolean(group?.items.some((i) => screensFor(i).some((s) => s.dataset.kind === 'board')));
-      if (trigger === current) render(); // the same row, a new block: only the card's width can change
-      else show(trigger);
+      if (trigger === current) {
+        // the same row: the reading has moved on to its next screen (reduced
+        // motion), or the block is new and only the card's width can change
+        if (still.matches && seqOwn && part < seq.length) seqAt = part;
+        render();
+      } else show(trigger, part);
       plan();
     };
     document.querySelectorAll<HTMLElement>('.ct-steps').forEach((list) => {
       const hold = (event: Event) => {
+        // reduced motion: nothing plays, so there is nothing to hold — the
+        // reading alone picks, and a pointer resting on the text while the
+        // wheel turns cannot pull the phone away from it
+        if (still.matches) return;
         const item = (event.target as HTMLElement).closest<HTMLElement>('.ct-step[data-state]');
         if (!item || !playing || playing.list !== list) return;
         held = true;
@@ -733,14 +839,17 @@ for (const key of shots) {
     // reduced motion switched on or off mid-read: the shown screen arrives
     // again under the new rule
     still.addEventListener('change', () => {
+      uncue();
       const el = shown;
       if (el) {
         pans.get(el)?.anim.cancel();
         pans.delete(el);
         clipOf(el)?.pause();
-        el.classList.remove('is-playing', 'is-ended');
+        ended.delete(el);
+        el.classList.remove('is-cued', 'is-ended');
         enter(el);
       }
+      render(); // a clip that was waiting for its first frame arrives under the new rule
       stepAt = performance.now();
       plan();
     });
@@ -880,9 +989,14 @@ for (const key of shots) {
       // proportion lets it stand in the screen's height; a page capture in a
       // 1 : 2 window it scrolls by hand (the "Scroll" hint until its foot is
       // in view); a clip plays once from its first frame and settles on its
-      // still, or with reduced motion shows the still.
+      // still, or with reduced motion shows the still. As on the phone, the
+      // clip opens on its first frame, never on its still (its ending): the
+      // card stays blank paper until that frame is in, CUE_WAIT at most, past
+      // which the still stands in and the clip does not play.
       if (enlarge && zoom && zoomMedia && zoomClose) {
         const stillMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+        const CUE_WAIT = 1500;
+        let cueTimer = 0;
         zoomMedia.addEventListener('scroll', () => {
           zoom.classList.toggle('is-end', zoomMedia.scrollTop + zoomMedia.clientHeight >= zoomMedia.scrollHeight - 4);
         }, { passive: true });
@@ -896,18 +1010,26 @@ for (const key of shots) {
           pic.src = src.currentSrc || src.src;
           pic.alt = src.alt || on.getAttribute('aria-label') || '';
           zoomMedia.replaceChildren(pic);
+          window.clearTimeout(cueTimer);
+          zoom.classList.remove('is-cueing');
           const clip = on.querySelector<HTMLVideoElement>('video');
           if (clip?.dataset.src && !stillMotion.matches) {
             const video = document.createElement('video');
             video.className = 'ct-zoom__clip';
             video.muted = true;
             video.playsInline = true;
-            video.poster = clip.poster;
             video.src = clip.dataset.src;
             video.setAttribute('aria-hidden', 'true');
+            zoom.classList.add('is-cueing');
+            const begun = () => zoom.classList.remove('is-cueing');
+            const fail = () => { video.pause(); video.classList.add('is-ended'); begun(); };
+            video.addEventListener('loadeddata', begun, { once: true });
+            video.addEventListener('playing', begun, { once: true });
             video.addEventListener('ended', () => video.classList.add('is-ended'));
+            video.addEventListener('error', fail);
+            cueTimer = window.setTimeout(() => { if (video.readyState < 2) fail(); }, CUE_WAIT);
             zoomMedia.append(video);
-            video.play().catch(() => { /* refused: the still stands in */ });
+            video.play().catch((error: unknown) => { if ((error as DOMException)?.name === 'NotAllowedError') fail(); });
           }
           zoom.style.setProperty('--zoom-r', (pan ? on.dataset.frame : on.dataset.ratio) ?? '2');
           zoom.classList.toggle('is-pan', pan);
@@ -918,7 +1040,12 @@ for (const key of shots) {
         zoomClose.addEventListener('click', () => zoom.close());
         // a tap on the dimmed backdrop closes it too
         zoom.addEventListener('click', (event) => { if (event.target === zoom) zoom.close(); });
-        zoom.addEventListener('close', () => { zoomMedia.replaceChildren(); enlarge.focus(); });
+        zoom.addEventListener('close', () => {
+          window.clearTimeout(cueTimer);
+          zoom.classList.remove('is-cueing');
+          zoomMedia.replaceChildren();
+          enlarge.focus();
+        });
       } else if (enlarge && scrim) {
         const shrink = () => { grow(false); enlarge.focus(); };
         enlarge.addEventListener('click', () => { grow(true); close.focus(); });
@@ -1539,8 +1666,10 @@ for (const key of shots) {
   .ct-screen--pan, .ct-screen--clip { overflow: hidden; }
   .ct-screen__scroll { height: 100%; overflow: hidden; }
   .ct-screen__page { display: block; width: 100%; height: auto; }
-  /* a clip over its still: hidden until its first frame is painted, faded back
-     to the still once it has played */
+  /* a clip over its still: shown once cued (its first frame is up, and the
+     screen arrives only then), faded back to the still once it has played.
+     While the clip shows, the still under it is hidden outright, so not even
+     a frame the clip is late to paint can show its ending through it. */
   .ct-screen__still, .ct-screen__clip {
     position: absolute;
     inset: 0;
@@ -1550,7 +1679,8 @@ for (const key of shots) {
     object-position: top;
   }
   .ct-screen__clip { opacity: 0; }
-  .ct-screen--clip.is-playing .ct-screen__clip { opacity: 1; }
+  .ct-screen--clip.is-cued .ct-screen__clip { opacity: 1; }
+  .ct-screen--clip.is-cued:not(.is-ended) .ct-screen__still { visibility: hidden; }
   .ct-screen--clip.is-ended .ct-screen__clip { opacity: 0; transition: opacity var(--dur-3) var(--ease-standard); }
   /* "Scroll ↓": a paper chip at the foot of a page that scrolls by hand (the
      phone's page with reduced motion, the enlarged view on phones), until the
@@ -1755,10 +1885,13 @@ for (const key of shots) {
       --ct-foot-h: 0px;
       /* the phone stands as tall as the card allows and takes the width its
          proportion gives it — unless the column is narrower (a tablet), when
-         it takes the column and its height follows */
+         it takes the column and its height follows. Both budgets take off the
+         card's own 1px border each side (--ct-card-edge): left in, the card
+         stood 2px taller than the sticky box at 1280×720, 1px over each end. */
+      --ct-card-edge: 2px;
       --ct-phone-w: min(
-        calc(100cqw - 2 * var(--card-padding)),
-        calc((var(--ct-pane-h) - 2 * var(--card-padding) - var(--ct-title-h) - var(--ct-foot-h) - var(--ct-edge)) / var(--ct-ratio) + var(--ct-edge))
+        calc(100cqw - 2 * var(--card-padding) - var(--ct-card-edge)),
+        calc((var(--ct-pane-h) - 2 * var(--card-padding) - var(--ct-card-edge) - var(--ct-title-h) - var(--ct-foot-h) - var(--ct-edge)) / var(--ct-ratio) + var(--ct-edge))
       );
       container-type: inline-size;
     }
@@ -1772,7 +1905,7 @@ for (const key of shots) {
     /* a new proportion eases in, the card with it (reduced motion: at once,
        as every --dur-* is then zero) */
     .ct-pane {
-      width: calc(var(--ct-phone-w) + 2 * var(--card-padding) + 2px);
+      width: calc(var(--ct-phone-w) + 2 * var(--card-padding) + var(--ct-card-edge));
       max-width: 100%;
       height: auto;
       margin-inline: auto;
@@ -1947,6 +2080,13 @@ for (const key of shots) {
     object-position: top;
   }
   .ct-zoom__media :global(.ct-zoom__clip.is-ended) { opacity: 0; transition: opacity var(--dur-3) var(--ease-standard); }
+  /* until the clip's first frame is in, the still (its ending) stays hidden:
+     the card is blank paper for that moment, at the still's size */
+  .ct-zoom.is-cueing .ct-zoom__media :global(.ct-zoom__img) { visibility: hidden; }
+  /* the page behind the open dialog stays put: a wheel or swipe that runs
+     past the dialog's own scrolling, or lands on the dimmed page, moves
+     nothing (the dialog is outside the smooth scroll: data-lenis-prevent) */
+  :global(html):has(.ct-zoom[open]) { overflow: hidden; }
   .ct-zoom__close {
     position: absolute;
     top: calc(-1 * var(--space-3));

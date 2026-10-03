@@ -325,12 +325,16 @@ these 4 slideshows, accordingly the highlight changes in the left … in all the
 blocks"): once the reading reaches a block showing two or more different
 screens, the phone runs through them a beat (2.6s) each and the row it shows
 takes the highlight; hovering a row holds it; reduced motion keeps the
-scroll-driven pick. **A row with several screens plays them in turn**
+scroll-driven pick, row by row inside a block too, and hover holds nothing
+there. **A row with several screens plays them in turn**
 (`screens.map` to a list — the Mall tab: its modal, then its PiP), the card's
-title following the file shown; **a beat never takes a screen away before it
-has finished** — a page pans its round trip, a clip plays and holds 1.2s — and
-**rows that share a screen hand it on as it is**, with no new fade, pan or
-replay. The table is in `docs/design-tokens.md`; never drop these pages back
+title following the file shown; with reduced motion **the reading shares the
+row out among them** — the band passing from the row's top to its foot shows
+each in turn — so no screen he supplied is out of reach. **A beat never takes
+a screen away before it has finished** — a page pans its round trip, a clip
+plays and holds 1.2s — and **rows that share a screen hand it on as it is**,
+with no new fade, pan or replay (a row that borrows a list of screens carries
+on from the one showing). The table is in `docs/design-tokens.md`; never drop these pages back
 to `--section-y-sm`. **Every teaser page navigates by a rail of scroll points,
 each title a tooltip** (Uttham, 2026-10-02: "the sticky notes as scroll points in
 l2 is weird lets do the one you initially made but the active or hover state show
@@ -371,10 +375,18 @@ file with a clip (`screens.videos`) plays it once from its first frame each
 time its screen arrives, then settles on its still** (the poster, optimised
 like any screen — for the order confirmation, whose clip ends mid-transition,
 the confirmed frame); clips load only as their rows near the reading, wait
-while the phone cannot be seen, and with reduced motion never play. The mini
+while the phone cannot be seen, and with reduced motion never play. **A clip
+never opens on its still**, which is its ending: its screen arrives only once
+the clip's first frame is ready, the screen before (and its title) staying up
+until then — a frame or two when preloaded, 1.5s at most on a slow line, past
+which the still stands in and the clip plays on its next arrival. The mini
 player takes the same proportions, and its full-size dialog shows the screen
-whole: a page in a 1 : 2 window that scrolls, a clip playing. The live phone on
-the AI Space pages keeps its handset 9 : 19.5, untouched.
+whole: a page in a 1 : 2 window that scrolls (by wheel and trackpad too: the
+dialog is outside the smooth scroll, `data-lenis-prevent`, and the page behind
+it is locked), a clip playing from its first frame. **The card stands exactly
+in its sticky box**: the phone's height budget takes off the card's own 1px
+border (`--ct-card-edge`), which had left it 2px over at 1280×720. The live
+phone on the AI Space pages keeps its handset 9 : 19.5.
 
 **Glass only where something sits between** (Uttham, 2026-10-01: "for the phone
 preview no need to use the glass, use the card component, glass is only used
