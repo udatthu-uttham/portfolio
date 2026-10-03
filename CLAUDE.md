@@ -750,16 +750,25 @@ on 0.8s. Touch, keys, rail and nav jumps, reduced motion, an open dialog (the
 enlarged screen), the live phone enlarged on a phone and a focused field (the
 password) never snap.
 
-**The phone card hugs the phone** (2026-10-02: "too much padding on left right of
-the mobile preview, we should optimise this space"): from 768px the device is as
-tall as the screen allows (`--ct-pane-h`, ≤`--ct-pane-max` 720px) and the card is
-the device plus one `--card-padding` all round, centred in its columns, so spare
-width falls outside the card — plus, on a page with notes, the notes column on
-its left, when the card stands at its columns' left edge instead (see "His
-boards become phone screens" below). **The card is centred in the visible height under the header** (the sticky box is `100dvh` less the header and two gaps, so a tablet browser's sliding address bar never piles the spare height under the card; 2026-10-02: "less spacing on top than bottom"). **The card carries a title above the phone** naming what it
+**The phone stands on the page, centred in its columns** (Uttham, 2026-10-03:
+"Remove the glass behind the phone preview across"; "so the phone preview always
+stays and is center aligned horizontally"). From 768px the device is as tall as
+the screen allows (`--ct-pane-h`, ≤`--ct-pane-max` 720px, less one
+`--card-padding` of air above and below and the title's slot) or as wide as its
+columns allow, and **nothing stands behind it** — no glass, no bolts, no card
+background, border or shadow. `.ct-pane` is only the box holding the title and
+the device, the device's width, **centred in its columns on every page**, notes
+or not (the notes stand outside it, on its left; see "His boards become phone
+screens" below). **The phone block is centred in the visible height under the
+header** while it sticks: `.ct-pane` is the sticky element, its top inset the
+header, a `--content-gap` and half of what the block leaves of `100dvh` (so a
+tablet browser's sliding address bar never piles the spare height under it;
+2026-10-02: "less spacing on top than bottom"), and `.ct-panel` runs the whole
+height of the reading as its container (`pointer-events: none`, so only the
+block itself is "the preview" for the hover hold). **The block carries a title above the phone** naming what it
 shows (`screens.titles`, one short line per state; a state that borrows an
 earlier screen borrows its title): **one line in a slot of its own height**
-(`--text-small` × `--lh-statement`), weight 500 in `--ink-900`, one `--space-3`
+(`--text-body-lg` × `--lh-statement`), weight 600 in `--ink-900`, one `--space-4`
 over the device; a long title ends in an ellipsis and keeps its whole text as
 the element's title. It is centred, not set left: the handset is symmetrical and
 its top corners are deeply rounded, so a title on the device's left edge hangs
@@ -781,10 +790,10 @@ Android status bar (the clock at the left, a punch-hole camera in the middle,
 Wi-Fi, signal and battery at the right) **above** the screenshot and a
 gesture-bar strip **below** it, both inside the bezel and never over the
 export's own top row (the exports carry no status bar of their own), and the
-power key and volume rocker both on the right edge. **The sticky card around
-it is glass, pinned by four bolts** (2026-10-03: "glass will have bolts"; "make
-sure the bolts really dont come onto phone": the card's inset is the bolt's far
-edge plus a `--space-2`, so a bolt never meets the device), and
+power key and volume rocker both on the right edge. **It stands on the page
+itself** (2026-10-03: "Remove the glass behind the phone preview across"; this
+retires the same day's glass card and its four bolts, and with them the
+bolt-sized inset), and
 **its title above the device is set at `--text-body-lg`, weight 600**, so it
 registers ("the title on the can be more bigger"). Every length is a share of the
 display's width, `--ct-device-screen` (`--ct-device-k-*`: bezel 0.03, status bar
@@ -804,13 +813,18 @@ sampled live, the splash's strips read #6524fd against the #7028fc on screen for
 the whole clip (2026-10-03). On a platform that shows the clips darker than a
 Mac does, a clip and its own still differ by that shade; the strips follow the
 still. **On a given
-viewport the card, the device and its 1 : 2 display never change size**: the
-display's width is the column or the card's tallest height over the handset's
-proportions, whichever binds, set once per viewport, and no state, beat, clip,
-board or title enters the sum, so a short screen shrinks the device once, never
-per state. Measured 2026-10-03 at 1440×900 / 1280×720 / 1024×768 / 768×1024
-(display 273 / 222 / 251 / 198px wide) and in the 112px mini player at 375×812:
-one card size and one display size through every state and beat on both pages.
+viewport the device and its 1 : 2 display never change size**: the display's
+width is the columns (less a `--space-1` each side for the keys) or the block's
+tallest height over the handset's proportions, whichever binds, set once per
+viewport — and on a page with notes, up to a tenth less where that makes their
+room (below) — and no state, beat, clip, board or title enters the sum, so a
+short screen shrinks the device once, never per state. Measured 2026-10-03
+(after the glass came off) at 1440×900 / 1280×720 / 1024×768 / 768×1024: display
+269 / 219 / 248 / 224px wide on Mall and the prototype page (the product cards
+249 at 1440×900, for its notes; Resona, with no title slot, 288), the device
+centred in its columns to the pixel, the same gap above the title as under the
+device while it sticks, and in the 112px mini player at 375×812; one size
+through every state and beat sampled.
 
 **Nothing on the phone is ever cropped or stretched** (Uttham, 2026-10-03: "when
 I give big images I dont want you to just paste them or crop them abruptly making
@@ -890,7 +904,7 @@ the dialog to scroll. **Its full-size
 dialog is never wider than the card's phone, only taller** (Uttham, 2026-10-03:
 "for some contents outside l2 you can increase the phone size but not the width,
 it should look relaistic wherever it can"): one width for every screen, the
-card's largest display (`--ct-device-screen-max`, ~272px) or what the page
+column's largest display (`--ct-device-screen-max`, ~268px) or what the page
 allows; a page capture gets a handset's 19.5 : 9 display there and scrolls by
 hand (by wheel and trackpad too: the dialog is outside the smooth scroll,
 `data-lenis-prevent`, and the page behind it is locked), its chip in the home
@@ -899,17 +913,31 @@ strip; a clip plays from its first frame; a board opens whole on a paper card.
 dialog's × stands in a row of its own above it, right-aligned, a `--space-2`
 clear, its height taken out of the device's budget (`--ct-zoom-close`), and the
 mini player's × stands the same `--space-2` above the handset (2026-10-03, review:
-on the corner they hid the battery and broke the body's outline). **At the end of the reading the card's foot lands level with the last card on
+on the corner they hid the battery and broke the body's outline). **At the end of the reading the device's foot lands level with the last card on
 the left** (Uttham, 2026-10-03: "these two should be aligned at bottom before
-both start scrolling down"): the sticky box gives back half its spare height as
-a negative bottom margin (`--ct-give`, measured; see "The phone stays to the
-very end"), so it stops that much lower, and the page ends where it has stopped. **The card stands exactly
-in its sticky box**: the device's height budget takes off the card's own 1px
-border (`--ct-card-edge`), which had left it 2px over at 1280×720. **The live
-phone on the AI Space pages keeps its handset 9 : 19.5 and no device mock**: the
-tools draw their own chrome (the prototype its app header and bottom nav, Resona
-its own dark frame), and a status bar and home strip around them would take ~12%
-of the height and shrink the running prototype's viewport, re-laying it out.
+both start scrolling down"): the sticky block's margin gives back the air under
+the device (`margin-bottom: -card-padding`), and it sticks until its margin box
+meets the panel's foot, which is the reading's foot. (It had been the panel that
+stuck, with a negative margin of half its spare height; that margin cannot read
+the columns' width — a cqw on the panel names an outer container, and Chrome
+places a sticky box with a `%` margin resolved against the whole grid — so
+wherever the columns set the device's size, a tablet or a page whose notes take
+room, the foot missed: 23px on the product cards at 1440×900 in a first try.)
+Measured 2026-10-03: 0px at 1440×900 on the product cards and Resona, and at
+768×1024 on Mall. **The page then ends exactly the room the centred block has
+under it** (a `--content-gap`, half the spare height, `--ct-give` from the
+block's measured height `--ct-card-h`, and the block's air under the device), so
+the phone never leaves its place, through Outcome, the gate card or the full
+study and "More cases" to the very end. **The live phone on the AI Space pages stands in the same
+handset** (Uttham, 2026-10-03: "in ai cards the phone preview is missing add
+that", "I meant in teaser pages"): the running tool fills the display's 1 : 2
+row, so the prototype is handed a 360 × 720 viewport (it had 360 × 780 in the
+old 9 : 19.5 frame) and lays out with its app bar under the status bar and its
+bottom bar over the gesture strip; Resona gets 320 × 640, still follows the
+reading, and its status bar takes its app bar's pink wash. The iframe is built
+once in the handset and never moved, so growing the mini player in place on a
+phone (the same handset at a phone's own size, its display at most 360px wide,
+the × row above it) never reloads it.
 
 **His boards become phone screens, and their words become notes** (Uttham,
 2026-10-03: "in meesho product cards images, I gave the whole dump I want you to
@@ -935,39 +963,52 @@ Lanczos, never sharpened; the effective upscale on the page is ×1.5 for the
 title, date and list screens (the boards are 1× renders) and none for the
 framework card. **The words outside, as on the homepage**: handwritten notes
 (`screens.notes` in `src/data/plp-case.ts`, per screen file, `y` a share of
-that screen's height, priority order, no numbers), the tiles' Caveat in ink and
-on the card's glass **left of the device** — every one of these screens sets
+that screen's height, priority order, no numbers), the tiles' Caveat in ink
+straight on the page **left of the device** — every one of these screens sets
 its content against its left edge, and that side faces the reading. **Each
 note's line starts inside the screen, on the thing it names** (Uttham,
 2026-10-03: "the pointers should have the origins from inside so it is easy to
 understand what point we are highlighting"): a dot at (`x`, `y`), shares of the
 display's width and height, on the element or in the card's margin just left of
 it, and a thin ink line on a paper halo from the dot out across the bezel to the
-words. **The words stand at `ty`** (default `y`), spread down the column so
+words. **Every dot is read off the export's own pixels** (2026-10-03: "In card
+framework the arrows and the dots are not matching please fix them"): on a big
+element's left end, clear of its text (the framework's picture, chips and
+rating), or touching a line of text or a mark from the card's margin (the price,
+the FAST mark, a title). The mismatch was the CSS, not only the numbers: the
+notes' box is a container, and the dot's `x` × `--ct-device-screen` re-read the
+display's width against that box (its `100cqw`), so every dot sat at about a
+quarter of its `x` — 22–43px left of its element, outside the product card, at
+1440×900. The notes now read the display's width as a registered length,
+`--ct-annot-screen`, set on `.ct-pane`; measured after: every dot at its (`x`,
+`y`) to 0.0001 of the screen, every line ending on its dot and starting 5px
+right of its words. **The words stand at `ty`** (default `y`), spread down the column so
 close zones still get generous room between their notes ("I want the spacing to
 be generous here"); the line takes its length and angle from `hypot()` and
 `atan2()`. Never words over the screen, never between the device and its title.
 The framework's notes are his labels word for word (Product comprehension,
 Comprehension, Price, Quality, Fast programme); the others are DRAFT wording,
-his to set. **The notes column is constant**: `--ct-notes-w`, 0.46 of the
-display's width, kept at every state (empty while a screen has none) so the
-card never changes size, and only where the card's columns hold it beside a
-full-size device — 1440×900, 1366×768 and 1280×720; at 1200×800 and narrower
-(1024×768, tablets) it is 0 and the notes are off, never the phone smaller.
-With the column the card stands at its columns' left edge, so the spare width
-goes to the rail's gutter. A screen's notes fade with it; the mini player and
-the dialog show none. Measured 2026-10-03: card 480.7 × 720 / 395.7 × 596 at
-1440×900 / 1280×720 through every state of the teaser and the full study, the
-display 273 / 222 as before; the Mall page is unchanged.
+his to set. **The notes take the room the centred device leaves on its left,
+inside the columns, and never push the phone off centre** (Uttham, 2026-10-03:
+"so the phone preview always stays and is center aligned horizontally"; this
+retires the notes column that stood the card at its columns' left edge). That
+room is one size per viewport, so no state changes it; the notes show where it
+holds their longest word beside its line (`--ct-annot-need`, 6.6em of the notes'
+own type; a container query on the box at 6.5em). **A page with notes takes a
+device up to a tenth smaller than its full size to make that room**, and below
+that keeps the full device and drops the notes: on the product cards 1440×900
+(display 249 against 269; the box 118px), 1366×768 and 1280×720 (219, the full
+size) show them; 1024×768 and tablets drop them. A screen's notes fade with it;
+the mini player and the dialog show none.
 
-**The phone preview stands on glass** (Uttham, 2026-10-03: "for phone preview
-use glass background"; "as we have phone we can ignore the background white
-card?? or put a glass card"). The sticky card is the site's `.glass` pane, its
-edge kept at 1px so the height budget holds; the mini player stays bare. The AI
+**The phone preview stands on the page, with nothing behind it** (Uttham,
+2026-10-03: "Remove the glass behind the phone preview across"), on every teaser
+page and in the mini player; the handset is the object. This retires the glass
+card of earlier the same day ("for phone preview use glass background") and the
+paper card of 2026-10-01 — never put a pane, card or bolts back behind it. The AI
 prompt panel stays on the paper card (`--paper-1`, `--line-1`, `--radius-sm`,
 `--shadow-rest`, `--card-padding`), the prompt in the sheet's recessed well
-(`--paper-2`). (From 2026-10-01 the phone stood on paper: "glass is only used
-when you want to keep something between".)
+(`--paper-2`).
 
 **The AI Space tool pages are one-pagers, not teasers** (Uttham, 2026-10-02:
 "for AI space cards, there is no need to have teaser, just a one pager only" —
@@ -977,7 +1018,7 @@ is all about explaining my work"). They borrow the case studies' layout
 (2026-10-01: "the right side is running preview as we did for the project case
 studies"): `/ai/<slug>` renders `CaseTeaser` in live mode with `frame="phone"`: **the left column is
 the white-label guide and the sticky phone runs the tool itself**, in the
-teaser's own 9/19.5 phone (the tool fills it). Left, in order (2026-10-02): the page's headline and summary as the hero
+case pages' handset (the tool fills its display). Left, in order (2026-10-02): the page's headline and summary as the hero
 (explaining the tool, not selling it); facts — Tool, **Value added** (his line
 on who uses it, where he has given one; it replaces Kind) and Year; The idea
 (the prototype: how the spark came, then the real-data claim with its one `^^`
@@ -1001,7 +1042,16 @@ row and step names one of its own steps — prepare, setup, record, synth, insig
 the phone shows that step; the homepage card keeps its loop. **The prototype
 just runs, and can be used in the phone** (`interactive`); driving its routes
 from the reading would pull it out of the reader's hands, so its rows carry no
-state, and "Open the prototype ↗" under the facts opens it full size. On phones
+state. **It is used there and only there** (Uttham, 2026-10-03: "dont give link
+of real prototye let the prototype be interactable there only, and give callout
+on top that it is interactable"): nothing on the page links out to
+`/proto/feed-ux` (`tool.visit` is only the preview's source; `ai-pages.ts` no
+longer passes it as the page's `visit`), and **a callout over the handset says
+it can be used** — `callout` in `tools.ts`, a small paper chip in the title's
+slot with an amber touch mark, "Try it — tap and scroll" (a label, his to
+reword), never over the screen and not in the mini player. Measured 2026-10-03:
+a tap on a card opens its product page inside the phone and the wheel scrolls
+the app, not the page. On phones
 a live phone opens full size *in place* on a tap (moving an iframe into the
 dialog would reload it), centred under the header over a dimmed page; × or the
 page shrinks it, a second × hides it. A page whose last part (or, for reduced

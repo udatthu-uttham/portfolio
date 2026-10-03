@@ -2,8 +2,9 @@
 // A teaser page as Uttham laid it out (2026-10-01): a two-minute read on the
 // left, a sticky preview on the right that follows the reading, and — where a
 // study has one — the full case study expanding in place behind a light
-// password gate. Built from the site's own pieces: paper for the words, glass
-// for the screens, the sticker CTA. Content comes in as CaseTeaserData
+// password gate. Built from the site's own pieces: paper for the words, a
+// handset standing on the page for the screens (no glass behind it since
+// 2026-10-03), the sticker CTA. Content comes in as CaseTeaserData
 // (src/data/case-teaser.ts); the product-cards and Meesho Mall case studies and
 // the AI Space tool pages all render through here.
 //
@@ -15,9 +16,9 @@
 // taller than a phone pans, a still with a clip plays it, a reference board
 // stands in the device's place. Live: a `preview` slot — a running tool —
 // which hears each state as a `case:state` event. With `frame="phone"` the
-// slot stands in the teaser's own phone (a handset's 9/19.5, the mini player's
-// tap-to-enlarge) and the tool just fills it; without it the tool sizes its own
-// frame.
+// slot stands in the same handset as the screens (CaseDevice, its 1 : 2
+// display; the mini player's tap-to-enlarge) and the tool just fills the
+// display; without it the tool sizes its own frame.
 import { Image, getImage } from 'astro:assets';
 import CaseDevice from './CaseDevice.astro';
 import { rich } from '../lib/rich';
@@ -36,6 +37,8 @@ const live = Astro.slots.has('preview');
 const livePhone = live && frame === 'phone';
 // the way on to the next case or tool, at the end of the reading column
 const hasMore = Astro.slots.has('more');
+// a live phone's line above the device, e.g. that the tool can be used there
+const callout = livePhone ? data.callout : undefined;
 
 // the case studies' phone screens: plp/ and mall-case/ hold only what Uttham
 // supplies for them (2026-10-02: "remove them and ask me I will give all of
@@ -215,8 +218,8 @@ const boardWidths = (key: string) => [...new Set([480, 960, 1600].map((w) => Mat
 // homepage tiles have them (Uttham, 2026-10-03: "the framework card should
 // come inside the image, and the wordings outside as you did on home page"):
 // only on a phone screen, which fills the display, so a note's `y` is a share
-// of the display's height. A page with notes keeps a notes column on its card
-// at every state (ct-panel--notes), so the card never changes size for them.
+// of the display's height. A page with notes (ct-panel--notes) sets them in the
+// room the centred device leaves on its left, the same at every state.
 const notesFor = (key: string) => (kindFor(key) === 'phone' ? data.screens?.notes?.[nameOf(key)] ?? [] : []);
 const noted = live ? [] : shots.filter((key) => notesFor(key).length);
 ---
@@ -366,24 +369,45 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
       )}
     </div>
 
-    <aside class:list={['ct-panel', { 'ct-panel--live': live, 'ct-panel--device': !live, 'ct-panel--titled': titles && !live, 'ct-panel--visit': data.visit, 'ct-panel--notes': noted.length > 0 }]} aria-label={data.panelLabel ?? 'Preview'} data-case-panel data-map={JSON.stringify(stateFiles)} data-titles={titles && !live ? JSON.stringify(titles) : undefined}>
-      <div class="ct-pane glass">
-        {/* glass is pinned by its four bolts, as on the homepage panes */}
-        <span class="bolt bolt--tl" aria-hidden="true"></span>
-        <span class="bolt bolt--tr" aria-hidden="true"></span>
-        <span class="bolt bolt--bl" aria-hidden="true"></span>
-        <span class="bolt bolt--br" aria-hidden="true"></span>
+    <aside class:list={['ct-panel', { 'ct-panel--live': live, 'ct-panel--device': !live || livePhone, 'ct-panel--titled': (titles && !live) || callout, 'ct-panel--visit': data.visit, 'ct-panel--notes': noted.length > 0 }]} aria-label={data.panelLabel ?? 'Preview'} data-case-panel data-map={JSON.stringify(stateFiles)} data-titles={titles && !live ? JSON.stringify(titles) : undefined}>
+      {/* THE PHONE STANDS ON THE PAGE ITSELF (Uttham, 2026-10-03: "Remove the
+          glass behind the phone preview across"): no pane of glass, no bolts,
+          no card behind it — the title, the handset and its notes, nothing
+          else. .ct-pane is only the box that holds them, as wide as the
+          device and centred in its columns. */}
+      <div class="ct-pane">
         {/* one line in a slot of its own height: a long title ends in an
             ellipsis and keeps its whole text as the element's title */}
         {titles && !live && <p class="ct-pane__title" data-pane-title aria-live="polite"></p>}
+        {/* a running tool the reader can use says so, in the title's slot
+            above the device, never over its screen (Uttham, 2026-10-03: "give
+            callout on top that it is interactable") */}
+        {callout && (
+          <p class="ct-pane__title ct-pane__callout">
+            <span class="ct-callout">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="8" cy="8" r="2.4" fill="currentColor" stroke="none" /><circle cx="8" cy="8" r="5.9" opacity="0.45" /></svg>
+              {callout}
+            </span>
+          </p>
+        )}
         <div class="ct-stage">
           {livePhone ? (
-            <div class="ct-phone ct-phone--live">
-              <div class="ct-live ct-live--framed"><slot name="preview" /></div>
+            <>
+              {/* THE SAME HANDSET AS THE CASE PAGES (Uttham, 2026-10-03: "in ai
+                  cards the phone preview is missing add that", "I meant in
+                  teaser pages"): the running tool fills the display's 1 : 2
+                  row between the status bar and the gesture strip, so the
+                  prototype gets a 360 × 720 viewport and Resona a 320 × 640
+                  one. Built once, never moved, so the iframe never reloads. */}
+              <CaseDevice class="ct-device--live">
+                <div class="ct-phone ct-phone--live">
+                  <div class="ct-live ct-live--framed"><slot name="preview" /></div>
+                </div>
+              </CaseDevice>
               {/* phones only: the mini phone grows to full size in place (an
                   iframe moved into a dialog would reload) */}
               <button class="ct-pip__enlarge" type="button" aria-label="Enlarge the preview" data-pip-enlarge></button>
-            </div>
+            </>
           ) : live ? (
             <div class="ct-live"><slot name="preview" /></div>
           ) : (
@@ -2299,16 +2323,14 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
     text-transform: uppercase;
   }
 
-  /* ---- the phone, on a pane of glass (Uttham, 2026-10-03: "for phone
-     preview use glass background"; it stood on a paper card from 2026-10-01).
-     The .glass recipe (global.css) gives the sheen, rim and contact shadow;
-     the edge stays 1px, so the height budget's --ct-card-edge still holds. ---- */
+  /* ---- the phone, standing on the page (Uttham, 2026-10-03: "Remove the
+     glass behind the phone preview across"; it stood on a paper card from
+     2026-10-01 and on glass with four bolts earlier on 2026-10-03). The pane
+     draws nothing — no background, border, shadow or bolts: it only holds the
+     title, the device and the notes beside it. ---- */
   .ct-pane {
     position: relative;
     height: 100%;
-    padding: var(--card-padding);
-    border: 1px solid var(--glass-edge);
-    border-radius: var(--radius-sm);
   }
 
   /* THE HANDSET'S PROPORTIONS (CaseDevice), as shares of its display's width,
@@ -2324,38 +2346,28 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
     --ct-device-k-radius: 0.1;
     --ct-device-k-wide: calc(1 + 2 * var(--ct-device-k-bezel));
     --ct-device-k-tall: calc(2 + var(--ct-device-k-status) + var(--ct-device-k-home) + 2 * var(--ct-device-k-bezel));
-    /* the tallest the card may be, and so the widest its display gets: what
-       is left of 720px under the card's widest inset, edge and title (~272px).
-       Nothing outside the card draws the phone wider than this (the enlarged
-       dialog; Uttham, 2026-10-03: "you can increase the phone size but not
-       the width") */
+    /* the tallest the phone block may be, and so the widest its display
+       gets: what is left of 720px under the air above and below it and the
+       title (~268px). Nothing outside the column draws the phone wider than
+       this (the enlarged dialog; Uttham, 2026-10-03: "you can increase the
+       phone size but not the width") */
     --ct-pane-max: 720px;
-    --ct-device-screen-max: calc((var(--ct-pane-max) - 2 * var(--space-6) - 2px - var(--text-small) * var(--lh-statement) - var(--space-3)) / var(--ct-device-k-tall));
+    --ct-device-screen-max: calc((var(--ct-pane-max) - 2 * var(--card-padding) - var(--text-body-lg) * var(--lh-statement) - var(--space-4)) / var(--ct-device-k-tall));
   }
-  /* the device's footprint, for the card around it and the boards that stand
+  /* the device's footprint, for the box around it and the boards that stand
      in its place */
   .ct-panel--device {
     --ct-device-w: calc(var(--ct-device-screen) * var(--ct-device-k-wide));
     --ct-device-h: calc(var(--ct-device-screen) * var(--ct-device-k-tall));
   }
 
-  /* THE LIVE PHONE (the AI Space pages): a running tool in a handset's
-     9 : 19.5, sized off the stage's height AND width so it always stands
-     whole, never cut and never stretched. The case pages' device leaves it as
-     it was: an iframe moved or rescaled would reload or blur, and Resona keeps
-     its own dark chrome (from 768px the card hugs it; see --ct-phone-w). */
-  .ct-panel--live { --ct-ratio: calc(19.5 / 9); --ct-edge: 0px; }
+  /* THE LIVE PHONE (the AI Space pages): the running tool fills the
+     handset's display row, as a screenshot does on the case pages — its
+     own app bar under the status bar, its own bottom bar over the gesture
+     strip. ProtoPreview and ResonaPreview scale their 360px and 320px
+     viewports to the row's width and hand the app the row's height. */
   .ct-stage { height: 100%; container-type: size; display: grid; place-items: center; }
-  .ct-phone--live {
-    position: relative;
-    width: min(100cqw, calc(100cqh / var(--ct-ratio)));
-    aspect-ratio: 1 / var(--ct-ratio);
-    overflow: hidden;
-    border: 1px solid var(--line-1);
-    border-radius: var(--radius-media);
-    background: var(--paper-1);
-    box-shadow: var(--shadow-rest);
-  }
+  .ct-phone--live { background: var(--paper-1); }
 
   /* ---- the case pages' screens, in the device's 1 : 2 display ---- */
   /* the stage is the device's footprint: the device, or a board in its place */
@@ -2550,54 +2562,54 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
 
   /* THE NOTES (Uttham, 2026-10-03: "the framework card should come inside the
      image, and the wordings outside as you did on home page"): the homepage
-     tiles' handwriting — Caveat in ink, a few words, the same hand-drawn arrow
-     — on the card's paper LEFT of the device, each arrow's tip on the part of
-     the screen it names (`y`, a share of the screen's height). Left, because
-     every screen they annotate sets its content against its left edge (a
-     card's chips, price, rating and delivery line; a list row's picture), and
-     because that side faces the reading, so the eye goes text, note, screen.
-     A note is one line where it can be: the words stand on the arrow's tail,
-     so a note is about a line and a half tall and the framework's four rows,
-     a little over that apart, never collide; a longer note wraps upwards.
-     The type and the arrow scale with the display (--ct-device-screen), so a
-     note keeps its place against the screen at every size. Never over the
-     screen, never between the device and the title.
-     THE COLUMN is constant: a page with notes gives its card --ct-notes-w at
-     every state, empty while a screen has none, so no state changes the
-     card's size. It is 0.46 of the display's width — the room the
-     framework's longest one-line note ("Fast programme") takes beside its
-     arrow — and only where the card's columns hold it beside a device of its
-     full size; anywhere narrower (a small laptop, a tablet) the column is 0
-     and the notes are off, rather than the phone shrinking for them (as the
-     homepage's narrow wells drop theirs). round(down, room, column) is the
-     column once the room holds it, and 0 before; a browser without round()
-     keeps 0. */
-  .ct-panel--notes { --ct-notes-w: 0px; }
-  @supports (width: round(down, 10px, 3px)) {
-    @media (min-width: 768px) {
-      .ct-panel--notes {
-        --ct-notes-col: calc(var(--ct-device-screen) * 0.46);
-        --ct-notes-room: calc(100cqw - var(--ct-device-w) - 2 * var(--card-padding) - var(--ct-card-edge));
-        --ct-notes-w: min(var(--ct-notes-col), max(0px, round(down, var(--ct-notes-room), var(--ct-notes-col))));
-      }
-    }
+     tiles' handwriting — Caveat in ink, a few words, a thin line — on the
+     page LEFT of the device, each line starting on the part of the screen it
+     names. Left, because every screen they annotate sets its content against
+     its left edge (a card's chips, price, rating and delivery line; a list
+     row's picture), and because that side faces the reading, so the eye goes
+     text, note, screen. A longer note wraps upwards. The type and the line
+     scale with the display (--ct-device-screen), so a note keeps its place
+     against the screen at every size. Never over the screen, never between
+     the device and the title.
+     THE PHONE STAYS CENTRED (Uttham, 2026-10-03: "so the phone preview always
+     stays and is center aligned horizontally"): the notes take the room the
+     centred device leaves on its left, inside the columns, and never push it
+     off centre. That room is one size per viewport, so no state changes it.
+     The notes show where it holds their longest word beside its line
+     (--ct-annot-need, in em of the notes' own type; the container query
+     below): a page with notes takes a device up to a tenth smaller than its
+     full size to make that room (1440×900 and wider), and below that keeps
+     the full device and drops the notes (1200px and narrower, tablets), as
+     the homepage's narrow wells drop theirs. */
+  .ct {
+    --ct-annot-k: 0.072; /* the notes' type, as a share of the display's width */
+    --ct-annot-floor: 15px; /* …and never smaller than this */
+    --ct-annot-need: 6.6; /* the notes' room, in em of that type: the longest word, its line and air */
   }
-  /* the notes' box: the display's height, from the card's paper (a --space-3
-     in from its edge) to the display's left edge, over which the arrows land */
+  /* the display's width again, as a length: the notes' box is a container,
+     and a cqw inside it would read the box, not the columns (it put every dot
+     about a quarter of `x` in from the screen's edge until 2026-10-03). Set
+     on the pane, where the columns are the container, and inherited as a
+     length. */
+  @property --ct-annot-screen {
+    syntax: '<length>';
+    inherits: true;
+    initial-value: 0px;
+  }
+  .ct-pane { --ct-annot-screen: var(--ct-device-screen, 0px); }
+  /* the notes' box: the display's height, from the columns' left edge to the
+     display's left edge, over which the lines land */
   .ct-annots {
     position: absolute;
     top: calc(var(--ct-device-screen) * (var(--ct-device-k-bezel) + var(--ct-device-k-status)));
     right: calc(100% - var(--ct-device-screen) * var(--ct-device-k-bezel));
-    width: calc(var(--ct-notes-w, 0px) + var(--card-padding) + var(--ct-device-screen) * var(--ct-device-k-bezel) - var(--space-3));
+    width: calc((100cqw - var(--ct-device-w)) / 2 + var(--ct-device-screen) * var(--ct-device-k-bezel));
     height: calc(var(--ct-device-screen) * 2);
-    /* a container, so a column too narrow to hold the notes hides them; its
-       own lengths still resolve against the panel, and the notes inside it
-       use only em and % (their type is set here, where the display's width
-       can be read) */
+    /* a container, so a box too narrow to hold the notes hides them */
     container: ct-annots / inline-size;
     color: var(--ink-900);
     font-family: var(--font-hand);
-    font-size: clamp(15px, calc(var(--ct-device-screen) * 0.072), 22px);
+    font-size: clamp(var(--ct-annot-floor), calc(var(--ct-device-screen) * var(--ct-annot-k)), 22px);
     font-weight: 600;
     line-height: 1.15;
     pointer-events: none;
@@ -2634,8 +2646,8 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
     rotate: -2deg;
   }
   .ct-annot__line {
-    --dx: calc(var(--ct-annot-gap) - var(--ct-annot-pad) + var(--x) * var(--ct-device-screen));
-    --dy: calc((var(--y) - var(--ty)) * var(--ct-device-screen) * 2);
+    --dx: calc(var(--ct-annot-gap) - var(--ct-annot-pad) + var(--x) * var(--ct-annot-screen));
+    --dy: calc((var(--y) - var(--ty)) * var(--ct-annot-screen) * 2);
     position: absolute;
     left: calc(100% - var(--ct-annot-gap) + var(--ct-annot-pad));
     top: calc(var(--ty) * 100%);
@@ -2650,7 +2662,7 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
   }
   .ct-annot__dot {
     position: absolute;
-    left: calc(100% + var(--x) * var(--ct-device-screen));
+    left: calc(100% + var(--x) * var(--ct-annot-screen));
     top: calc(var(--y) * 100%);
     width: 8px;
     height: 8px;
@@ -2659,8 +2671,10 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
     background: currentColor;
     box-shadow: 0 0 0 2px var(--paper-1), 0 1px 3px rgb(22 20 14 / 0.25);
   }
-  /* no column (it did not fit): no notes */
-  @container ct-annots (width < 96px) {
+  /* no room for the longest word beside its line: no notes. The threshold is
+     a hair under --ct-annot-need (em here are the box's own type), so a box
+     sized to exactly that room never flickers between the two */
+  @container ct-annots (width < 6.5em) {
     .ct-annot { display: none; }
   }
 
@@ -2810,14 +2824,14 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
     .ct-points { --pt-pad: var(--space-2); }
   }
 
-  /* THE CARD'S TITLE: what the phone is showing, one line in a slot of its
+  /* THE PHONE'S TITLE: what the phone is showing, one line in a slot of its
      own height, so a long title never pushes the device down — it ends in an
-     ellipsis and keeps its whole text as the element's title. Small, medium
-     weight and in ink, so it names the screen without competing with the
-     dark handset under it; CENTRED, because the device is symmetrical and
-     its top corners are deeply rounded — a title set to its left edge would
-     hang past the curve and read as off-centre. One within-card step
-     (--space-3) to the device. */
+     ellipsis and keeps its whole text as the element's title. In ink, so it
+     names the screen without competing with the dark handset under it;
+     CENTRED over the device, because the device is symmetrical and its top
+     corners are deeply rounded — a title set to its left edge would hang past
+     the curve and read as off-centre. One within-card step (--space-4) to
+     the device. */
   /* the title names the screen at a glance (Uttham, 2026-10-03: "the title
      on the can be more bigger, it not not getting registered now") */
   .ct-pane__title {
@@ -2833,6 +2847,35 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
     overflow: hidden;
     text-overflow: ellipsis;
   }
+  /* THE CALLOUT over a phone the reader can use (Uttham, 2026-10-03: "let the
+     prototype be interactable there only, and give callout on top that it is
+     interactable"): a small paper chip in the title's slot, centred over the
+     device, its touch-point mark in amber — the board's "Click to enlarge"
+     chip's twin, never laid over the screen. */
+  .ct-pane__callout {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: visible;
+  }
+  .ct-callout {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    height: min(100%, var(--space-6));
+    padding: 0 var(--space-3);
+    background: var(--paper-1);
+    border: 1px solid var(--line-1);
+    border-radius: var(--radius-pill);
+    box-shadow: var(--shadow-rest);
+    color: var(--ink-900);
+    font-size: var(--text-small);
+    font-weight: 500;
+    letter-spacing: 0;
+    line-height: 1;
+    white-space: nowrap;
+  }
+  .ct-callout svg { flex: none; width: 1.15em; height: 1.15em; color: var(--amber-700); }
 
   /* the mini-player controls exist only on phones */
   .ct-pip__enlarge, .ct-pip__close, .ct-pip__restore, .ct-pip__scrim { display: none; }
@@ -2863,87 +2906,71 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
     .ct-panel {
       grid-column: 8 / -1;
       grid-row: 1;
-      position: sticky;
-      top: calc(var(--header-height) + var(--content-gap));
-      /* THE CARD HUGS THE PHONE (Uttham, 2026-10-02: "the prototype pane on
-         right has too much padding on left right of the mobile preview, we
-         should optimise this space"). The phone is as tall as the screen
-         allows; the card is the phone plus one card inset all round, centred
-         in its columns, so the spare width falls between text and card instead
-         of inside it. --ct-pane-h is the tallest the card may be. */
+      /* the panel runs the whole height of the reading, so the phone block
+         inside it (.ct-pane, below) can stick under the header until the
+         reading ends; it is also the container every length of the phone is
+         read against (cqw: the columns' width) */
+      align-self: stretch;
+      container-type: inline-size;
+      /* …but only the phone block takes the pointer: a pointer resting on the
+         empty column above or below it is not resting on the preview (the
+         hover hold), and the page under it stays in reach */
+      pointer-events: none;
+      /* THE PHONE BLOCK HUGS THE PHONE (Uttham, 2026-10-02: "the prototype
+         pane on right has too much padding on left right of the mobile
+         preview, we should optimise this space"). The phone is as tall as the
+         screen allows, under its title, with one --card-padding of air above
+         and below; the block is the device's width, centred in its columns.
+         --ct-pane-h is the tallest the block may be. */
       --ct-pane-h: min(calc(100svh - var(--header-height) - 2 * var(--content-gap)), var(--ct-pane-max));
-      /* THE CARD SITS CENTRED in the screen under the header (Uttham,
-         2026-10-02: "the phone preview on l2 pages is not center aligned, there
-         is less spacing on top than bottom when the header disappears"). The
-         sticky box is the whole visible height below the header — dvh, so it
-         follows a tablet browser's address bar as it slides away — and the card
-         is centred in it. The phone's own size stays on svh, so it never jumps
-         while the bar moves; only the spare height around it is shared out. */
-      height: calc(100svh - var(--header-height) - 2 * var(--content-gap));
-      height: calc(100dvh - var(--header-height) - 2 * var(--content-gap));
-      display: grid;
-      align-content: center;
       --ct-title-h: 0px;
       --ct-foot-h: 0px;
-      /* Both budgets take off the card's own 1px border each side
-         (--ct-card-edge): left in, the card stood 2px taller than the sticky
-         box at 1280×720, 1px over each end. */
-      --ct-card-edge: 2px;
-      container-type: inline-size;
     }
-    /* THE CARD ENDS ON THE PAGE'S LAST LINE (Uttham, 2026-10-03: "these two
-       should be aligned at bottom before both start scrolling down"): the card
-       is centred in its sticky box, so when the column runs out the box stops
-       with half the spare height still under the card, and the card's foot
-       sat above the last card on the left. The box's margin gives that half
-       back (--ct-give), so the box stops that much lower and the card's foot
-       lands on the column's foot, level with the last thing in the reading —
-       now "More cases" / "More tools" (.ct-more). AND IT NEVER LEAVES ITS
-       PLACE (Uttham, 2026-10-03: "now the out come section also should scroll
-       and the phone should be sticky to the right for both the case studies";
-       "so the phone preview always stays"): the page ends exactly the room
-       the centred card has under it (a --content-gap and that half) below the
-       column's foot, so at the very end the card is still centred where it
-       stood all the way down — through Outcome, the gate card or the full
-       study and the way on — and its foot is level with the last row. The
-       half is the box's spare height less the card's, both on the screen:
-       the card's height is measured (--ct-card-h, set by the script below the
-       main one), because a formula on the panel resolved its width against
-       the viewport and gave back 88px of a tablet's 214 (768×1024). Without
-       the script it falls back to the tallest card, which is a laptop's. */
-    /* THE BOLTS NEVER TOUCH THE PHONE (Uttham, 2026-10-03: "make sure the
-       bolts really dont come onto phone"): a bolt sits --bolt-inset in from
-       each corner and is --bolt-size across, so the glass card's inset is the
-       bolt's far edge plus a --space-2, on every side — the device, its notes
-       and the card's height budget all read this one length. */
-    .ct-panel--device { --card-padding: calc(var(--bolt-inset) + var(--bolt-size) + var(--space-2)); }
+    /* THE PHONE NEVER LEAVES ITS PLACE (Uttham, 2026-10-03: "now the out come
+       section also should scroll and the phone should be sticky to the right
+       for both the case studies"; "so the phone preview always stays"): the
+       phone block sticks centred in the height under the header (.ct-pane,
+       below) until the reading's foot, where its device's foot lands level
+       with the last thing in the reading ("these two should be aligned at
+       bottom before both start scrolling down"). The page then ends exactly
+       the room the centred block has under it — a --content-gap, half the
+       spare height (--ct-give) and the block's own air under the device — so
+       at the very end the phone is still where it stood all the way down.
+       The block's height is measured (--ct-card-h, set by the script below
+       the main one); without the script it falls back to the tallest block,
+       a laptop's. */
     .ct {
       --ct-give: max(0px, (100dvh - var(--header-height) - 2 * var(--content-gap) - var(--ct-card-h, min(100svh - var(--header-height) - 2 * var(--content-gap), var(--ct-pane-max)))) / 2);
-      padding-bottom: calc(var(--content-gap) + var(--ct-give));
-    }
-    .ct-panel { margin-bottom: calc(-1 * var(--ct-give)); }
-    /* the live phone stands as tall as the card allows and takes the width
-       its proportion gives it — unless the column is narrower (a tablet),
-       when it takes the column and its height follows */
-    .ct-panel--live {
-      --ct-phone-w: min(
-        calc(100cqw - 2 * var(--card-padding) - var(--ct-card-edge)),
-        calc((var(--ct-pane-h) - 2 * var(--card-padding) - var(--ct-card-edge) - var(--ct-title-h) - var(--ct-foot-h) - var(--ct-edge)) / var(--ct-ratio) + var(--ct-edge))
-      );
+      padding-bottom: calc(var(--content-gap) + var(--ct-give) + var(--card-padding));
     }
     /* THE DEVICE IS ONE SIZE PER VIEWPORT (Uttham, 2026-10-03: "all the aspect
        ratio should be fixed for this card … everything should have constant
        height and width"). Its display's width is whichever binds first: the
-       column, or the card's tallest height less its insets, edge and title,
-       over the handset's proportions. Nothing a screen does — a clip, a page
-       that pans, a board, a long title — enters the sum, so the card, the
-       device and the 1 : 2 screen hold their size through every state, and a
-       short screen shrinks the device once, for good, not per screen. */
+       columns (less a --space-1 each side, so the side keys stay inside them),
+       or the block's tallest height less its air and title, over the
+       handset's proportions. Nothing a screen does — a clip, a page that pans,
+       a board, a long title — enters the sum, so the device and its 1 : 2
+       display hold their size through every state, and a short screen shrinks
+       the device once, for good, not per screen. (Only what stands inside
+       the panel reads it: a cqw on the panel itself would name an outer
+       container.) */
     .ct-panel--device {
-      --ct-device-screen: min(
-        calc((100cqw - 2 * var(--card-padding) - var(--ct-card-edge)) / var(--ct-device-k-wide)),
-        calc((var(--ct-pane-h) - 2 * var(--card-padding) - var(--ct-card-edge) - var(--ct-title-h) - var(--ct-foot-h)) / var(--ct-device-k-tall))
-      );
+      --ct-device-tall: calc((var(--ct-pane-h) - 2 * var(--card-padding) - var(--ct-title-h) - var(--ct-foot-h)) / var(--ct-device-k-tall));
+      --ct-device-full: min(calc((100cqw - 2 * var(--space-1)) / var(--ct-device-k-wide)), var(--ct-device-tall));
+      --ct-device-screen: var(--ct-device-full);
+    }
+    /* A PAGE WITH NOTES makes their room left of the centred device (see THE
+       NOTES): the widest display that leaves the box --ct-annot-need em of the
+       notes' type, F. Where F is at least nine tenths of the full size N, the
+       device takes min(N, F) and the notes show; below that it keeps N and the
+       notes are off. round(down, F, 0.9 N) is 0 below that line and at least
+       0.9 N above it, so N - that x 1000 picks between the two; a browser
+       without round() keeps N, and drops the notes where they do not fit. */
+    @supports (width: round(down, 10px, 3px)) {
+      .ct-panel--notes {
+        --ct-notes-fit: min(calc(100cqw / (1 + 2 * var(--ct-annot-need) * var(--ct-annot-k))), calc(100cqw - 2 * var(--ct-annot-need) * var(--ct-annot-floor)));
+        --ct-device-screen: max(min(var(--ct-device-full), var(--ct-notes-fit)), calc(var(--ct-device-full) - round(down, var(--ct-notes-fit), 0.9 * var(--ct-device-full)) * 1000));
+      }
     }
     /* the title over the phone: its one-line slot and a within-card step */
     .ct-panel--titled { --ct-title-h: calc(var(--text-body-lg) * var(--lh-statement) + var(--space-4)); }
@@ -2956,32 +2983,35 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
       max-width: 100%;
       height: auto;
       margin-inline: auto;
+      pointer-events: auto;
     }
-    /* the card is the device plus one inset all round, at every state — and,
-       on a page with notes, the notes column on its left (--ct-notes-w, 0 where
-       it does not fit), which every state keeps. With the column the card
-       stands at its columns' left edge, beside the reading, so what width is
-       spare falls in the right gutter, where the rail's tooltips need it; the
-       device's own size never depends on the notes. */
+    /* THE PHONE BLOCK: the device's width, centred in its columns, at every
+       state — the notes stand outside it, on its left (.ct-annots), so the
+       phone is centred whether they show or not — with --card-padding of air
+       above and below. It sticks under the header, CENTRED in the visible
+       height below it (Uttham, 2026-10-02: "the phone preview on l2 pages is
+       not center aligned, there is less spacing on top than bottom when the
+       header disappears"): its top inset is the header, a --content-gap, and
+       half of what the block leaves of that height — dvh, so it follows a
+       tablet browser's address bar as it slides away, while the phone's own
+       size stays on svh and never jumps. --ct-pane-block is the block's
+       height. */
     .ct-panel--device .ct-pane {
-      width: calc(var(--ct-device-w) + 2 * var(--card-padding) + var(--ct-card-edge) + var(--ct-notes-w, 0px));
-      padding-inline-start: calc(var(--card-padding) + var(--ct-notes-w, 0px));
-      margin-inline: max(0px, (100cqw - var(--ct-device-w) - 2 * var(--card-padding) - var(--ct-card-edge)) / 2 - var(--ct-notes-w, 0px) * 1000) auto;
-    }
-    /* the live card follows its phone (reduced motion: at once, as every
-       --dur-* is then zero) */
-    .ct-panel--live .ct-pane {
-      width: calc(var(--ct-phone-w) + 2 * var(--card-padding) + var(--ct-card-edge));
-      transition: width var(--dur-3) var(--ease-standard);
+      --ct-pane-block: calc(var(--ct-device-screen) * var(--ct-device-k-tall) + 2 * var(--card-padding) + var(--ct-title-h) + var(--ct-foot-h));
+      position: sticky;
+      top: calc(var(--header-height) + var(--content-gap) + max(0px, (100svh - var(--header-height) - 2 * var(--content-gap) - var(--ct-pane-block)) / 2));
+      top: calc(var(--header-height) + var(--content-gap) + max(0px, (100dvh - var(--header-height) - 2 * var(--content-gap) - var(--ct-pane-block)) / 2));
+      width: var(--ct-device-w);
+      padding-block: var(--card-padding);
+      /* THE PHONE ENDS ON THE PAGE'S LAST LINE (Uttham, 2026-10-03: "these
+         two should be aligned at bottom before both start scrolling down"):
+         the block sticks until its margin box meets the panel's foot, which
+         is the reading's foot, and its margin gives back the air under the
+         device, so the device's foot lands level with the last thing in the
+         reading */
+      margin-bottom: calc(-1 * var(--card-padding));
     }
     .ct-stage { height: auto; container-type: normal; display: block; }
-    .ct-phone--live {
-      width: var(--ct-phone-w);
-      height: calc((var(--ct-phone-w) - var(--ct-edge)) * var(--ct-ratio) + var(--ct-edge));
-      aspect-ratio: auto;
-      margin-inline: auto;
-      transition: width var(--dur-3) var(--ease-standard), height var(--dur-3) var(--ease-standard), border-color var(--dur-3) var(--ease-standard), box-shadow var(--dur-3) var(--ease-standard);
-    }
     /* a board on the card opens full size from the button over it */
     .ct-panel--device.is-board .ct-pip__enlarge { display: block; }
   }
@@ -3014,20 +3044,10 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
        screen; a board stands in its place on a paper card of its footprint */
     .ct-panel--device { --ct-device-screen: calc(var(--ct-pip-w) / var(--ct-device-k-wide)); }
     .ct-panel.is-pip-on { opacity: 1; visibility: visible; translate: 0 0; transition-delay: 0s; }
-    .ct-pane {
-      height: auto;
-      padding: 0;
-      background: none;
-      border: 0;
-      box-shadow: none;
-      -webkit-backdrop-filter: none;
-      backdrop-filter: none;
-    }
-    .ct-pane .bolt { display: none; }
-    .ct-pane__title { display: none; } /* the mini player is only the phone */
+    .ct-pane { height: auto; }
+    .ct-pane__title { display: none; } /* the mini player is only the phone (and no callout) */
     .ct-annots { display: none; } /* and no notes, as its dialog has none */
     .ct-stage { position: relative; height: auto; container-type: normal; display: block; }
-    .ct-phone--live { width: 100%; border-radius: var(--radius-sm); box-shadow: var(--shadow-lift); }
     .ct-panel--device .ct-boards {
       /* at 112px a board keeps one small step of paper round it, and its
          chip only the magnifier */
@@ -3082,19 +3102,23 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
     .ct-full { scroll-margin-top: calc(var(--header-height) + var(--content-gap)); }
 
     /* A live tool in the teaser's phone opens full size where it stands: the
-       panel grows to a handset-sized phone centred in the screen under the
-       header (never wider than the tool's own 320px viewport, never taller
-       than the room the header leaves), over a dimmed page, and the tool takes
-       the pointer. The teaser is its own stacking context under the header, so
+       panel grows to the same handset at a phone's own size, centred in the
+       screen under the header and the × row above the device (its display
+       never wider than the prototype's own 360px viewport, the device never
+       taller than the room left), over a dimmed page, and the tool takes the
+       pointer. The teaser is its own stacking context under the header, so
        the header stays on top and in use. */
     .ct-panel.is-pip-big {
-      --pip-big-w: min(calc(100vw - 2 * var(--margin-side)), 320px, calc((100svh - var(--header-height) - 2 * var(--space-5)) * 9 / 19.5));
-      inset: var(--header-height) 0 0;
-      width: var(--pip-big-w);
-      height: calc(var(--pip-big-w) * 19.5 / 9);
+      --ct-device-screen: min(
+        calc((100vw - 2 * var(--margin-side)) / var(--ct-device-k-wide)),
+        360px,
+        calc((100svh - var(--header-height) - 2 * var(--space-5) - var(--space-6) - var(--space-2)) / var(--ct-device-k-tall))
+      );
+      inset: calc(var(--header-height) + var(--space-6) + var(--space-2)) 0 0;
+      width: var(--ct-device-w);
+      height: var(--ct-device-h);
       margin: auto;
     }
-    .ct-panel.is-pip-big .ct-phone--live { border-radius: var(--radius-media); }
     .ct-panel.is-pip-big .ct-pip__enlarge { display: none; }
     .ct-pip__scrim:not([hidden]) {
       display: block;
