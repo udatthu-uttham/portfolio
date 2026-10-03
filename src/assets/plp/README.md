@@ -88,3 +88,5 @@ a phone screen instead, as above.
 On hand (2026-10-03, from Uttham): `before.png` (the old feed) and `after.png` (the new feed).
 They also stand side by side, tagged Before and After, in the homepage tile (`tile` in
 `src/data/studies.ts`). The earlier cut-outs came off on 2026-10-02.
+
+`after-tile.png` is the homepage tile's copy of `after.png` (2026-10-04): the carousel dots moved from the third product (the yellow kurti) to the foot of the fourth's photo (the bedsheet), beside the tile's "Scrollable" note, so its arrow meets them; the kurti's photo is filled in where the dots were. The case page keeps `after.png` as he exported it.

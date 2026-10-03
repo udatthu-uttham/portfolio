@@ -100,9 +100,13 @@ scope: ['Product card systems', 'Experiment design', 'PLP at scale'],
       { image: 'plp/before', label: 'Before', tone: 'old', notes: [
         { text: 'Padded to the tallest card', y: 0.49 },
       ] },
-      { image: 'plp/after', label: 'After', tone: 'new', notes: [
+      // after-tile: his after.png with the carousel dots moved from the third
+      // product to the fourth, beside the note, so its arrow meets them
+      // (2026-10-04: "if needed move the scrollable image pagination to the
+      // 4th image and connect it to it"); the case page keeps after.png as is
+      { image: 'plp/after-tile', label: 'After', tone: 'new', notes: [
         { text: 'Facts replace the title', y: 0.31 },
-        { text: 'Scrollable', y: 0.658, x: 0.25 }, // on the yellow kurti's carousel dots, left column
+        { text: 'Scrollable', y: 0.689, x: 0.82 }, // the carousel dots on the fourth product's photo, a short line from the arrow
       ] },
     ] },
     // The case page is Uttham's teaser layout (2026-10-01); the six-chapter
