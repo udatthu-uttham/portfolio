@@ -56,7 +56,7 @@ On hand (2026-10-03, from Uttham):
 | `v3-nav.png` + `public/media/mall-case/v3-nav.mp4` | v3-nav, first; and v3-ftux via `screens.map` ("v3-ftux is homepage ftux only, that is the animation") | Figma "Mall v3 Homepage - new entrypoint" |
 | `v3-nav-pip.png` + `…/v3-nav-pip.mp4` | v3-nav, second | Figma "Mall v3 Homepage - PIP" |
 | `v3-splash.png` + `…/v3-splash.mp4` | v3-splash | Figma "mall v3- Splash" |
-| `v3-landing-active.png` + `…/v3-landing-active.mp4` | v3-landing-active | composed by `scripts/mall-landing-clip.mjs` from `v3-landing-new.png` and his Figma layers (see below) |
+| `v3-landing-active.png` + `…/v3-landing-active.mp4` | **unused** since 2026-10-03: no state shows it (the "Landing page for returning shoppers" row came off the teaser) | composed by `scripts/mall-landing-clip.mjs` from `v3-landing-new.png` and his Figma layers (see below) |
 | `v3-ocp.png` + `…/v3-ocp.mp4` (1080×1920, 9:16) | v3-ocp | Figma "success screen 2" |
 
 The videos are Figma's own MP4 export of each frame (2 s, re-encoded to 720px
@@ -66,6 +66,8 @@ playing: the closing frame, or for v3-ocp the "Order Confirmed!" frame (its clip
 ends mid-transition, so it fades back to the confirmation).
 The two 360×720 files are 1× exports and read soft on a 2× screen; a 3× export
 replaces them by name.
+
+**`v3-landing-active` is unused** (Uttham, 2026-10-03: "just one landing page (remove the second landing page section, we will not talk about it in preview)"): the row, its alt, its card title and its `screens.videos` entry are out of `src/data/mall-case.ts`, and the landing is `v3-landing-new` alone. The still, the clip, its entry in `src/data/clip-edges.json` and `scripts/mall-landing-clip.mjs` stay, so the row can come back by adding its state, alt, title and video again. To stop deploying the clip, delete `public/media/mall-case/v3-landing-active.mp4` and its `clip-edges.json` entry (`npm run clip-edges` rewrites the file from whatever is in `public/media/`). What follows is how it was made.
 
 `v3-landing-active` is not a Figma export (2026-10-03: "v3 landing active is
 v3 landing page … you can animate and scroll them"; "both the horizontal cards

@@ -6,16 +6,19 @@ up on the next build — `before.png`, `scan-price.png`, and so on (.png, .jpg o
 .webp). A state with no file keeps the previous screen on the phone.
 
 Teaser (2026-10-02), in reading order, with the title the card shows above
-the phone:
+the phone. Since 2026-10-03 the Strategy's first block, "Remove what slows them
+down", holds Card framework and Seller titles only; the staggered feed and the
+list or grid moved under "Add what helps them decide", ahead of Swipeable images
+and Delivery date:
 
 | File | Shown at | Card title | What the screen is |
 |---|---|---|---|
 | `before` | Context | The old card | the old product card in the feed |
 | `before-annotated` | Problem | Which team added what | the old card, each element labelled with the team that added it |
 | `framework` (state `cleanup`) | Card framework | The card framework | composed: the framework card alone, large, on the feed under the search bar and filter row; its zone labels are notes beside the phone |
-| `titles` | Clearer titles | Facts in place of the title | composed: the four title variants as a 2 × 2 feed grid, the feed carrying on below |
-| `stagger` | Staggered feed | A staggered feed | a feed with staggered columns, each card at its natural height |
-| `list` | List or grid by category | List view by category | composed: the list-view screen only (earphones as rows) |
+| `titles` | Seller titles | Facts in place of the title | composed: the four title variants as a 2 × 2 feed grid, the feed carrying on below |
+| `stagger` | Staggered feed (block 2) | A staggered feed | a feed with staggered columns, each card at its natural height |
+| `list` | List or grid by category (block 2) | List view by category | composed: the list-view screen only (earphones as rows) |
 | `scroll` | Swipeable images | More views and variations | a card whose swipeable images show more of the product and its variations |
 | `bigimg` | Bigger images for fashion | Bigger images for fashion | a fashion card with the taller 4:5 image |
 | `date` | Delivery date | Dates on fast deliveries | composed: the winning card (Fast and its day count) in the new feed, among cards with no date |

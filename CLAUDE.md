@@ -379,8 +379,25 @@ small to read on a phone. **It is all
 static**: nothing in the well moves on hover; the tile keeps its tilt, border and
 arrow nudge, and the notes ride the tilt with the sheet. A case with one screen keeps one phone;
 both cases have a pair today. **Keep a phone's notes about half a screen apart**
-(`y` 0.4 and 0.93 on the Mall "to"; 0.33 and 0.84 on the product cards'), or
-their words collide on a short tablet or laptop well.
+(`y` 0.4 and 0.91 on the Mall "to"), or their words collide on a short tablet or
+laptop well. **Where the truth leaves them closer, the lower note is one line**:
+the product cards' "to" has "Facts replace the title" at 0.31 (the shampoo's
+chips) and "Images scroll" at 0.658 (the third product's carousel dots), a third
+of a screen, 51px on a 1280×720 well where the "to" is 148px tall; a note's box
+is 44px on one line and 65px on two, so only the one-line note clears (7px;
+"Images you can swipe" wrapped and ran into the note above). A one-line note must
+leave room in the narrowest note column, ~104px of text at 18px, so "Scrollable
+images" (103px) was too tight. The tip lands on the screen's right edge, where
+the "to"'s notes stand, so "Images scroll" points across the row of the dots
+rather than at the kurti's card itself (its dots are in the left column).
+**The product cards tile is titled and worded by Uttham** (2026-10-03: "Meesho
+product cards title use camel case, and subtitle From quick scan to empowered
+scan, and helping users understand products better."): the title is **Meesho
+Product Cards** and its line "From quick scan to empowered scan, and **helping
+users understand products better.**"; his notes on the tiles' arrows: "instead of
+cards at natural height, say that images are scrollable, the third product in new
+one shows this" and, on Mall, "say that mall is explained via brands as hook not
+USPs" (the arrow lands on the purple "Popular Brands" band under the cards).
 
 A tool sheet's well holds **one phone standing flush on the bottom edge and
 nothing else** — no step list, no page list, no caption beside it — and the phone
@@ -525,13 +542,27 @@ player in the bottom-right corner** — it appears once the hero has gone, keeps
 following the reading, opens full size on a tap, hides on × ("Show preview"
 brings it back) and steps away at the end of the study. Content lives in `src/data/plp-case.ts`;
 the page is `src/components/CaseTeaser.astro`, opted in by `teaser` on the study.
+**Strategy runs in two blocks** (Uttham, 2026-10-03: "the other 2 things in remove
+what"; "bring the last two things here"): "Remove what slows them down" holds the
+Card framework (we optimised and grouped the information: multiple prices and
+offers, consideration tags; the detailed study is in the full case study) and
+**Seller titles** (they weren't adding value, so they were replaced; what took
+their place comes under "Add what helps them decide"), and "Add what helps them
+decide" holds the staggered feed, list or grid by category, swipeable images and
+the delivery date, in that order. Block 2 has no row on the facts that replaced
+the titles yet: he said he will talk about that under value additions.
 
 **Meesho Mall is the same teaser**, from `src/data/mall-case.ts`, reworked on
 2026-10-02 from his notes: Role Senior Product Designer, 2022–2023; where it
 started (competitive, better-quality alternatives for shoppers who seek quality,
 and a quiet hint that the first launch found the go-to-market); v2 as the bold
 version that followed; the research before the v3 launch, with its sticky note;
-v3; what happened. **Its full case study is behind the same gate**, built from
+v3; what happened. **v3 shows one landing page** (2026-10-03: "just one landing
+page (remove the second landing page section, we will not talk about it in
+preview)"): the row for returning shoppers, its alt, card title and clip are out
+of `mall-case.ts`, and its files stay, unused (see the `mall-case` README); and
+the sub-group once called "Be found" is **"Make it noticeable"** ("rename the be
+found terminology across to something like making it noticeable"). **Its full case study is behind the same gate**, built from
 his own deck chapters (git `09893d8^`): no colleague names, no team-lead claims,
 no numbers. **Uttham supplies every case-page screen** (2026-10-02: "the existing
 screens you have put are all bad for projects remove them and ask me I will give
@@ -778,7 +809,8 @@ never opens on its still**, which is its ending: its screen arrives only once
 the clip's first frame is ready, the screen before (and its title) staying up
 until then — a frame or two when preloaded, 1.5s at most on a slow line, past
 which the still stands in and the clip plays on its next arrival. **The Mall
-landing's clip (v3-landing-active) is composed, not exported** (Uttham,
+landing's clip (v3-landing-active) is composed, not exported, and unused since
+2026-10-03, when its row came off the teaser** (Uttham,
 2026-10-03: "you can animate and scroll them"; "just a small peek, not full
 animation"): `scripts/mall-landing-clip.mjs` builds it from his
 `v3-landing-new.png` and his Figma layers, re-runnable once the layers listed

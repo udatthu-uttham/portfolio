@@ -56,20 +56,28 @@ export const plpCase: CaseTeaserData = {
       heading: 'Strategy',
       blocks: [
         { kind: 'p', text: 'We worked on the card **in two directions, one experiment at a time**, each measured on its own.' },
+        // Reworked from his notes (Uttham, 2026-10-03). Framework: "we optimised
+        // and grouped information related to multiple prices offers,
+        // consideration tags, detailed study inside". Titles: "rename it as
+        // seller titles and say they are not adding value and we replaced them,
+        // what we replaced we will talk in value additions". And "the other 2
+        // things in remove what" (the staggered feed, list or grid) "bring the
+        // last two things here" — under block 2, in their original order, ahead
+        // of the two that were already there.
         {
           kind: 'steps',
           heading: '1. Remove what slows them down',
           steps: [
-            { state: 'cleanup', label: 'Card framework', text: 'We started by understanding every case the card has to carry, then built a framework from them: **the right information architecture for browsing cards, and one that scales.**' },
-            { state: 'titles', label: 'Clearer titles', text: 'Titles weren’t adding value: most of them had shop names in them. We replaced them with **the important facts shoppers need before making a decision.**' },
-            { state: 'stagger', label: 'Staggered feed', text: 'Cards at their natural height, so more fit on a screen.' },
-            { state: 'list', label: 'List or grid by category', text: 'Rows where details decide, grid where looks decide.' },
+            { state: 'cleanup', label: 'Card framework', text: 'We started by understanding every case the card has to carry, then built a framework from them: **the right information architecture for browsing cards, and one that scales.** Inside it we **optimised and grouped the information**: multiple prices and offers, and consideration tags. The detailed study is inside the full case study.' },
+            { state: 'titles', label: 'Seller titles', text: 'Seller titles **weren’t adding value**: most of them had shop names in them. **We replaced them**; what took their place comes under “Add what helps them decide”, next.' },
           ],
         },
         {
           kind: 'steps',
           heading: '2. Add what helps them decide',
           steps: [
+            { state: 'stagger', label: 'Staggered feed', text: 'Cards at their natural height, so more fit on a screen.' },
+            { state: 'list', label: 'List or grid by category', text: 'Rows where details decide, grid where looks decide.' },
             { state: 'scroll', label: 'Swipeable images', text: 'We added more swipeable images because **shoppers form better conviction from them** before opening the product. They show more of the product and the variations it comes in.' },
             { state: 'date', label: 'Delivery date', text: 'A clear day count instead of a promise, added **only on products where delivery is fast**, not on all of them.' },
           ],

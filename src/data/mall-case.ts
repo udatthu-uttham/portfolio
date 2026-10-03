@@ -74,7 +74,10 @@ export const mallCase: CaseTeaserData = {
         },
         {
           kind: 'steps',
-          heading: 'Be found',
+          // renamed (Uttham, 2026-10-03: "rename the be found terminology across
+          // to something like making it noticeable"); a verb phrase, like its
+          // siblings "Decide what Mall is" and "Be understood where decisions happen"
+          heading: 'Make it noticeable',
           steps: [
             { state: 'v3-nav', label: 'Bottom-nav entry and onboarding', text: 'Mall got a tab. The modal explains it with **brands people already know** and celebrity faces for trust and attention.' },
             { state: 'v3-splash', label: 'Splash on first visits', text: 'For the first few entries into a Mall product or landing page: **the feeling of walking into a mall to buy company products.**' },
@@ -87,7 +90,6 @@ export const mallCase: CaseTeaserData = {
           steps: [
             { state: 'v3-pdp', label: 'Product page', text: 'A purple enclosure so **a Mall product page looks different from the rest.** A brand entry point at the top for curiosity. Brand content and brand performance below the details.' },
             { state: 'v3-landing-new', label: 'Landing page for new shoppers', text: '**Popular brand logos**, popular products as hooks, brand names that rotate weekly; top categories to catch intent; product-level discovery kept.' },
-            { state: 'v3-landing-active', label: 'Landing page for returning shoppers', text: 'Mall-local search for faster rediscovery, top categories for quick access, a best-offers widget.' },
             { state: 'v3-ocp', label: 'Order confirmation', text: 'A purple animation at the moment of purchase, so **the colour and the programme stick.**' },
           ],
         },
@@ -159,7 +161,7 @@ export const mallCase: CaseTeaserData = {
       title: 'v3: purple became the promise',
       status: 'Shipped in v3',
       why: 'v2 had explained Mall, and shoppers ignored the explaining. v3 set two objectives: **make shoppers aware Mall exists**, through brands they already know, and **make them understand it where they decide**, so they remember it next time.',
-      how: 'v3 rebuilt Mall around **recognition, not explanation.** **One colour and one mark, carried through every step:** a bottom-nav entry with an education modal of popular brands and celebrity faces; a splash for the first few visits; a hint on listings for anyone who missed it; a purple enclosure on the product page, with the brand’s own content; a landing page that leads with logos for newcomers and search for regulars; and a purple animation when the order is confirmed.',
+      how: 'v3 rebuilt Mall around **recognition, not explanation.** **One colour and one mark, carried through every step:** a bottom-nav entry with an education modal of popular brands and celebrity faces; a splash for the first few visits; a hint on listings for anyone who missed it; a purple enclosure on the product page, with the brand’s own content; a landing page that leads with brand logos; and a purple animation when the order is confirmed.',
       worked: '**People now recognise Mall by colour.** Anchored by celebrities and icons, Mall became recognisable, a go-to place and, finally, trusted, and it **hit the share the business had asked for at kickoff.** The lesson I took from it: **the answer was brand-led storytelling, not more UI tweaks.**',
     },
   ],
@@ -185,16 +187,14 @@ export const mallCase: CaseTeaserData = {
     },
     // Screens that move: his Figma animations, exported as MP4 (2026-10-03).
     // Keyed by file; the file's own still in this folder is the poster.
-    // v3-landing-active is the landing itself coming alive (2026-10-03: "v3
-    // landing active is v3 landing page … you can animate and scroll them"):
-    // the logo wall drifts, the brand cards and the Newly Launched row only
-    // peek, composed by scripts/mall-landing-clip.mjs from his export and his
-    // Figma layers; it opens and closes on the v3-landing-new screen.
+    // The landing page's composed clip (v3-landing-active) came off with its
+    // row (2026-10-03: "just one landing page (remove the second landing page
+    // section, we will not talk about it in preview)"): the files are kept, see
+    // src/assets/mall-case/README.md.
     videos: {
       'v3-nav': '/media/mall-case/v3-nav.mp4',
       'v3-nav-pip': '/media/mall-case/v3-nav-pip.mp4',
       'v3-splash': '/media/mall-case/v3-splash.mp4',
-      'v3-landing-active': '/media/mall-case/v3-landing-active.mp4',
       'v3-ocp': '/media/mall-case/v3-ocp.mp4',
     },
     alts: {
@@ -206,7 +206,6 @@ export const mallCase: CaseTeaserData = {
       'v3-splash': 'v3: the Mall splash on a first visit',
       'v3-pdp': 'v3: a Mall product page inside its purple enclosure',
       'v3-landing-new': 'v3: the Mall landing page for new shoppers',
-      'v3-landing-active': 'v3: the Mall landing page for returning shoppers',
       'v3-ocp': 'v3: the purple order-confirmation moment',
       'v2-mixed-feed': 'v2: search results with Mall cards mixed between marketplace cards',
       'research-concepts': 'Badge concepts from the preference tests, side by side on a listing card',
@@ -222,7 +221,6 @@ export const mallCase: CaseTeaserData = {
       'v3-splash': 'v3: the first-visit splash',
       'v3-pdp': 'v3: the purple product page',
       'v3-landing-new': 'v3: landing for newcomers',
-      'v3-landing-active': 'v3: landing for regulars',
       'v3-ocp': 'v3: order confirmed in purple',
       'v2-mixed-feed': 'v2: the mixed feed',
       'research-concepts': 'Concepts shoppers tested',

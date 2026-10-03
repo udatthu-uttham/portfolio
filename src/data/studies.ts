@@ -63,8 +63,12 @@ export const studies: Study[] = [
     featured: true,
 kicker: 'Current',
 year: '2026—',
-    title: 'Meesho product cards',
-    summary: 'From quick to empowered scan: **helping users understand products better at first glance.**',
+    // Title and line are Uttham's (2026-10-03: "Meesho product cards title use
+    // camel case, and subtitle From quick scan to empowered scan, and helping
+    // users understand products better."): the title in title case, the claim
+    // in bold.
+    title: 'Meesho Product Cards',
+    summary: 'From quick scan to empowered scan, and **helping users understand products better.**',
 focus: 'Attribute chips and a second price row **spend** card height; staggering **reclaims** it. **Running them separately was the mistake** — the real question is **the exchange rate between them.**',
 scope: ['Product card systems', 'Experiment design', 'PLP at scale'],
     cover: { image: 'stagger-cover', caption: 'Left: every card padded to its row. Right: height follows content, and an extra card enters by the third row.' },
@@ -76,15 +80,24 @@ scope: ['Product card systems', 'Experiment design', 'PLP at scale'],
     // we changed"). DRAFT wording, for Uttham to rewrite. Each `y` is measured on
     // the 1080×2160 export: Before's first row is padded to its taller card, so
     // the shirt card has blank paper under its rating (y≈0.46–0.51); After's
-    // shampoo card carries chips in place of its name (0.31–0.35) and the
-    // right-hand column ends a card at 0.837 where the left ended one at 0.778.
+    // shampoo card carries chips in place of its name (0.31–0.35); and its third
+    // product, the yellow kurti, carries the dots of an image carousel at
+    // 0.651–0.665 (its next picture peeks in at the card's edge). The last note
+    // is his (2026-10-03: "in the image arrow explanations, instead of cards at
+    // natural height, say that images are scrollable, the third product in new
+    // one shows this"): the old "Cards at natural height" (0.837) is gone.
+    // The lower note of a pair must be ONE line: its box is about 44px tall on a
+    // one-line note and 65px on two, and the pair's tips stand only 0.35 of the
+    // screen apart (51px on a 1280×720 well, where the "to" is 148px tall), so
+    // "Images you can swipe", which wraps, ran its words into the note above.
+    // "Images scroll" has ~15% to spare at the narrowest note column.
     tile: { phones: [
       { image: 'plp/before', label: 'Before', tone: 'old', notes: [
         { text: 'Padded to the tallest card', y: 0.49 },
       ] },
       { image: 'plp/after', label: 'After', tone: 'new', notes: [
-        { text: 'Facts replace the title', y: 0.33 },
-        { text: 'Cards at natural height', y: 0.837 },
+        { text: 'Facts replace the title', y: 0.31 },
+        { text: 'Images scroll', y: 0.658 },
       ] },
     ] },
     // The case page is Uttham's teaser layout (2026-10-01); the six-chapter
@@ -111,20 +124,29 @@ scope: ['Product card systems', 'Experiment design', 'PLP at scale'],
     // accordingly"). v2 sells Mall itself — the big wordmark, "Branded products
     // at best prices", its own promises — and keeps the brands to a thin strip
     // of logos; v3 sells the brands — the logo wall, the brand on every card,
-    // Mall shrunk to a tick (his "sell brands, not Mall"). DRAFT wording, for
+    // the "Popular Brands" band (his "sell brands, not Mall"). DRAFT wording, for
     // Uttham to rewrite, except v2's, which is his ("say the focus was on mall
-    // USPs"). Each `y` is measured on the export: v2's "Original Brands ·
-    // Direct From Company" row at 0.24; v3's brand badge on
-    // the first card at 0.40 and the Mall tab's tick in its bottom bar at 0.93
-    // (the notes need about half a screen between them, or their words collide
-    // on a short tablet or laptop well).
+    // USPs"), and v3's second, which is his meaning (2026-10-03: "In Mall card
+    // instead of mall shrinks as a tick, say that mall is explained via brands
+    // as hook not USPs"; the old "Mall shrinks to a tick", at 0.93, is gone).
+    // Each `y` is measured on the export: v2's "Original Brands · Direct From
+    // Company" row at 0.24; v3's brand badge on the first card at 0.40 and the
+    // purple "Now on meesho · Popular Brands" band under the cards at 0.79–0.92,
+    // where Mall is explained by its brands. The logo wall above the cards
+    // (0.08–0.35) is the other brand hook, but a note's words stand above its
+    // tip, so a `y` much past 0.3 is what clears the glass, and that is only
+    // 0.07 from the card's note. The notes need about half a screen between
+    // them, or their words collide on a short tablet or laptop well: 0.51 here,
+    // which is 75px against a 65px two-line note on a 1280×720 well. Keep the
+    // lower note short: it is two lines on a laptop and three at 1920×1080,
+    // where the "to" is 261px tall and there is room.
     tile: { phones: [
       { image: 'mall-case/v2-landing', label: 'v2', tone: 'old', notes: [
         { text: 'The focus was on Mall USPs', y: 0.24 },
       ] },
       { image: 'mall-case/v3-landing-new', label: 'v3', tone: 'new', notes: [
         { text: 'The brand on every card', y: 0.4 },
-        { text: 'Mall shrinks to a tick', y: 0.93 },
+        { text: 'Brands as the hook, not USPs', y: 0.91 },
       ] },
     ] },
     focus: 'Making “branded” **believable to shoppers who had never met a brand online** — then finding that the answer was **storytelling, not more UI.**',
