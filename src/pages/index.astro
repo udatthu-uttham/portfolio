@@ -12,7 +12,7 @@ import HeroMotion from '../components/HeroMotion.astro';
 import { studies, contact, type TilePhone } from '../data/studies';
 import { rich } from '../lib/rich';
 import CaseIndex from '../components/CaseIndex.astro';
-import { SITE, NAME, person } from '../lib/seo';
+import { SITE, NAME, person, homeTitle, homeDescription } from '../lib/seo';
 import ResonaPreview from '../components/ResonaPreview.astro';
 import ProtoPreview from '../components/ProtoPreview.astro';
 const featuredStudies = studies.filter((s) => s.featured);
@@ -75,15 +75,32 @@ const principles = [
   },
 ];
 
-// Search and link previews (CLAUDE.md, "Domain trust"): the title is the
-// hidden h1 below, the description the hero's own lead, word for word.
-const seoTitle = `${NAME} — Design lead, systems thinker and builder`;
-const seoDescription = 'I’m a design lead, systems thinker and builder. I run the signals at the busy intersections where user needs cross business goals.';
+// Search and link previews (CLAUDE.md, "Domain trust"). The title is his name,
+// his roles and his employer, the terms a recruiter types (Uttham, 2026-10-03:
+// "it should trigger for uttham, or product designer, design manager and all
+// relevant scopes I hope"); the description is the hero's own lead, word for
+// word, since it is his copy. Both live in src/lib/seo.ts. The hidden h1 below
+// is his copy too and stays the hero's words.
+const seoTitle = homeTitle;
+const seoDescription = homeDescription;
+// The homepage is his profile page (Google lets an "About me" page carry
+// ProfilePage), with the Person as its main entity. The WebSite's name is what
+// a results page shows as the site's name; the domain is its alternate.
 const homeLd = {
   '@context': 'https://schema.org',
   '@graph': [
-    { '@type': 'WebSite', '@id': `${SITE}/#website`, url: `${SITE}/`, name: NAME, inLanguage: 'en', publisher: { '@id': person['@id'] } },
-    { ...person, image: new URL(portrait.src, SITE).href, mainEntityOfPage: `${SITE}/` },
+    { '@type': 'WebSite', '@id': `${SITE}/#website`, url: `${SITE}/`, name: NAME, alternateName: 'uttham.fyi', inLanguage: 'en', publisher: { '@id': person['@id'] } },
+    {
+      '@type': 'ProfilePage',
+      '@id': `${SITE}/#profile`,
+      url: `${SITE}/`,
+      name: seoTitle,
+      description: seoDescription,
+      inLanguage: 'en',
+      isPartOf: { '@id': `${SITE}/#website` },
+      mainEntity: { '@id': person['@id'] },
+    },
+    { ...person, image: new URL(portrait.src, SITE).href, mainEntityOfPage: { '@id': `${SITE}/#profile` } },
   ],
 };
 ---

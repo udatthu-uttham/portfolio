@@ -382,13 +382,61 @@ newly registered domain). On-page SEO came in the same pass. What lives where:
   from `site` in `astro.config.mjs`), so the www and workers.dev copies fold
   into it. Titles, descriptions, Open Graph, Twitter and JSON-LD are built in
   `src/lib/seo.ts` and printed by `src/layouts/Base.astro`, after the font
-  preloads. **They are assembled from copy already on the site, never written
-  fresh**: the hero line on the homepage, title plus dek on a case page, the
-  guide's headline plus the card's line on a tool page. They are joined only
-  while they fit 60 / 155 characters, otherwise the shorter whole sentence is
-  used, and the build warns when one runs over. The homepage carries the
-  `Person` (with LinkedIn and GitHub in `sameAs`). Case and tool pages carry a
-  `CreativeWork` by that Person plus a two-step `BreadcrumbList`.
+  preloads. **Descriptions are assembled from copy already on the site, never
+  written fresh**: the hero line on the homepage, word for word (not recast to
+  carry his name or "Meesho"; the title does that), title plus dek on a case page,
+  the guide's headline plus who uses the tool (its Value added line) on a tool
+  page, or the card's line where that runs long. They are joined only while they fit
+  155 characters, otherwise the shorter whole sentence is used, and the build
+  warns when a title passes 60 or a description 155.
+- **Titles name him, his roles, his employer and the page's topic**, the words
+  people search for (Uttham, 2026-10-03: "it should trigger for uttham, or
+  product designer, design manager and all relevant scopes I hope"). Home is
+  "Uttham Udatthu — Design Lead and Product Designer at Meesho"; a case is the
+  employer-plus-topic query, then his name and his role on it ("Meesho Mall case
+  study — Uttham Udatthu, product designer"); a tool is its name and kind ("Realistic
+  prototype for user research — Uttham Udatthu"). The terms live in `caseSearch`
+  and `toolSearch` in `src/lib/seo.ts`. **Every role term must be one he holds
+  and the site shows**: design lead (the hero, the pod of five), Product
+  Designer (the CV he links: Lead Product Designer at Meesho; Senior Product
+  Designer on Mall). **"Design manager" is not his title, so nothing claims
+  it**; it can only come from visible copy he writes. No meta keywords (Google
+  ignores them), no hidden text.
+- **The JSON-LD describes one person and his work.** Home carries a
+  `ProfilePage` whose main entity is the `Person`: given and family name, the
+  handles' order (`Udatthu Uttham`) as `alternateName`, `jobTitle` Design Lead,
+  `hasOccupation` (Design Lead; Product Designer, alternately Lead Product
+  Designer as the CV has it), `worksFor` Meesho (meesho.com, its Wikipedia
+  page), `knowsAbout` only what the site shows him doing, `alumniOf` from the CV,
+  LinkedIn and GitHub in `sameAs`. The `WebSite` gives `uttham.fyi` as its
+  alternate name. **A case page is an `Article` about its subject and Meesho**,
+  with keywords from its topic and the study's scope, and **his role on that
+  work rides on the Article, never the Person**: its `creator` is a schema.org
+  `Role` around him, named from the page's Role fact, dated from its Timeline
+  when that is a span of years (Mall: Senior Product Designer, 2022–2023).
+  **The Person carries no dated titles**, because the Mall role overlaps the
+  CV's Lead Product Designer since April 2022, and two titles at one employer
+  for one period read as a contradiction (which title held in 2022–2023 is
+  Uttham's to confirm). `author` stays the plain Person, which is what Google
+  reads. A tool page is a `CreativeWork` about its subject; each has a
+  two-step `BreadcrumbList`. validator.schema.org reported no errors and no
+  warnings on all five pages (2026-10-03).
+- **What will and won't rank, honestly** (searched 2026-10-03, before the site
+  was indexed): **his full name and "Udatthu" are winnable within weeks of
+  indexing** — today only a ZoomInfo listing and dictionary pages answer them.
+  **"Meesho Mall case study" and "Meesho product card case study" are
+  winnable**: the first returns news coverage and students' concept redesigns,
+  the second only Meesho's own card-holder listings, and no first-hand
+  designer's case study ranks for either. "Product designer Meesho" and "design
+  lead Meesho" are Meesho's own job ads and job boards; he can appear beside
+  them, not above them. **Bare "Uttham" is unreliable**: engines fold it into
+  "Uttam" (Uttam Kumar and other Wikipedia pages) and the Sanskrit word; the
+  domain helps, but expect months, not weeks. **Generic "product designer",
+  "design manager" and "product designer Bangalore portfolio" will not rank**:
+  Coursera, Glassdoor, job boards and portfolio directories own them, and the
+  site names no city. The biggest lever left is visible text, which is his to
+  write: a short line carrying his name, role and Meesho (options proposed
+  2026-10-03, not applied).
 - **Link previews are drawn in the site's own stock**, from
   `scripts/og/og-card.html` (its comment has the render command), as
   `public/og/<card>.jpg` at 1200×630. That is a card for home and one for each
@@ -496,7 +544,11 @@ tall as the screen allows (`--ct-pane-h`, ≤720px) and the card is the phone pl
 one `--card-padding` all round, centred in its columns, so spare width falls
 outside the card. **The card is centred in the visible height under the header** (the sticky box is `100dvh` less the header and two gaps, so a tablet browser's sliding address bar never piles the spare height under the card; 2026-10-02: "less spacing on top than bottom"). **Reference boards are shown whole** (2026-10-03: "I will give reference image (figure out a way on how to place this)"): a screen wider than a phone (width/height > 0.62) drops the phone frame and the card widens to its whole column, the board contained on the paper at the phone's height; a block that holds any board keeps the card wide throughout, so the slideshow never makes it breathe. **The card carries a title above the phone** naming what it
 shows (`screens.titles`, one short line per state; a state that borrows an
-earlier screen borrows its title); the mini player on phones has none.
+earlier screen borrows its title); the mini player on phones has none. **A
+screen's alt and title are its file's own entry first**, then the first state
+showing it that has one, so a row that borrows another state's file can never
+blank them (Mall's v3-labels did, 2026-10-03); the build warns on a screen with
+no alt.
 
 **Nothing on the phone is ever cropped** (Uttham, 2026-10-03: "when I give big
 images I dont want you to just paste them or crop them abruptly making its
