@@ -1086,12 +1086,14 @@ const boardWidths = (key: string) => [...new Set([480, 960, 1600].map((w) => Mat
     // every width now that phones float the preview instead of stacking it.
     const bandCentre = () => innerHeight / 2;
 
-    // Where a page ends on its last rows (the AI Space pages have nothing
-    // after them), those rows can never scroll up to the middle, so the
-    // preview would never reach them. Only then, over the last half screen of
-    // scrolling, the band slides from the middle down to the last row's centre
-    // and every trigger is a candidate. A page whose rows all reach the middle
-    // (a case study, with "More cases" after it) never takes this path.
+    // Where too little follows a page's last rows for them to scroll up to
+    // the middle, the preview would never reach them. Only then, over the last
+    // half screen of scrolling, the band slides from the middle down to the
+    // last row's centre and every trigger is a candidate. A page whose rows
+    // all reach the middle never takes this path. "More tools" after an AI
+    // Space page (2026-10-03) shortens the slide but does not always end it:
+    // Resona's last row still misses the middle by ~70px at 1440×900 (it
+    // reaches it at 1280×720), so it keeps the slide there, over the block.
     const tailBand = (): number | null => {
       const last = triggers[triggers.length - 1];
       if (!last) return null;

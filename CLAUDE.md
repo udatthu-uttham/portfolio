@@ -757,10 +757,27 @@ from the reading would pull it out of the reader's hands, so its rows carry no
 state, and "Open the prototype ↗" under the facts opens it full size. On phones
 a live phone opens full size *in place* on a tap (moving an iframe into the
 dialog would reload it), centred under the header over a dimmed page; × or the
-page shrinks it, a second × hides it. A page that ends on its last rows (these
-do) lets the reading band slide down over the last half screen, so those rows
-still drive the phone; a page with rows that all reach the middle never takes
-that path.
+page shrinks it, a second × hides it. A page whose last rows cannot scroll up
+to the middle lets the reading band slide down over the last half screen, so
+those rows still drive the phone; a page with rows that all reach the middle
+never takes that path.
+
+**Every tool page ends on "More tools", as a case page ends on "More cases"**
+(Uttham, 2026-10-03: "and similar to projects at the end give entry points for
+next ones in ai prototype also"): after the recipe, one `--section-y` down (the
+layout's own bottom pad) and one `--section-y-sm` above the page's end, **a
+ruled row for every other tool with a page**, in the homepage's card order,
+linking to `/ai/<slug>`. **It is the same component, `CaseIndex` with `end`**:
+cases pass their studies, tools pass rows built from `tools.ts` only — year,
+kicker, name and the card's line (`what`), nothing written for it; a row
+without a year or kicker leaves that cell empty, never invented. The label
+names what the rows are, as "More cases" does, and the homepage section calls
+them tools ("Tools I build so the team moves faster."). The block **shortens
+Resona's band slide but does not end it**: its last row still misses the middle
+by ~70px at 1440×900 (it reaches it at 1280×720), so the slide runs over the
+block and the last row still takes the phone; the block itself holds no
+trigger, so the phone never changes as it scrolls in, and on phones the mini
+player has stepped away before it arrives.
 
 **The full case study opens behind a light gate** (Uttham chose "Light
 gate only"). **The password card holds the "In the full case study" list** (2026-10-02:
