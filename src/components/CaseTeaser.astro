@@ -2855,13 +2855,18 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
     max-width: 100cqw;
     translate: -50% 0;
   }
+  /* handwritten, as the notes are (Uttham, 2026-10-04: "use handwritten title
+     format for headings above the phone"): Caveat in ink, a size up from the
+     body's large step because Caveat's letters run small for their size */
+  .ct { --ct-title-size: calc(var(--text-body-lg) * 1.35); }
   .ct-pane__title {
-    height: calc(var(--text-body-lg) * var(--lh-statement));
+    height: calc(var(--ct-title-size) * var(--lh-statement));
     margin: 0 0 var(--space-4);
     color: var(--ink-900);
-    font-size: var(--text-body-lg);
-    font-weight: 600;
-    letter-spacing: var(--track-heading);
+    font-family: var(--font-hand);
+    font-size: var(--ct-title-size);
+    font-weight: 700;
+    letter-spacing: 0;
     line-height: var(--lh-statement);
     text-align: center;
     white-space: nowrap;
@@ -2983,7 +2988,7 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
     /* (A page with notes takes the same device: the notes find their room
        beside it, in the gutter — see THE NOTES — and never shrink it.) */
     /* the title over the phone: its one-line slot and a within-card step */
-    .ct-panel--titled { --ct-title-h: calc(var(--text-body-lg) * var(--lh-statement) + var(--space-4)); }
+    .ct-panel--titled { --ct-title-h: calc(var(--ct-title-size) * var(--lh-statement) + var(--space-4)); }
     /* the open link under the phone takes its line the same way: a within-card
        step above it and the text link's own height (its underline included) */
     .ct-panel--visit { --ct-foot-h: calc(var(--space-4) + var(--text-body) * var(--lh-heading) + var(--space-2)); }

@@ -794,8 +794,10 @@ power key and volume rocker both on the right edge. **It stands on the page
 itself** (2026-10-03: "Remove the glass behind the phone preview across"; this
 retires the same day's glass card and its four bolts, and with them the
 bolt-sized inset), and
-**its title above the device is set at `--text-body-lg`, weight 600**, so it
-registers ("the title on the can be more bigger"). Every length is a share of the
+**its title above the device is handwritten** — Caveat in ink at 1.35 ×
+`--text-body-lg`, weight 700 (2026-10-04: "use handwritten title format for
+headings above the phone"; it was General Sans 600 from "the title on the can
+be more bigger"). Every length is a share of the
 display's width, `--ct-device-screen` (`--ct-device-k-*`: bezel 0.03, status bar
 0.12, home strip 0.10, display corner 0.10); the body's corner is exactly the
 display's plus the bezel, depth is the paper's own layered shadows, and the
