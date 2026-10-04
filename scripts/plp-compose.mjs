@@ -38,7 +38,7 @@
 // catalogue photos are fetched once into .clip-work/ (untracked) when missing.
 import sharp from 'sharp';
 import { fileURLToPath } from 'node:url';
-import { PHOTOS, photoFile } from './plp-photos.mjs';
+import { PHOTOS, EARBUDS, photoFile } from './plp-photos.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const DIR = `${root}src/assets/plp`;
@@ -201,7 +201,37 @@ const withPhoto = async (c, photo) => {
     .resize({ width: W, height: H, kernel: KERNEL })
     .png()
     .toBuffer();
-  await save('list', [{ input: buf, left: 0, top: 0 }, { input: await rect(W, 3, FRAME), left: 0, top: FOOT }]);
+  // Rows 2–4 show three different earbuds, not his one i12 photo four times
+  // (Uttham, 2026-10-04: "the images are repititive … go to meesho.com and
+  // take images from there"). Each row's photo is a 409px square at x 0–408
+  // (rows at y 714, 1154, 1659); only that square changes. His wishlist heart
+  // (a 245-white disc, radius 35, centred at x 348) and row 2's OUT OF STOCK
+  // label are put back from his own pixels, and row 2's photo takes the same
+  // white wash his out-of-stock row has.
+  const BOX = 409;
+  const rowsOut = [
+    { photo: EARBUDS.white, top: 714, heart: 776, wash: 0.45 },
+    { photo: EARBUDS.black, top: 1154, heart: 1190 },
+    { photo: EARBUDS.gaming, top: 1659, heart: 1658 },
+  ];
+  const disc = Buffer.from(`<svg width="76" height="76"><circle cx="38" cy="38" r="35.5" fill="#fff"/></svg>`);
+  const layers = [{ input: buf, left: 0, top: 0 }];
+  for (const r of rowsOut) {
+    // the square the row shows: the photo's top 88%, centred, so the listing
+    // stamp meesho.com prints in each photo's bottom-left corner stays out
+    const file = await photoFile(r.photo);
+    const { width: pw, height: ph } = await sharp(file).metadata();
+    const side = Math.min(pw, Math.round(ph * 0.88));
+    const square = { left: Math.round((pw - side) / 2), top: 0, width: side, height: side };
+    layers.push({ input: await sharp(file).extract(square).resize({ width: BOX, height: BOX, kernel: KERNEL }).png().toBuffer(), left: 0, top: r.top });
+    if (r.wash) layers.push({ input: await sharp({ create: { width: BOX, height: BOX, channels: 4, background: { r: 255, g: 255, b: 255, alpha: r.wash } } }).png().toBuffer(), left: 0, top: r.top });
+    const heart = await sharp(buf).extract({ left: 348 - 38, top: r.heart - 38, width: 76, height: 76 }).composite([{ input: disc, blend: 'dest-in' }]).png().toBuffer();
+    layers.push({ input: heart, left: 348 - 38, top: r.heart - 38 });
+  }
+  const pill = Buffer.from(`<svg width="370" height="76"><rect x="1" y="1" width="368" height="74" rx="16" fill="#fff"/></svg>`);
+  layers.push({ input: await sharp(buf).extract({ left: 20, top: 880, width: 370, height: 76 }).composite([{ input: pill, blend: 'dest-in' }]).png().toBuffer(), left: 20, top: 880 });
+  layers.push({ input: await rect(W, 3, FRAME), left: 0, top: FOOT });
+  await save('list', layers);
   // on the board: the first row's middle at y 330, the third row's chips at 580
   report.list = { scale: '3.000', 'first row': at((330 - 164) * 3), 'third row': at((580 - 164) * 3) };
 }

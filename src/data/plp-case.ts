@@ -97,7 +97,7 @@ export const plpCase: CaseTeaserData = {
           kind: 'inside',
           lead: 'In the full case study:',
           items: [
-            'Each of the eight changes: why, how, what worked',
+            'Each of the seven changes: why, how, what worked',
             'Before and after screens for every change',
           ],
         },
@@ -154,13 +154,6 @@ export const plpCase: CaseTeaserData = {
       worked: 'Taps into the product fell while orders per tap rose: one finding, not two. **The decision moved onto the listing.**',
     },
     {
-      state: 'bigimg',
-      title: 'Bigger images for fashion',
-      why: 'For a garment on a body **the look is the decision**, and the standard image was too small to judge it.',
-      how: 'Taller 4:5 image on fashion cards, tested across the feed and then by category.',
-      worked: 'Fashion converted on fewer, larger cards; **non-fashion paid for it in the same feed.** The rule it points at is **intent, not a blanket change.**',
-    },
-    {
       state: 'cash',
       title: 'Cash price',
       status: 'Live',
@@ -197,9 +190,7 @@ export const plpCase: CaseTeaserData = {
     // cash-price row lit" is still to come), so it shows the old feed, whose
     // cards carry the cash price in its own row under the prepaid (UPI) price
     // (2026-10-04 audit: it had borrowed the swipe clip). Bigger images for
-    // fashion has none either and no export shows a taller 4:5 image, so it
-    // still borrows the swipe clip, under that clip's own title, until he
-    // supplies one.
+    // fashion came out of the study (2026-10-04: "remove this").
     map: { stagger: 'after', cleanup: 'framework', scroll: 'swipe', cash: 'before' },
     // Swipeable images as a composed clip (Uttham, 2026-10-03: "please mock by
     // moving images … for other 1 or 2 products atleast"): scripts/plp-swipe-clip.mjs
@@ -212,7 +203,6 @@ export const plpCase: CaseTeaserData = {
       list: 'Earphones as list rows: each row a picture beside its fact chips, price, cash price and rating',
       scroll: 'A feed whose cards carry swipeable images, with the dots under each picture',
       swipe: 'A feed of different kurtis whose cards carry swipeable images: the first swipes to a kurti in another colour, two more to their own back view, and back, the dots under each picture following',
-      bigimg: 'A fashion card with a taller 4:5 image',
       date: 'The new feed with a kurti that shows Fast and its day count at its foot, among cards with no delivery line',
       after: 'The new product card',
       // for his cash.png when it comes (drop `cash: 'before'` from the map then)
@@ -228,7 +218,6 @@ export const plpCase: CaseTeaserData = {
       stagger: 'A staggered feed',
       list: 'List view by category',
       scroll: 'More views and variations',
-      bigimg: 'Bigger images for fashion',
       date: 'Dates on fast deliveries',
       after: 'The new card',
       cash: 'The cash-price row',

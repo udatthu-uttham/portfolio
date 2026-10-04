@@ -614,7 +614,7 @@ of his exports is the right one**, which `screens.map` then names (2026-10-04
 audit, "I want you to judge whether we are showing right infor and images": the
 product cards' Cash price shows `before`, whose cards carry the cash price in its
 own row, under its own title, instead of the swipe clip; Bigger images for
-fashion has no right export and still borrows). `src/assets/mall/` is the Mall
+fashion came out of the study on 2026-10-04, "remove this"). `src/assets/mall/` is the Mall
 deck's own exports, kept only for the homepage tile.
 
 **The teaser pages run on the homepage spacing ladder, stepped up for reading**

@@ -20,17 +20,15 @@ and Delivery date:
 | `stagger` | Staggered feed (block 2) | A staggered feed | a feed with staggered columns, each card at its natural height |
 | `list` | List or grid by category (block 2) | List view by category | composed: the list-view screen only (earphones as rows; his one earphone photo on every row, because the prototype's catalogue has no earphones — a varied set is his to supply) |
 | `swipe` (state `scroll`; its clip is `public/media/plp/swipe.mp4`) | Swipeable images | More views and variations | composed clip: his Kurti feed capture (`scroll.png`), six of whose eight yellow kurtis are the prototype's other kurtis; the first card swipes to a red kurti, the black and ivory ones to their own back views, and back, the dots following; `swipe.png` is the clip's first and last frame |
-| `bigimg` | Bigger images for fashion | Bigger images for fashion | a fashion card with the taller 4:5 image |
 | `date` | Delivery date | Dates on fast deliveries | composed: the winning card (Fast and its day count) in the new feed, among cards with no date |
 | `after` | Outcome | The new card | the new product card |
 
-Full case study only: `cash` (The cash-price row) and `bigimg` (Bigger images
-for fashion), neither exported yet. Until his `cash.png` comes, the state maps
+Full case study only: `cash` (The cash-price row), not exported yet. Until his `cash.png` comes, the state maps
 to `before`, whose cards carry the cash price in its own row under the UPI
 price, under its own title, The cash-price row (2026-10-04 audit: it had
 borrowed the swipe clip); when the file arrives, drop `cash: 'before'` from
-`screens.map`. No export shows a taller 4:5 fashion image, so `bigimg` still
-borrows the swipe clip under that clip's title. The other blocks reuse the
+`screens.map`. Bigger images for fashion (`bigimg`) came out of the study on
+2026-10-04 ("remove this"). The other blocks reuse the
 names above. The scan-order screens (`scan-*`) left with that section.
 
 **Composed screens** (Uttham, 2026-10-03: "I gave the whole dump I want you to
@@ -123,3 +121,5 @@ They also stand side by side, tagged Before and After, in the homepage tile (`ti
 `src/data/studies.ts`). The earlier cut-outs came off on 2026-10-02.
 
 `after-tile.png` is the homepage tile's copy of `after.png` (2026-10-04): the carousel dots moved from the third product (the yellow kurti) to the foot of the fourth's photo (the bedsheet), beside the tile's "Scrollable" note, so its arrow meets them; the kurti's photo is filled in where the dots were. The case page keeps `after.png` as he exported it.
+
+The list view's rows 2–4 (2026-10-04): three different wireless earbuds from meesho.com's own listings (`EARBUDS` in `scripts/plp-photos.mjs`; "go to meesho.com and take images from there") instead of his i12 photo four times; row 1 keeps his i12. Only each row's 409px photo square changes, cropped above the listing stamp in each photo's corner; his hearts, row 2's OUT OF STOCK label and its white wash are kept.

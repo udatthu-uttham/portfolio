@@ -7,8 +7,10 @@
 // Every one is a public Meesho catalogue photo that the prototype's compiled
 // bundle (public/proto/feed-ux/assets/index-*.js) already references by
 // address, under its women_kurti records. The prototype has no earphones (its
-// only electronics are a speaker and a cable), so the list view keeps
-// Uttham's own earphone photo on every row.
+// only electronics are a speaker and a cable), so the list view's rows 2–4
+// take public Meesho listing photos of wireless earbuds from meesho.com's own
+// search results instead (EARBUDS, below; Uttham, 2026-10-04: "go to
+// meesho.com and take images from there"); row 1 keeps his i12 photo.
 //
 // Used by scripts/plp-compose.mjs (the titles grid) and
 // scripts/plp-swipe-clip.mjs (the Kurti feed under the swipe clip). Each photo
@@ -44,6 +46,20 @@ export const PHOTOS = {
   ivoryBack: { id: '5041199', n: 2, url: at('5041199', '2.jpg'), crop: { left: 0, top: 0, width: 1080, height: 1080 } },
   // a short green-and-navy kurti over leggings, front
   navy: { id: '5040548', n: 1, url: at('5040548', '1.jpg'), crop: { left: 0, top: 20, width: 512, height: 512 } },
+};
+
+// Wireless earbuds from meesho.com's search for "bluetooth earbuds tws"
+// (2026-10-04): plain product shots on light backgrounds, no banner text, so
+// each reads like his i12 row; every chip on those rows (battery hours, noise
+// cancellation, water resistant, warranty) is a generic earbuds claim.
+const lst = (id, file) => `https://images.meesho.com/images/products/${id}/${file}_512.webp`;
+export const EARBUDS = {
+  // white earbuds beside their box, on white (row 2, the out-of-stock row)
+  white: { id: '1097097511', n: 1, url: lst('1097097511', 'pz2ji') },
+  // black earbuds in an open black case, on grey (row 3)
+  black: { id: '1079969949', n: 1, url: lst('1079969949', 'wiowl') },
+  // black gaming earbuds with a lit case, on white (row 4)
+  gaming: { id: '409579286', n: 1, url: lst('409579286', 'kahxm') },
 };
 
 // the local file for a photo, fetched from its public address when missing
