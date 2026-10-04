@@ -15,41 +15,56 @@
 // ends where it began. Three of its cards swipe their picture, one at a time,
 // so the eye can follow: the first card (row 1, left) while the window is at
 // the top; then, panned to the foot, the right card of row 2 and the left card
-// of row 3. Each slides to a second photo of a similar product and back, the
-// way an iOS paging scroll view settles — a critically damped spring, no
-// bounce — and the carousel dots under the picture follow: the dot for the
-// page on show darkens as the swipe begins, moves to the second dot as the
-// picture passes halfway, and fades back once the card is at rest, so the
-// clip's first and last frames are his capture to the pixel. Nothing else in
-// the capture is touched: the wishlist heart and the dots pill stay put over
-// the sliding pictures (the heart is a masked copy of his own pixels; the pill
-// is redrawn at its measured geometry only while a card is moving).
+// of row 3. Each slides to a second picture and back, the way an iOS paging
+// scroll view settles — a critically damped spring, no bounce — and the
+// carousel dots under the picture follow: the dot for the page on show darkens
+// as the swipe begins, moves to the second dot as the picture passes halfway,
+// and fades back once the card is at rest, so the clip's first and last
+// frames are the same. The wishlist heart and the dots pill stay put over the
+// sliding pictures (the heart is a masked copy of the feed's own pixels; the
+// pill is redrawn at its measured geometry only while a card is moving).
 //
-// THE SECOND PHOTOS come from the realistic prototype's own product
-// catalogue — Meesho's public catalogue photos, which its compiled bundle
-// (public/proto/feed-ux/assets/) references by address (Uttham, 2026-10-03:
-// public, fine to use). Three kurtis, so each card swipes to another kurti:
-// a red printed A-line (5047403), a teal printed anarkali (5038838) and a
-// grey-and-white printed A-line (5037151). They are fetched into
-// .clip-work/plp-swipe/photos/ (untracked) when missing, then cropped square
-// — the model's head in, the stamp in the corner out — and scaled to the
-// card's own 528 × 531 image box, never outside it. Under the pill and the
-// heart his photo is unknown, so where the sliding picture carries them away
-// those small patches are filled from their surroundings (the pill's rows
-// interpolated from the rows above and below it, the heart's disc from the
-// flat background around it); at rest the original pixels show.
+// A FEED OF DIFFERENT KURTIS (Uttham, 2026-10-04: "In the first project
+// teaser, the images are repititive can we use other images to make the image
+// output realistic take it from prototype porject"). His capture shows one
+// yellow kurti on all eight cards, so six of them take other kurtis from the
+// realistic prototype's catalogue (scripts/plp-photos.mjs): row 1 right the
+// teal anarkali, row 2 the grey-and-white A-line and the black anarkali, row 3
+// the ivory print and the short green-and-navy kurti, row 4 left the red
+// A-line. The first card and row 4 right keep his yellow kurti, so the two
+// never stand in one window except as row 1's last 60px over row 4's heads at
+// the foot. Every card reads "Cotton" over a kurti, so every chip stays true.
+// Only each card's 528 × 531 picture box changes, and only below the chrome
+// (row 1's boxes run 111px under it) and above the capture's foot rule: the
+// dots pill goes back on as his own pixels, cut to its rounded shape, and the
+// heart as his own pixels too, re-tinted to the new photo, because its disc is
+// about 77% white over the picture (each pixel moves by the change in the
+// background under it, times what the disc lets through).
+//
+// THE SECOND PICTURES, from the same catalogue: the first card (his yellow
+// kurti) swipes to the red printed A-line, a kurti in another colour; the
+// black anarkali and the ivory print swipe to their own back views — "more of
+// the product and the variations it comes in", as the row says. Every photo
+// is cropped square, the model's head in and the corner stamp out, and scaled
+// to the card's own picture box, never outside it. Under his yellow kurti's
+// pill his photo is unknown, so where the sliding picture carries the pill
+// away that small patch is filled from its surroundings (its rows
+// interpolated from the rows above and below it); the replaced cards' photos
+// are whole, so nothing needs filling there.
 //
 // OUTPUT. Frames are rendered at 1080 × 2160 and encoded at 720 × 1440,
 // 30 fps, H.264 with the moov atom first: public/media/plp/swipe.mp4. The
 // poster, src/assets/plp/swipe.png (1080 × 2160), is the clip's first frame,
 // which is also its last, so the page's still is both what the clip opens on
 // and what it settles on. Re-runnable: the capture and the photos are the
-// source, the outputs are overwritten. Run `npm run clip-edges` afterwards so
-// the handset's strips follow the clip's frames.
+// source, the outputs are overwritten; the photos are fetched once into
+// .clip-work/plp-photos/ (untracked) when missing. Run `npm run clip-edges`
+// afterwards so the handset's strips follow the clip's frames.
 import sharp from 'sharp';
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, readdirSync, rmSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { PHOTOS as CATALOGUE, photoFile } from './plp-photos.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const SRC = `${root}src/assets/plp/scroll.png`;
@@ -57,7 +72,6 @@ const POSTER = `${root}src/assets/plp/swipe.png`;
 const CLIP_DIR = `${root}public/media/plp`;
 const CLIP = `${CLIP_DIR}/swipe.mp4`;
 const WORK = `${root}.clip-work/plp-swipe`;
-const PHOTOS = `${WORK}/photos`;
 const FRAMES = `${WORK}/frames`;
 const ENCODER = `${root}scripts/frames-to-mp4.swift`;
 
@@ -73,29 +87,47 @@ const KERNEL = 'lanczos3';
 // 9px gutters between rows. Every card's picture is a 528 × 531 box — x 6–533
 // in the left column, 546–1073 in the right (the #EAEAF2 either side of it is
 // the card's own edge and the gutter, one colour); the first row's boxes start
-// at y 189, their top 111 rows under the chrome (the feed is scrolled). Under
-// each picture a white pill, 159 × 30, holds four 22.4 × 12 dots (#CECEDE)
-// 35.7 apart; a card with a wishlist heart has it as a 72px disc at the top
-// right.
+// at y 189, their top 111 rows under the chrome (the feed is scrolled), and the
+// gutters put the next rows' boxes at y 954, 1719 and 2544 on the left and
+// 1014, 1779 and 2544 on the right (measured 2026-10-04); the fourth row runs
+// on past the capture's foot rule (rows 2817–2819). Under each picture, 186px
+// in and 483px down its box, a white pill, 159 × 30, holds four 22.4 × 12 dots
+// (#CECEDE) 35.7 apart; a card with a wishlist heart has it as a 72px disc
+// centred 468.5px in and 56.5px down its box, about 77% white over the photo.
 const CARD_W = 528, CARD_H = 531;
 const PILL = { w: 159, h: 30, dotX: 18.2, dotPitch: 35.7, dotW: 22.4, dotH: 12, dotY: 9 };
 const DOT = { rest: [0xce, 0xce, 0xde], on: [0x61, 0x61, 0x73] }; // his dot grey; the icon ink of his heart
 const HEART_R = 36;
+const CHROME = 300; // rows 0–299: the search bar and filter row, over row 1's boxes
+const FOOT_RULE = 2817; // the capture's 3px foot rule starts here
+const LEFT = 6, RIGHT = 546;
+const box = (x, top) => ({
+  x,
+  top,
+  seen: Math.max(top, CHROME),
+  pill: top + 483 + PILL.h <= FOOT_RULE ? { x: x + 186, y: top + 483 } : null,
+  heart: top + 56.5 - HEART_R >= CHROME && top + 56.5 + HEART_R <= FOOT_RULE ? { cx: x + 468.5, cy: top + 56.5 } : null,
+});
 
-// the photos: the prototype's catalogue, by product id (public addresses in
-// public/proto/feed-ux/assets/index-*.js), each with its square crop
-const PHOTO = {
-  red: { id: '5047403', url: 'https://images.meesho.com/images/products/5047403/1.jpg', crop: { left: 29, top: 0, width: 1222, height: 1222 } },
-  teal: { id: '5038838', url: 'https://images.meesho.com/images/products/5038838/mvhxc.jpg', crop: { left: 0, top: 0, width: 512, height: 512 } },
-  grey: { id: '5037151', url: 'https://images.meesho.com/images/products/5037151/1.jpg', crop: { left: 121, top: 0, width: 1850, height: 1850 } },
-};
+// the feed: a kurti per card, from the prototype's catalogue, or his own
+// yellow kurti where `photo` is absent
+const FEED = [
+  { name: 'row 1 left', ...box(LEFT, 189) },
+  { name: 'row 1 right', ...box(RIGHT, 189), photo: CATALOGUE.teal },
+  { name: 'row 2 left', ...box(LEFT, 954), photo: CATALOGUE.grey },
+  { name: 'row 2 right', ...box(RIGHT, 1014), photo: CATALOGUE.black },
+  { name: 'row 3 left', ...box(LEFT, 1719), photo: CATALOGUE.ivory },
+  { name: 'row 3 right', ...box(RIGHT, 1779), photo: CATALOGUE.navy },
+  { name: 'row 4 left', ...box(LEFT, 2544), photo: CATALOGUE.red },
+  { name: 'row 4 right', ...box(RIGHT, 2544) },
+];
+const feedCard = (name) => FEED.find((c) => c.name === name);
 
-// the three cards that swipe: the picture box, where it is visible from (the
-// first row's is partly under the chrome), its pill, its heart (if seen)
+// the three cards that swipe, and the picture each swipes to
 const CARDS = [
-  { name: 'row 1 left', x: 6, top: 189, seen: 300, pill: { x: 192, y: 672 }, heart: null, photo: PHOTO.red },
-  { name: 'row 2 right', x: 546, top: 1014, seen: 1014, pill: { x: 732, y: 1497 }, heart: { cx: 1014.5, cy: 1070.5 }, photo: PHOTO.teal },
-  { name: 'row 3 left', x: 6, top: 1719, seen: 1719, pill: { x: 192, y: 2202 }, heart: { cx: 474.5, cy: 1775.5 }, photo: PHOTO.grey },
+  { ...feedCard('row 1 left'), to: CATALOGUE.red },
+  { ...feedCard('row 2 right'), to: CATALOGUE.blackBack },
+  { ...feedCard('row 3 left'), to: CATALOGUE.ivoryBack },
 ];
 
 // ---- the timeline (seconds) --------------------------------------------------
@@ -145,26 +177,102 @@ const panAt = (t) => {
 };
 
 // ---- sources -----------------------------------------------------------------
-mkdirSync(PHOTOS, { recursive: true });
-for (const photo of Object.values(PHOTO)) {
-  photo.file = `${PHOTOS}/${photo.id}.jpg`;
-  if (existsSync(photo.file)) continue;
-  console.log(`fetching ${photo.url}`);
-  const res = await fetch(photo.url);
-  if (!res.ok) throw new Error(`${photo.url}: ${res.status}`);
-  writeFileSync(photo.file, Buffer.from(await res.arrayBuffer()));
+const orig = await sharp(SRC).removeAlpha().raw().toBuffer({ resolveWithObject: true });
+const PW = orig.info.width, PH = orig.info.height;
+if (PW !== W) throw new Error(`${SRC} is ${PW} wide, not ${W}`);
+if (PH < FOOT_RULE + 3) throw new Error(`${SRC} is ${PH} tall; its foot rule was measured at ${FOOT_RULE}`);
+const px = (buf, w, x, y) => { const i = (y * w + x) * 3; return [buf[i], buf[i + 1], buf[i + 2]]; };
+const clamp255 = (v) => Math.max(0, Math.min(255, Math.round(v)));
+
+// a catalogue photo, cropped square and scaled to the picture box, never
+// outside it (the box is 3px short of square, so the cover fit trims that much)
+const photoOf = async (photo) =>
+  sharp(await photoFile(photo)).extract(photo.crop).resize(CARD_W, CARD_H, { fit: 'cover', kernel: KERNEL }).removeAlpha().raw().toBuffer();
+
+// ---- the feed: a different kurti per card ----------------------------------
+// The heart's disc lets about a fifth of the photo through (measured on his
+// capture: (250 − 230) / (255 − 230) on its left, (248 − 218) / (255 − 218) on
+// its right), its outline is opaque ink (97, 97, 115), and its rim is 1px soft
+// at a 36px radius. Over a new photo each pixel moves by the change in the
+// backdrop times what the disc lets through there: none of the photo where the
+// ink is, a fifth where the disc is white, all of it outside the rim. His
+// backdrop under the disc is unknown, so it is taken as the ring round it.
+// The rim is read off his pixels instead of the circle: how much white each
+// rim pixel carries over the backdrop just outside it, at the same angle,
+// is how much it lays over the new photo (a drawn circle's rim sat a fraction
+// of a pixel off his and left a faint grey ring on a white photo).
+const HEART_A = 0.8;
+const RIM = HEART_R - 4; // from here out, the rim's white is read off his pixels
+const FILL_SUM = 745, INK_SUM = 309; // the disc's white and the heart's ink, as r + g + b
+const ringOf = (heart) => {
+  const sum = [0, 0, 0];
+  let n = 0;
+  for (let y = Math.floor(heart.cy - 47); y <= Math.ceil(heart.cy + 47); y++) {
+    for (let x = Math.floor(heart.cx - 47); x <= Math.ceil(heart.cx + 47); x++) {
+      const d = Math.hypot(x + 0.5 - heart.cx, y + 0.5 - heart.cy);
+      if (d < HEART_R + 3 || d > HEART_R + 10) continue;
+      const c = px(orig.data, PW, x, y);
+      sum[0] += c[0]; sum[1] += c[1]; sum[2] += c[2]; n++;
+    }
+  }
+  return sum.map((v) => v / n);
+};
+const base = { data: Buffer.from(orig.data), info: orig.info };
+const pills = [];
+for (const card of FEED) {
+  if (!card.photo) continue;
+  card.photoData = await photoOf(card.photo);
+  // the picture, from under the chrome to the foot rule
+  for (let y = card.seen; y < Math.min(card.top + CARD_H, FOOT_RULE); y++) {
+    card.photoData.copy(base.data, (y * PW + card.x) * 3, (y - card.top) * CARD_W * 3, ((y - card.top) * CARD_W + CARD_W) * 3);
+  }
+  // the heart, his pixels re-tinted to the photo now under them
+  if (card.heart) {
+    const { cx, cy } = card.heart;
+    const bg = ringOf(card.heart);
+    for (let y = Math.floor(cy - HEART_R - 2); y <= Math.ceil(cy + HEART_R + 2); y++) {
+      for (let x = Math.floor(cx - HEART_R - 2); x <= Math.ceil(cx + HEART_R + 2); x++) {
+        const dx = x + 0.5 - cx, dy = y + 0.5 - cy, d = Math.hypot(dx, dy);
+        if (d > HEART_R + 1.5) continue;
+        const his = px(orig.data, PW, x, y);
+        const photo = px(card.photoData, CARD_W, x - card.x, y - card.top);
+        const i = (y * PW + x) * 3;
+        if (d > RIM) {
+          // the white this rim pixel carries over the backdrop just outside it
+          const out = px(orig.data, PW, Math.floor(cx + (dx / d) * (HEART_R + 4)), Math.floor(cy + (dy / d) * (HEART_R + 4)));
+          const white = [0, 1, 2].reduce((s, k) => s + (his[k] - out[k]) / Math.max(1, 255 - out[k]), 0) / 3;
+          const w = Math.min(1, Math.max(0, white));
+          for (let k = 0; k < 3; k++) base.data[i + k] = clamp255(photo[k] + (255 - photo[k]) * w);
+          continue;
+        }
+        const ink = Math.min(1, Math.max(0, (FILL_SUM - his[0] - his[1] - his[2]) / (FILL_SUM - INK_SUM)));
+        const a = HEART_A + (1 - HEART_A) * ink;
+        for (let k = 0; k < 3; k++) base.data[i + k] = clamp255(his[k] + (photo[k] - bg[k]) * (1 - a));
+      }
+    }
+  }
+  // the dots pill, his pixels, cut to its rounded shape
+  if (card.pill) {
+    const region = await sharp(orig.data, { raw: { width: PW, height: PH, channels: 3 } })
+      .extract({ left: card.pill.x, top: card.pill.y, width: PILL.w, height: PILL.h })
+      .ensureAlpha()
+      .png()
+      .toBuffer();
+    const mask = Buffer.from(`<svg width="${PILL.w}" height="${PILL.h}"><rect width="${PILL.w}" height="${PILL.h}" rx="${PILL.h / 2}" fill="#fff"/></svg>`);
+    pills.push({ input: await sharp(region).composite([{ input: mask, blend: 'dest-in' }]).png().toBuffer(), left: card.pill.x, top: card.pill.y });
+  }
+}
+if (pills.length) {
+  const withPills = await sharp(base.data, { raw: { width: PW, height: PH, channels: 3 } }).composite(pills).removeAlpha().raw().toBuffer();
+  withPills.copy(base.data);
 }
 
-const base = await sharp(SRC).removeAlpha().raw().toBuffer({ resolveWithObject: true });
-const PW = base.info.width, PH = base.info.height;
-if (PW !== W) throw new Error(`${SRC} is ${PW} wide, not ${W}`);
-const px = (buf, w, x, y) => { const i = (y * w + x) * 3; return [buf[i], buf[i + 1], buf[i + 2]]; };
-
-// a card's picture box as his pixels, with the pill (and the heart) filled in
-// from their surroundings, so nothing of them rides along with the slide
+// his yellow kurti's picture box, with the pill filled in from its
+// surroundings, so nothing of it rides along with the slide (the one card of
+// his that swipes has no heart in view: row 1's are under the chrome)
 const boxOf = (card) => {
   const data = Buffer.alloc(CARD_W * CARD_H * 3);
-  for (let y = 0; y < CARD_H; y++) base.data.copy(data, y * CARD_W * 3, ((card.top + y) * PW + card.x) * 3, ((card.top + y) * PW + card.x + CARD_W) * 3);
+  for (let y = 0; y < CARD_H; y++) orig.data.copy(data, y * CARD_W * 3, ((card.top + y) * PW + card.x) * 3, ((card.top + y) * PW + card.x + CARD_W) * 3);
   const set = (x, y, c) => { const i = (y * CARD_W + x) * 3; data[i] = c[0]; data[i + 1] = c[1]; data[i + 2] = c[2]; };
   const get = (x, y) => px(data, CARD_W, x, y);
   // the pill: every column a straight blend from the row over it to the row under it
@@ -176,26 +284,11 @@ const boxOf = (card) => {
       set(x, y, a.map((v, i) => Math.round(v + (b[i] - v) * k)));
     }
   }
-  // the heart: its disc takes the mean of the ring around it
-  if (card.heart) {
-    const cx = card.heart.cx - card.x, cy = card.heart.cy - card.top;
-    const sum = [0, 0, 0]; let n = 0;
-    for (let y = Math.floor(cy - 47); y <= Math.ceil(cy + 47); y++) for (let x = Math.floor(cx - 47); x <= Math.ceil(cx + 47); x++) {
-      if (x < 0 || y < 0 || x >= CARD_W || y >= CARD_H) continue;
-      const d = Math.hypot(x + 0.5 - cx, y + 0.5 - cy);
-      if (d >= HEART_R + 3 && d <= HEART_R + 10) { const c = get(x, y); sum[0] += c[0]; sum[1] += c[1]; sum[2] += c[2]; n++; }
-    }
-    const mean = sum.map((v) => Math.round(v / n));
-    for (let y = Math.floor(cy - 40); y <= Math.ceil(cy + 40); y++) for (let x = Math.floor(cx - 40); x <= Math.ceil(cx + 40); x++) {
-      if (x < 0 || y < 0 || x >= CARD_W || y >= CARD_H) continue;
-      if (Math.hypot(x + 0.5 - cx, y + 0.5 - cy) <= HEART_R + 2.5) set(x, y, mean);
-    }
-  }
   return data;
 };
 
-// the heart as his own pixels, cut round: a 77px square about its centre,
-// masked to the disc with a soft 1px edge
+// the heart as the feed's own pixels, cut round: a 77px square about its
+// centre, masked to the disc with a soft 1px edge
 const heartOf = async (card) => {
   if (!card.heart) return null;
   const left = Math.round(card.heart.cx - 38.5), top = Math.round(card.heart.cy - 38.5), side = 77;
@@ -215,13 +308,10 @@ const pillOf = (page, on) => {
   return Buffer.from(`<svg width="${PILL.w}" height="${PILL.h}"><rect width="${PILL.w}" height="${PILL.h}" rx="${PILL.h / 2}" fill="#fff"/>${dots}</svg>`);
 };
 
-// the second photo, cropped square and scaled to the box, never outside it
-// (the box is 3px short of square, so the cover fit trims that much)
-const photoOf = async (card) => sharp(card.photo.file).extract(card.photo.crop).resize(CARD_W, CARD_H, { fit: 'cover', kernel: KERNEL }).removeAlpha().raw().toBuffer();
-
 for (const card of CARDS) {
-  card.box = boxOf(card);
-  card.next = await photoOf(card);
+  // photo 1: a catalogue photo whole, or his yellow kurti with its pill filled
+  card.box = card.photo ? FEED.find((c) => c.name === card.name).photoData : boxOf(card);
+  card.next = await photoOf(card.to);
   card.heartLayer = await heartOf(card);
   card.seenRows = card.top + CARD_H - card.seen; // the rows of the box in view
 }

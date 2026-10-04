@@ -16,15 +16,21 @@ and Delivery date:
 | `before` | Context | The old card | the old product card in the feed |
 | `before-annotated` | Problem | Which team added what | the old card, each element labelled with the team that added it |
 | `framework` (state `cleanup`) | Card framework | The card framework | composed: the framework card alone, large, on the feed under the search bar and filter row; its zone labels are notes beside the phone |
-| `titles` | Seller titles | Facts in place of the title | composed: the four title variants as a 2 × 2 feed grid, the feed carrying on below |
+| `titles` | Seller titles, then Facts in place of the title | Facts in place of the title | composed: the four title variants as a 2 × 2 feed grid, the feed carrying on below; the seller's-title card keeps his yellow kurti, the one-fact and two-fact cards carry the prototype's teal and grey kurtis, so the grid is not one kurti three times |
 | `stagger` | Staggered feed (block 2) | A staggered feed | a feed with staggered columns, each card at its natural height |
-| `list` | List or grid by category (block 2) | List view by category | composed: the list-view screen only (earphones as rows) |
-| `swipe` (state `scroll`; its clip is `public/media/plp/swipe.mp4`) | Swipeable images | More views and variations | composed clip: his Kurti feed capture (`scroll.png`), three of whose cards swipe their picture to another kurti and back, the dots following; `swipe.png` is the clip's first and last frame |
+| `list` | List or grid by category (block 2) | List view by category | composed: the list-view screen only (earphones as rows; his one earphone photo on every row, because the prototype's catalogue has no earphones — a varied set is his to supply) |
+| `swipe` (state `scroll`; its clip is `public/media/plp/swipe.mp4`) | Swipeable images | More views and variations | composed clip: his Kurti feed capture (`scroll.png`), six of whose eight yellow kurtis are the prototype's other kurtis; the first card swipes to a red kurti, the black and ivory ones to their own back views, and back, the dots following; `swipe.png` is the clip's first and last frame |
 | `bigimg` | Bigger images for fashion | Bigger images for fashion | a fashion card with the taller 4:5 image |
 | `date` | Delivery date | Dates on fast deliveries | composed: the winning card (Fast and its day count) in the new feed, among cards with no date |
 | `after` | Outcome | The new card | the new product card |
 
-Full case study only: `cash` (The cash-price row). The other blocks reuse the
+Full case study only: `cash` (The cash-price row) and `bigimg` (Bigger images
+for fashion), neither exported yet. Until his `cash.png` comes, the state maps
+to `before`, whose cards carry the cash price in its own row under the UPI
+price, under its own title, The cash-price row (2026-10-04 audit: it had
+borrowed the swipe clip); when the file arrives, drop `cash: 'before'` from
+`screens.map`. No export shows a taller 4:5 fashion image, so `bigimg` still
+borrows the swipe clip under that clip's title. The other blocks reuse the
 names above. The scan-order screens (`scan-*`) left with that section.
 
 **Composed screens** (Uttham, 2026-10-03: "I gave the whole dump I want you to
@@ -45,6 +51,25 @@ notes' new `y` from what it prints. Effective upscale on the page (1440×900,
 2× display): titles and date cards ×1.5 (the boards are 1× renders), the list
 ×1.5, the framework card ×0.9 (none).
 
+**No screen repeats one product photo** (Uttham, 2026-10-04: "In the first
+project teaser, the images are repititive can we use other images to make the
+image output realistic take it from prototype porject"). Where his boards and
+his Kurti capture show one yellow kurti on card after card, the composed
+screens put other kurtis in those cards' picture boxes, from the realistic
+prototype's own catalogue: public Meesho catalogue photos its bundle
+(`public/proto/feed-ux/assets/index-*.js`) already references, listed with
+their crops in `scripts/plp-photos.mjs` and fetched once into
+`.clip-work/plp-photos/` (untracked) when missing. Only the picture box
+changes: his words, chips, prices, ratings, edges, hearts and dots stay his,
+and every chip on those cards ("Kurti", "Cotton") is true of a kurti. The
+titles grid's seller's-title card keeps his yellow kurti; its one-fact card
+shows the teal anarkali (5038838) and its two-fact card the grey-and-white
+A-line (5037151). The date screen (one yellow kurti among a shirt, a hair oil,
+a bedsheet and two other kurtis) and the framework card were not repetitive and
+are unchanged. The list view's four rows still share his i12 earphone photo:
+the catalogue has no earphones, and a mismatched product would make the row's
+battery and noise-cancellation chips false, so a varied set is his to supply.
+
 **The swipeable-images clip** (Uttham, 2026-10-03: "Swipeable images in the
 prototype please mock by moving images, it only there on one card, I want to
 move it for other 1 or 2 products atleast . find similar images from the
@@ -55,20 +80,28 @@ his 1080 × 2820 Kurti feed capture: a 1 : 2 window that pans gently down the
 page and back, in which three cards swipe their picture one at a time — the
 first card (row 1, left) while the window is at the top, then the right card
 of row 2 and the left card of row 3 once it has panned to the foot — each
-sliding to a second photo of a similar kurti and back on a critically damped
-spring (no bounce), the dot for the page on show darkening as the swipe
-begins, moving to the second dot as the picture passes halfway and fading
-back at rest. The second photos are three public catalogue photos the
-realistic prototype's bundle already references (kurtis 5047403, 5038838 and
-5037151), cropped square — the model's head in, the corner stamp out — and
-scaled to the card's own 528 × 531 image box; the script fetches them into
-`.clip-work/plp-swipe/photos/` (untracked) when missing. Nothing else in the
-capture is touched, and the clip's first and last frames are its top window
-to the pixel, so the poster is both what the clip opens on and what it settles
-on (reduced motion shows the poster alone). After re-rendering, run
-`npm run clip-edges` so the handset's strips follow its frames. `scroll.png`
-stays as the clip's source; it is not shown on its own once the `scroll` state
-maps to `swipe`.
+sliding to a second picture and back on a critically damped spring (no
+bounce), the dot for the page on show darkening as the swipe begins, moving to
+the second dot as the picture passes halfway and fading back at rest. **The
+feed is eight different-looking cards** (2026-10-04, above): his capture shows
+the yellow kurti on all eight, so six take the prototype's other kurtis — row 1
+right the teal anarkali, row 2 the grey-and-white A-line and the black
+anarkali (5037149), row 3 the ivory print (5041199) and the short
+green-and-navy kurti (5040548), row 4 left the red A-line (5047403) — and the
+first card and row 4 right keep his yellow kurti (they share a window only as
+row 1's last 60px over row 4's heads at the foot). Only each 528 × 531 picture
+box changes, below the chrome and above the foot rule; his dots pill goes back
+on as his own pixels, and his heart as his own pixels re-tinted to the new
+photo (its disc is about 80% white over the picture, its rim read off his
+pixels). **The second pictures**: his yellow kurti swipes to the red A-line, a
+kurti in another colour; the black anarkali and the ivory print swipe to their
+own back views, more of the same product. All photos are cropped square — the
+model's head in, the corner stamp out — and scaled to the card's own box. The
+clip's first and last frames are the same, so the poster is both what the clip
+opens on and what it settles on (reduced motion shows the poster alone). After
+re-rendering, run `npm run clip-edges` so the handset's strips follow its
+frames. `scroll.png` stays as the clip's source; it is not shown on its own
+once the `scroll` state maps to `swipe`.
 
 Export phone screens at 1 : 2 (1080 × 2160 is ideal), at 2× or more (≥ 720px
 wide), with dummy data only — no Figma links or file keys on the page, and no

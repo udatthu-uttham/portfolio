@@ -23,16 +23,22 @@
 //   cleanup  the card framework: the card alone, large, on the feed under the
 //            app's search bar and filter row, its zone boxes and labels gone
 //   titles   facts in place of the title: the four cards in a 2 × 2 feed grid,
-//            the feed carrying on below them
+//            the feed carrying on below them; the board shows one kurti three
+//            times, so the one-fact and two-fact cards take two other kurtis
+//            from the realistic prototype's catalogue (scripts/plp-photos.mjs;
+//            Uttham, 2026-10-04: "the images are repititive … take it from
+//            prototype porject"), their words, prices and chrome untouched
 //   list     list view by category: the list-view screen only (the grid
 //            control and the variant labels dropped)
 //   date     dates on fast deliveries: the winning card only (Fast and a day
 //            count), in the new feed in place of the same kurti's card, so it
 //            stands among cards that are not fast and carry no date
 //
-// Re-runnable: the boards are the source, the outputs are overwritten.
+// Re-runnable: the boards are the source, the outputs are overwritten; the
+// catalogue photos are fetched once into .clip-work/ (untracked) when missing.
 import sharp from 'sharp';
 import { fileURLToPath } from 'node:url';
+import { PHOTOS, photoFile } from './plp-photos.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const DIR = `${root}src/assets/plp`;
@@ -83,6 +89,54 @@ const save = async (name, layers, background = { r: 255, g: 255, b: 255 }) => {
 const at = (y) => (y / H).toFixed(3);
 const report = {};
 
+// A catalogue photo in a board card's picture box. On the titles board each
+// card (180 × 254 with its 1px #EAEAF2 edge) holds its picture at x 2–177,
+// y 1–177, with a white column either side of it and a white row under it,
+// and a wishlist heart over its top right: an opaque white disc 24px across,
+// centred at (158.25, 20), its outlined heart within 10px of the centre. The
+// photo is scaled (cover) straight into that box at the card's composed size,
+// so it is the catalogue's own pixels rather than a 1× render scaled up. The
+// white column and row beside it are the board's white again (scaling had
+// left the old photo's tint in their first pixels, a faint line against a
+// white-backed photo). The heart goes back over it: its disc drawn white at
+// its own size, so its rim blends with the new photo, and its icon the
+// board's own pixels, scaled with the card and cut round inside the disc.
+// Everything outside the box — the words, chips, price, rating and edges —
+// stays the board's.
+const BOX = { x0: 2, x1: 178, y0: 1, y1: 178 };
+const HEART = { cx: 158.25, cy: 20, r: 12, icon: 10.5 };
+const withPhoto = async (c, photo) => {
+  const s = c.scale;
+  const left = Math.round(BOX.x0 * s), top = Math.round(BOX.y0 * s);
+  const right = Math.round(BOX.x1 * s), foot = Math.round(BOX.y1 * s);
+  const width = right - left, height = foot - top;
+  const pic = await sharp(await photoFile(photo))
+    .extract(photo.crop)
+    .resize(width, height, { fit: 'cover', kernel: KERNEL })
+    .removeAlpha()
+    .png()
+    .toBuffer();
+  const white = { r: 255, g: 255, b: 255 };
+  const gap = Math.ceil(s); // the board's 1px white column / row, scaled
+  const cx = HEART.cx * s, cy = HEART.cy * s;
+  const hl = Math.floor(cx - HEART.r * s - 2), ht = Math.floor(cy - HEART.r * s - 2), side = Math.ceil(2 * HEART.r * s + 4);
+  const disc = Buffer.from(`<svg width="${side}" height="${side}"><circle cx="${cx - hl}" cy="${cy - ht}" r="${HEART.r * s}" fill="#fff"/></svg>`);
+  const region = await sharp(c.buf).extract({ left: hl, top: ht, width: side, height: side }).ensureAlpha().png().toBuffer();
+  const mask = Buffer.from(`<svg width="${side}" height="${side}"><circle cx="${cx - hl}" cy="${cy - ht}" r="${HEART.icon * s}" fill="#fff"/></svg>`);
+  const icon = await sharp(region).composite([{ input: mask, blend: 'dest-in' }]).png().toBuffer();
+  const buf = await sharp(c.buf)
+    .composite([
+      { input: pic, left, top },
+      { input: await rect(gap, foot + gap - top, white), left: right, top },
+      { input: await rect(right + gap - left, gap, white), left, top: foot },
+      { input: disc, left: hl, top: ht },
+      { input: icon, left: hl, top: ht },
+    ])
+    .png()
+    .toBuffer();
+  return { ...c, buf };
+};
+
 // ---- titles: the four cards in a 2 × 2 grid ---------------------------------
 // titles.png (978 × 478): four cards 180px wide with their 1px #EAEAF2 edge, at
 // x 100, 295, 490 and 698; the three kurtis 254px tall from y 100, the Dove
@@ -92,15 +146,24 @@ const report = {};
 // cards in a column abut, so their edges make the feed's gutter. Under them the
 // feed carries on with the next cards from after.png, the orange and the black
 // kurti, as a feed does below the fold.
+// On the board the three kurti cards share one photo, the yellow kurti, which
+// in a feed reads as one product repeated (Uttham, 2026-10-04: "the images are
+// repititive"). The seller's-title card keeps his yellow kurti; the one-fact
+// card ("Kurti") takes the prototype's teal printed anarkali and the two-fact
+// card ("Kurti", "Cotton") its grey-and-white printed A-line — kurtis, so
+// every chip stays true, in colours apart from the yellow beside them and the
+// orange and black below.
 {
   const src = `${BOARDS}/titles.png`;
   const kurti = (x) => ({ left: x, top: 100, width: 180, height: 254 });
-  const [title, one, two, mall] = await Promise.all([
+  const [title, oneBoard, twoBoard, mall] = await Promise.all([
     card(src, kurti(100), COL_W),
     card(src, kurti(295), COL_W),
     card(src, kurti(490), COL_W),
     card(src, { left: 698, top: 100, width: 180, height: 278 }, COL_W),
   ]);
+  const one = await withPhoto(oneBoard, PHOTOS.teal);
+  const two = await withPhoto(twoBoard, PHOTOS.grey);
   const row2 = CHROME_H + title.height;
   const leftEnd = row2 + two.height;
   const rightEnd = row2 + mall.height;

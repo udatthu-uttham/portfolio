@@ -609,8 +609,13 @@ screens you have put are all bad for projects remove them and ask me I will give
 all of them"): they go in `src/assets/plp/` and `src/assets/mall-case/`, named by
 state, listed with their card titles in `screens.titles`; until one exists the
 phone borrows the previous screen, and with none at all the build shows "Screen
-coming soon". `src/assets/mall/` is the Mall deck's own exports, kept only for the
-homepage tile.
+coming soon" — **unless the borrowed screen would be the wrong evidence and one
+of his exports is the right one**, which `screens.map` then names (2026-10-04
+audit, "I want you to judge whether we are showing right infor and images": the
+product cards' Cash price shows `before`, whose cards carry the cash price in its
+own row, under its own title, instead of the swipe clip; Bigger images for
+fashion has no right export and still borrows). `src/assets/mall/` is the Mall
+deck's own exports, kept only for the homepage tile.
 
 **The teaser pages run on the homepage spacing ladder, stepped up for reading**
 (Uttham: "make sure there is lot of spacing … it should match that system"):
@@ -883,12 +888,14 @@ products atleast . find similar images from the product repo"):
 `scripts/plp-swipe-clip.mjs` builds `public/media/plp/swipe.mp4` and its
 poster `src/assets/plp/swipe.png` from his `scroll.png` — a 1 : 2 window that
 pans gently down the capture and back, in which **three cards swipe their
-picture one at a time to another kurti and back** (a critically damped spring,
-no bounce; the dot for the page on show darkens, moves and fades back), the
-second photos being public catalogue photos the prototype's bundle already
-references, cropped to the card's own image box; **the first and last frames
-are his capture to the pixel**, so the poster opens and closes it, and nothing
-else in the capture is touched (`src/assets/plp/README.md` has the row). A new
+picture one at a time and back** (a critically damped spring, no bounce; the
+dot for the page on show darkens, moves and fades back): his yellow kurti to a
+red one, a kurti in another colour, and two catalogue kurtis to their own back
+views. **Its feed is eight different kurtis, not his one yellow kurti eight
+times** (2026-10-04; see "His boards become phone screens" below): six cards'
+picture boxes carry the prototype's catalogue kurtis, everything else in the
+capture is his pixels, and **the first and last frames are the same**, so the
+poster opens and closes it (`src/assets/plp/README.md` has the row). A new
 or replaced clip needs `npm run clip-edges` on macOS so the
 handset's strips follow its frames. The mini
 player is the same handset at 112px, by the same fit rules — except that with
@@ -955,7 +962,23 @@ restored from its own top edge, mirrored). The title and date screens take
 `after.png`'s search bar and filter row as their chrome; the list has its own.
 Lanczos, never sharpened; the effective upscale on the page is ×1.5 for the
 title, date and list screens (the boards are 1× renders) and none for the
-framework card. **The words outside, as on the homepage**: handwritten notes
+framework card. **No composed screen repeats one product photo** (Uttham,
+2026-10-04: "In the first project teaser, the images are repititive can we use
+other images to make the image output realistic take it from prototype
+porject"): where a board or his Kurti capture shows one yellow kurti on card
+after card, those cards' picture boxes take other kurtis from the realistic
+prototype's own catalogue — public catalogue photos its bundle already
+references, listed with their crops in `scripts/plp-photos.mjs` and fetched
+once into `.clip-work/` (untracked). In the title grid the seller's-title card
+keeps his yellow kurti and the one- and two-fact cards show a teal and a grey
+kurti; in the swipe clip's feed six of eight cards change. **Only the picture
+box changes** — his words, chips, prices, ratings, edges, hearts and dots stay
+his — and **a card takes only a photo its words are true of** (every chip on
+these cards reads "Kurti" or "Cotton"). The list view keeps his one i12
+earphone photo on all four rows: the prototype has no earphones, and another
+product would make the rows' battery and noise-cancellation chips false, so a
+varied set is his to supply. The date screen and the framework card had no
+repeats and are unchanged. **The words outside, as on the homepage**: handwritten notes
 (`screens.notes` in `src/data/plp-case.ts`, per screen file, `y` a share of
 that screen's height, priority order, no numbers), the tiles' Caveat in ink
 straight on the page **left of the device** — every one of these screens sets

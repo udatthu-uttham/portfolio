@@ -188,22 +188,34 @@ export const plpCase: CaseTeaserData = {
     // product cards I want you to place thme in a mbile grid and explain not use
     // as it is, similarly for framework the framework card should comeinside the
     // image, and the wordings outside"); the boards themselves stay in
-    // src/assets/plp/boards/ as the script's source and are never shown raw
-    map: { stagger: 'after', cleanup: 'framework', scroll: 'swipe' },
+    // src/assets/plp/boards/ as the script's source and are never shown raw.
+    // Where his boards and his Kurti capture repeat one yellow kurti, the
+    // composed titles grid and the swipe clip's feed take other kurtis from
+    // the realistic prototype's catalogue (Uttham, 2026-10-04: "the images are
+    // repititive … take it from prototype porject"; scripts/plp-photos.mjs).
+    // The cash-price row has no screen of its own yet (his "new card with the
+    // cash-price row lit" is still to come), so it shows the old feed, whose
+    // cards carry the cash price in its own row under the prepaid (UPI) price
+    // (2026-10-04 audit: it had borrowed the swipe clip). Bigger images for
+    // fashion has none either and no export shows a taller 4:5 image, so it
+    // still borrows the swipe clip, under that clip's own title, until he
+    // supplies one.
+    map: { stagger: 'after', cleanup: 'framework', scroll: 'swipe', cash: 'before' },
     // Swipeable images as a composed clip (Uttham, 2026-10-03: "please mock by
     // moving images … for other 1 or 2 products atleast"): scripts/plp-swipe-clip.mjs
     videos: { swipe: '/media/plp/swipe.mp4' },
     alts: {
       before: 'The old product card',
       cleanup: 'The card framework: one product card, large on the feed, its zones running from the picture down through its fact chips, price and timer, rating and Trusted mark, to the Fast delivery line',
-      titles: 'A feed of four cards: a kurti with the seller’s title, the same kurti with one fact chip, then with two, and a Mall shampoo whose Ad and Mall tags share the row with its facts',
+      titles: 'A feed of four cards: a yellow kurti under the seller’s title, a teal kurti with one fact chip in its place, a grey kurti with two, and a Mall shampoo whose Ad and Mall tags share the row with its facts',
       stagger: 'A product feed with staggered columns: each card at its natural height',
       list: 'Earphones as list rows: each row a picture beside its fact chips, price, cash price and rating',
       scroll: 'A feed whose cards carry swipeable images, with the dots under each picture',
-      swipe: 'A feed whose cards carry swipeable images: three of them swipe their picture to another kurti and back, the dots under each picture following',
+      swipe: 'A feed of different kurtis whose cards carry swipeable images: the first swipes to a kurti in another colour, two more to their own back view, and back, the dots under each picture following',
       bigimg: 'A fashion card with a taller 4:5 image',
       date: 'The new feed with a kurti that shows Fast and its day count at its foot, among cards with no delivery line',
       after: 'The new product card',
+      // for his cash.png when it comes (drop `cash: 'before'` from the map then)
       cash: 'The new card with the cash-price row lit',
     },
     // the title on the card, above the phone (Uttham, 2026-10-02: "add title of

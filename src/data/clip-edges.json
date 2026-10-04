@@ -128,113 +128,50 @@
         "dark"
       ],
       [
-        2.633,
-        "#fbfcfc",
-        "dark",
-        "#ffffff",
-        "dark"
-      ],
-      [
-        2.667,
-        "#ffffff",
-        "dark",
-        "#ffffff",
-        "dark"
-      ],
-      [
         2.733,
-        "#e3e1d4",
+        "#f5f5fb",
         "dark",
-        "#ffffff",
-        "dark"
-      ],
-      [
-        2.767,
-        "#f1f2e5",
-        "dark",
-        "#ffffff",
+        "#fffffe",
         "dark"
       ],
       [
         2.8,
-        "#f1f2e5",
+        "#f5f5fb",
         "dark",
-        "#f1f2e5",
+        "#f5f5fb",
         "dark"
       ],
       [
-        2.833,
-        "#ececdb",
+        2.9,
+        "#f4f4f2",
         "dark",
-        "#ececdb",
+        "#f4f4f2",
         "dark"
       ],
       [
-        2.967,
-        "#e8eadb",
+        3.867,
+        "#faf5f5",
         "dark",
-        "#e8eadb",
+        "#faf5f5",
         "dark"
       ],
       [
-        3,
-        "#e6e5d2",
+        4.833,
+        "#f7f5f9",
         "dark",
-        "#e6e5d2",
+        "#f7f5f9",
         "dark"
       ],
       [
-        3.033,
-        "#e9e5d4",
+        4.867,
+        "#f4f4f7",
         "dark",
-        "#e9e5d4",
-        "dark"
-      ],
-      [
-        3.067,
-        "#e7e3d1",
-        "dark",
-        "#e7e3d1",
-        "dark"
-      ],
-      [
-        3.9,
-        "#e5e1cd",
-        "dark",
-        "#e5e1cd",
-        "dark"
-      ],
-      [
-        7.767,
-        "#e6e4d2",
-        "dark",
-        "#e6e4d2",
-        "dark"
-      ],
-      [
-        7.867,
-        "#eae9da",
-        "dark",
-        "#eae9da",
-        "dark"
-      ],
-      [
-        7.933,
-        "#ececdd",
-        "dark",
-        "#ececdd",
-        "dark"
-      ],
-      [
-        8.067,
-        "#f2f2e4",
-        "dark",
-        "#f2f2e4",
+        "#f4f4f7",
         "dark"
       ],
       [
         8.1,
-        "#f2f2e5",
+        "#f8f6f9",
         "dark",
         "#ffffff",
         "dark"
