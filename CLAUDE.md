@@ -56,7 +56,10 @@ lifts toward the pointer, fine pointers only, reduced motion respected. Instax
 photos and stickers never lift, tilt, straighten or peel — with the one
 exception below; the `magnetic` prop on `InstaxFrame` stays retired. Other hover
 states are colour, border and the arrow nudge only. Entrance reveals and the
-pointer ride are unaffected.
+pointer ride are unaffected. **The pointer ride leaves only soft exhaust gas** (Uttham,
+2026-10-05: "lets get rid of the tire marks … lets get subtle exhaust fumes,
+more like gas feel"): no rubber marks, and no grain or smear that reads as a
+brush stroke; the measurements are in `docs/design-tokens.md`.
 
 **The contact notes lift on hover again** (Uttham, 2026-10-01: "the hover
 animations on these cards are also gone, please fix them"). On a fine pointer a
@@ -1181,6 +1184,16 @@ preview's notes file out of the public repo.
 grammar and add the bold highlights, nothing else (Uttham, 2026-09-21).
 Compressing his sentences to fit a layout changed what they meant. If the copy
 does not fit, change the layout or ask; do not paraphrase it shorter.
+
+**The site speaks in the first person** (Uttham, 2026-10-05, after a
+colleague's review: "there are so many grammatical errors and tone difference,
+some in first person and some in third person, please make everything first
+person"). Narration about him is "I", "my", "me" — alt texts and labels too
+("Me on my bike") — and **team work stays "we"**, so the pod's work is never
+claimed as his alone. His name stays where it is a name: the wordmark, page
+titles, SEO and JSON-LD, the hidden h1. Shopper verbatims, the copyable prompts
+and the running tools' own UI keep their own voice. **The site writes British
+English** (colour, programme, kick-off).
 
 ## A tool preview keeps the tool's own identity
 
