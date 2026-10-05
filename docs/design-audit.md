@@ -402,8 +402,8 @@ Two further corrections to the plan itself:
 6. **Motion tokens are duplicated as JS numbers** — `motion.js:10-11` hardcodes
    `DUR = {micro:0.15, standard:0.22, …}` mirroring `--dur-1..4`. Editing the CSS token
    desynchronises GSAP.
-7. **`pointer-ride.js` bakes sprites at init** from `--graphite`, `--ink-900`, `--dust-alpha`,
-   `--dur-1`, `--linger`. Live edits do nothing until reload.
+7. **`pointer-ride.js` bakes sprites at init** from `--graphite` and `--dust-alpha`
+   (the gas since 2026-10-05). Live edits do nothing until reload.
 8. **The grain** — a custom property cannot be interpolated into a `url("data:…")`. The ink,
    frequencies, seeds and 38 hand-authored fibres are literal, and the recipe is duplicated.
 9. **16 raster screenshots** of real product UI are colour-baked. `--mall-purple` / `--mall-lavender`

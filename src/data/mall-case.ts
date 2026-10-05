@@ -45,7 +45,7 @@ export const mallCase: CaseTeaserData = {
       state: 'v1-tag',
       heading: 'Where it started',
       blocks: [
-        { kind: 'p', text: 'Meesho sells unbranded goods to shoppers who came for the price. Meesho Mall is the place inside the app for branded products: **competitive alternatives with better quality**, for shoppers who seek quality.' },
+        { kind: 'p', text: 'Meesho sells unbranded goods to shoppers who come for the price. Meesho Mall is the place inside the app for branded products: **competitive alternatives with better quality**, for shoppers who seek quality.' },
         { kind: 'p', text: 'Mall products were first tried out quietly, with a small tag on the card, and **shoppers showed they would spend a little extra for good quality**: Mall had found its go-to-market.' },
         // the doubt the title promises, moved up from the full study's v2 Why,
         // its finding in his words (Uttham, 2026-10-05: "shoppers were not able
@@ -61,7 +61,7 @@ export const mallCase: CaseTeaserData = {
         // most of its list of surfaces left out (the full study's v2 How names
         // them); "USPs spelled out" stays, the setup for "Nobody wanted a
         // programme" and v3's "not Mall"
-        { kind: 'p', text: '**v2 made Mall bold everywhere**, USPs spelled out. Orders jumped at launch, **then the graphs went flat.**' },
+        { kind: 'p', text: '**v2 made Mall bold everywhere**, USPs spelled out. Orders jumped at launch; **then the graphs went flat.**' },
         // his live paragraph, unchanged
         { kind: 'p', text: '**Shoppers ignored the messaging** and stayed on their usual paths. Mall still felt abstract. And the business had filled it with seller labels for margin, so **the badge sat on products nobody recognised.**' },
         // his deck's sentence (git 09893d8^, chapter "Bold wasn't enough": "I
@@ -127,7 +127,7 @@ export const mallCase: CaseTeaserData = {
             {
               state: 'v3-labels',
               label: 'Seller labels out',
-              text: 'Argued the business out of local seller labels: **real brands only, or the badge means nothing.** Popular brand names became the explanation.',
+              text: 'I argued the business out of local seller labels: **real brands only, or the badge means nothing.** Popular brand names became the explanation.',
               // no "Why this design:": the row carries its own reason ("real
               // brands only, or the badge means nothing"), as the product
               // cards' Seller titles row does
@@ -140,7 +140,7 @@ export const mallCase: CaseTeaserData = {
               // Lucknow card's "Purple colour means Mall" pays off a colour the
               // text names
               label: 'A purple badge people can trust and notice',
-              text: 'It is placed **in proximity to the brand name** with the title, which has also gone bolder. With Mall only coming with popular D2C brands, **it created a strong anchor.**',
+              text: 'It is placed **in proximity to the brand name** with the title, which has also gone bolder. With Mall coming only with popular D2C brands, **it creates a strong anchor.**',
             },
           ],
         },
@@ -153,7 +153,7 @@ export const mallCase: CaseTeaserData = {
           steps: [
             // his label (Uttham, 2026-10-05: "make mall more easy to access
             // and onboard"); it was "Bottom-nav entry and onboarding"
-            { state: 'v3-nav', label: 'Make Mall easier to access and onboard', text: 'Mall got a tab. An onboarding modal explains it with **brands people already know** and celebrity faces for trust and attention.' },
+            { state: 'v3-nav', label: 'Make Mall easier to access and onboard', text: 'Mall gets a tab. An onboarding modal explains it with **brands people already know** and celebrity faces for trust and attention.' },
             { state: 'v3-splash', label: 'Splash on first visits', text: 'For the first few entries into a Mall product or landing page: **the feeling of walking into a mall to buy company products.**' },
             // his live row "Listing-page hint" is left out for length: a fallback, and it replayed the onboarding modal of the row
             // above. The full study's v3 How keeps "a hint on listings for
@@ -256,7 +256,7 @@ export const mallCase: CaseTeaserData = {
       status: 'Shipped, then flat',
       // its middle is the teaser's now
       why: 'The first launch had found the go-to-market, but awareness and discoverability were low, and **people did not realise they were ordering from Mall.**',
-      how: 'v2 made an aggressive bet on **mixed feeds**: a pill and a colour on Mall cards inside normal search and category results, so shoppers met Mall where they already scroll and could compare it with marketplace products. Around it, **more journey points and louder comms**: a home widget and banner, a Mall landing page, category landing pages, identifiers on listing and product pages, brand storefronts, and the USPs “Original Brands” and “Direct From Company” on home and the product page.',
+      how: 'v2 made an aggressive bet on **mixed feeds**: a pill and a colour on Mall cards inside normal search and category results, so shoppers met Mall where they already scrolled and could compare it with marketplace products. Around it, **more journey points and louder comms**: a home widget and banner, a Mall landing page, category landing pages, identifiers on listing and product pages, brand storefronts, and the USPs “Original Brands” and “Direct From Company” on home and the product page.',
       worked: 'Orders and views jumped at launch, **Mall’s share of the business climbed**, and the launch won a quarterly award. Then the line went flat. **People scan images, not pills.** The pill was read last, if at all, and **a cheaper look-alike beside a Mall card became the hook.** Marketplace listings carry promises inside their photos, so **brand cards looked quiet next to them**; duplicates of the very brands we highlighted blurred the signal.',
     },
     {
@@ -265,7 +265,7 @@ export const mallCase: CaseTeaserData = {
       status: 'Through v2 and v3',
       why: 'The v2 reads and the usability tests agreed: **comprehension was poor even among shoppers who had visited Mall many times**, so the constructs we had shipped were not doing the job. Another shade of blue would not fix that.',
       // its first sentence is the teaser's now
-      how: 'About **four rounds a year for a year and a half**: diary studies with repeat shoppers, a week each; in-home interviews in Lucknow and Gaya, in Hindi; concept preference tests with 50+ shoppers a round; and usability tests on every v2 and v3 build.',
+      how: 'We ran about **four rounds a year for a year and a half**: diary studies with repeat shoppers, a week each; in-home interviews in Lucknow and Gaya, in Hindi; concept preference tests with 50+ shoppers a round; and usability tests on every v2 and v3 build.',
       // his finding (Uttham, 2026-10-05) in place of "“Mall” already meant
       // company products"; the turn back from the teaser ("this one lets park
       // for teaser"); ", and a tick in purple read as trust" is left out, since
@@ -278,7 +278,7 @@ export const mallCase: CaseTeaserData = {
       title: 'The seller-label call',
       status: 'Removed in v3',
       // its "Shoppers had not built trust in Mall yet" is the teaser's now
-      why: 'In v2 the business **wanted seller labels on Mall products for margin**: small local labels, not the brands shoppers knew. Every label that was not a brand **diluted the one thing the badge had to say.**',
+      why: 'In v2, the business **wanted seller labels on Mall products for margin**: small local labels, not the brands shoppers knew. Every label that was not a brand **diluted the one thing the badge had to say.**',
       // its first sentence ("I argued against them in v2, and the labels went
       // in anyway.") is the teaser's now, so "the argument" points back to it
       how: '**The research gave the argument its evidence**: the labels were diluting what shoppers understood Mall to be. For v3, **my advocacy and research shifted us to real brands only**, with popular brand names as the explanation of Mall.',
@@ -288,7 +288,7 @@ export const mallCase: CaseTeaserData = {
       state: 'v3-pill',
       title: 'The purple tick',
       status: 'Shipped in v3',
-      why: 'In v2, the Mall pill on a listing card competed with **every other tag and programme in the app**, and shoppers could not read its Mall text: its tick spoiled its legibility, the contrast was poor, and the letter “l” confused people.',
+      why: 'In v2, the Mall pill on a listing card competed with **every other tag and programme in the app**, and shoppers could not read its Mall text: the tick spoiled its legibility, the contrast was poor, and the letter “l” confused people.',
       how: 'Two goals for the rebrand: **find the colour that wins attention on a listing card** among every other colour and programme, and make the colour and mark stronger than the Mall branding itself, so a shopper knows Mall without reading it. **A tick, because a tick read as trust**; a legible wordmark; purple, because it stood out from every other colour in the app.',
       // his placement and anchor sentences (2026-10-05) are the teaser's badge
       // row, so they are not repeated here
@@ -301,7 +301,7 @@ export const mallCase: CaseTeaserData = {
       why: 'v2 had explained Mall, and shoppers ignored the explaining. v3 set two objectives: **make shoppers aware Mall exists**, through brands they already know, and **make them understand it where they decide**, so they remember it next time.',
       how: 'v3 rebuilt Mall around **recognition, not explanation.** **One colour and one mark, carried through every step:** a bottom-nav entry with an education modal of popular brands and celebrity faces; a splash for the first few visits; a hint on listings for anyone who missed it; a purple enclosure on the product page, with the brand’s own content; a landing page that leads with brand logos; and a purple animation when the order is confirmed, to bring relatability and the delight that shoppers are getting their order from Mall.',
       // its middle and its last sentence are the teaser's now
-      worked: '**People now recognise Mall by colour**, and Mall hit the share the business had asked for at kickoff.',
+      worked: '**People now recognise Mall by colour**, and Mall hit the share the business had asked for at kick-off.',
     },
   ],
 

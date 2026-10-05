@@ -95,7 +95,7 @@ export const plpCase: CaseTeaserData = {
             { state: 'before', label: 'The picture was the only source they relied on', text: 'Shoppers judge from pictures and the card showed one; **they needed to go inside to get more image data.**' },
           ],
         },
-        { kind: 'p', text: 'The pod’s mission: **help 250 million shoppers find the right product faster**, whatever the category and whatever brings them to browse.' },
+        { kind: 'p', text: 'Our pod’s mission: **help 250 million shoppers find the right product faster**, whatever the category and whatever brings them to browse.' },
       ],
     },
     {
@@ -147,7 +147,7 @@ export const plpCase: CaseTeaserData = {
               // staggered feed's reason talks about them
               text: 'We replaced the seller titles with **the important facts shoppers need before making a decision**, shown as chips.',
               // his Why (2026-10-05)
-              why: 'Help users understand **non-visual cues like material**, and remove ambiguity about how many units: **that helped them pick the right products in the first place.**',
+              why: 'To help users understand **non-visual cues like material**, and remove ambiguity about how many units. **That helped them pick the right products in the first place.**',
             },
             {
               state: 'stagger',
@@ -168,7 +168,7 @@ export const plpCase: CaseTeaserData = {
               label: 'Swipeable images',
               text: 'We added more swipeable images because **shoppers form better conviction from them** before opening the product. They show more of the product and the variations it comes in.',
               // his Why (2026-10-05)
-              why: 'Help users form a **better understanding of the product and its variations**, and help them pick relevant products.',
+              why: 'To help users form a **better understanding of the product and its variations**, and help them pick relevant products.',
             },
             {
               state: 'date',
@@ -211,7 +211,7 @@ export const plpCase: CaseTeaserData = {
           // only what the full study holds: his two items promised every
           // change's why, how and what worked, and screens for each
           items: [
-            'How the changes were built, and what worked where we know',
+            'How we built the changes, and what worked where we know',
             // what died was the rationing, not the swipe ("An early version that
             // rationed scrolling to selected products was killed on day one")
             'How swipeable images evolved: what worked and what didn’t', // his line (2026-10-05)
@@ -254,8 +254,8 @@ export const plpCase: CaseTeaserData = {
       status: 'Live; next version in test',
       // his third sentence is the teaser's first Problem row now
       why: 'Seller-written titles were long, repetitive and stuffed with search words, and **most of them carried shop names**, which added no value. Shoppers glanced and read nothing.',
-      how: 'Defined a minimum viable truth per category: **the smallest set of facts that lets a shopper decide without opening the product.** Replaced the title with those facts as chips, **over three runs of the facts-on-title variant.** A second version tightened the chips, added consideration tags (price drop / quality marks; some scaled, and the others are going through restructuring and further validation), and **forced three rounds of catalogue cleanup so the chips were true.**',
-      worked: 'Chips were noticed late but **valued once seen**; shoppers stopped opening products to check fabric. **Pack size was the most useful fact in ambiguous categories.** A chip the picture contradicts is not believed, so **catalogue quality had to come first.** Showing the prepaid price up front confused cash shoppers — fed the cash-price work.',
+      how: 'We defined a minimum viable truth per category: **the smallest set of facts that lets a shopper decide without opening the product.** We replaced the title with those facts as chips, **over three runs of the facts-on-title variant.** A second version tightened the chips, added consideration tags (price drop / quality marks; some scaled, and the others are going through restructuring and further validation), and **forced three rounds of catalogue cleanup so the chips were true.**',
+      worked: 'Chips were noticed late but **valued once seen**; shoppers stopped opening products to check fabric. **Pack size was the most useful fact in ambiguous categories.** A chip the picture contradicts is not believed, so **catalogue quality had to come first.** Showing the prepaid price up front confused cash shoppers — this fed the cash-price work.',
       // his pack-size verbatim, the evidence for "Pack size was the most
       // useful fact" (REC-001). The translation is ours; consent: false keeps
       // it off a live page until he confirms consent
@@ -267,18 +267,18 @@ export const plpCase: CaseTeaserData = {
       status: 'Inconclusive',
       // his Why is the teaser row's reason now
       why: '',
-      how: 'Let each card take its natural height in the For You feed so columns stagger.', // the three runs were the MVTs' (his correction, 2026-10-05)
+      how: 'We let each card take its natural height in the For You feed so columns stagger.', // the three runs were the MVTs' (his correction, 2026-10-05)
       // "read" is the team's word for a result: plain words for readers outside
-      worked: '**Shoppers never noticed misaligned text under the images** (confirms picture-first). No clean result yet; it stays open. Rule kept: **never force staggering** — it is what variable content does when the grid stops hiding it.',
+      worked: '**Shoppers never noticed misaligned text under the images** (which confirms that shoppers are picture-first). No clean result yet; it stays open. Rule kept: **never force staggering** — it is what variable content does when the grid stops hiding it.',
     },
     {
       state: 'list',
       title: 'List or grid by category',
       // "reading" in plain words
-      status: 'Live, results pending',
-      why: 'Grid suits products judged on looks. Headphones and other considered categories are **judged on facts a grid card cannot carry.**',
+      status: 'Live; results pending',
+      why: 'A grid suits products judged on looks. Headphones and other considered categories are **judged on facts a grid card cannot carry.**',
       how: 'Full-width list rows for considered categories. **The platform picks list or grid by category; no user toggle.**',
-      worked: 'Live; results pending. Direction supports **rows where details decide, grid where looks decide.**',
+      worked: 'Live; results pending. The direction supports **rows where details decide, grid where looks decide.**',
     },
     {
       state: 'scroll',
@@ -286,7 +286,7 @@ export const plpCase: CaseTeaserData = {
       status: 'Shipped',
       // his Why became the teaser's second Problem row (his "image data" line)
       why: '',
-      how: 'Up to three images swipe inside the card, showing **more of the product and the variations it comes in**, one autoplay to teach the gesture. An early version that rationed scrolling to selected products was **killed on day one — breadth was the point.**',
+      how: 'Up to three images swipe inside the card, showing **more of the product and the variations it comes in**, with one autoplay to teach the gesture. An early version that rationed scrolling to selected products was **killed on day one — breadth was the point.**',
       worked: 'Taps into the product fell while orders per tap rose: one finding, not two. **The decision moved onto the listing.**',
     },
     {
@@ -308,7 +308,7 @@ export const plpCase: CaseTeaserData = {
       // assumed and what the old line told them
       why: 'We wanted to solve for **people who wanted their products faster.** Shoppers assumed four to five days in cities and a week or more outside them. **“Free Delivery” on every card told them nothing.**',
       how: 'A day count at the foot of the card, **shown only on products where delivery is fast**, not on all of them. Three tests, including one with a “FAST” mark in front of the number.',
-      worked: '**The date did the work; the word in front of it carried nothing.** Third test scaled.',
+      worked: '**The date did the work; the word in front of it carried nothing.** The third test scaled.',
     },
   ],
 
@@ -343,7 +343,7 @@ export const plpCase: CaseTeaserData = {
       stagger: 'A product feed with staggered columns: each card at its natural height',
       list: 'Earphones as list rows: each row a picture beside its fact chips, price, cash price and rating',
       scroll: 'A feed whose cards carry swipeable images, with the dots under each picture',
-      swipe: 'A feed of different kurtis whose cards carry swipeable images: the first swipes to a kurti in another colour, two more to their own back view, and back, the dots under each picture following',
+      swipe: 'A feed of different kurtis whose cards carry swipeable images: the first swipes to a kurti in another colour, two more to their own back views, and back, the dots under each picture following',
       date: 'The new feed with a kurti that shows Fast and its day count at its foot, among cards with no delivery line',
       after: 'The new product card',
       // for his cash.png when it comes (drop `cash: 'before'` from the map then)

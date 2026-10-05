@@ -176,7 +176,6 @@
   --lh-body: 1.55; /* body copy */
 
   /* z-index — page-level layers only; components stack locally with 0–3 */
-  --z-surface-fx: 5; /* residue on the paper (pointer marks): above content, under the header */
   --z-header: 10;
   --z-float: 20;
   --z-skip: 100;
@@ -190,7 +189,6 @@
   --dur-3: 400ms; /* moderate: staged sequences, one-time entrances */
   --dur-4: 600ms; /* deliberate: scroll reveals, hero entrance */
   --stagger-1: 70ms; /* between siblings in one reveal group */
-  --linger: 8000ms; /* how long rubber stays on the paper before its 3s fade; the marks layer is off under reduced motion */
   --ease-standard: cubic-bezier(0.2, 0, 0, 1); /* moving between states */
   --ease-enter: cubic-bezier(0.22, 1, 0.36, 1); /* arriving: fast in, soft settle */
   --ease-exit: cubic-bezier(0.3, 0, 1, 0.3); /* leaving: gathers speed */

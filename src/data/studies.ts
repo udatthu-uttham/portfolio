@@ -66,7 +66,7 @@ export const studies: Study[] = [
     slug: 'a-line-of-card-height',
     featured: true,
 kicker: 'Current',
-year: '2026—',
+year: '2026–',
     // Title and line are Uttham's (2026-10-03: "Meesho product cards title use
     // camel case, and subtitle From quick scan to empowered scan, and helping
     // users understand products better."): the title in title case, the claim
@@ -121,7 +121,7 @@ scope: ['Product card systems', 'Experiment design', 'PLP at scale'],
     title: 'Meesho Mall',
     summary: 'From doubt to desire: **building India’s new trust in online brands.**',
     deck: {
-      title: ['From doubt to Desire:', 'Building India’s new trust in online brands'],
+      title: ['From doubt to desire:', 'Building India’s new trust in online brands'],
       subtitle: 'Product and design strategy for brand discovery at national scale.',
       byline: 'Uttham Udatthu · Senior Product Designer',
       pdf: '/meesho-mall-case-study.pdf',
@@ -162,7 +162,7 @@ scope: ['Product card systems', 'Experiment design', 'PLP at scale'],
     ] },
     focus: 'Making “branded” **believable to shoppers who had never met a brand online** — then finding that the answer was **storytelling, not more UI.**',
     scope: ['Product strategy', 'Brand & identity', 'User research'],
-    placeholder: 'Program visuals coming soon.',
+    placeholder: 'Programme visuals coming soon.',
     // The case page is Uttham's teaser layout (2026-10-01); the deck-first
     // chapters it replaces are in git history. `deck` stays: the homepage tile
     // stands its phone on deck.screen.

@@ -1,13 +1,12 @@
 ---
-// The visitor rides the paper (plans/014). Two click-through canvases driven by
-// one sampler in pointer-ride.js: rubber marks in page space below the header,
-// smoke in viewport space above it. Fine mouse only; nothing on touch.
+// The visitor rides the paper (plans/014). One click-through canvas driven by
+// pointer-ride.js: soft exhaust gas in viewport space, above the header. Fine
+// mouse only; nothing on touch. The rubber marks layer came off on 2026-10-05
+// (Uttham: "lets get rid of the tire marks, that is distracting").
 ---
-<canvas class="ride-marks" aria-hidden="true"></canvas>
 <canvas class="ride-smoke" aria-hidden="true"></canvas>
 
 <style>
-  .ride-marks,
   .ride-smoke {
     position: fixed;
     inset: 0;
@@ -15,26 +14,17 @@
     height: 100%;
     pointer-events: none;
     contain: strict;
+    z-index: calc(var(--z-header) + 1);
   }
-
-  .ride-marks { z-index: var(--z-surface-fx); }
-  .ride-smoke { z-index: calc(var(--z-header) + 1); }
 
   @media (prefers-reduced-motion: reduce), (hover: none), (pointer: coarse) {
-    .ride-marks,
     .ride-smoke { display: none; }
-  }
-
-  /* Rubber lowers text contrast a little; high-contrast readers get none. */
-  @media (prefers-contrast: more) {
-    .ride-marks { display: none; }
   }
 </style>
 
 <script>
   import { initPointerRide } from '../scripts/pointer-ride.js';
   const dispose = initPointerRide({
-    marks: document.querySelector('.ride-marks'),
     smoke: document.querySelector('.ride-smoke'),
   });
   if (import.meta.hot) import.meta.hot.dispose(dispose);

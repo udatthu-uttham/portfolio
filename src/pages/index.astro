@@ -59,7 +59,10 @@ const principles = [
   },
   {
     title: 'Evidence and craft, in the same room.',
-    tag: 'Open with the number. Close with the bar.',
+    // Uttham, 2026-10-05: "Open with the number. Close with the bar." read as
+    // confusing; "the idea here was saying that both quantitative and
+    // qualitatively we are checking"
+    tag: 'Data shows what happened. Research shows why.',
   },
   {
     // Uttham, 2026-10-01: "rather than saying speed … optimising the process
@@ -125,7 +128,7 @@ const homeLd = {
           <InstaxFrame label="Uttham Udatthu" rotate={-5} develop>
             <Image
               src={portrait}
-              alt="Uttham smiling on a boat, with green cliffs behind him"
+              alt="Me smiling on a boat, with green cliffs behind me"
               width={480}
               widths={[160, 320, 480]}
               sizes="164px"
@@ -152,7 +155,7 @@ const homeLd = {
               <div class="mask">
                 <p class="hero__lead" data-hero-line>
                   I’m a <strong>design lead, systems thinker and builder.</strong>
-                  I run the signals at the <strong>busy intersections where user needs cross business goals.</strong>
+                  I work at the <strong>busy intersections where user needs cross business goals.</strong>
                 </p>
               </div>
 
@@ -357,14 +360,14 @@ const homeLd = {
         <!-- me & the bike — every ride badge lives on this photo -->
         <div class="contact-panel__photo rv rv-d1">
           <InstaxFrame
-            label="Uttham on the bike"
+            label="Me on my bike"
             caption="my peaceful zone = race tracks"
             rotate={-3}
             aspect="1500 / 1602"
           >
             <Image
               src={rider}
-              alt="Uttham in riding gear on his motorcycle"
+              alt="Me in riding gear on my motorcycle"
               width={720}
               widths={[360, 540, 720]}
               sizes="(max-width: 639px) 300px, 340px"

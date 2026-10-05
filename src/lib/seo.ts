@@ -45,7 +45,7 @@ export const firstSentence = (text: string) => plain(text).split(/(?<=[.!?])\s+/
 // stock. A page without its own card uses the home one.
 export type OgImage = { src: string; alt: string; width: number; height: number };
 const card = (name: string, alt: string): OgImage => ({ src: `/og/${name}.jpg`, alt, width: 1200, height: 630 });
-export const ogHome = card('home', 'Uttham Udatthu, design lead, systems thinker and builder: his portrait on an instant print with a hi! sticker');
+export const ogHome = card('home', 'Uttham Udatthu, design lead, systems thinker and builder: my portrait on an instant print with a hi! sticker');
 export const ogCase: Record<string, OgImage> = {
   'a-line-of-card-height': card('a-line-of-card-height', 'From a glance to a decision: the old Meesho product feed beside the new one'),
   'meesho-mall': card('meesho-mall', 'From doubt to desire: the Meesho Mall landing page on a phone'),
@@ -69,7 +69,7 @@ export const ogCase: Record<string, OgImage> = {
 // terms: the title already carries them. Keep it in step with the hero in
 // src/pages/index.astro.
 export const homeTitle = `${NAME} — Design Lead and Product Designer at Meesho`;
-export const homeDescription = 'I’m a design lead, systems thinker and builder. I run the signals at the busy intersections where user needs cross business goals.';
+export const homeDescription = 'I’m a design lead, systems thinker and builder. I work at the busy intersections where user needs cross business goals.';
 
 // A case or tool page's search terms. `query` leads the title as a searcher
 // would type it; `role` is what he was on that work, added after the name when

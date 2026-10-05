@@ -38,7 +38,7 @@ export const guides: Guide[] = [
     get: [
       'A setup step that **pins the objective, cohort, method and discussion guide** before a single recording is loaded.',
       'Transcripts with speakers separated and **each utterance tagged to a section of your discussion guide**.',
-      'Observations clustered into themes, **insights scored by how many participants support them**, verbatims pinned to timestamps.',
+      'Observations clustered into themes, **insights scored by how many participants support them**, and verbatims pinned to timestamps.',
       'A key finding, how-might-we prompts per theme, and **an “AI asks” list of claims that need your clarification**.',
       'A report that exports cleanly and re-runs when a recording is added.',
       'A store of finished studies anyone can search, so **the next study starts from what is already known**.',
@@ -135,7 +135,7 @@ When we keep the library:
     title: 'Real app, real data, real reactions',
     intro: 'Not a click-through. A **small web app with the real product\u2019s shape** \u2014 a catalogue that reads like the catalogue, a cart that adds up, a payment step that fails when you make it fail. Participants stop performing for you, because **there is nothing to perform for.**',
     get: [
-      '**A running app on a URL** you can send to a moderator, a participant, or a stakeholder.',
+      '**A running app on a URL** you can send to a moderator, a participant or a stakeholder.',
       '**Every page a participant could wander into** \u2014 feed, category, product, cart, payment, order placed, past orders \u2014 not only the ones on the happy path.',
       'A mock catalogue with prices, ratings, review counts and delivery promises that **read like the real thing**.',
       'Checkout and payment that **run end to end on dummy instruments**, so complex flows become testable.',
