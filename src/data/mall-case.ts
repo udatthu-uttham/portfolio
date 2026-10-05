@@ -136,7 +136,10 @@ export const mallCase: CaseTeaserData = {
               state: 'v3-pill',
               // his words (Uttham, 2026-10-05); the colour and the tick's
               // reasons are the full study's purple tick
-              label: 'A badge people can trust and notice',
+              // "purple" added with his OK (2026-10-05: "you can"), so the
+              // Lucknow card's "Purple colour means Mall" pays off a colour the
+              // text names
+              label: 'A purple badge people can trust and notice',
               text: 'It is placed **in proximity to the brand name** with the title, which has also gone bolder. With Mall only coming with popular D2C brands, **it created a strong anchor.**',
             },
           ],
@@ -169,6 +172,17 @@ export const mallCase: CaseTeaserData = {
             // USPs.", from the homepage tile's draft note) is gone: the heading
             // carries the beat
             { state: 'v3-landing-new', label: 'Landing page for new shoppers', text: '**Popular brand logos**, popular products as hooks, brand names that rotate weekly; top categories to catch intent; product-level discovery kept.' },
+          ],
+        },
+        {
+          kind: 'steps',
+          // his group (Uttham, 2026-10-05: "it is not part of this, can you
+          // create a new section that says, differentiated experience and add
+          // this here"): the order confirmation's delight comes after the
+          // decision, not where it happens. His other changes in it come later,
+          // in the full case study
+          heading: 'Differentiated experience',
+          steps: [
             // his reason (Uttham, 2026-10-05: "Order confirmation page changes
             // are done to bring relatability and delight that they are getting
             // order from mall"), in place of "so the colour and the programme

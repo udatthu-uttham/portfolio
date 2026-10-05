@@ -599,8 +599,12 @@ and a quiet hint that the first launch found the go-to-market); v2 as the bold
 version that followed; the research before the v3 launch, with its sticky note;
 v3; what happened. (Since the 2026-10-05 storyline the chapters are Where it
 started, When bold wasn't enough, Before v3: what shoppers told us, v3: sell
-brands, not Mall, and What happened, and each quote is a row of cards, one per
-insight; see "Case teasers tell a story" below.) **v3 shows one landing page** (2026-10-03: "just one landing
+brands, not Mall — its groups Decide what Mall is, Make it noticeable, Be
+understood where decisions happen and **Differentiated experience** (Uttham,
+2026-10-05: the order confirmation's delight comes after the decision, so it
+has a group of its own, where his other such changes will join it in the full
+study) — and What happened, and each quote is a row of cards, one per insight;
+see "Case teasers tell a story" below.) **v3 shows one landing page** (2026-10-03: "just one landing
 page (remove the second landing page section, we will not talk about it in
 preview)"): the row for returning shoppers, its alt, card title and clip are out
 of `mall-case.ts`, and its files stay, unused (see the `mall-case` README); and
@@ -1154,7 +1158,9 @@ have multiple insights create multple cards"); **a sentence moved up from the
 full study leaves it** (move, don't copy), and his corrections flow into the
 full study wherever it said the same thing. The Mall research finding is his:
 **few recognised Mall without nudges, and those who did took it for a nearby
-mall** — never "the name already worked". **The v2 badge failed on legibility:
+mall** — never "the name already worked". **v3's badge is "A purple badge people can trust and notice"**, so the
+Lucknow card's "Purple colour means Mall" pays off a colour the text names.
+**The v2 badge failed on legibility:
 the tick spoiled the Mall text, the contrast was poor and the letter "l"
 confused people** (2026-10-05); trust
 and notice are what worked in v3 ("I wanted to say it worked on v3").
