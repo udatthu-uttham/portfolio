@@ -18,7 +18,7 @@ and Delivery date:
 | `framework` (state `cleanup`) | Card framework | The card framework | composed: the framework card alone, large, on the feed under the search bar and filter row; its zone labels are notes beside the phone |
 | `titles` | Seller titles, then Facts in place of the title | Facts in place of the title | composed: the four title variants as a 2 × 2 feed grid, the feed carrying on below; the seller's-title card keeps his yellow kurti, the one-fact and two-fact cards carry the prototype's teal and grey kurtis, so the grid is not one kurti three times |
 | `stagger` | Staggered feed (block 2) | A staggered feed | a feed with staggered columns, each card at its natural height |
-| `list` | List or grid by category (block 2) | List view by category | composed: the list-view screen only (earphones as rows; his one earphone photo on every row, because the prototype's catalogue has no earphones — a varied set is his to supply) |
+| `list` | List or grid by category (block 2) | List view by category | composed: the list-view screen only (earphones as rows: his i12 in row 1, three meesho.com earbuds in rows 2–4, each row with its own prices) |
 | `swipe` (state `scroll`; its clip is `public/media/plp/swipe.mp4`) | Swipeable images | More views and variations | composed clip: his Kurti feed capture (`scroll.png`), six of whose eight yellow kurtis are the prototype's other kurtis; the first card swipes to a red kurti, the black and ivory ones to their own back views, and back, the dots following; `swipe.png` is the clip's first and last frame |
 | `date` | Delivery date | Dates on fast deliveries | composed: the winning card (Fast and its day count) in the new feed, among cards with no date |
 | `after` | Outcome | The new card | the new product card |
@@ -64,9 +64,7 @@ titles grid's seller's-title card keeps his yellow kurti; its one-fact card
 shows the teal anarkali (5038838) and its two-fact card the grey-and-white
 A-line (5037151). The date screen (one yellow kurti among a shirt, a hair oil,
 a bedsheet and two other kurtis) and the framework card were not repetitive and
-are unchanged. The list view's four rows still share his i12 earphone photo:
-the catalogue has no earphones, and a mismatched product would make the row's
-battery and noise-cancellation chips false, so a varied set is his to supply.
+are unchanged. The list view's rows came later from meesho.com (below).
 
 **The swipeable-images clip** (Uttham, 2026-10-03: "Swipeable images in the
 prototype please mock by moving images, it only there on one card, I want to
@@ -123,3 +121,5 @@ They also stand side by side, tagged Before and After, in the homepage tile (`ti
 `after-tile.png` is the homepage tile's copy of `after.png` (2026-10-04): the carousel dots moved from the third product (the yellow kurti) to the foot of the fourth's photo (the bedsheet), beside the tile's "Scrollable" note, so its arrow meets them; the kurti's photo is filled in where the dots were. The case page keeps `after.png` as he exported it.
 
 The list view's rows 2–4 (2026-10-04): three different wireless earbuds from meesho.com's own listings (`EARBUDS` in `scripts/plp-photos.mjs`; "go to meesho.com and take images from there") instead of his i12 photo four times; row 1 keeps his i12. Only each row's 409px photo square changes, cropped above the listing stamp in each photo's corner; his hearts, row 2's OUT OF STOCK label and its white wash are kept.
+
+The list view's prices (2026-10-05, Uttham: "can you randomise the price values realistic ones, for both UPI and cash prices"): each row has its own price, struck MRP, discount and cash price instead of his board's one ₹384 / ₹420 / ₹410 four times — ₹312 / ₹399 / 22% off / ₹334 with CASH, ₹587 / ₹799 / 27% / ₹619, ₹268 / ₹299 / 10% / ₹285, ₹673 / ₹999 / 33% / ₹711; the discount is worked out from the two prices and cash is the UPI price plus ₹17–38. `plp-compose.mjs` paints them onto the board's 1× crop before the ×3 upscale, so they are as soft as every other letter, in Mier B02 (Meesho's face, installed on his Mac) at the board's own sizes and colours, after refilling the green chip column by column from the clean rows around the old text; "UPI" and everything else is his. Without Mier B02 installed the script warns and leaves `list.png` as it is.

@@ -28,77 +28,196 @@ export const plpCase: CaseTeaserData = {
   // Shareholders' Letter, 251 million annual transacting users). The sentence
   // is under 15 words, so no bold.
   dek: 'Rethinking Meesho’s product card for 250 million people who browse by picture.',
+  // his highlight and his year (Uttham, 2026-10-05: "can we highlight
+  // strategy and design lead"; "in bracket add (2026)"). The page's SEO reads
+  // the Role through plain(), and a Timeline that is not a span of years gives
+  // its JSON-LD no dates
   facts: [
-    { label: 'Role', value: 'Strategy and design lead for a pod of five' },
-    { label: 'Timeline', value: 'Six months' },
+    { label: 'Role', value: '**Strategy and design lead** for a pod of five' },
+    { label: 'Timeline', value: 'Six months (2026)' },
   ],
   panelLabel: 'Card preview',
-  rail: { top: true, sections: ['Problem', 'Strategy', 'Outcome'] },
+  // the rail names the full headings; its tooltips still cut at the colon, so
+  // they read Problem / Strategy / Outcome. Context stays off it (2026-10-02).
+  rail: { top: true, sections: ['Problem: too full and too empty', 'Strategy: make room, then spend it', 'Outcome: enough to say yes'] },
+
+  // THE STORYLINE (approved 2026-10-05, after a preview: "Now make these
+  // changes and update the git and website"): two jobs (Context) → too full
+  // and too empty (Problem) → make room, then spend it (Strategy) → the turn,
+  // facts cost height (the staggered feed's reason) → enough to say yes
+  // (Outcome). Each Strategy row is his line, then at most one
+  // reason, labelled "Why this design:". Nothing claims the new card shipped:
+  // the Outcome keeps only his own "Results are confidential…" sentence.
 
   sections: [
     {
       state: 'before',
-      heading: 'Context',
+      // "image-first" is his word in the paragraph below; his records scope
+      // "rejection" to search (L-002), browsing to image-first (L-001)
+      heading: 'Context: image-first',
       blocks: [
-        { kind: 'p', text: 'Most of our shoppers live in **tier 3 and tier 4 towns**, and some are new to e-commerce and shop only on Meesho. All 250 million of them just open Meesho whenever they have time and start browsing. They scan by picture only, and they operate in **a mode of rejection**. They are image-first: **they stop when the image is nice**, and everything else comes later.' },
+        // his live paragraph. "All 250 million of them" lost its figure (the
+        // page's fourth 250 million read as name-dropping; the dek and the
+        // mission keep it)
+        { kind: 'p', text: 'Most of our shoppers live in **tier 3 and tier 4 towns**, and some are new to e-commerce and shop only on Meesho. All of them just open Meesho whenever they have time and start browsing. They scan by picture only, and they operate in a mode of rejection. They are image-first: **they stop when the image is nice**, and everything else comes later.' },
+        // the two jobs the page pays off: the first in Strategy, the second in
+        // the Outcome's heading. Two highlights, the rule's most
+        // the two jobs, as Uttham edited them (2026-10-05: "now without
+        // opening, say need to open more products should reduce")
+        { kind: 'p', text: 'So the card has two jobs: **keep the pictures coming while they scan**, and **give them enough to say yes**, so they need to open fewer products.' },
       ],
     },
     {
       // no screen of its own: the old feed from Context stays on the phone
       // (Uttham, 2026-10-03: "we can ignore the annotated version")
-      heading: 'Problem',
+      heading: 'Problem: too full and too empty',
       blocks: [
-        { kind: 'p', text: 'Over time, **more than ten teams** had added their own features to the card. Each addition made it taller, so **shoppers saw fewer products on every screen**, and the pictures they rely on got harder to compare.' },
-        { kind: 'p', text: 'The pod’s mission: ^^help 250 million shoppers find the right product faster^^, whatever the category and whatever brings them to browse.' },
+        // "too full", his live paragraph; the section's one ^^ beat is the cost
+        { kind: 'p', text: 'Over time, **more than ten teams** had added their own features to the card. Each addition made it taller, so ^^shoppers saw fewer products on every screen^^, and the pictures they rely on got harder to compare.' },
+        // the pain voice, straight after the "too full" line it backs: his
+        // shopper's quote (2026-10-05); the translation is ours. Two insights in his shopper's one sentence, one card each (Uttham,
+        // 2026-10-05: "when you have multiple insights create multple cards …
+        // similarly do for product cards"); split at "isliye"; labels and
+        // translations are ours
+        { kind: 'quotes', id: 'V2', source: 'Shopper', items: [
+          { id: 'V2a', consent: true, insight: 'Too much on the card', text: '“Bahut saare chezein aata hai…”', translation: 'So much comes up…' },
+          { id: 'V2b', consent: true, insight: 'So the picture decides', text: '“…isliye mai bas image dek kar aage bad jaati hun.”', translation: '…so I just look at the image and move on.' },
+        ] },
+        {
+          kind: 'steps',
+          // "too empty": the turn from the height above to what was missing
+          lead: 'Yet for all that height, the card left out what shoppers needed.',
+          steps: [
+            // his labels (Uttham, 2026-10-05: "Instead of facts, lets say there
+            // was no enough non visual cues"; "Picture was the only source they
+            // relied"); the first row's text is moved up from the full study
+            { state: 'before', label: 'There weren’t enough non-visual cues', text: 'The facts that decide a purchase (fabric for a kurti, pack size for a snack) were not on the card, so **people opened products just to check.**' },
+            { state: 'before', label: 'The picture was the only source they relied on', text: 'Shoppers judge from pictures and the card showed one; **they needed to go inside to get more image data.**' },
+          ],
+        },
+        { kind: 'p', text: 'The pod’s mission: **help 250 million shoppers find the right product faster**, whatever the category and whatever brings them to browse.' },
       ],
     },
     {
-      heading: 'Strategy',
+      // "make room, then spend it": the shape of his two blocks (remove, then
+      // add) and the trade between them, claiming no rule (the zone/cap rule
+      // is open, plan 026)
+      heading: 'Strategy: make room, then spend it',
       blocks: [
-        { kind: 'p', text: 'We worked on the card **in two directions, one experiment at a time**, each measured on its own.' },
-        // Reworked from his notes (Uttham, 2026-10-03). Framework: "we optimised
-        // and grouped information related to multiple prices offers,
-        // consideration tags, detailed study inside". Titles: "rename it as
-        // seller titles and say they are not adding value and we replaced them,
-        // what we replaced we will talk in value additions". And "the other 2
-        // things in remove what" (the staggered feed, list or grid) "bring the
-        // last two things here" — under block 2, in their original order, ahead
-        // of the two that were already there.
+        // his live line, its tail ("one experiment at a time, each measured on
+        // its own") left out: the changes were bundled, not measured one by one
+        { kind: 'p', text: 'We worked on the card **in two directions**.' },
+        // Reworked from his notes (Uttham, 2026-10-03): the framework, then the
+        // seller titles ("say they are not adding value and we replaced them"),
+        // then "the other 2 things in remove what … bring the last two things
+        // here", under block 2 in their original order.
         {
           kind: 'steps',
           heading: '1. Remove what slows them down',
           steps: [
-            { state: 'cleanup', label: 'Card framework', text: 'We started by understanding every case the card has to carry, then built a framework from them: **the right information architecture for browsing cards, and one that scales.** Inside it we **optimised and grouped the information**: multiple prices and offers, and consideration tags. The detailed study is inside the full case study.' },
-            { state: 'titles', label: 'Seller titles', text: 'Seller titles **weren’t adding value**: most of them had shop names in them. **We replaced them**; what took their place comes under “Add what helps them decide”, next.' },
+            {
+              state: 'cleanup',
+              label: 'Card framework',
+              // his live row, its last sentence ("The detailed study is inside
+              // the full case study.") left out until the full study holds the
+              // framework detail. The prices-and-tags list is his note
+              text: 'We started by understanding every case the card has to carry, then **built a framework from them**: the right information architecture for browsing cards, and one that scales. Inside it we optimised and grouped the information: multiple prices and offers, and consideration tags.',
+              // his full-study Why, its second half ("…with no shared rule for
+              // what earned a place"), as its own sentence: why a framework
+              why: 'There was no shared rule for what earned a place.',
+            },
+            {
+              state: 'titles',
+              label: 'Seller titles',
+              // his live row; its reason is in it. The signpost after "We
+              // replaced them" is left out: the next row says it
+              text: 'Seller titles **weren’t adding value**: most of them had shop names in them. We replaced them.',
+            },
           ],
         },
         {
           kind: 'steps',
           heading: '2. Add what helps them decide',
           steps: [
-            // what replaced the seller titles, promised by the row above (his
-            // own sentence from before the rename, 2026-10-02)
-            { state: 'titles', label: 'Facts in place of the title', text: 'We replaced them with **the important facts shoppers need before making a decision.**' },
-            { state: 'stagger', label: 'Staggered feed', text: 'Cards at their natural height, so more fit on a screen.' },
-            { state: 'list', label: 'List or grid by category', text: 'Rows where details decide, grid where looks decide.' },
-            { state: 'scroll', label: 'Swipeable images', text: 'We added more swipeable images because **shoppers form better conviction from them** before opening the product. They show more of the product and the variations it comes in.' },
-            { state: 'date', label: 'Delivery date', text: 'A clear day count instead of a promise, added **only on products where delivery is fast**, not on all of them.' },
+            {
+              state: 'titles',
+              label: 'Facts in place of the title',
+              // his live sentence, "the seller titles" for his "them" (a block
+              // heading now stands between) and the chips named, since the
+              // staggered feed's reason talks about them
+              text: 'We replaced the seller titles with **the important facts shoppers need before making a decision**, shown as chips.',
+              // his Why (2026-10-05)
+              why: 'Help users understand **non-visual cues like material**, and remove ambiguity about how many units: **that helped them pick the right products in the first place.**',
+            },
+            {
+              state: 'stagger',
+              label: 'Staggered feed',
+              text: 'Cards at their natural height, so more fit on a screen.',
+              // his whole full-study Why, moved up: the cost the chips raised
+              why: 'The grid padded every row to its tallest card. Once chips and tags varied by product, that padding was whitespace, and by the third row **the shopper had lost a product she could have seen.**',
+            },
+            {
+              state: 'list',
+              label: 'List or grid by category',
+              // his live line carries its own reason (details decide), so his
+              // full-study Why stays in the full study
+              text: 'Rows where details decide, grid where looks decide.',
+            },
+            {
+              state: 'scroll',
+              label: 'Swipeable images',
+              text: 'We added more swipeable images because **shoppers form better conviction from them** before opening the product. They show more of the product and the variations it comes in.',
+              // his Why (2026-10-05)
+              why: 'Help users form a **better understanding of the product and its variations**, and help them pick relevant products.',
+            },
+            {
+              state: 'date',
+              label: 'Delivery date',
+              // his live row
+              text: 'A clear day count instead of a promise, added **only on products where delivery is fast**, not on all of them.',
+              // his meaning (Uttham, 2026-10-05: "we wanted to solve for people
+              // who wanted products faster"); what shoppers assumed stays in the
+              // full study's Why
+              why: 'We wanted to solve for **people who wanted their products faster.**',
+            },
           ],
         },
+        // Not placed: his cash-on-delivery verbatim (git 444d9e3^). It is
+        // evidence for the cash-price row, which the teaser leaves out
+        // (2026-10-02: "ignore the cash price thing here").
       ],
     },
     {
       state: 'after',
-      heading: 'Outcome',
+      // a call back to Context's "give them enough to say yes", claiming no result
+      heading: 'Outcome: enough to say yes',
       blocks: [
-        { kind: 'p', text: '**The new card is live** for 250 million shoppers. Results are confidential for a listed company; I walk through them in interviews.' },
+        // the Problem's own words answered; "the new card", never "now on the
+        // card", which would claim it shipped. The section's one ^^ beat
+        { kind: 'p', text: 'The picture still comes first, and ^^the facts that decide a purchase are on the new card.^^' },
+        // the claim, then the shopper saying it, as Mall's "What happened". The
+        // source is his own line from the 09-20 draft (git 444d9e3^); the method
+        // line under it is still his to give. consent: false keeps it off the
+        // live page until he confirms the participant's consent
+        { kind: 'quote', id: 'V1', consent: false, text: '“Fabric pahle andar jaake dekhti thi, ab idhar se hi pata lag raha hai.”', translation: 'I used to open the product to check the fabric. Now I can tell from here.', source: 'Shopper, usability session.' },
+        // his live Outcome's second sentence, alone: its first, "The new card
+        // is live for 250 million shoppers", is not backed by his records
+        // (REC-001 TBD; REC-002 holds the scale-up), so it is left out
+        { kind: 'p', text: 'Results are confidential for a listed company; I walk through them in interviews.' },
         { kind: 'gate' },
         {
           kind: 'inside',
           lead: 'In the full case study:',
+          // only what the full study holds: his two items promised every
+          // change's why, how and what worked, and screens for each
           items: [
-            'Each of the seven changes: why, how, what worked',
-            'Before and after screens for every change',
+            'How the changes were built, and what worked where we know',
+            // what died was the rationing, not the swipe ("An early version that
+            // rationed scrolling to selected products was killed on day one")
+            'How swipeable images evolved: what worked and what didn’t', // his line (2026-10-05)
+            // "Three runs, each bundled with other changes"; "No clean read
+            // because of bundling"
+            'The three runs of facts in place of the title (minimum viable truths)', // his correction (2026-10-05: "3 runs for MVTs facts on title variant")
           ],
         },
       ],
@@ -113,43 +232,60 @@ export const plpCase: CaseTeaserData = {
   // worked, direction and status only. Not yet placed: the brief's tag-colour
   // call (inline green tested best; yellow shipped because the card was already
   // green) — which block it belongs in waits on Uttham (open item 5).
+  // A sentence the open teaser carries is left out here (move, don't copy); a
+  // part left empty prints nothing, and a block with no part left prints
+  // nothing.
   experiments: [
     {
       state: 'cleanup',
       // renamed with the teaser (Uttham, 2026-10-02: "rephrase this with card framework")
       title: 'Card framework',
-      why: '**More than ten teams had placed features on one card** with no shared rule for what earned a place. Each line pushed another product off the screen for a shopper who was only looking at pictures.',
-      how: 'We started by understanding every case the card has to carry, then built a framework from them: **the right information architecture for browsing cards, and one that scales.**',
+      // his live Why's first sentence is on the teaser (the ten teams in his
+      // Problem, the rule as the framework row's reason) and its How is the
+      // teaser's own row; its second sentence, the cost, stays here. The block
+      // still owes his framework detail (the audit, the named zones and their
+      // caps, how the ten teams agreed to them)
+      why: 'Each line pushed another product off the screen for a shopper who was only looking at pictures.',
+      how: '',
     },
     {
       state: 'titles',
       title: 'Clearer titles (minimum viable truths)',
       status: 'Live; next version in test',
-      why: 'Seller-written titles were long, repetitive and stuffed with search words, and **most of them carried shop names**, which added no value. Shoppers glanced and read nothing. The facts that decide a purchase (fabric for a kurti, pack size for a snack) were not on the card, so **people opened products just to check.**',
-      how: 'Defined a minimum viable truth per category: **the smallest set of facts that lets a shopper decide without opening the product.** Replaced the title with those facts as chips. A second version tightened the chips, added consideration tags (price drop / quality marks; built, not launched — too few products qualified), and **forced three rounds of catalogue cleanup so the chips were true.**',
+      // his third sentence is the teaser's first Problem row now
+      why: 'Seller-written titles were long, repetitive and stuffed with search words, and **most of them carried shop names**, which added no value. Shoppers glanced and read nothing.',
+      how: 'Defined a minimum viable truth per category: **the smallest set of facts that lets a shopper decide without opening the product.** Replaced the title with those facts as chips, **over three runs of the facts-on-title variant.** A second version tightened the chips, added consideration tags (price drop / quality marks; built, not launched — too few products qualified), and **forced three rounds of catalogue cleanup so the chips were true.**',
       worked: 'Chips were noticed late but **valued once seen**; shoppers stopped opening products to check fabric. **Pack size was the most useful fact in ambiguous categories.** A chip the picture contradicts is not believed, so **catalogue quality had to come first.** Showing the prepaid price up front confused cash shoppers — fed the cash-price work.',
+      // his pack-size verbatim, the evidence for "Pack size was the most
+      // useful fact" (REC-001). The translation is ours; consent: false keeps
+      // it off a live page until he confirms consent
+      quote: { id: 'V3', consent: false, text: '“Yaha pe nya pack ka information aa rha hai, ki kitna saman milega, ye badiya hai.”', translation: 'The new pack information here tells me how much I’ll get. That’s great.', source: 'Shopper, usability test.' },
     },
     {
       state: 'stagger',
       title: 'Staggered feed (For You)',
-      status: 'Inconclusive after three runs',
-      why: 'The grid padded every row to its tallest card. Once chips and tags varied by product, that padding was whitespace, and by the third row **the shopper had lost a product she could have seen.**',
-      how: 'Let each card take its natural height in the For You feed so columns stagger. Three runs, each bundled with other changes.',
-      worked: '**Shoppers never noticed misaligned text under the images** (confirms picture-first). No clean read because of bundling; result stays open. Rule kept: **never force staggering** — it is what variable content does when the grid stops hiding it.',
+      status: 'Inconclusive',
+      // his Why is the teaser row's reason now
+      why: '',
+      how: 'Let each card take its natural height in the For You feed so columns stagger.', // the three runs were the MVTs' (his correction, 2026-10-05)
+      // "read" is the team's word for a result: plain words for readers outside
+      worked: '**Shoppers never noticed misaligned text under the images** (confirms picture-first). No clean result yet; it stays open. Rule kept: **never force staggering** — it is what variable content does when the grid stops hiding it.',
     },
     {
       state: 'list',
       title: 'List or grid by category',
-      status: 'Live, reading',
+      // "reading" in plain words
+      status: 'Live, results pending',
       why: 'Grid suits products judged on looks. Headphones and other considered categories are **judged on facts a grid card cannot carry.**',
       how: 'Full-width list rows for considered categories. **The platform picks list or grid by category; no user toggle.**',
-      worked: 'Live, read in progress. Direction supports **rows where details decide, grid where looks decide.**',
+      worked: 'Live; results pending. Direction supports **rows where details decide, grid where looks decide.**',
     },
     {
       state: 'scroll',
       title: 'Swipeable images',
       status: 'Shipped',
-      why: 'Shoppers judge from pictures and the card showed one; **every second view cost a tap in and a tap back.**',
+      // his Why became the teaser's second Problem row (his "image data" line)
+      why: '',
       how: 'Up to three images swipe inside the card, showing **more of the product and the variations it comes in**, one autoplay to teach the gesture. An early version that rationed scrolling to selected products was **killed on day one — breadth was the point.**',
       worked: 'Taps into the product fell while orders per tap rose: one finding, not two. **The decision moved onto the listing.**',
     },
@@ -159,13 +295,18 @@ export const plpCase: CaseTeaserData = {
       status: 'Live',
       why: 'Most shoppers pay cash on delivery and the card showed the prepaid price. A higher number at the door cost the category, not one order — **shoppers stopped buying that kind of product.**',
       how: 'Cash price in its own row under the prepaid price; one rule for the card: **anything price-related lives in that row.**',
-      worked: '**Cash shoppers stopped being surprised at the door**; the cohort that had been hidden from the real price responded.',
+      // his What worked is a result his cash-price record (REC-002) has as
+      // "TBD — experiment is currently running" (plan 026), so it is left out
+      worked: 'The test is still running.',
     },
     {
       state: 'date',
       title: 'Delivery date',
       status: 'Scaled',
-      why: 'Shoppers assumed four to five days in cities and a week or more outside them; **“Free Delivery” on every card told them nothing.**',
+      // his reason first, as on the teaser row (2026-10-05: "we wanted to
+      // solve for people who wanted products faster"), then what shoppers
+      // assumed and what the old line told them
+      why: 'We wanted to solve for **people who wanted their products faster.** Shoppers assumed four to five days in cities and a week or more outside them. **“Free Delivery” on every card told them nothing.**',
       how: 'A day count at the foot of the card, **shown only on products where delivery is fast**, not on all of them. Three tests, including one with a “FAST” mark in front of the number.',
       worked: '**The date did the work; the word in front of it carried nothing.** Third test scaled.',
     },
@@ -252,8 +393,21 @@ export const plpCase: CaseTeaserData = {
         { text: 'A row per product', x: 0.05, y: 0.231 }, // DRAFT: on the first row's picture
         { text: 'Facts beside the picture', x: 0.39, y: 0.578 }, // DRAFT: touching the third row's Noice Cancellation chip (from x 0.40)
       ],
+      // DRAFT notes on the old card ("too full" was only told, never shown):
+      // three of the lines the teams had stacked under the picture, each named
+      // by what it is, not by the team that owns it (open in his brief). Read
+      // off before.png's pixels: the shirt's title from x 0.025 (y 0.3667),
+      // its cash row from x 0.024 (y 0.4264), its Trusted mark from x 0.357
+      // (y 0.4553); the words spread down the column at `ty`
+      before: [
+        { text: 'The seller’s title', x: 0.012, y: 0.367, ty: 0.3 }, // DRAFT: touching "KMX striped shirt"
+        { text: 'A second price, for cash', x: 0.012, y: 0.426, ty: 0.43 }, // DRAFT: touching "₹260 with CASH"
+        { text: 'A trust mark', x: 0.364, y: 0.455, ty: 0.56 }, // DRAFT: on the Trusted mark's left end
+      ],
       date: [
-        { text: 'Fast, with a day count', x: 0.02, y: 0.782 }, // DRAFT: touching the kurti's FAST mark (from x 0.035)
+        // his draft, as it was live. It is true to the screen, which shows FAST
+        // before the day count
+        { text: 'Fast, with a day count', x: 0.02, y: 0.782 }, // DRAFT: touching the kurti's delivery line at its FAST mark (from x 0.035)
         { text: 'None where it isn’t fast', x: 0.016, y: 0.407 }, // DRAFT: touching the shirt's rating, its last row, with no delivery line
       ],
     },

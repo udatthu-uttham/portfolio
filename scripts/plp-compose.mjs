@@ -29,7 +29,8 @@
 //            Uttham, 2026-10-04: "the images are repititive … take it from
 //            prototype porject"), their words, prices and chrome untouched
 //   list     list view by category: the list-view screen only (the grid
-//            control and the variant labels dropped)
+//            control and the variant labels dropped), each row with its own
+//            prices (the board repeats one set on all four)
 //   date     dates on fast deliveries: the winning card only (Fast and a day
 //            count), in the new feed in place of the same kurti's card, so it
 //            stands among cards that are not fast and carry no date
@@ -190,14 +191,138 @@ const withPhoto = async (c, photo) => {
   };
 }
 
+// ---- the list rows' prices --------------------------------------------------
+// On the board all four list rows carry one set of prices: ₹384 over ₹420
+// struck and "7% off" on the green UPI chip, "₹410 with CASH" under it. Each
+// row now shows its own, varied on Uttham's request (2026-10-05: "can you
+// randomise the price values realistic ones, for both UPI and cash prices"):
+// budget earbuds, the UPI price under a struck MRP, the discount worked out
+// from the two, and the cash price a little above the UPI one, as his board
+// has it. Fixed here rather than drawn at random, so a re-run gives the same
+// screen.
+const LIST_PRICES = [
+  { upi: 312, mrp: 399, cash: 334 }, // row 1, the i12 pair
+  { upi: 587, mrp: 799, cash: 619 }, // row 2, the white pair (out of stock)
+  { upi: 268, mrp: 299, cash: 285 }, // row 3, the black pair
+  { upi: 673, mrp: 999, cash: 711 }, // row 4, the gaming pair
+];
+const offOf = (p) => Math.round((100 * (p.mrp - p.upi)) / p.mrp);
+
+// The figures are redrawn on the board's own 1× crop, before the ×3 scale, so
+// they pass through the same Lanczos as every other letter on the screen and
+// are exactly as soft. The board sets Mier B, Meesho's typeface, at 15/16 of
+// its sizes: the UPI price 15px Demi #353543; the MRP 11.25px Book #8B8BA3,
+// struck by a 0.75px line from its origin to its advance; the discount
+// 11.25px Book #038D63; the cash price 11.25px Demi #616173, then "with CASH"
+// in Book. Sizes, origins and the strike were fitted to his pixels (each run
+// rendered 8× over, averaged down, and matched to 1/8px), and the gaps between
+// runs are his: 4.54px after the price, 4.46px after the MRP, 2.71px after the
+// cash price. Coordinates are the 360 × 720 crop's, for row 1; the other rows
+// are the same block 138, 276 and 432px lower. Under the figures his
+// background goes back first: the chip's colour column by column (its gradient
+// runs left to right, so each column is one colour from its top edge to its
+// foot, read from the chip's rows above and below the text), and white under
+// the cash line. "UPI" and the chip's right end are not touched.
+// Needs Mier B02 installed (macOS: ~/Library/Fonts); librsvg finds it through
+// fontconfig, and the script checks the face it got by one advance.
+const ROW_DY = [0, 138, 276, 432];
+const PRICE_LINE = { x0: 142, x1: 300, y0: 157, y1: 174, chipRows: [156, 157, 158, 159, 160, 172, 173, 174, 175] };
+const CASH_LINE = { x0: 142, x1: 300, y0: 178, y1: 196 };
+const RUN = {
+  upi: { weight: 600, size: 15, ink: '#353543', x: 144, y: 172 },
+  mrp: { weight: 400, size: 11.25, ink: '#8B8BA3', gap: 4.54, y: 171, strike: { top: 167.875, height: 0.75, trim: 0.125 } },
+  off: { weight: 400, size: 11.25, ink: '#038D63', gap: 4.46, y: 171.125 },
+  cash: { weight: 600, size: 11.25, ink: '#616173', x: 144, y: 191.125 },
+  cashWords: { weight: 400, size: 11.25, ink: '#616173', gap: 2.71, y: 191.125, text: 'with CASH' },
+};
+const svgText = (text, run, x, y, k, anchor = 'start') =>
+  `<text x="${x * k}" y="${y * k}" font-family="Mier B02" font-weight="${run.weight}" font-size="${run.size * k}" fill="${run.ink ?? '#000'}" text-anchor="${anchor}">${text}</text>`;
+// a run's advance as librsvg lays it out: the run set from a point and set to
+// end at it, and the distance between the two inks' centroids
+const advanceOf = async (text, run) => {
+  const k = 16, half = Math.ceil(run.size * text.length) * k, h = Math.ceil(run.size * 2) * k;
+  const centroid = async (anchor) => {
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${2 * half}" height="${h}">${svgText(text, run, half / k, run.size * 1.5, k, anchor)}</svg>`;
+    const { data, info } = await sharp(Buffer.from(svg)).ensureAlpha().extractChannel(3).raw().toBuffer({ resolveWithObject: true });
+    let mass = 0, moment = 0;
+    for (let i = 0; i < data.length; i++) { mass += data[i]; moment += data[i] * (i % info.width); }
+    return moment / mass;
+  };
+  return ((await centroid('start')) - (await centroid('end'))) / k;
+};
+// repaints the four rows' prices into the crop's raw pixels, in place
+const repriceList = async (px, info) => {
+  const ch = info.channels;
+  const idx = (x, y) => (y * info.width + x) * ch;
+  const K = 8;
+  for (const [row, dy] of ROW_DY.entries()) {
+    const p = LIST_PRICES[row];
+    // his background, back under both lines
+    const L = PRICE_LINE;
+    for (let x = L.x0; x <= L.x1; x++) {
+      const chip = [0, 1, 2].map((c) => {
+        const v = L.chipRows.map((y) => px[idx(x, y + dy) + c]).sort((a, b) => a - b);
+        return v[v.length >> 1];
+      });
+      for (let y = L.y0 + dy; y <= L.y1 + dy; y++) for (let c = 0; c < 3; c++) px[idx(x, y) + c] = chip[c];
+    }
+    for (let y = CASH_LINE.y0 + dy; y <= CASH_LINE.y1 + dy; y++)
+      for (let x = CASH_LINE.x0; x <= CASH_LINE.x1; x++) for (let c = 0; c < 3; c++) px[idx(x, y) + c] = 255;
+    // the runs, laid out as his are
+    const upi = `₹${p.upi}`, mrp = `₹${p.mrp}`, off = `${offOf(p)}% off`, cash = `₹${p.cash}`;
+    const mrpX = RUN.upi.x + (await advanceOf(upi, RUN.upi)) + RUN.mrp.gap;
+    const mrpW = await advanceOf(mrp, RUN.mrp);
+    const offX = mrpX + mrpW + RUN.off.gap;
+    const offEnd = offX + (await advanceOf(off, RUN.off));
+    if (offEnd > 318) throw new Error(`list row ${row + 1}: "${off}" would reach the UPI tag`);
+    const wordsX = RUN.cash.x + (await advanceOf(cash, RUN.cash)) + RUN.cashWords.gap;
+    // drawn 8× over a box from the price line's top to the cash line's foot,
+    // then averaged down to the crop's pixels and laid over his background
+    const box = { x: L.x0, y: L.y0 + dy, w: L.x1 - L.x0 + 1, h: CASH_LINE.y1 - L.y0 + 1 };
+    const t = (text, run, x, y) => svgText(text, run, x - box.x, y + dy - box.y, K);
+    const s = RUN.mrp.strike;
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${box.w * K}" height="${box.h * K}">${[
+      t(upi, RUN.upi, RUN.upi.x, RUN.upi.y),
+      t(mrp, RUN.mrp, mrpX, RUN.mrp.y),
+      `<rect x="${(mrpX - box.x) * K}" y="${(s.top + dy - box.y) * K}" width="${(mrpW - s.trim) * K}" height="${s.height * K}" fill="${RUN.mrp.ink}"/>`,
+      t(off, RUN.off, offX, RUN.off.y),
+      t(cash, RUN.cash, RUN.cash.x, RUN.cash.y),
+      t(RUN.cashWords.text, RUN.cashWords, wordsX, RUN.cashWords.y),
+    ].join('')}</svg>`;
+    const { data: hi, info: hiInfo } = await sharp(Buffer.from(svg)).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+    for (let y = 0; y < box.h; y++) for (let x = 0; x < box.w; x++) {
+      let a = 0; const c3 = [0, 0, 0];
+      for (let j = 0; j < K; j++) for (let i = 0; i < K; i++) {
+        const o = ((y * K + j) * hiInfo.width + x * K + i) * 4, al = hi[o + 3];
+        a += al; for (let c = 0; c < 3; c++) c3[c] += al * hi[o + c];
+      }
+      if (!a) continue;
+      const n = K * K * 255, o = idx(box.x + x, box.y + y);
+      for (let c = 0; c < 3; c++) px[o + c] = Math.round(px[o + c] * (1 - a / n) + c3[c] / n);
+    }
+  }
+};
+
 // ---- list: the list-view screen alone ---------------------------------------
 // list.png (981 × 963): two phone crops under purple variant labels; the list
 // view is x 521–880, y 164–884 inside its 1px #CECEDE frame. Its rows 164–883
 // are exactly 1 : 2 (360 × 720), scaled ×3; the frame's foot (row 884) is
-// redrawn at the bottom, so nothing is stretched.
-{
-  const buf = await sharp(`${BOARDS}/list.png`)
+// redrawn at the bottom, so nothing is stretched. Its prices are each row's
+// own (above); without Mier B02 the screen is left as it was last composed.
+list: {
+  const crop = await sharp(`${BOARDS}/list.png`)
     .extract({ left: 521, top: 164, width: 360, height: 720 })
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+  // Mier B02 Book sets "₹420" at 11.25px 26.415px wide; any other face misses
+  const probe = await advanceOf('₹420', RUN.mrp);
+  if (Math.abs(probe - 26.415) > 0.05) {
+    console.warn(`list.png not written: librsvg did not find Mier B02 ("₹420" set ${probe.toFixed(3)}px wide, not 26.415)`);
+    report.list = 'skipped: Mier B02 not installed';
+    break list;
+  }
+  await repriceList(crop.data, crop.info);
+  const buf = await sharp(crop.data, { raw: { width: crop.info.width, height: crop.info.height, channels: crop.info.channels } })
     .resize({ width: W, height: H, kernel: KERNEL })
     .png()
     .toBuffer();
@@ -233,7 +358,12 @@ const withPhoto = async (c, photo) => {
   layers.push({ input: await rect(W, 3, FRAME), left: 0, top: FOOT });
   await save('list', layers);
   // on the board: the first row's middle at y 330, the third row's chips at 580
-  report.list = { scale: '3.000', 'first row': at((330 - 164) * 3), 'third row': at((580 - 164) * 3) };
+  report.list = {
+    scale: '3.000',
+    'first row': at((330 - 164) * 3),
+    'third row': at((580 - 164) * 3),
+    prices: LIST_PRICES.map((p) => `₹${p.upi} ₹${p.mrp} ${offOf(p)}% off UPI · ₹${p.cash} with CASH`),
+  };
 }
 
 // ---- date: the winning card in the new feed ---------------------------------

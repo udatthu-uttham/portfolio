@@ -597,7 +597,10 @@ the tallest card, which is a laptop's.
 started (competitive, better-quality alternatives for shoppers who seek quality,
 and a quiet hint that the first launch found the go-to-market); v2 as the bold
 version that followed; the research before the v3 launch, with its sticky note;
-v3; what happened. **v3 shows one landing page** (2026-10-03: "just one landing
+v3; what happened. (Since the 2026-10-05 storyline the chapters are Where it
+started, When bold wasn't enough, Before v3: what shoppers told us, v3: sell
+brands, not Mall, and What happened, and each quote is a row of cards, one per
+insight; see "Case teasers tell a story" below.) **v3 shows one landing page** (2026-10-03: "just one landing
 page (remove the second landing page section, we will not talk about it in
 preview)"): the row for returning shoppers, its alt, card title and clip are out
 of `mall-case.ts`, and its files stay, unused (see the `mall-case` README); and
@@ -974,10 +977,15 @@ keeps his yellow kurti and the one- and two-fact cards show a teal and a grey
 kurti; in the swipe clip's feed six of eight cards change. **Only the picture
 box changes** — his words, chips, prices, ratings, edges, hearts and dots stay
 his — and **a card takes only a photo its words are true of** (every chip on
-these cards reads "Kurti" or "Cotton"). The list view keeps his one i12
-earphone photo on all four rows: the prototype has no earphones, and another
-product would make the rows' battery and noise-cancellation chips false, so a
-varied set is his to supply. The date screen and the framework card had no
+these cards reads "Kurti" or "Cotton"). The list view keeps his i12 in row 1
+and takes three other wireless earbuds from meesho.com's own listings for rows
+2–4 (2026-10-04, "go to meesho.com and take images from there"), and **each row
+carries its own realistic prices** (2026-10-05: "can you randomise the price
+values realistic ones, for both UPI and cash prices"): price, struck MRP, a
+discount worked out from the two, and a cash price a little above the UPI one,
+painted in Mier B02 at the board's sizes and colours before the upscale (the
+plp README has the figures; without the font installed the script leaves
+`list.png` alone). The date screen and the framework card had no
 repeats and are unchanged. **The words outside, as on the homepage**: handwritten notes
 (`screens.notes` in `src/data/plp-case.ts`, per screen file, `y` a share of
 that screen's height, priority order, no numbers), the tiles' Caveat in ink
@@ -1095,9 +1103,11 @@ a chevron per row** ("the more case section can be just a small section with
 chevron and takes the column width of the content it should not flow into the
 column of the phone preview, so the phone preview always stays"): one
 `--section-y` under the last section, the label a `--ct-tie` over the rows,
-which stand on the faint band the page's blocks of rows share, the dashed rule
-only between rows, each row its title, its line and a chevron that nudges on
-hover; it never reaches the phone's columns, and the sticky card stands beside
+which stand on open paper **between dashed rules — one over the first row and
+one under each, the column's width** (Uttham, 2026-10-05: "give this the dotted
+line effect not the card effect", on every page with the list; until then it
+stood on the faint band, which the blocks of rows inside a page keep), each row
+its title, its line and a chevron that nudges on hover; it never reaches the phone's columns, and the sticky card stands beside
 it to the end. **It is the same component, `CaseIndex` with `compact`**, passed
 in CaseTeaser's `more` slot (`end` keeps the old full-width ruled index for a
 case page without the teaser layout): cases pass their studies, tools pass rows
@@ -1128,6 +1138,36 @@ product-cards fabric quote left with the scan-order section on 2026-10-02) until
 he confirms it; the Mall quotes are not so
 marked and were already public. Anything a brief marks "open" is left out,
 never shown as a placeholder.
+
+## Case teasers tell a story, and a story change is previewed first
+
+**Both case teasers run as a storyline, not a list of action items** (Uttham,
+2026-10-04: "the teaser today just looks like action items we did, there is no
+l2 reasons or no drama or storyline"; approved 2026-10-05: "Now make these
+changes and update the git and website"). The product cards: two jobs →
+too full and too empty → make room, then spend it → enough to say yes. Mall:
+from doubt to desire — the quiet tag that did not explain Mall, bold that was
+not enough, homes, v3, trusted. **Each row is his line, then at most one
+reason, labelled "Why this design:"** (a row's `why`); **a quote with several
+insights is one card per insight** (`kind: 'quotes'`, 2026-10-05: "when you
+have multiple insights create multple cards"); **a sentence moved up from the
+full study leaves it** (move, don't copy), and his corrections flow into the
+full study wherever it said the same thing. The Mall research finding is his:
+**few recognised Mall without nudges, and those who did took it for a nearby
+mall** — never "the name already worked". **The v2 badge failed on legibility:
+the tick spoiled the Mall text, the contrast was poor and the letter "l"
+confused people** (2026-10-05); trust
+and notice are what worked in v3 ("I wanted to say it worked on v3").
+
+**A storyline or copy rewrite is built on a separate preview first**
+(2026-10-04: "dont touch the original, create seperate preview, then we will
+merge it"): its own worktree and dev server, with `PREVIEW_MARKS` on in
+`src/lib/rich.ts` and `preview: true` on the page's data, so every proposed
+line is marked by where it comes from (`[[new:ID|…]]` yellow, `[[full:ID|…]]`
+blue, `[[slot:ID|…]]` grey) under a legend banner, and a verbatim awaiting
+consent shows as a green note. **On main the switch is off and no marker is
+left in the data**: the merge strips them, drops the flag and keeps the
+preview's notes file out of the public repo.
 
 ## Uttham's copy is Uttham's
 

@@ -9,13 +9,25 @@
 // a `preview` slot (a live tool) it is announced as a `case:state` event
 // instead.
 
-export type CaseStep = { state?: string; label: string; text: string }; // a labelled ruled row; highlights in **bold**
+// A shopper's own words on a sticky note. consent: false keeps it off the page
+// (on a preview page it shows, labelled as needing his consent); a translation,
+// when the words are not in English, sits under them; a placeholder (preview
+// only) is a dashed empty note saying where one of his verbatims could go.
+export type CaseQuote = { text: string; source: string; translation?: string; consent?: boolean; placeholder?: boolean; id?: string };
+// a labelled ruled row; highlights in **bold**. `why` is the row's one reason,
+// a line under its text, always labelled "Why this design:"; `quote` a
+// verbatim on a note in the row
+export type CaseStep = { state?: string; label: string; text: string; why?: string; quote?: CaseQuote };
 export type CaseRow = { state?: string; text: string }; // one ruled row of prose; highlights in **bold**
 
 export type CaseBlock =
   | { kind: 'p'; text: string } // a paragraph; highlights in **bold**
   | { kind: 'steps'; heading?: string; lead?: string; steps: CaseStep[] } // an optional h3 and lead line over ruled rows
-  | { kind: 'quote'; text: string; source: string; consent?: boolean } // a sticky note; consent: false keeps it off the page
+  | ({ kind: 'quote' } & CaseQuote) // a sticky note; consent: false keeps it off the page
+  // several insights from one source, one sticky card each, side by side
+  // (Uttham, 2026-10-05: "when you have multiple insights create multple
+  // cards, like the house holde review of lucknow has 3 insights")
+  | { kind: 'quotes'; id?: string; source: string; items: (CaseQuote & { insight?: string })[] }
   | { kind: 'inside'; lead: string; items: string[] } // "In the full case study:" and its list
   | { kind: 'rows'; heading?: string; lead?: string; rows: CaseRow[] } // ruled rows of prose, each its own trigger (the AI Space pages)
   | { kind: 'prompt'; text: string; copy: string } // the prompt card: a preview of `text` and a button (`copy` its label) that copies all of it
@@ -32,7 +44,9 @@ export type CaseSection = { state?: string; heading: string; blocks: CaseBlock[]
 // A note beside the phone: its line starts ON the thing it names, inside the
 // screen, at (x, y), and runs out to its words, which stand at `ty` in the
 // notes column (shares of the screen's width and height; `ty` defaults to y).
-export type ScreenNote = { text: string; y: number; x?: number; ty?: number };
+// `isNew` (preview only): a draft note the live page does not have, shown on
+// the yellow of new wording so the preview's legend holds for the notes too.
+export type ScreenNote = { text: string; y: number; x?: number; ty?: number; isNew?: boolean };
 
 export type Experiment = {
   state: string;
@@ -41,6 +55,7 @@ export type Experiment = {
   why: string;
   how?: string; // omitted while the brief marks it open
   worked?: string; // omitted while the brief marks it open
+  quote?: CaseQuote; // a verbatim on a note under What worked, its evidence; consent: false keeps it off the page
 };
 
 export type CaseTeaserData = {
@@ -67,4 +82,8 @@ export type CaseTeaserData = {
   // 2026-10-02: "the scroll stepper should also have limited things").
   rail?: { top?: boolean; sections: string[] };
   panelLabel?: string; // the preview's accessible name
+  // A storyline preview for Uttham's approval (2026-10-04): a banner says the
+  // page is not live and what the marks mean (src/lib/rich.ts), and verbatims
+  // still waiting on consent show, labelled. Never set on a page that is live.
+  preview?: boolean;
 };

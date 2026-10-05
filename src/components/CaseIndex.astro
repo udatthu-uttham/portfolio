@@ -100,21 +100,14 @@ const rows: Row[] = given ?? items.map((s) => ({ href: `/work/${s.slug}`, year: 
   }
 
   /* COMPACT, in a teaser page's reading column: the label a --ct-tie over the
-     rows, which share the reading's faint band (--ct-block-bg, --radius-sm,
-     inset --card-padding at the sides) with the dashed rule only between rows,
-     as the page's blocks of rows do. Each row is its title, its line under it
-     and a chevron at the right, centred on the pair. Hover is colour and the
-     chevron's nudge only. The page's tokens fall back to the same values
-     outside a teaser page. */
+     rows, which stand on open paper between dashed rules — one over the first
+     row and one under each, drawn the column's width, as the facts row is
+     (Uttham, 2026-10-05: "give this the dotted line effect not the card
+     effect"; it shared the reading's faint band until then). Each row is its
+     title, its line under it and a chevron at the right, centred on the pair.
+     Hover is colour and the chevron's nudge only. The page's tokens fall back
+     to the same values outside a teaser page. */
   .case-index--compact .case-index__label { margin-bottom: var(--ct-tie, var(--space-4)); }
-  .case-index--compact .case-index__list {
-    padding: 0 var(--card-padding);
-    border-top: 0;
-    background: var(--ct-block-bg, color-mix(in oklab, var(--paper-1) 55%, transparent));
-    border-radius: var(--radius-sm);
-  }
-  .case-index--compact .case-index__row { border-bottom: 0; }
-  .case-index--compact .case-index__row + .case-index__row { border-top: 1px dashed var(--line-mark); }
   .case-index--compact .case-index__link {
     grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;

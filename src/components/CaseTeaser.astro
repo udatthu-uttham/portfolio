@@ -21,12 +21,12 @@
 // display; without it the tool sizes its own frame.
 import { Image, getImage } from 'astro:assets';
 import CaseDevice from './CaseDevice.astro';
-import { rich } from '../lib/rich';
+import { rich, unmark, PREVIEW_MARKS } from '../lib/rich';
 import { screenEdges } from '../lib/screen-edges';
 import type { Edge } from '../lib/edge-colour';
 import clipEdges from '../data/clip-edges.json';
 import { CASE_PASSWORD_SHA256 } from '../data/case-gate';
-import type { CaseTeaserData } from '../data/case-teaser';
+import type { CaseTeaserData, CaseQuote } from '../data/case-teaser';
 
 interface Props {
   data: CaseTeaserData;
@@ -95,6 +95,18 @@ const altFor = (key: string) => {
 const dev = import.meta.env.DEV;
 const back = data.back ?? { href: '/#work', label: '← All projects' };
 const hasFull = Boolean(data.gate && data.experiments?.length);
+// A STORYLINE PREVIEW (2026-10-04): the banner, the marks' legend, and the
+// verbatims still waiting on consent, shown and labelled so. Off with the
+// marks themselves (PREVIEW_MARKS in src/lib/rich.ts).
+const preview = Boolean(data.preview) && PREVIEW_MARKS;
+const showQuote = (q: CaseQuote) => (q.placeholder ? preview : q.consent !== false || preview);
+// the legend's green key only where a verbatim on the page waits on consent
+// (Mall preview round 1: Mall has none, and the key sent him looking for one);
+// the cards of a `quotes` block count too (Mall preview round 2)
+const pendingQuote = [
+  ...data.sections.flatMap((s) => s.blocks.flatMap((b) => (b.kind === 'quote' ? [b] : b.kind === 'quotes' ? b.items : b.kind === 'steps' ? b.steps.flatMap((st) => (st.quote ? [st.quote] : [])) : []))),
+  ...(data.experiments ?? []).flatMap((e) => (e.quote ? [e.quote] : [])),
+].some((q) => !q.placeholder && q.consent === false);
 
 const sourceLink = data.source
   ? `<a class="ct-source" href="${data.source.href}" target="_blank" rel="noopener" title="${data.source.title}">${data.source.label}</a>`
@@ -104,7 +116,7 @@ const dek = rich(data.dek).replace('{source}', sourceLink);
 // Every section and full-study block gets an id, so the scroll points can jump
 // to it. Prefixed, so none can collide with the homepage scrollspy's about /
 // work / ai / contact.
-const idFor = (text: string) => `s-${text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`;
+const idFor = (text: string) => `s-${unmark(text).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`;
 
 // The scroll points, in reading order: each section, each sub-group heading
 // inside it, and — once the full study is open — the study and its blocks.
@@ -120,12 +132,12 @@ const rail = data.rail;
 const marks: Mark[] = rail
   ? [
       ...(rail.top ? [{ id: 'ct-top', title: data.title }] : []),
-      ...data.sections.filter((s) => rail.sections.includes(s.heading)).map((s) => ({ id: idFor(s.heading), title: s.heading })),
+      ...data.sections.filter((s) => rail.sections.includes(unmark(s.heading))).map((s) => ({ id: idFor(s.heading), title: unmark(s.heading) })),
     ]
   : data.sections.flatMap((section) => [
-      { id: idFor(section.heading), title: section.heading },
+      { id: idFor(section.heading), title: unmark(section.heading) },
       ...section.blocks.flatMap((b) =>
-        (b.kind === 'steps' || b.kind === 'rows') && b.heading ? [{ id: idFor(b.heading), title: b.heading, sub: true }] : []
+        (b.kind === 'steps' || b.kind === 'rows') && b.heading ? [{ id: idFor(b.heading), title: unmark(b.heading), sub: true }] : []
       ),
     ]);
 if (data.gate && data.experiments?.length && !rail) {
@@ -225,6 +237,26 @@ const notesFor = (key: string) => (kindFor(key) === 'phone' ? data.screens?.note
 const noted = live ? [] : shots.filter((key) => notesFor(key).length);
 ---
 
+{preview && (
+  /* A STORYLINE PREVIEW (2026-10-04): not live, and what the four marks mean
+     (round 4: cuts are left out and questions are in PREVIEW-NOTES.md, so
+     nothing on the page is struck or boxed in red) */
+  <div class="pv-banner" role="note" aria-label="Preview legend" data-pv-banner>
+    <p>
+      <b>PREVIEW — not live.</b>{' '}
+      <span class="pv-key"><i class="pv-swatch pv-swatch--new"></i>Yellow = new wording</span>{' · '}
+      <span class="pv-key"><i class="pv-swatch pv-swatch--full"></i>Blue = your own sentence, moved up from the full study</span>{' · '}
+      {pendingQuote && <><span class="pv-key"><i class="pv-swatch pv-swatch--quote"></i>Green = a real shopper quote, needs your consent</span>{' · '}</>}
+      <span class="pv-key"><i class="pv-swatch pv-swatch--slot"></i>Grey dashed = only you can fill this</span>{' · '}
+      <span class="pv-key pv-key--long">Everything unmarked is your live copy. What was cut, and the questions for you: PREVIEW-NOTES.md.</span>
+    </p>
+    <button class="pv-banner__hide" type="button" aria-label="Hide the preview legend" data-pv-hide>×</button>
+  </div>
+  <script is:inline>
+    document.querySelector('[data-pv-hide]')?.addEventListener('click', function () { this.closest('[data-pv-banner]').hidden = true; });
+  </script>
+)}
+
 <div class="ct">
   <header class="ct-hero" id={rail?.top ? 'ct-top' : undefined}>
     <a class="back-link text-link" href={back.href}>{back.label}</a>
@@ -247,26 +279,71 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
     <div class="ct-story">
       {data.sections.map((section) => (
         <section class="ct-section" id={idFor(section.heading)} data-state={section.state}>
-          <h2>{section.heading}</h2>
+          <h2 set:html={rich(section.heading)} />
           {section.blocks.map((block) =>
             block.kind === 'p' ? (
               <p class="ct-body" set:html={rich(block.text)} />
             ) : block.kind === 'steps' ? (
               <>
-                {block.heading && <h3 id={idFor(block.heading)}>{block.heading}</h3>}
+                {block.heading && <h3 id={idFor(block.heading)} set:html={rich(block.heading)} />}
                 {block.lead && <p class="ct-body ct-sublead" set:html={rich(block.lead)} />}
                 <ul class="ct-steps">
                   {block.steps.map((s) => (
-                    <li class="ct-step" data-state={s.state}><b>{s.label}</b><span set:html={rich(s.text)} /></li>
+                    <li class="ct-step" data-state={s.state}>
+                      <b set:html={rich(s.label)} /><span set:html={rich(s.text)} />
+                      {s.why && rich(s.why).trim() && (
+                        /* preview: the design argument for the change, one line
+                           (a slot alone prints nothing once the marks are off) */
+                        <p class="ct-why"><span class="ct-why__label">Why this design:</span> <span set:html={rich(s.why)} /></p>
+                      )}
+                      {s.quote && showQuote(s.quote) && (
+                        s.quote.placeholder ? (
+                          <aside class="ct-note ct-note--slot" title={s.quote.id}><p set:html={rich(s.quote.text)} /></aside>
+                        ) : (
+                          <aside class:list={['ct-note', { 'ct-note--pending': preview && s.quote.consent === false }]} title={preview ? s.quote.id : undefined}>
+                            {preview && s.quote.consent === false && <span class="ct-note__flag">Verbatim — needs your consent to publish</span>}
+                            <p set:html={rich(s.quote.text)} />
+                            {rich(s.quote.translation).trim() && <p class="ct-note__tr" set:html={rich(s.quote.translation)} />}
+                            <small set:html={rich(s.quote.source)} />
+                          </aside>
+                        )
+                      )}
+                    </li>
                   ))}
                 </ul>
               </>
             ) : block.kind === 'quote' ? (
-              block.consent !== false && (
-                <aside class="ct-note">
-                  <p>{block.text}</p>
-                  <small>{block.source}</small>
-                </aside>
+              showQuote(block) && (
+                block.placeholder ? (
+                  <aside class="ct-note ct-note--slot" title={block.id}><p set:html={rich(block.text)} /></aside>
+                ) : (
+                  <aside class:list={['ct-note', { 'ct-note--pending': preview && block.consent === false }]} title={preview ? block.id : undefined}>
+                    {preview && block.consent === false && <span class="ct-note__flag">Verbatim — needs your consent to publish</span>}
+                    <p set:html={rich(block.text)} />
+                    {rich(block.translation).trim() && <p class="ct-note__tr" set:html={rich(block.translation)} />}
+                    <small set:html={rich(block.source)} />
+                  </aside>
+                )
+              )
+            ) : block.kind === 'quotes' ? (
+              /* one insight per card, the cards side by side across the
+                 reading column, each signed with the source at its foot as a
+                 single note is (Uttham, 2026-10-05: "can make them horizontally
+                 wider, and the research participant text should be inside the
+                 sticky notes") */
+              block.items.some((q) => showQuote(q)) && (
+                <div class="ct-notes" title={preview ? block.id : undefined}>
+                  <div class="ct-notes__row">
+                    {block.items.filter((q) => showQuote(q)).map((q) => (
+                      <aside class:list={['ct-note', 'ct-note--card', { 'ct-note--pending': preview && q.consent === false }]} title={preview ? q.id : undefined}>
+                        {q.insight && <span class="ct-note__insight" set:html={rich(q.insight)} />}
+                        <p set:html={rich(q.text)} />
+                        {rich(q.translation).trim() && <p class="ct-note__tr" set:html={rich(q.translation)} />}
+                        {rich(block.source).trim() && <small set:html={rich(block.source)} />}
+                      </aside>
+                    ))}
+                  </div>
+                </div>
               )
             ) : block.kind === 'inside' ? (
               /* in a section with the gate, the list goes inside the gate card */
@@ -274,13 +351,13 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
               <div class="ct-inside-block" data-inside>
                 <p class="ct-body ct-inside-lead">{block.lead}</p>
                 <ul class="ct-inside">
-                  {block.items.map((item) => <li>{item}</li>)}
+                  {block.items.map((item) => <li set:html={rich(item)} />)}
                 </ul>
               </div>
               )
             ) : block.kind === 'rows' ? (
               <>
-                {block.heading && <h3 id={idFor(block.heading)}>{block.heading}</h3>}
+                {block.heading && <h3 id={idFor(block.heading)} set:html={rich(block.heading)} />}
                 {block.lead && <p class="ct-body ct-sublead" set:html={rich(block.lead)} />}
                 <ul class="ct-steps ct-rows">
                   {block.rows.map((r) => (
@@ -310,7 +387,7 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
                     <div class="ct-gate__inside">
                       <p class="ct-gate__lead">{b.lead}</p>
                       <ul class="ct-inside">
-                        {b.items.map((item) => <li>{item}</li>)}
+                        {b.items.map((item) => <li set:html={rich(item)} />)}
                       </ul>
                     </div>
                   ))}
@@ -341,15 +418,29 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
               the added content") */}
           <div class="ct-full__rule" aria-hidden="true"><span>The full case study</span></div>
           <h2 class="sr-only" id="full-title" tabindex="-1">The full case study</h2>
-          {data.experiments!.map((e) => (
+          {/* a block whose parts have all moved up to the open teaser (a
+              preview move, once the marks are off) prints nothing at all */}
+          {data.experiments!.filter((e) => [e.why, e.how, e.worked].some((t) => rich(t).trim())).map((e) => (
             <article class="ct-exp" id={idFor(e.title)} data-state={e.state}>
               <div class="ct-exp__head">
                 <h3>{e.title}</h3>
-                {e.status && <p class="ct-exp__status">{e.status}</p>}
+                {e.status && <p class="ct-exp__status" set:html={rich(e.status)} />}
               </div>
-              <div class="ct-exp__part"><p class="ct-exp__label">Why</p><p class="ct-body" set:html={rich(e.why)} /></div>
-              {e.how && <div class="ct-exp__part"><p class="ct-exp__label">How</p><p class="ct-body" set:html={rich(e.how)} /></div>}
-              {e.worked && <div class="ct-exp__part"><p class="ct-exp__label">What worked</p><p class="ct-body" set:html={rich(e.worked)} /></div>}
+              {/* a part whose words have all moved up to the open teaser (a
+                  preview cut, once the marks are off) prints nothing */}
+              {rich(e.why).trim() && <div class="ct-exp__part"><p class="ct-exp__label">Why</p><p class="ct-body" set:html={rich(e.why)} /></div>}
+              {rich(e.how).trim() && <div class="ct-exp__part"><p class="ct-exp__label">How</p><p class="ct-body" set:html={rich(e.how)} /></div>}
+              {rich(e.worked).trim() && <div class="ct-exp__part"><p class="ct-exp__label">What worked</p><p class="ct-body" set:html={rich(e.worked)} /></div>}
+              {e.quote && showQuote(e.quote) && (
+                /* a shopper's words as the evidence for What worked (preview
+                   round 3: the product cards' pack-size verbatim) */
+                <aside class:list={['ct-note', { 'ct-note--pending': preview && e.quote.consent === false }]} title={preview ? e.quote.id : undefined}>
+                  {preview && e.quote.consent === false && <span class="ct-note__flag">Verbatim — needs your consent to publish</span>}
+                  <p set:html={rich(e.quote.text)} />
+                  {rich(e.quote.translation).trim() && <p class="ct-note__tr" set:html={rich(e.quote.translation)} />}
+                  <small set:html={rich(e.quote.source)} />
+                </aside>
+              )}
             </article>
           ))}
         </section>
@@ -482,7 +573,7 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
                   {noted.map((key) => (
                     <div class="ct-annots__set" data-notes-for={key}>
                       {notesFor(key).map((n) => (
-                        <span class="ct-annot" style={`--x: ${n.x ?? 0.03}; --y: ${n.y}; --ty: ${n.ty ?? n.y};`}>
+                        <span class:list={['ct-annot', { 'ct-annot--new': preview && n.isNew }]} style={`--x: ${n.x ?? 0.03}; --y: ${n.y}; --ty: ${n.ty ?? n.y};`}>
                           <span class="ct-annot__text">{n.text}</span>
                           {/* the line starts on the thing it names, inside the
                               screen (the dot), and runs out to the words */}
@@ -1265,7 +1356,10 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
             // the block's own heading and lead line are the last h3 in what
             // came before it; anything earlier is the section's intro, or a
             // coda of the block before
-            const h3 = pending.map((el) => el.tagName).lastIndexOf('H3');
+            let h3 = pending.map((el) => el.tagName).lastIndexOf('H3');
+            // a block with no heading of its own (the product cards' three
+            // costs): its lead line, straight before it, is still its own
+            if (h3 < 0 && pending[pending.length - 1]?.classList.contains('ct-sublead')) h3 = pending.length - 1;
             const own = h3 >= 0 ? pending.slice(h3) : [];
             const rest = h3 >= 0 ? pending.slice(0, h3) : pending;
             if (rest.length) {
@@ -2140,6 +2234,138 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
   .ct-note small { display: block; margin-top: var(--space-3); font-family: var(--font-paper); font-size: var(--text-small); color: var(--ink-900); }
   /* a paragraph after a tilted note clears its corner by a group step */
   .ct-note + .ct-body { margin-top: var(--ct-sub); }
+  /* a block with no heading: its lead opens the sub-group, a group step under
+     the text before it, a --ct-tie over its rows; and text after a block of
+     rows is a group step under the band, as after a note */
+  .ct-body + .ct-sublead,
+  .ct-steps + .ct-body { margin-top: var(--ct-sub); }
+
+  /* ---- A STORYLINE PREVIEW (2026-10-04; Uttham: "can you create a preview,
+     dont change without my approval, I am not able to understand with the
+     text"). Preview only, off with PREVIEW_MARKS in src/lib/rich.ts and
+     `preview` on the page's data. Each proposed line is marked by where its
+     words come from: yellow new wording, blue his full-study sentence moved
+     up; his current copy is unmarked. A verbatim still waiting on consent
+     carries a green flag; a dashed grey note is a place for one of his. ---- */
+  :global(.pv) {
+    padding: 0.04em 0.16em;
+    margin: 0 -0.04em;
+    border-radius: 3px;
+    color: inherit;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+  :global(.pv--new) { background: rgb(247 195 109 / 0.5); }
+  :global(.pv--full) { background: rgb(120 180 245 / 0.34); }
+  :global(.pv__tag) {
+    margin-left: 0.35em;
+    font-family: var(--font-paper);
+    font-size: 9px;
+    font-style: normal;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    line-height: 0;
+    vertical-align: super;
+    white-space: nowrap;
+  }
+  :global(.pv--new .pv__tag) { color: #855508; }
+  :global(.pv--full .pv__tag) { color: #1d5799; }
+  /* a place only he can fill: what goes there, in a dashed grey box */
+  :global(.pv--slot) { background: transparent; border: 1.5px dashed var(--ink-400); color: var(--ink-600); }
+  :global(.pv--slot .pv__tag) { color: var(--ink-600); }
+  /* a draft note beside the phone that the live page does not have: the
+     yellow of new wording behind its handwriting (round 4) */
+  .ct-annot--new .ct-annot__text { background: rgb(247 195 109 / 0.5); border-radius: 3px; padding: 0 0.2em; }
+  /* the design argument under a change: a small labelled line */
+  .ct-why { margin: var(--space-3) 0 0; }
+  .ct-why__label {
+    margin-right: 0.2em;
+    padding: 0.12em 0.4em;
+    border-radius: 3px;
+    background: rgb(247 195 109 / 0.5);
+    color: var(--ink-900);
+    font-size: 0.72em;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  /* a verbatim in a row: the case page's sticky note, a step under the line */
+  .ct-step .ct-note { margin-top: var(--space-5); }
+  .ct-note .ct-note__tr { margin-top: var(--space-2); font-size: calc(var(--text-note) * 0.82); font-weight: 400; }
+  /* several insights from one source: one card each, sharing the reading
+     column's width in equal tracks (two cards take half each, three a third),
+     one height per row so their sources line up at the foot, tilted a little
+     differently so they read as separate notes; a track is never under 12rem,
+     so a narrow column wraps them and a phone stacks them */
+  .ct-notes { margin-top: var(--ct-sub); }
+  .ct-notes__row { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); gap: var(--space-5); }
+  .ct-notes .ct-note--card { display: flex; flex-direction: column; max-width: none; margin: 0; padding: var(--space-5) var(--space-5) var(--space-4); }
+  .ct-notes .ct-note--card small { margin-top: auto; padding-top: var(--space-3); }
+  .ct-notes .ct-note--card:nth-child(3n + 1) { rotate: -2deg; }
+  .ct-notes .ct-note--card:nth-child(3n + 2) { rotate: 1.5deg; }
+  .ct-notes .ct-note--card:nth-child(3n) { rotate: -1deg; }
+  .ct-note__insight { display: block; margin-bottom: var(--space-2); font-family: var(--font-paper); font-size: var(--text-eyebrow); font-weight: 600; letter-spacing: var(--track-label); text-transform: uppercase; color: var(--ink-900); }
+  .ct-notes + .ct-body { margin-top: var(--ct-sub); }
+  .ct-note--pending { outline: 2px solid #3f9d5a; outline-offset: 3px; }
+  .ct-note__flag {
+    display: inline-block;
+    margin-bottom: var(--space-3);
+    padding: 2px 6px;
+    border-radius: 3px;
+    background: #d4efda;
+    color: #1d6a34;
+    font-family: var(--font-paper);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    line-height: 1.4;
+    text-transform: uppercase;
+  }
+  .ct-note--slot { background: transparent; border: 1.5px dashed var(--ink-400); box-shadow: none; color: var(--ink-600); }
+  .ct-note--slot p { font-family: var(--font-paper); font-size: var(--text-small); font-weight: 500; line-height: var(--lh-body); }
+  .pv-banner {
+    position: fixed;
+    top: var(--header-height);
+    left: 0;
+    right: 0;
+    z-index: calc(var(--z-header) - 1);
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: var(--space-3);
+    padding: 6px var(--margin-side);
+    background: rgb(255 252 244 / 0.97);
+    border-bottom: 1px solid var(--line-mark);
+    color: var(--ink-900);
+    font-family: var(--font-paper);
+    font-size: 13px;
+    line-height: 1.45;
+  }
+  .pv-banner[hidden] { display: none; }
+  .pv-banner p { margin: 0; text-align: center; text-wrap: balance; }
+  .pv-key { white-space: nowrap; }
+  .pv-key--long { white-space: normal; }
+  .pv-swatch { display: inline-block; width: 0.95em; height: 0.95em; margin-right: 0.35em; vertical-align: -0.12em; border-radius: 2px; }
+  .pv-swatch--new { background: rgb(247 195 109 / 0.8); }
+  .pv-swatch--full { background: rgb(120 180 245 / 0.6); }
+  .pv-swatch--quote { background: #d4efda; box-shadow: inset 0 0 0 2px #3f9d5a; }
+  .pv-swatch--slot { box-sizing: border-box; border: 1.5px dashed var(--ink-400); }
+  .pv-banner__hide {
+    flex: none;
+    padding: 0 6px;
+    border: 0;
+    background: none;
+    color: var(--ink-600);
+    font: inherit;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+  }
+  @media (max-width: 600px) {
+    .pv-banner { font-size: 12px; }
+    .pv-key { white-space: normal; }
+  }
 
   /* live mode: a running tool fills the stage; the tool sizes its own frame */
   .ct-live { position: relative; width: 100%; height: 100%; }
@@ -2315,6 +2541,8 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
   }
   .ct-exp__part { display: grid; gap: var(--space-3); }
   .ct-exp__part .ct-body { margin: 0; }
+  /* a verbatim under What worked: the article's gap is its step (preview round 3) */
+  .ct-exp > .ct-note { margin-top: 0; justify-self: start; }
   .ct-exp__label {
     margin: 0;
     color: var(--ink-600);
@@ -2872,6 +3100,11 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    /* Caveat's letters draw past their own advance (the last "d" of "The new
+       card" was cut by the overflow that makes the ellipsis; Uttham,
+       2026-10-05: "the d in card is cropped??"), so the box keeps a quarter em
+       of room each side, which keeps the title centred */
+    padding-inline: 0.25em;
   }
   /* THE CALLOUT over a phone the reader can use (Uttham, 2026-10-03: "let the
      prototype be interactable there only, and give callout on top that it is
