@@ -357,7 +357,7 @@ export const mallCase: CaseTeaserData = {
       'v2-home': 'v2: Mall everywhere',
       'v3-pill': 'v3: the purple tick',
       'v3-nav': 'v3: the Mall tab',
-      'v3-nav-pip': 'v3: Mall, introduced on the home',
+      'v3-nav-pip': 'v3: Mall, introduced on the home screen',
       'v3-splash': 'v3: the first-visit splash',
       'v3-pdp': 'v3: the purple product page',
       'v3-landing-new': 'v3: landing for newcomers',

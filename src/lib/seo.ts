@@ -97,7 +97,7 @@ export const caseSearch: Record<string, Search> = {
 export const toolSearch: Record<string, Search> = {
   // "A research tool that plans, listens, synthesises and remembers", in AI Space
   resona: {
-    query: 'Research allrounder: an AI research tool',
+    query: 'Research all-rounder: an AI research tool',
     about: 'UX research',
     keywords: ['AI research tool', 'UX research', 'research planning', 'research synthesis', 'research library', 'Meesho'],
   },
@@ -162,7 +162,7 @@ export const person = {
     'Design systems', // the card framework; the CV
     'Information architecture', // "the right information architecture for browsing cards"
     'Interaction design',
-    'UX research', // Mall's research rounds; Research allrounder
+    'UX research', // Mall's research rounds; Research all-rounder
     'Experiment design', // the product cards' scope
     'E-commerce',
     'Prototyping', // the realistic prototype

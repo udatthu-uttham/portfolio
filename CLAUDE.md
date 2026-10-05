@@ -1195,6 +1195,20 @@ titles, SEO and JSON-LD, the hidden h1. Shopper verbatims, the copyable prompts
 and the running tools' own UI keep their own voice. **The site writes British
 English** (colour, programme, kick-off).
 
+**No copy ships without a grammar and tone check** (Uttham, 2026-10-05: "add
+the grammatical and tone thing in your rules, so that we dont end up in these
+situations for this project in future"). Before any new or changed line goes
+live — a row, label, why line, alt text, note, full-study paragraph, his own
+supplied words included — read it once more for: **person** (I for him, we for
+the team, never "Uttham"/"he"/"his" in narration, no verbless "Argued…" lines
+that hide who acted); **grammar** (agreement, articles, run-ons and comma
+splices, a "they" or "it" with nothing to point to); **one tense per passage**;
+**British spelling**; **curly quotes, en dashes for ranges, em dashes for
+breaks**; and **a meaning that does not depend on an order or a claim he did not
+make** (2026-10-05: a tagline that read as a fixed sequence, "it can happen
+either ways"). Fixing his words stays grammar-only; where a fix would need new
+words, ask him.
+
 ## A tool preview keeps the tool's own identity
 
 **A preview renders the tool's real UI, not a restyled version of it** (Uttham,

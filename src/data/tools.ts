@@ -48,7 +48,7 @@ export const tools: Tool[] = [
   {
     slug: 'resona',
     kicker: 'Internal tool',
-    name: 'Research allrounder',
+    name: 'Research all-rounder', // British spelling (2026-10-05)
     year: '2026',
     what: 'A central tool for **research preparation and insight capture** — and for reaching past research, so each study is run better than the last.',
     helps: [
@@ -64,8 +64,8 @@ export const tools: Tool[] = [
     // parts research planning … research execution … research synthesis … and
     // research library"). The planning, execution and library leads are his,
     // grammar and bold only; the rows explain each part. Mechanism only — no
-    // tool, model or file names — because this repo is public; n8n is named
-    // because he names it.
+    // tool, model or file names — because this repo is public (n8n became "an
+    // automation workflow" on 2026-10-05, with his OK).
     made: {
       lead: 'Four parts, one for each stage of a study — the last one keeps it for the next.',
       groups: [
@@ -108,7 +108,7 @@ export const tools: Tool[] = [
           heading: 'Research library',
           // the description only (Uttham, 2026-10-02: "just the description in
           // portfolio, no need to add clear details about this")
-          rows: ['All the research reports are **vectorised and embedded using n8n,** to store them and retrieve them effectively.'],
+          rows: ['All the research reports are **vectorised and embedded using an automation workflow,** to store them and retrieve them effectively.'],
         },
       ],
     },
