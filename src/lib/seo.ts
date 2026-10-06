@@ -69,7 +69,7 @@ export const ogCase: Record<string, OgImage> = {
 // terms: the title already carries them. Keep it in step with the hero in
 // src/pages/index.astro.
 export const homeTitle = `${NAME} — Design Lead and Product Designer at Meesho`;
-export const homeDescription = 'I’m a design lead, systems thinker and builder. I work at the busy intersections where user needs cross business goals.';
+export const homeDescription = 'I’m a design lead, systems thinker and builder. I work at the busy intersections where shoppers’ needs cross business goals.';
 
 // A case or tool page's search terms. `query` leads the title as a searcher
 // would type it; `role` is what he was on that work, added after the name when

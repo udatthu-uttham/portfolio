@@ -1209,6 +1209,20 @@ make** (2026-10-05: a tagline that read as a fixed sequence, "it can happen
 either ways"). Fixing his words stays grammar-only; where a fix would need new
 words, ask him.
 
+**The homepage tells one story, in one image** (Uttham, 2026-10-06: the
+landing message and How I lead "look seperated and disjointed in context"; he
+chose option R from a preview). The hero says where I work — **the busy
+intersections where shoppers’ needs cross business goals** — the caption beside
+the traffic scene names three jobs (setting direction, deciding how we ship,
+**building faster, smoother roads for people and AI agents**), How I lead takes
+the road image in **all three** principles, each decoded by its tagline ("Know
+who’s on the road, two layers down." / "Read the map and walk the street." /
+"Build smoother, faster roads with AI."), and Contact closes it: "If our roads
+cross". **A metaphor runs through every principle or none** ("bringing it just
+for third principle is bad"), and no line may lean on it so hard that its
+tagline cannot decode it. "At Meesho" stays out of the hero for now ("lets park
+Meesho here").
+
 ## A tool preview keeps the tool's own identity
 
 **A preview renders the tool's real UI, not a restyled version of it** (Uttham,

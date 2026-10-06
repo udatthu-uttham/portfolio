@@ -52,29 +52,28 @@ const hasNotes = (phones: TilePhone[], side: 'l' | 'r') => phones.some((p, i) =>
 // the guide page can never drift apart.
 
 // Authored copy; unfinished metrics stay out of the rendered page.
+// How I lead (Uttham, 2026-10-06, option R: "Perfect makes sense, lets go with
+// R"): the hero, the caption, the principles and "If our roads cross" read as
+// one picture. The caption names the three jobs — setting direction, deciding
+// how we ship, building faster, smoother roads — and the principles take the
+// road image in all three ("all the other principles dont have the road
+// analogy, bringing it just for third principle is bad"), each decoded by its
+// tagline. The taglines are his: the first two as before, the third his own
+// "Elevate the craft and automate repetitive flows." Before: "Know the user two
+// layers down." / "Evidence and craft, in the same room." / "Design workflows,
+// boosted by AI." Principle 2's map (data) and street (research in homes)
+// check each other, so neither comes first ("it can happen either ways").
 const principles = [
   {
-    title: 'Know the user two layers down.',
+    title: 'Know who’s on the road, two layers down.',
     tag: 'What they do → why → what it costs them',
   },
   {
-    title: 'Evidence and craft, in the same room.',
-    // Uttham, 2026-10-05: "Open with the number. Close with the bar." read as
-    // confusing; "the idea here was saying that both quantitative and
-    // qualitatively we are checking"; then "Data shows what happened. Research
-    // shows why." read as a linear flow, "but it can happen either ways"
+    title: 'Read the map and walk the street.',
     tag: 'Data and research, each checking the other.',
   },
   {
-    // Uttham, 2026-10-01: "rather than saying speed … optimising the process
-    // and leveraging AI tooling to accelerate & improve efficiency"; compacted
-    // to the other two's length on 2026-10-02 ("the third how I lead is
-    // verbose, please compact that whole block"). It was "Boosting design
-    // workflows for improving efficiency." / "Automate repetitive tasks,
-    // boosting workflows with AI."
-    title: 'Design workflows, boosted by AI.',
-    // Uttham, 2026-10-02: "lets rephrase this as elevate the craft and automate
-    // repititive flows"
+    title: 'Build smoother, faster roads with AI.',
     tag: 'Elevate the craft and automate repetitive flows.',
   },
 ];
@@ -156,7 +155,7 @@ const homeLd = {
               <div class="mask">
                 <p class="hero__lead" data-hero-line>
                   I’m a <strong>design lead, systems thinker and builder.</strong>
-                  I work at the <strong>busy intersections where user needs cross business goals.</strong>
+                  I work at the busy intersections where <strong>shoppers’ needs cross business goals.</strong>
                 </p>
               </div>
 
@@ -173,8 +172,8 @@ const homeLd = {
         <figcaption class="mask">
           <p class="hero__signals" data-hero-line>
             <strong>These days I run the signals</strong><br />
-            — <strong>setting direction,</strong> deciding how to ship, and
-            <strong>clearing the road for <mark class="hl">people and AI agents</mark>.</strong>
+            — setting direction, deciding how we ship and
+            <strong>building faster, smoother roads for <mark class="hl">people and AI agents</mark>.</strong>
           </p>
         </figcaption>
         <div class="hero__art-window">
