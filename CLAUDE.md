@@ -1223,6 +1223,34 @@ for third principle is bad"), and no line may lean on it so hard that its
 tagline cannot decode it. "At Meesho" stays out of the hero for now ("lets park
 Meesho here").
 
+## The harness: checks that run without being remembered
+
+**The rules above are enforced by scripts, not only by memory** (Uttham,
+2026-10-08: "lets do the harness setup that you mentioned, all of them sound
+interesting & correct to me"). All live in `scripts/harness/`:
+
+- **Copy check** (`copy-lint.mjs`): a PostToolUse hook in
+  `.claude/settings.json` runs it on every edit to a copy file and hands the
+  findings back — third-person narration, American spelling, straight quotes,
+  open `**`/`^^`, preview marks, business figures. `--all` checks the site.
+  It cannot judge meaning or tense; the careful read still does that.
+- **Release gate** (`release-gate.mjs`): the git pre-push hook
+  (`.githooks/pre-push`, `core.hooksPath`) blocks a push with preview marks, the
+  preview switch on, a tracked preview notes file, or copy-check findings;
+  `--dist` also checks the built pages for those and for verbatims awaiting
+  consent. Never bypass it without his say-so for that push.
+- **`/ship`** (`.claude/skills/ship`, `ship.sh`): commit, fit-check, build,
+  gate, push `HEAD:main`, wait until every live page matches the build byte for
+  byte, confirm uttham.fyi from abroad. The only way the site goes live.
+- **`/preview`** (`.claude/skills/preview`, `preview.sh open|close <name>`):
+  the separate worktree, dev server and option switcher for anything he
+  should see before it ships, and their removal afterwards.
+- **Fit probe** (`fit-probe.js`, run in the browser pane): no sideways scroll,
+  the hero and Contact screens fit, How I lead titles on two lines, no phone
+  title cut off. `/ship` runs it when layout or copy changed.
+- **Finish notification** (`notify.sh`): a desktop notification when a turn
+  ran over two minutes (phone pushes are off by org policy).
+
 ## A tool preview keeps the tool's own identity
 
 **A preview renders the tool's real UI, not a restyled version of it** (Uttham,

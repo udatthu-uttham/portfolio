@@ -1,0 +1,6 @@
+#!/bin/sh
+# Release gate before any push (scripts/harness/release-gate.mjs): blocks a push
+# that would ship storyline-preview marks, the preview switch, a tracked preview
+# notes file, or copy the copy check flags. Installed with:
+#   git config core.hooksPath .githooks
+exec node "$(git rev-parse --show-toplevel)/scripts/harness/release-gate.mjs"
