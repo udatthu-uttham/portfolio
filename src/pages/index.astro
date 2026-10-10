@@ -114,7 +114,7 @@ const homeLd = {
   <Header heroAvatar />
 
   <main id="main" tabindex="-1">
-    <h1 class="sr-only">Uttham Udatthu — design lead, systems thinker and builder</h1>
+    <h1 class="sr-only">Uttham Udatthu: design lead, systems thinker and builder</h1>
 
     <!-- the dotted column grid runs under the entire page -->
     <GridOverlay />
@@ -160,7 +160,7 @@ const homeLd = {
               </div>
 
               <div class="hero__ctas" data-hero-ctas>
-                <a class="cta cta--primary" href="/uttham-udatthu-cv.pdf" download="Uttham-Udatthu-CV-2026.pdf">Download CV</a>
+                <a class="cta cta--primary" href="/uttham-udatthu-cv.pdf" download="Uttham-Udatthu-CV-2026.pdf" data-cv-view="/resume#downloaded">Download CV</a>
               </div>
             </div>
           </div>
@@ -171,8 +171,8 @@ const homeLd = {
       <figure class="hero__aside" data-hero-art>
         <figcaption class="mask">
           <p class="hero__signals" data-hero-line>
-            <strong>These days I run the signals</strong><br />
-            — setting direction, deciding how we ship and
+            <strong>These days I run the signals</strong>:<br />
+            setting direction, deciding how we ship and
             <strong>building faster, smoother roads for <mark class="hl">people and AI agents</mark>.</strong>
           </p>
         </figcaption>
@@ -387,6 +387,14 @@ const homeLd = {
       </span>
     </footer>
   </main>
+<script>
+  // "Download CV" downloads the PDF as before, and also opens /resume in a
+  // new tab so the CV can be read straight away. Without the script, it is
+  // a plain download.
+  for (const a of document.querySelectorAll<HTMLAnchorElement>('a[data-cv-view]')) {
+    a.addEventListener('click', () => { window.open(a.dataset.cvView, '_blank', 'noopener'); });
+  }
+</script>
 </Base>
 
 <style>

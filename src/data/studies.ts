@@ -73,7 +73,7 @@ year: '2026–',
     // in bold.
     title: 'Meesho Product Cards',
     summary: 'From quick scan to empowered scan, and **helping users understand products better.**',
-focus: 'Attribute chips and a second price row **spend** card height; staggering **reclaims** it. **Running them separately was the mistake** — the real question is **the exchange rate between them.**',
+focus: 'Attribute chips and a second price row **spend** card height; staggering **reclaims** it. **Running them separately was the mistake**: the real question is **the exchange rate between them.**',
 scope: ['Product card systems', 'Experiment design', 'PLP at scale'],
     cover: { image: 'stagger-cover', caption: 'Left: every card padded to its row. Right: height follows content, and an extra card enters by the third row.' },
     // The old feed and the new one, side by side (Uttham, 2026-10-03: "highlight
@@ -160,7 +160,7 @@ scope: ['Product card systems', 'Experiment design', 'PLP at scale'],
         { text: 'The brand on every card', y: 0.7 }, // the boAt card's name and price
       ] },
     ] },
-    focus: 'Making “branded” **believable to shoppers who had never met a brand online** — then finding that the answer was **storytelling, not more UI.**',
+    focus: 'Making “branded” **believable to shoppers who had never met a brand online**, then finding that the answer was **storytelling, not more UI.**',
     scope: ['Product strategy', 'Brand & identity', 'User research'],
     placeholder: 'Programme visuals coming soon.',
     // The case page is Uttham's teaser layout (2026-10-01); the deck-first

@@ -36,7 +36,7 @@ const page = aiPage(guide.slug);
 // names Meesho — else the headline and the card's own line (tools.ts `what`),
 // else that line alone.
 const search = toolSearch[guide.slug];
-const seoTitle = search ? searchTitle(search) : `${tool?.name ?? guide.title} · AI Space — ${NAME}`;
+const seoTitle = search ? searchTitle(search) : `${tool?.name ?? guide.title} · AI Space | ${NAME}`;
 const seoDescription = tool
   ? (tool.value && describeWhole(guide.title, firstSentence(tool.value))) || describe(guide.title, tool.what)
   : describe(guide.intro);

@@ -133,10 +133,10 @@ When we keep the library:
     // app experience, faster" (his earlier ask) and "Build a prototype people
     // forget is a prototype".
     title: 'Real app, real data, real reactions',
-    intro: 'Not a click-through. A **small web app with the real product\u2019s shape** \u2014 a catalogue that reads like the catalogue, a cart that adds up, a payment step that fails when you make it fail. Participants stop performing for you, because **there is nothing to perform for.**',
+    intro: 'Not a click-through. A **small web app with the real product\u2019s shape**: a catalogue that reads like the catalogue, a cart that adds up, a payment step that fails when you make it fail. Participants stop performing for you, because **there is nothing to perform for.**',
     get: [
       '**A running app on a URL** you can send to a moderator, a participant or a stakeholder.',
-      '**Every page a participant could wander into** \u2014 feed, category, product, cart, payment, order placed, past orders \u2014 not only the ones on the happy path.',
+      '**Every page a participant could wander into** (feed, category, product, cart, payment, order placed, past orders), not only the ones on the happy path.',
       'A mock catalogue with prices, ratings, review counts and delivery promises that **read like the real thing**.',
       'Checkout and payment that **run end to end on dummy instruments**, so complex flows become testable.',
       'A place to drop a new feature or a new content row in and **watch people meet it cold**.',

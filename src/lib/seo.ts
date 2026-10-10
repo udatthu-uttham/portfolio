@@ -68,8 +68,38 @@ export const ogCase: Record<string, OgImage> = {
 // it is not recast in the third person or given "at Meesho" to carry search
 // terms: the title already carries them. Keep it in step with the hero in
 // src/pages/index.astro.
-export const homeTitle = `${NAME} — Design Lead and Product Designer at Meesho`;
+export const homeTitle = `${NAME} | Design Lead and Product Designer at Meesho`;
 export const homeDescription = 'I’m a design lead, systems thinker and builder. I work at the busy intersections where shoppers’ needs cross business goals.';
+
+// The resume page (/resume): his CV as a web page. The title is the page's
+// kind, then his name and the two roles the home title carries; the
+// description is assembled from the CV's own headline and the first sentence
+// of its About Me, whole sentences only (describe), so nothing is written for
+// search. The page passes its own CV text in, so the words live in one place.
+export const resumeTitle = `Resume | ${NAME}, Design Lead and Product Designer`;
+export const resumeLd = (p: { url: string; description: string }) => ({
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'ProfilePage',
+      '@id': `${p.url}#profile`,
+      url: p.url,
+      name: resumeTitle,
+      description: p.description,
+      inLanguage: 'en',
+      isPartOf: { '@id': `${SITE}/#website` },
+      // the same Person the homepage describes, by reference
+      mainEntity: { '@id': personId },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: NAME, item: `${SITE}/` },
+        { '@type': 'ListItem', position: 2, name: 'Resume', item: p.url },
+      ],
+    },
+  ],
+});
 
 // A case or tool page's search terms. `query` leads the title as a searcher
 // would type it; `role` is what he was on that work, added after the name when
@@ -111,8 +141,8 @@ export const toolSearch: Record<string, Search> = {
 
 // "<query> — Uttham Udatthu, <role>" when that fits in 60, else without the role.
 export const searchTitle = (s: Search) => {
-  const full = s.role ? `${s.query} — ${NAME}, ${s.role}` : '';
-  return full && full.length <= TITLE_MAX ? full : `${s.query} — ${NAME}`;
+  const full = s.role ? `${s.query} | ${NAME}, ${s.role}` : '';
+  return full && full.length <= TITLE_MAX ? full : `${s.query} | ${NAME}`;
 };
 
 // The employer, once, so the Person's worksFor and a case's `about` name the

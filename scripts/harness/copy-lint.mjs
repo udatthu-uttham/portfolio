@@ -6,6 +6,7 @@
 //   - American spellings where the site writes British English
 //   - straight quotes and apostrophes in prose (the site uses curly ones)
 //   - ** or ^^ markers left open
+//   - em dashes (—): the site uses none in visible copy; en dashes stay for ranges
 //   - storyline-preview marks ([[new:…]], [[full:…]], [[slot:…]])
 //   - business figures: percentages, lakh/crore, NMV/GMV, any "million" but 250
 // It cannot judge meaning or tense; it catches the mechanical slips so the
@@ -97,6 +98,8 @@ function lint(file) {
     const bold = (s.match(/\*\*/g) || []).length, beat = (s.match(/\^\^/g) || []).length;
     if (bold % 2) add(n, 'a ** highlight is left open', s);
     if (beat % 2) add(n, 'a ^^ beat is left open', s);
+    // no em dashes in visible copy (Uttham, 2026-10-10); a verbatim keeps its own
+    if (!verbatim && /—|\\u2014|&mdash;|&#8212;|&#x2014;/i.test(s)) add(n, 'em dash: use a comma, colon, full stop or parentheses (en dashes stay for ranges)', s);
     if (/\d+(\.\d+)?\s?%|\b(lakh|crore|NMV|GMV)\b/i.test(s)) add(n, 'looks like a business figure (CLAUDE.md, "Metrics")', s);
     const mil = s.match(/\b(\d[\d,.]*)\s*(million|mn|bn|billion)\b/i);
     if (mil && mil[1] !== '250') add(n, `a figure other than the public 250 million ("${mil[0]}")`, s);

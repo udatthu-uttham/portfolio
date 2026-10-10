@@ -243,7 +243,7 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
      nothing on the page is struck or boxed in red) */
   <div class="pv-banner" role="note" aria-label="Preview legend" data-pv-banner>
     <p>
-      <b>PREVIEW — not live.</b>{' '}
+      <b>PREVIEW: not live.</b>{' '}
       <span class="pv-key"><i class="pv-swatch pv-swatch--new"></i>Yellow = new wording</span>{' · '}
       <span class="pv-key"><i class="pv-swatch pv-swatch--full"></i>Blue = your own sentence, moved up from the full study</span>{' · '}
       {pendingQuote && <><span class="pv-key"><i class="pv-swatch pv-swatch--quote"></i>Green = a real shopper quote, needs your consent</span>{' · '}</>}
@@ -301,7 +301,7 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
                           <aside class="ct-note ct-note--slot" title={s.quote.id}><p set:html={rich(s.quote.text)} /></aside>
                         ) : (
                           <aside class:list={['ct-note', { 'ct-note--pending': preview && s.quote.consent === false }]} title={preview ? s.quote.id : undefined}>
-                            {preview && s.quote.consent === false && <span class="ct-note__flag">Verbatim — needs your consent to publish</span>}
+                            {preview && s.quote.consent === false && <span class="ct-note__flag">Verbatim: needs your consent to publish</span>}
                             <p set:html={rich(s.quote.text)} />
                             {rich(s.quote.translation).trim() && <p class="ct-note__tr" set:html={rich(s.quote.translation)} />}
                             <small set:html={rich(s.quote.source)} />
@@ -318,7 +318,7 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
                   <aside class="ct-note ct-note--slot" title={block.id}><p set:html={rich(block.text)} /></aside>
                 ) : (
                   <aside class:list={['ct-note', { 'ct-note--pending': preview && block.consent === false }]} title={preview ? block.id : undefined}>
-                    {preview && block.consent === false && <span class="ct-note__flag">Verbatim — needs your consent to publish</span>}
+                    {preview && block.consent === false && <span class="ct-note__flag">Verbatim: needs your consent to publish</span>}
                     <p set:html={rich(block.text)} />
                     {rich(block.translation).trim() && <p class="ct-note__tr" set:html={rich(block.translation)} />}
                     <small set:html={rich(block.source)} />
@@ -435,7 +435,7 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
                 /* a shopper's words as the evidence for What worked (preview
                    round 3: the product cards' pack-size verbatim) */
                 <aside class:list={['ct-note', { 'ct-note--pending': preview && e.quote.consent === false }]} title={preview ? e.quote.id : undefined}>
-                  {preview && e.quote.consent === false && <span class="ct-note__flag">Verbatim — needs your consent to publish</span>}
+                  {preview && e.quote.consent === false && <span class="ct-note__flag">Verbatim: needs your consent to publish</span>}
                   <p set:html={rich(e.quote.text)} />
                   {rich(e.quote.translation).trim() && <p class="ct-note__tr" set:html={rich(e.quote.translation)} />}
                   <small set:html={rich(e.quote.source)} />
@@ -2440,7 +2440,7 @@ const noted = live ? [] : shots.filter((key) => notesFor(key).length);
     gap: var(--space-2);
     margin: var(--space-3) 0 0;
     padding: 0 0 0 var(--space-4);
-    list-style: '— ';
+    list-style: '– ';
     color: var(--ink-600);
     font-size: var(--text-body);
     line-height: var(--lh-body);

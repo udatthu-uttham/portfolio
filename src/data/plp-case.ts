@@ -255,7 +255,7 @@ export const plpCase: CaseTeaserData = {
       // his third sentence is the teaser's first Problem row now
       why: 'Seller-written titles were long, repetitive and stuffed with search words, and **most of them carried shop names**, which added no value. Shoppers glanced and read nothing.',
       how: 'We defined a minimum viable truth per category: **the smallest set of facts that lets a shopper decide without opening the product.** We replaced the title with those facts as chips, **over three runs of the facts-on-title variant.** A second version tightened the chips, added consideration tags (price drop / quality marks; some scaled, and the others are going through restructuring and further validation), and **forced three rounds of catalogue cleanup so the chips were true.**',
-      worked: 'Chips were noticed late but **valued once seen**; shoppers stopped opening products to check fabric. **Pack size was the most useful fact in ambiguous categories.** A chip the picture contradicts is not believed, so **catalogue quality had to come first.** Showing the prepaid price up front confused cash shoppers — this fed the cash-price work.',
+      worked: 'Chips were noticed late but **valued once seen**; shoppers stopped opening products to check fabric. **Pack size was the most useful fact in ambiguous categories.** A chip the picture contradicts is not believed, so **catalogue quality had to come first.** Showing the prepaid price up front confused cash shoppers. This fed the cash-price work.',
       // his pack-size verbatim, the evidence for "Pack size was the most
       // useful fact" (REC-001). The translation is ours; consent: false keeps
       // it off a live page until he confirms consent
@@ -269,7 +269,7 @@ export const plpCase: CaseTeaserData = {
       why: '',
       how: 'We let each card take its natural height in the For You feed so columns stagger.', // the three runs were the MVTs' (his correction, 2026-10-05)
       // "read" is the team's word for a result: plain words for readers outside
-      worked: '**Shoppers never noticed misaligned text under the images** (which confirms that shoppers are picture-first). No clean result yet; it stays open. Rule kept: **never force staggering** — it is what variable content does when the grid stops hiding it.',
+      worked: '**Shoppers never noticed misaligned text under the images** (which confirms that shoppers are picture-first). No clean result yet; it stays open. Rule kept: **never force staggering**: it is what variable content does when the grid stops hiding it.',
     },
     {
       state: 'list',
@@ -286,14 +286,14 @@ export const plpCase: CaseTeaserData = {
       status: 'Shipped',
       // his Why became the teaser's second Problem row (his "image data" line)
       why: '',
-      how: 'Up to three images swipe inside the card, showing **more of the product and the variations it comes in**, with one autoplay to teach the gesture. An early version that rationed scrolling to selected products was **killed on day one — breadth was the point.**',
+      how: 'Up to three images swipe inside the card, showing **more of the product and the variations it comes in**, with one autoplay to teach the gesture. An early version that rationed scrolling to selected products was **killed on day one: breadth was the point.**',
       worked: 'Taps into the product fell while orders per tap rose: one finding, not two. **The decision moved onto the listing.**',
     },
     {
       state: 'cash',
       title: 'Cash price',
       status: 'Live',
-      why: 'Most shoppers pay cash on delivery and the card showed the prepaid price. A higher number at the door cost the category, not one order — **shoppers stopped buying that kind of product.**',
+      why: 'Most shoppers pay cash on delivery and the card showed the prepaid price. A higher number at the door cost the category, not one order: **shoppers stopped buying that kind of product.**',
       how: 'Cash price in its own row under the prepaid price; one rule for the card: **anything price-related lives in that row.**',
       // his What worked is a result his cash-price record (REC-002) has as
       // "TBD — experiment is currently running" (plan 026), so it is left out

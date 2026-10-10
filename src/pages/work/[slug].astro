@@ -38,7 +38,7 @@ const roleFact = fact('Role');
 const role: WorkRole | undefined = roleFact
   ? { name: plain(roleFact), ...(years && { start: years[1], end: years[2] }) }
   : undefined;
-const seoTitle = search ? searchTitle(search) : `${study.title} case study — ${NAME}`;
+const seoTitle = search ? searchTitle(search) : `${study.title} case study | ${NAME}`;
 const seoDescription = study.teaser ? describe(study.teaser.title, study.teaser.dek) : describe(study.summary);
 const seoImage = ogCase[study.slug] ?? ogHome;
 const pageUrl = new URL(`/work/${study.slug}/`, SITE).href;
@@ -151,7 +151,7 @@ const caseLd = workLd({
                     {chapter.notes.map((n) => (
                       <aside class="chapter__note" style={`--note-tilt: ${n.tilt}`}>
                         <p>{n.text}</p>
-                        <small>— {n.source}</small>
+                        <small>{n.source}</small>
                       </aside>
                     ))}
                   </div>
@@ -159,7 +159,7 @@ const caseLd = workLd({
                 {chapter.verbatim && (
                   <aside class="chapter__note" style="--note-tilt: -2deg">
                     <p>“{chapter.verbatim.text}”</p>
-                    <small>— {chapter.verbatim.source}</small>
+                    <small>{chapter.verbatim.source}</small>
                   </aside>
                 )}
               </div>
@@ -351,7 +351,7 @@ const caseLd = workLd({
   .chapter__working summary::-webkit-details-marker { display: none; }
   .chapter__working-tick { width: var(--tick-size); height: 1px; background: var(--line-mark); transition: rotate var(--dur-2) ease; }
   .chapter__working[open] .chapter__working-tick { rotate: 90deg; }
-  .chapter__working ul { display: grid; gap: var(--space-2); margin: var(--space-3) 0 0; padding: 0 0 0 var(--space-4); list-style: '— '; color: var(--ink-600); font-size: var(--text-small); line-height: var(--lh-body); }
+  .chapter__working ul { display: grid; gap: var(--space-2); margin: var(--space-3) 0 0; padding: 0 0 0 var(--space-4); list-style: '– '; color: var(--ink-600); font-size: var(--text-small); line-height: var(--lh-body); }
   .chapter__working li { border: 0; border-radius: 0; padding: 0; letter-spacing: 0; text-transform: none; font-size: inherit; font-weight: 400; }
   .chapter__note { align-self: flex-start; margin-inline-start: var(--space-4); max-width: 34ch; padding: var(--space-5) var(--space-5) var(--space-4); background: var(--amber-400); border: 1px solid var(--line-1); border-radius: var(--radius-sm); box-shadow: var(--shadow-stuck); rotate: var(--note-tilt); font-family: var(--font-hand); color: var(--ink-900); }
   .chapter__note p { margin: 0; font-size: var(--text-note); font-weight: 500; line-height: var(--lh-heading); }

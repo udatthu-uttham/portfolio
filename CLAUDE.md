@@ -459,10 +459,10 @@ newly registered domain). On-page SEO came in the same pass. What lives where:
 - **Titles name him, his roles, his employer and the page's topic**, the words
   people search for (Uttham, 2026-10-03: "it should trigger for uttham, or
   product designer, design manager and all relevant scopes I hope"). Home is
-  "Uttham Udatthu — Design Lead and Product Designer at Meesho"; a case is the
+  "Uttham Udatthu | Design Lead and Product Designer at Meesho"; a case is the
   employer-plus-topic query, then his name and his role on it ("Meesho Mall case
-  study — Uttham Udatthu, product designer"); a tool is its name and kind ("Realistic
-  prototype for user research — Uttham Udatthu"). The terms live in `caseSearch`
+  study | Uttham Udatthu, product designer"); a tool is its name and kind ("Realistic
+  prototype for user research | Uttham Udatthu"). The terms live in `caseSearch`
   and `toolSearch` in `src/lib/seo.ts`. **Every role term must be one he holds
   and the site shows**: design lead (the hero, the pod of five), Product
   Designer (the CV he links: Lead Product Designer at Meesho; Senior Product
@@ -1092,7 +1092,7 @@ on top that it is interactable"): nothing on the page links out to
 `/proto/feed-ux` (`tool.visit` is only the preview's source; `ai-pages.ts` no
 longer passes it as the page's `visit`), and **a callout over the handset says
 it can be used** — `callout` in `tools.ts`, a small paper chip in the title's
-slot with an amber touch mark, "Try it — tap and scroll" (a label, his to
+slot with an amber touch mark, "Try it: tap and scroll" (a label, his to
 reword), never over the screen and not in the mini player. Measured 2026-10-03:
 a tap on a card opens its product page inside the phone and the wheel scrolls
 the app, not the page. On phones
@@ -1203,8 +1203,12 @@ supplied words included — read it once more for: **person** (I for him, we for
 the team, never "Uttham"/"he"/"his" in narration, no verbless "Argued…" lines
 that hide who acted); **grammar** (agreement, articles, run-ons and comma
 splices, a "they" or "it" with nothing to point to); **one tense per passage**;
-**British spelling**; **curly quotes, en dashes for ranges, em dashes for
-breaks**; and **a meaning that does not depend on an order or a claim he did not
+**British spelling**; **curly quotes and en dashes for ranges**; **no em
+dashes in visible copy** (Uttham, 2026-10-10, after a colleague's review:
+"remove any m dashes … that is clear ai slop"): a break takes a comma, a
+colon, a full stop or parentheses, page titles take a pipe ("Uttham Udatthu |
+Design Lead and Product Designer at Meesho"), and a shopper's verbatim keeps
+its own punctuation; the copy check flags any that slip in; and **a meaning that does not depend on an order or a claim he did not
 make** (2026-10-05: a tagline that read as a fixed sequence, "it can happen
 either ways"). Fixing his words stays grammar-only; where a fix would need new
 words, ask him.

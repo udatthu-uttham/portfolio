@@ -50,7 +50,7 @@ export const tools: Tool[] = [
     kicker: 'Internal tool',
     name: 'Research all-rounder', // British spelling (2026-10-05)
     year: '2026',
-    what: 'A central tool for **research preparation and insight capture** — and for reaching past research, so each study is run better than the last.',
+    what: 'A central tool for **research preparation and insight capture**, and for reaching past research, so each study is run better than the last.',
     helps: [
       '**Non-designers can be confident,** as this tool suggests the right research methods and research questions.',
       '**They can learn, follow and improve,** as the tool actively listens to their research and upskills them.',
@@ -67,22 +67,22 @@ export const tools: Tool[] = [
     // tool, model or file names — because this repo is public (n8n became "an
     // automation workflow" on 2026-10-05, with his OK).
     made: {
-      lead: 'Four parts, one for each stage of a study — the last one keeps it for the next.',
+      lead: 'Four parts, one for each stage of a study. The last one keeps it for the next.',
       groups: [
         {
           heading: 'Research planning',
           lead: 'Planning starts by **generating and decoding the research objectives.** I have added **Meesho context, from hero flows to who our users are,** and past popular research studies, and **trained it internally on research methodologies:** how to conduct research for the Meesho audience.',
           rows: [
-            '**It knows the four types of research** — foundational, generative, tactical and evaluative — maps a goal to one and names the method in a line, such as a usability test with tasks. With no screens to show, it won’t script a usability test, and **a new idea, an iteration or something being scaled each point to a different type.**',
+            '**It knows the four types of research** (foundational, generative, tactical and evaluative), maps a goal to one and names the method in a line, such as a usability test with tasks. With no screens to show, it won’t script a usability test, and **a new idea, an iteration or something being scaled each point to a different type.**',
             '**No question is written** until the goal and the decision it feeds, the cohorts and, for a test of something built, the screens are confirmed. Then it picks **one of two formats:** a 30–40 minute session with up to six objectives, or a 10–15 minute call on the participant’s own phone with two at most.',
-            'It proposes cohorts on what separates our shoppers — order history, feature use, digital comfort, gender, age and city tier — and **includes cash-on-delivery buyers and recent returners,** five to seven people a cohort.',
-            '**Apt Meesho examples teach it which method a goal needs** — asking whether a new product page works points to a tactical test — **and how a question should sound,** with before-and-after rewrites for moments like paying, discounts, delivery and cash on delivery.',
+            'It proposes cohorts on what separates our shoppers (order history, feature use, digital comfort, gender, age and city tier) and **includes cash-on-delivery buyers and recent returners,** five to seven people a cohort.',
+            '**Apt Meesho examples teach it which method a goal needs** (asking whether a new product page works points to a tactical test) **and how a question should sound,** with before-and-after rewrites for moments like paying, discounts, delivery and cash on delivery.',
             'Past popular studies taught it **what a guide must get right:** consent comes first, one question at a time, no asking shoppers to redesign the app, trust asked as what they checked before ordering, and **recruitment that says plainly what the session is about.**',
             'Questions are **tailored for Meesho shoppers.** Many are new to online shopping, browse more than they search and often share a phone on patchy data, so questions start from their last order, tasks are browse-first, and **prompts stay neutral, because people try to please someone from Meesho.**',
-            '**Every question is in the participant’s language** — Hindi by default, a regional language for regional cohorts, in whichever script the moderator reads faster — in everyday words instead of app jargon, one idea per sentence.',
+            '**Every question is in the participant’s language** (Hindi by default, a regional language for regional cohorts, in whichever script the moderator reads faster), in everyday words instead of app jargon, one idea per sentence.',
             'Every objective is **a task on the participant’s own phone first,** then probes that run from broad to narrow. Each question carries **up to four things for the moderator to watch,** and worries about delivery, returns or whether a product matches its photos are watched for, never asked.',
             '**The interview techniques are built in, unlabelled:** asking why until a real reason surfaces, laddering from a feature to what it means to them, “show me on your phone”, and “the last time this happened”, asked only after checking it did.',
-            '**Before a guide is shown, every question passes a bias check** — leading, two in one, assuming, fishing for agreement, giving away what is tested, hypothetical, or a word a first-time shopper wouldn’t know — and anything that fails is rewritten.',
+            '**Before a guide is shown, every question passes a bias check** (leading, two in one, assuming, fishing for agreement, giving away what is tested, hypothetical, or a word a first-time shopper wouldn’t know), and anything that fails is rewritten.',
           ],
         },
         {
@@ -93,10 +93,10 @@ export const tools: Tool[] = [
         },
         {
           heading: 'Research synthesis',
-          lead: 'The synthesis is **a pipeline of separate model calls, each building on the ones before it** — never one big prompt. The discussion guide steers all of it.',
+          lead: 'The synthesis is **a pipeline of separate model calls, each building on the ones before it**, never one big prompt. The discussion guide steers all of it.',
           steps: [
-            { label: 'Plan', text: 'The discussion guide becomes **a synthesis plan:** its themes, research questions and activities — a variant comparison, a card sort — are carried into every step after it.' },
-            { label: 'Listen', text: 'Each recording comes back **transcribed and translated, speakers separated, with emotion and vocal cues** — calibrated for India, so a flat “haan haan” is not read as agreement.' },
+            { label: 'Plan', text: 'The discussion guide becomes **a synthesis plan:** its themes, research questions and activities (a variant comparison, a card sort) are carried into every step after it.' },
+            { label: 'Listen', text: 'Each recording comes back **transcribed and translated, speakers separated, with emotion and vocal cues**, calibrated for India, so a flat “haan haan” is not read as agreement.' },
             { label: 'Nuggets', text: 'The transcripts become atomic observations, **each with one exact quote,** the participant, their emotion and a topic.' },
             { label: 'Cluster', text: 'Observations are grouped under the guide’s themes; **without a guide, the model clusters them bottom-up.**' },
             { label: 'Synthesise', text: 'It works through **each research question, then the leftovers,** into insights, opportunities, pain points and any sections the plan asked for. A theme with no evidence is reported as uncovered, never invented, and a quote whose voice disagrees with its words becomes **a say–feel gap, the deepest kind of insight.**' },
@@ -148,9 +148,9 @@ export const tools: Tool[] = [
       ],
     },
     helps: [
-      '**Strong engagement from users,** as this web app has user data and Meesho design that emulate real app movements — giving great insights.',
-      '**Complex flows like checkout and payments become testable** — users can emulate checkout, run journeys and track their orders.',
-      '**Understand how people react to new features and content** — for example, Best of Jaipur product cards in the feed.',
+      '**Strong engagement from users,** as this web app has user data and Meesho design that emulate real app movements, giving great insights.',
+      '**Complex flows like checkout and payments become testable**: users can emulate checkout, run journeys and track their orders.',
+      '**Understand how people react to new features and content**: for example, Best of Jaipur product cards in the feed.',
     ],
     action: 'View more',
     visit: { label: 'Open the prototype', href: '/proto/feed-ux/index.html' },
@@ -158,6 +158,6 @@ export const tools: Tool[] = [
     // 2026-10-03: "let the prototype be interactable there only, and give
     // callout on top that it is interactable"). A short label, not his copy:
     // the wording is his to set.
-    callout: 'Try it — tap and scroll',
+    callout: 'Try it: tap and scroll',
   },
 ];
